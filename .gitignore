@@ -1,0 +1,6 @@
+.idea/
+.idea/modules.xml
+.gradle/
+gradle/
+build/
+build.gradle
