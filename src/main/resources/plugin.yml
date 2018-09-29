@@ -1,0 +1,9 @@
+name: CustomMobs
+version: 1.0
+author: Offz
+main: com.offz.spigot.custommobs.CustomMobs
+
+prefix: CuMobs
+description: A mod that lets you climb and get exhausted
+
+commands:
