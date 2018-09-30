@@ -2,8 +2,8 @@ package com.offz.spigot.custommobs.Behaviours;
 
 
 import com.offz.spigot.custommobs.Mobs.MobBehaviour;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 public interface HitBehaviour extends MobBehaviour {
-    public void onHit(EntityDamageByEntityEvent event);
+    void onHit(EntityDamageEvent event);
 }

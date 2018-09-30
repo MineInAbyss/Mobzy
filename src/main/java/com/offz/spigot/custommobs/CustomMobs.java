@@ -1,5 +1,6 @@
 package com.offz.spigot.custommobs;
 
+import com.offz.spigot.custommobs.Behaviours.AI.MoveAnimationTask;
 import com.offz.spigot.custommobs.Behaviours.MobHitListener;
 import com.offz.spigot.custommobs.Loading.MobLoader;
 import com.offz.spigot.custommobs.Spawning.SpawnListener;
@@ -18,9 +19,15 @@ public final class CustomMobs extends JavaPlugin {
 
         getLogger().info("On enable has been called");
 
-
+        //Register events
         getServer().getPluginManager().registerEvents(new SpawnListener(), this);
         getServer().getPluginManager().registerEvents(new MobHitListener(context), this);
+
+        //Register repeating tasks
+        Runnable mobTask = new MobTask();
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, mobTask, 0, 1);
+        Runnable moveAnimationTask = new MoveAnimationTask();
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, moveAnimationTask, 0, 1);
 
         MobLoader.loadAllMobs(context);
     }
@@ -29,8 +36,5 @@ public final class CustomMobs extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         getLogger().info("onDisable has been invoked!");
-
-        Runnable staminaTask = new MobTask();
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, staminaTask, 0, 1);
     }
 }

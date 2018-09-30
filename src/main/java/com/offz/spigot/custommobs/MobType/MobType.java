@@ -2,7 +2,6 @@ package com.offz.spigot.custommobs.MobType;
 
 import com.offz.spigot.custommobs.Mobs.MobBehaviour;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,9 +11,9 @@ public interface MobType {
 
     String getName();
 
-    MobBehaviour getBehaviour();
+    short getModelID();
 
-//    String getTypeName();
+    MobBehaviour getBehaviour();
 
     static void registerMobType(MobType type) {
         registeredMobs.put(type.getKey(), type);
@@ -47,6 +46,7 @@ public interface MobType {
 
     class MobTypeKey {
         private String name;
+//        private short modelID; //May add this back later, but it's not too good of a way to identify mobs
 
         public MobTypeKey (String name) {
             this.name = name;
@@ -54,7 +54,7 @@ public interface MobType {
 
         @Override
         public int hashCode() {
-            return name.hashCode() /*^ typeName.hashCode()*/;
+            return name.hashCode() /*^ modelID.hashCode()*/;
         }
 
         @Override
@@ -62,7 +62,7 @@ public interface MobType {
             if (!(o instanceof MobTypeKey))
                 return false;
             MobTypeKey other = (MobTypeKey) o;
-            return /*this.typeName.equals(other.typeName) &&*/ this.name.equals(other.name);
+            return /*this.modelID.equals(other.modelID) &&*/ this.name.equals(other.name);
         }
     }
 }
