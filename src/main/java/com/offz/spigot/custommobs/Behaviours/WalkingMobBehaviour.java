@@ -1,7 +1,7 @@
-package com.offz.spigot.custommobs.Behaviours.AI;
+package com.offz.spigot.custommobs.Behaviours;
 
-import com.offz.spigot.custommobs.MobType.MobType;
-import com.offz.spigot.custommobs.Mobs.MobBehaviour;
+import com.offz.spigot.custommobs.Mobs.Type.MobType;
+import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import org.bukkit.entity.Entity;
 
 import java.util.Map;
@@ -18,7 +18,11 @@ public interface WalkingMobBehaviour extends MobBehaviour {
     static void registerMob(Entity e, MobType mobType, short stillDamageValue, short movingDamageValue, short hitDamageValue) { //Used for special cases if model does not follow normal format
         registeredMobs.put(e.getUniqueId(), new MobInfo(mobType, stillDamageValue, movingDamageValue, hitDamageValue, e));
     }
-    
+
+    /*static void unregisterMob(Entity e){ //TODO: UNREGISTER MOB
+        registeredMobs.remove(new MobInfo(mobType, stillDamageValue, (short) (stillDamageValue + 1));
+    }*/
+
     void animate(MobInfo mobInfo);
 
     class MobInfo {

@@ -1,10 +1,9 @@
-package com.offz.spigot.custommobs.Behaviours.Mobs;
+package com.offz.spigot.custommobs.Mobs.Behaviours;
 
-import com.offz.spigot.custommobs.Behaviours.AI.WalkingMobBehaviour;
+import com.offz.spigot.custommobs.Behaviours.WalkingMobBehaviour;
 import com.offz.spigot.custommobs.Behaviours.DeathBehaviour;
 import com.offz.spigot.custommobs.Behaviours.HitBehaviour;
-import com.offz.spigot.custommobs.MobType.MobType;
-import com.offz.spigot.custommobs.Mobs.MobBehaviour;
+import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageEvent;

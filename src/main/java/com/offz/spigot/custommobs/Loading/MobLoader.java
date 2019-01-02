@@ -1,28 +1,15 @@
 package com.offz.spigot.custommobs.Loading;
 
 import com.offz.spigot.custommobs.MobContext;
-import com.offz.spigot.custommobs.MobType.MobType;
-import com.offz.spigot.custommobs.MobType.StandardMobType;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Objects;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import com.offz.spigot.custommobs.Mobs.Type.GroundMobType;
+import com.offz.spigot.custommobs.Mobs.Type.MobType;
 
 public class MobLoader {
 //    private static MobClassLoader mobClassLoader;
 
     public static void loadAllMobs(MobContext context) {
-        for (StandardMobType standardMobType : StandardMobType.values()) {
-            MobType.registerMobType(standardMobType);
+        for (GroundMobType groundMobType : GroundMobType.values()) {
+            MobType.registerMobType(groundMobType);
         }
 
 

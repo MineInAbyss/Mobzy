@@ -1,6 +1,6 @@
-package com.offz.spigot.custommobs.MobType;
+package com.offz.spigot.custommobs.Mobs.Type;
 
-import com.offz.spigot.custommobs.Mobs.MobBehaviour;
+import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
@@ -48,13 +48,13 @@ public interface MobType {
         private String name;
 //        private short modelID; //May add this back later, but it's not too good of a way to identify mobs
 
-        public MobTypeKey (String name) {
+        public MobTypeKey(String name) {
             this.name = name;
         }
 
         @Override
         public int hashCode() {
-            return name.hashCode() /*^ modelID.hashCode()*/;
+            return name.hashCode();
         }
 
         @Override

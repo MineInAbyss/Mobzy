@@ -1,8 +1,10 @@
-package com.offz.spigot.custommobs.Behaviours;
+package com.offz.spigot.custommobs.Behaviours.Listener;
 
+import com.offz.spigot.custommobs.Behaviours.DeathBehaviour;
+import com.offz.spigot.custommobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.CustomMobs;
 import com.offz.spigot.custommobs.MobContext;
-import com.offz.spigot.custommobs.MobType.MobType;
+import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
