@@ -1,11 +1,13 @@
 package com.offz.spigot.custommobs.Mobs.Type;
 
 
-import com.offz.spigot.custommobs.Mobs.Behaviours.NeritantanBehaviour;
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
+import com.offz.spigot.custommobs.Mobs.Behaviours.NeritantanBehaviour;
 
 public enum GroundMobType implements MobType {
     NERITANTAN("Neritantan", (short) 2,
+            new NeritantanBehaviour()
+    ),FUWAGI("Fuwagi", (short) 5,
             new NeritantanBehaviour()
     );
 

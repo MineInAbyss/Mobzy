@@ -1,6 +1,10 @@
 package com.offz.spigot.custommobs.Spawning;
 
-import com.offz.spigot.custommobs.CustomMobs;
+import com.derongan.minecraft.deeperworld.world.WorldManager;
+import com.derongan.minecraft.mineinabyss.AbyssContext;
+import com.derongan.minecraft.mineinabyss.world.AbyssWorldManager;
+import com.offz.spigot.custommobs.Loading.CustomType;
+import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.EntityTypes;
 import org.bukkit.Location;
@@ -8,23 +12,38 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class SpawnListener implements Listener {
+    private WorldManager worldManager;
+    private AbyssContext context;
 
-    public SpawnListener() {
+    public SpawnListener(AbyssContext context) {
+        this.context = context;
+        this.worldManager = context.getRealWorldManager();
     }
 
     @EventHandler
-    public void onEntitySpawn(EntitySpawnEvent e){
-        switch(e.getEntity().getType()){
-            case OCELOT:
+    public void onEntitySpawn(CreatureSpawnEvent e) {
+        if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+            AbyssWorldManager manager = context.getWorldManager();
+            switch (e.getEntity().getType()) {
+                case ZOMBIE:
+                    if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth")) {
+                        spawnEntity(CustomType.NERITANTAN, e.getLocation());
+                        e.getEntity().remove();
+                    }
+                    break;
+                case SKELETON:
+                    if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth")) {
+                        spawnEntity(CustomType.FUWAGI, e.getLocation());
+                        e.getEntity().remove();
+                    }
+                    break;
 
-                Entity spawnedEntity = spawnEntity(CustomMobs.CUSTOM_ZOMBIE, e.getLocation());
-                e.getEntity().remove();
-                break;
-            default:
-                break;
+                default:
+                    break;
+            }
         }
     }
 

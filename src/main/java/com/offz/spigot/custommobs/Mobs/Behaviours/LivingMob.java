@@ -1,6 +1,8 @@
-package com.offz.spigot.custommobs.Behaviours;
+package com.offz.spigot.custommobs.Mobs.Behaviours;
 
-import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
+import com.offz.spigot.custommobs.Behaviours.DeathBehaviour;
+import com.offz.spigot.custommobs.Behaviours.HitBehaviour;
+import com.offz.spigot.custommobs.Behaviours.WalkingBehaviour;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -8,7 +10,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-public class LivingMob implements WalkingMobBehaviour, HitBehaviour, DeathBehaviour, MobBehaviour {
+public class LivingMob implements WalkingBehaviour, HitBehaviour, DeathBehaviour, MobBehaviour {
 
     @Override
     public void onHit(EntityDamageEvent e) {
@@ -17,7 +19,7 @@ public class LivingMob implements WalkingMobBehaviour, HitBehaviour, DeathBehavi
 
     @Override
     public void onDeath(EntityDeathEvent e) {
-        WalkingMobBehaviour.registeredMobs.remove(e);
+        WalkingBehaviour.registeredMobs.remove(e);
         for (Entity passanger : e.getEntity().getPassengers())
             passanger.remove();
     }
@@ -25,7 +27,7 @@ public class LivingMob implements WalkingMobBehaviour, HitBehaviour, DeathBehavi
     @Override
     public void animate(MobInfo mob) {
         Entity e = (Entity) mob.entity;
-        ArmorStand as = (ArmorStand) e.getPassengers().get(0);
+        ArmorStand as = (ArmorStand) e.getPassengers().get(0).getPassengers().get(0);
         EntityEquipment ee = as.getEquipment();
         ItemStack is = ee.getHelmet();
         if(is.getDurability() == mob.hitDamageValue)

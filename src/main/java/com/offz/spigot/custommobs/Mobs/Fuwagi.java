@@ -9,28 +9,27 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class Neritantan extends EntityZombie {
-    public Neritantan(World world) {
+public class Fuwagi extends EntityZombie {
+    public Fuwagi(World world) {
         super(world);
-        Zombie neritantan = (Zombie) this.getBukkitEntity();
+        Zombie fuwagi = (Zombie) this.getBukkitEntity();
 
         this.setBaby(true);
 
-        neritantan.setMaxHealth(10);
+        fuwagi.setMaxHealth(10);
         this.setHealth(10);
 
-        this.targetSelector.a(0, new PathfinderGoalNearestAttackableTarget<Fuwagi>(this, Fuwagi.class, true));
+        this.targetSelector.a(0, new PathfinderGoalNearestAttackableTarget<Neritantan>(this, Neritantan.class, true));
 
         this.addScoreboardTag("customMob");
-        neritantan.setCustomName("Neritantan");
+        fuwagi.setCustomName("Fuwagi");
         this.setCustomNameVisible(false);
         this.setSilent(true);
-        this.setNoAI(false);
 
-        neritantan.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
+        fuwagi.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
 
-        MobType type = MobType.getRegisteredMobType(neritantan);
-        WalkingBehaviour.registerMob(neritantan, type, type.getModelID());
+        MobType type = MobType.getRegisteredMobType(fuwagi);
+        WalkingBehaviour.registerMob(fuwagi, type, type.getModelID());
 
         this.getWorld().addEntity(this);
     }

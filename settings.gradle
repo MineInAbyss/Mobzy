@@ -1,2 +1,4 @@
 rootProject.name = 'custom-mobs'
 
+includeBuild '../MineInAbyss/'
+includeBuild '../DeeperWorld'

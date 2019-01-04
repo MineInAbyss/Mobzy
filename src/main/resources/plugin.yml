@@ -2,8 +2,13 @@ name: CustomMobs
 version: 1.0
 author: Offz
 main: com.offz.spigot.custommobs.CustomMobs
+softdepend: [DeeperWorld]
+depend: [MineInAbyss]
 
 prefix: CuMobs
 description: A mod that lets you climb and get exhausted
 
 commands:
+  removemobs:
+    description: Removes all registered mobs
+    usage: /removeMobs
