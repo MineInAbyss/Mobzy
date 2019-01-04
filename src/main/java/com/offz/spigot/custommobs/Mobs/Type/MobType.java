@@ -24,10 +24,13 @@ public interface MobType {
     }
 
     static MobType getRegisteredMobType(Entity e) {
-        String name = e.getCustomName();
+        if(e.getCustomName() == null)
+            return null;
         if (!e.getScoreboardTags().contains("customMob")) {
             return null;
         }
+
+        String name = e.getCustomName();
         return getRegisteredMobType(name);
     }
 

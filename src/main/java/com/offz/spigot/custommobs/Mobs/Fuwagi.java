@@ -2,22 +2,20 @@ package com.offz.spigot.custommobs.Mobs;
 
 import com.offz.spigot.custommobs.Behaviours.WalkingBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
-import net.minecraft.server.v1_13_R2.EntityZombie;
+import net.minecraft.server.v1_13_R2.EntityPig;
+import net.minecraft.server.v1_13_R2.GenericAttributes;
 import net.minecraft.server.v1_13_R2.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.server.v1_13_R2.World;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.Pig;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class Fuwagi extends EntityZombie {
+public class Fuwagi extends EntityPig {
     public Fuwagi(World world) {
         super(world);
-        Zombie fuwagi = (Zombie) this.getBukkitEntity();
+        Pig fuwagi = (Pig) this.getBukkitEntity();
 
-        this.setBaby(true);
-
-        fuwagi.setMaxHealth(10);
-        this.setHealth(10);
+        fuwagi.setBaby();
 
         this.targetSelector.a(0, new PathfinderGoalNearestAttackableTarget<Neritantan>(this, Neritantan.class, true));
 
@@ -32,5 +30,18 @@ public class Fuwagi extends EntityZombie {
         WalkingBehaviour.registerMob(fuwagi, type, type.getModelID());
 
         this.getWorld().addEntity(this);
+    }
+
+    @Override
+    public void k() {
+        super.k();
+        this.getBukkitEntity().setFireTicks(0);
+    }
+
+    @Override
+    protected void initAttributes() {
+        super.initAttributes();
+        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
+        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.2);
     }
 }

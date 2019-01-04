@@ -2,8 +2,10 @@ package com.offz.spigot.custommobs.Behaviours;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -34,7 +36,7 @@ public interface WalkingBehaviour extends MobBehaviour {
     }
 
     default void animate(MobInfo mob) {
-        Monster e = (Monster) mob.entity;
+        LivingEntity e = (LivingEntity) mob.entity;
         try {
             ArmorStand as = ((ArmorStand) e.getPassengers().get(0).getPassengers().get(0));
             EntityEquipment ee = as.getEquipment();

@@ -9,6 +9,8 @@ public enum GroundMobType implements MobType {
             new NeritantanBehaviour()
     ),FUWAGI("Fuwagi", (short) 5,
             new NeritantanBehaviour()
+    ),INBYO("Inbyo", (short) 8,
+            new NeritantanBehaviour()
     );
 
     private final String name;

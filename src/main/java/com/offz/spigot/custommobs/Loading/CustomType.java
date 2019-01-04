@@ -2,6 +2,7 @@ package com.offz.spigot.custommobs.Loading;
 
 import com.mojang.datafixers.types.Type;
 import com.offz.spigot.custommobs.Mobs.Fuwagi;
+import com.offz.spigot.custommobs.Mobs.Inbyo;
 import com.offz.spigot.custommobs.Mobs.Neritantan;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.*;
@@ -13,11 +14,13 @@ public class CustomType {
     // this is where we store our custom entity type (for use with spawning, etc)
     public static EntityTypes NERITANTAN;
     public static EntityTypes FUWAGI;
+    public static EntityTypes INBYO;
 
     public static void registerAllMobs() {
         // register the custom entity in the server
-        NERITANTAN = injectNewEntity("custom_zombie", "zombie", Neritantan.class, Neritantan::new);
-        FUWAGI = injectNewEntity("custom_zombie", "zombie", Fuwagi.class, Fuwagi::new);
+        NERITANTAN = injectNewEntity("neritantan", "pig", Neritantan.class, Neritantan::new);
+        FUWAGI = injectNewEntity("fuwagi", "zombie", Fuwagi.class, Fuwagi::new);
+        INBYO = injectNewEntity("inbyo", "zombie", Inbyo.class, Inbyo::new);
     }
     public static void unloadAllMobs() {
         // Unregister

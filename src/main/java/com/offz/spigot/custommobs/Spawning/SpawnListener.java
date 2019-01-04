@@ -27,23 +27,40 @@ public class SpawnListener implements Listener {
     public void onEntitySpawn(CreatureSpawnEvent e) {
         if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) {
             AbyssWorldManager manager = context.getWorldManager();
-            switch (e.getEntity().getType()) {
-                case ZOMBIE:
-                    if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth")) {
-                        spawnEntity(CustomType.NERITANTAN, e.getLocation());
-                        e.getEntity().remove();
-                    }
-                    break;
-                case SKELETON:
-                    if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth")) {
+
+            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth")) {
+                switch (e.getEntity().getType()) {
+                    case SKELETON:
                         spawnEntity(CustomType.FUWAGI, e.getLocation());
                         e.getEntity().remove();
-                    }
-                    break;
-
-                default:
-                    break;
+                        break;
+                }
             }
+
+            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Edge of the Abyss")) {
+                switch (e.getEntity().getType()) {
+                    case SKELETON:
+                        spawnEntity(CustomType.FUWAGI, e.getLocation());
+                        e.getEntity().remove();
+                        break;
+                }
+            }
+
+
+            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Forest of Temptation")) {
+                switch (e.getEntity().getType()) {
+                    case ZOMBIE:
+                        spawnEntity(CustomType.NERITANTAN, e.getLocation());
+                        e.getEntity().remove();
+                        break;
+                    case CREEPER:
+                        spawnEntity(CustomType.INBYO, e.getLocation());
+                        e.getEntity().remove();
+                        break;
+                }
+            }
+
+
         }
     }
 

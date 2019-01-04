@@ -7,10 +7,7 @@ import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Monster;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -34,29 +31,29 @@ public class MobListener implements Listener {
 
     @EventHandler
     public void onHit(EntityDamageEvent e) {
-        MobType type = MobType.getRegisteredMobType(e.getEntity());
+        Entity entity = e.getEntity();
+        if(entity != null) {
+            MobType type = MobType.getRegisteredMobType(entity);
+            if (type != null) {
+                if (type.getBehaviour() instanceof HitBehaviour && type.getBehaviour() instanceof SpawnModelBehaviour) {
+                    ((HitBehaviour) type.getBehaviour()).onHit(e);
+                    EntityEquipment ee = ((ArmorStand) entity.getPassengers().get(0).getPassengers().get(0)).getEquipment();
+                    ItemStack is = ee.getHelmet();
+                    is.setDurability((short) (MobType.getRegisteredMobType(entity).getModelID() + 2));
+                    ee.setHelmet(is);
 
-        if (type != null) {
-            if (type.getBehaviour() instanceof HitBehaviour && type.getBehaviour() instanceof SpawnModelBehaviour) {
-                ((HitBehaviour) type.getBehaviour()).onHit(e);
-
-                Monster entity = (Monster) e.getEntity();
-                EntityEquipment ee = ((ArmorStand) entity.getPassengers().get(0).getPassengers().get(0)).getEquipment();
-                ItemStack is = ee.getHelmet();
-                is.setDurability((short) (MobType.getRegisteredMobType(e.getEntity()).getModelID() + 2));
-                ee.setHelmet(is);
-
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!e.getEntity().isDead()) {
-                            is.setDurability((short) (MobType.getRegisteredMobType(e.getEntity()).getModelID() + 1));
-                            ee.setHelmet(is);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (!entity.isDead()) {
+                                is.setDurability((short) (MobType.getRegisteredMobType(entity).getModelID() + 1));
+                                ee.setHelmet(is);
+                            }
                         }
-                    }
-                }.runTaskLater(plugin, 5);
-            } else {
-                e.setCancelled(true);
+                    }.runTaskLater(plugin, 5);
+                } else {
+                    e.setCancelled(true);
+                }
             }
         }
     }
@@ -136,16 +133,11 @@ public class MobListener implements Listener {
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent e) {
         for (Entity entity : e.getChunk().getEntities()) {
-            try {
-                Bukkit.broadcastMessage("Loaded");
-                if (entity != null) {
-                    MobType type = MobType.getRegisteredMobType(entity);
-                    if (type != null && type.getBehaviour() instanceof WalkingBehaviour && !WalkingBehaviour.registeredMobs.containsKey(entity.getUniqueId())) {
-                        WalkingBehaviour.registerMob(entity, type, type.getModelID());
-                    }
+            if (entity != null) {
+                MobType type = MobType.getRegisteredMobType(entity);
+                if (type != null && type.getBehaviour() instanceof WalkingBehaviour && !WalkingBehaviour.registeredMobs.containsKey(entity.getUniqueId())) {
+                    WalkingBehaviour.registerMob(entity, type, type.getModelID());
                 }
-            } catch (NullPointerException npe) {
-
             }
         }
     }
