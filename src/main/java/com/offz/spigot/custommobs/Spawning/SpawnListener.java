@@ -27,35 +27,41 @@ public class SpawnListener implements Listener {
     public void onEntitySpawn(CreatureSpawnEvent e) {
         if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) {
             AbyssWorldManager manager = context.getWorldManager();
-
+            Entity original = e.getEntity();
             if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth")) {
-                switch (e.getEntity().getType()) {
+                switch (original.getType()) {
                     case SKELETON:
-                        spawnEntity(CustomType.FUWAGI, e.getLocation());
-                        e.getEntity().remove();
+                        spawnEntity(CustomType.FUWAGI, e.getLocation(), original);
+                        break;
+                    case CREEPER:
+                        spawnEntity(CustomType.INBYO, e.getLocation(), original);
                         break;
                 }
             }
 
             if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Edge of the Abyss")) {
-                switch (e.getEntity().getType()) {
+                switch (original.getType()) {
                     case SKELETON:
-                        spawnEntity(CustomType.FUWAGI, e.getLocation());
-                        e.getEntity().remove();
+                        spawnEntity(CustomType.FUWAGI, e.getLocation(), original);
+                        break;
+                    case WITCH:
+                        if (Math.random() >= 0.9)
+                            spawnEntity(CustomType.CORPSE_WEEPER, e.getLocation(), original);
                         break;
                 }
             }
 
-
             if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Forest of Temptation")) {
-                switch (e.getEntity().getType()) {
+                switch (original.getType()) {
+                    case WITCH:
+                        if (Math.random() >= 0.5)
+                            spawnEntity(CustomType.CORPSE_WEEPER, e.getLocation(), original);
+                        break;
                     case ZOMBIE:
-                        spawnEntity(CustomType.NERITANTAN, e.getLocation());
-                        e.getEntity().remove();
+                        spawnEntity(CustomType.NERITANTAN, e.getLocation(), original);
                         break;
                     case CREEPER:
-                        spawnEntity(CustomType.INBYO, e.getLocation());
-                        e.getEntity().remove();
+                        spawnEntity(CustomType.INBYO, e.getLocation(), original);
                         break;
                 }
             }
@@ -64,6 +70,10 @@ public class SpawnListener implements Listener {
         }
     }
 
+    public static Entity spawnEntity(EntityTypes entityTypes, Location loc, Entity remove){
+        remove.remove();
+        return spawnEntity(entityTypes, loc);
+    }
     /**
      * Spawns entity at specified Location
      *

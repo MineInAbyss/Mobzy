@@ -17,14 +17,14 @@ public class Neritantan extends EntityPig {
         neritantan.setBaby();
 
         this.goalSelector.a(4, new PathfinderGoalTempt(this, 1.2D, RecipeItemStack.a(new IMaterial[]{Items.CARROT,Items.APPLE}), false));
-//        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTargetInsentient(this, EntityIronGolem.class));
 
+//        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTargetInsentient(this, EntityIronGolem.class));
 
         this.addScoreboardTag("customMob");
         neritantan.setCustomName("Neritantan");
         this.setCustomNameVisible(false);
         this.setSilent(true);
-        this.setNoAI(false);
+        neritantan.setRemoveWhenFarAway(false);
 
         neritantan.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
 

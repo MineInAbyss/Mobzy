@@ -23,6 +23,7 @@ public class Fuwagi extends EntityPig {
         fuwagi.setCustomName("Fuwagi");
         this.setCustomNameVisible(false);
         this.setSilent(true);
+        fuwagi.setRemoveWhenFarAway(false);
 
         fuwagi.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
 

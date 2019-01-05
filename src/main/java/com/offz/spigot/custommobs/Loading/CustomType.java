@@ -1,6 +1,7 @@
 package com.offz.spigot.custommobs.Loading;
 
 import com.mojang.datafixers.types.Type;
+import com.offz.spigot.custommobs.Mobs.CorpseWeeper;
 import com.offz.spigot.custommobs.Mobs.Fuwagi;
 import com.offz.spigot.custommobs.Mobs.Inbyo;
 import com.offz.spigot.custommobs.Mobs.Neritantan;
@@ -16,11 +17,15 @@ public class CustomType {
     public static EntityTypes FUWAGI;
     public static EntityTypes INBYO;
 
+    public static EntityTypes CORPSE_WEEPER;
+
     public static void registerAllMobs() {
         // register the custom entity in the server
         NERITANTAN = injectNewEntity("neritantan", "pig", Neritantan.class, Neritantan::new);
         FUWAGI = injectNewEntity("fuwagi", "zombie", Fuwagi.class, Fuwagi::new);
         INBYO = injectNewEntity("inbyo", "zombie", Inbyo.class, Inbyo::new);
+
+        CORPSE_WEEPER = injectNewEntity("corpse_weeper", "zombie", CorpseWeeper.class, CorpseWeeper::new);
     }
     public static void unloadAllMobs() {
         // Unregister

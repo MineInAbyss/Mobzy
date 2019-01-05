@@ -5,6 +5,7 @@ import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Zombie;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -20,8 +21,9 @@ public class Inbyo extends EntityZombie {
         inbyo.setCustomName("Inbyo");
         this.setCustomNameVisible(false);
         this.setSilent(true);
-        this.setNoAI(false);
-        this.setBaby(false);
+        inbyo.setBaby(false);
+        inbyo.setRemoveWhenFarAway(false);
+        inbyo.getEquipment().setArmorContents(new ItemStack[4]); //remove any possible items the mob might spawn with
 
 
         inbyo.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
@@ -42,7 +44,7 @@ public class Inbyo extends EntityZombie {
     protected void initAttributes() {
         super.initAttributes();
         this.getAttributeInstance(GenericAttributes.maxHealth).setValue(40.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.5);
+        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.45);
         this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(7.0D);
         this.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(64.0D);
     }
