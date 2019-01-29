@@ -4,6 +4,7 @@ import com.offz.spigot.custommobs.MobContext;
 import com.offz.spigot.custommobs.Mobs.Type.FlyingMobType;
 import com.offz.spigot.custommobs.Mobs.Type.GroundMobType;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
+import com.offz.spigot.custommobs.Mobs.Type.NPCMobType;
 
 public class MobLoader {
 
@@ -14,6 +15,9 @@ public class MobLoader {
         }
         for (FlyingMobType flyingMobType : FlyingMobType.values()) {
             MobType.registerMobType(flyingMobType);
+        }
+        for (NPCMobType npcMobType : NPCMobType.values()) {
+            MobType.registerMobType(npcMobType);
         }
         CustomType.registerAllMobs();
     }

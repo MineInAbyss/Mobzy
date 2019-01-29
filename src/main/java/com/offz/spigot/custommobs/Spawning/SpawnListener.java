@@ -24,49 +24,81 @@ public class SpawnListener implements Listener {
     }
 
     @EventHandler
-    public void onEntitySpawn(CreatureSpawnEvent e) {
-        if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) {
-            AbyssWorldManager manager = context.getWorldManager();
+    public void onCreatureSpawn(CreatureSpawnEvent e) {
+        AbyssWorldManager manager = context.getWorldManager();
+        if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) && manager.isAbyssWorld(e.getEntity().getWorld())) {
             Entity original = e.getEntity();
-            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth")) {
-                switch (original.getType()) {
-                    case SKELETON:
-                        spawnEntity(CustomType.FUWAGI, e.getLocation(), original);
-                        break;
-                    case CREEPER:
-                        spawnEntity(CustomType.INBYO, e.getLocation(), original);
-                        break;
-                }
+
+            if(e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)) {
+                if(original.getName().equals("Mitty"))
+                    spawnEntity(CustomType.npc.get("MITTY"), e.getLocation(), original);
+                if(original.getName().equals("Nanachi"))
+                    spawnEntity(CustomType.npc.get("NANACHI"), e.getLocation(), original);
+                if(original.getName().equals("Marulk"))
+                    spawnEntity(CustomType.npc.get("MARULK"), e.getLocation(), original);
+                if(original.getName().equals("Ozen"))
+                    spawnEntity(CustomType.npc.get("OZEN"), e.getLocation(), original);
             }
 
-            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Edge of the Abyss")) {
+            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth"))
                 switch (original.getType()) {
-                    case SKELETON:
-                        spawnEntity(CustomType.FUWAGI, e.getLocation(), original);
-                        break;
-                    case WITCH:
-                        if (Math.random() >= 0.9)
-                            spawnEntity(CustomType.CORPSE_WEEPER, e.getLocation(), original);
-                        break;
                 }
-            }
 
-            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Forest of Temptation")) {
+
+            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Edge of the Abyss"))
+                switch (original.getType()) {
+                    case PIG:
+                    case COW:
+                    case SHEEP:
+                        spawnEntity(CustomType.ground.get("FUWAGI"), e.getLocation(), original);
+                        break;
+                    case ZOMBIE:
+                        spawnEntity(CustomType.ground.get("ROHANA"), e.getLocation(), original);
+                }
+
+
+            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Forest of Temptation"))
                 switch (original.getType()) {
                     case WITCH:
                         if (Math.random() >= 0.5)
-                            spawnEntity(CustomType.CORPSE_WEEPER, e.getLocation(), original);
+                            spawnEntity(CustomType.flying.get("CORPSE_WEEPER"), e.getLocation(), original);
                         break;
                     case ZOMBIE:
-                        spawnEntity(CustomType.NERITANTAN, e.getLocation(), original);
-                        break;
-                    case CREEPER:
-                        spawnEntity(CustomType.INBYO, e.getLocation(), original);
+                        if (e.getEntity().getLocation().getY() > 130)
+                            spawnEntity(CustomType.ground.get("INBYO"), e.getLocation(), original);
                         break;
                 }
-            }
 
+            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Great Fault"))
+                switch (original.getType()) {
+                    case ZOMBIE:
+                        spawnEntity(CustomType.ground.get("NERITANTAN"), e.getLocation(), original);
+                        break;
+                }
 
+            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("The Goblets of Giants"))
+                switch (original.getType()) {
+                    case ZOMBIE:
+                        spawnEntity(CustomType.ground.get("ROHANA"), e.getLocation(), original);
+                        spawnEntity(CustomType.ground.get("ROHANA"), e.getLocation(), original);
+                        spawnEntity(CustomType.ground.get("ROHANA"), e.getLocation(), original);
+                        break;
+                }
+
+            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Sea of Corpses"))
+                switch (original.getType()) {
+
+                }
+
+            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("The Capital of the Unreturned"))
+                switch (original.getType()) {
+
+                }
+
+            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("The Final Maelstrom"))
+                switch (original.getType()) {
+
+                }
         }
     }
 

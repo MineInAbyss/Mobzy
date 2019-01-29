@@ -1,6 +1,6 @@
 package com.offz.spigot.custommobs.Mobs;
 
-import com.offz.spigot.custommobs.Behaviours.WalkingBehaviour;
+import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.EntityPig;
 import net.minecraft.server.v1_13_R2.GenericAttributes;
@@ -23,12 +23,12 @@ public class Fuwagi extends EntityPig {
         fuwagi.setCustomName("Fuwagi");
         this.setCustomNameVisible(false);
         this.setSilent(true);
-        fuwagi.setRemoveWhenFarAway(false);
+        fuwagi.setRemoveWhenFarAway(true);
 
         fuwagi.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
 
         MobType type = MobType.getRegisteredMobType(fuwagi);
-        WalkingBehaviour.registerMob(fuwagi, type, type.getModelID());
+        AnimationBehaviour.registerMob(fuwagi, type, type.getModelID());
 
         this.getWorld().addEntity(this);
     }

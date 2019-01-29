@@ -1,6 +1,6 @@
 package com.offz.spigot.custommobs.Mobs;
 
-import com.offz.spigot.custommobs.Behaviours.WalkingBehaviour;
+import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.entity.Ghast;
@@ -15,18 +15,18 @@ public class CorpseWeeper extends EntityGhast {
     public CorpseWeeper(World world) {
         super(world);
         Ghast corpse_weeper = (Ghast) this.getBukkitEntity();
-        corpse_weeper.setRemoveWhenFarAway(false);
 
         this.addScoreboardTag("customMob");
         corpse_weeper.setCustomName("Corpse Weeper");
         this.setCustomNameVisible(false);
         this.setSilent(true);
+        corpse_weeper.setRemoveWhenFarAway(true);
 
 
         corpse_weeper.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
 
         MobType type = MobType.getRegisteredMobType(corpse_weeper);
-        WalkingBehaviour.registerMob(corpse_weeper, type, type.getModelID());
+        AnimationBehaviour.registerMob(corpse_weeper, type, type.getModelID());
 
         this.getWorld().addEntity(this);
     }

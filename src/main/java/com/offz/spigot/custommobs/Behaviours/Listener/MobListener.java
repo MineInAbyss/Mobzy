@@ -4,15 +4,18 @@ import com.offz.spigot.custommobs.Behaviours.*;
 import com.offz.spigot.custommobs.CustomMobs;
 import com.offz.spigot.custommobs.MobContext;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -35,9 +38,13 @@ public class MobListener implements Listener {
         if(entity != null) {
             MobType type = MobType.getRegisteredMobType(entity);
             if (type != null) {
-                if (type.getBehaviour() instanceof HitBehaviour && type.getBehaviour() instanceof SpawnModelBehaviour) {
+                if (type.getBehaviour() instanceof HitBehaviour) {
                     ((HitBehaviour) type.getBehaviour()).onHit(e);
-                    EntityEquipment ee = ((ArmorStand) entity.getPassengers().get(0).getPassengers().get(0)).getEquipment();
+                    EntityEquipment ee;
+                    if(type.getBehaviour() instanceof SpawnModelBehaviour)
+                        ee = ((ArmorStand) entity.getPassengers().get(0).getPassengers().get(0)).getEquipment();
+                    else
+                        ee = ((LivingEntity) entity).getEquipment();
                     ItemStack is = ee.getHelmet();
                     is.setDurability((short) (MobType.getRegisteredMobType(entity).getModelID() + 2));
                     ee.setHelmet(is);
@@ -51,8 +58,7 @@ public class MobListener implements Listener {
                             }
                         }
                     }.runTaskLater(plugin, 5);
-                } else {
-                    e.setCancelled(true);
+
                 }
             }
         }
@@ -63,8 +69,8 @@ public class MobListener implements Listener {
         MobType type = MobType.getRegisteredMobType(e.getEntity());
         if (type != null) {
             Entity entity = e.getEntity();
-            if (type.getBehaviour() instanceof WalkingBehaviour)
-                ((WalkingBehaviour) type.getBehaviour()).onDeath(entity.getUniqueId());
+            if (type.getBehaviour() instanceof AnimationBehaviour)
+                ((AnimationBehaviour) type.getBehaviour()).onDeath(entity.getUniqueId());
             if (type.getBehaviour() instanceof SpawnModelBehaviour) {
                 entity.getPassengers().get(0).getPassengers().get(0).remove();
                 entity.getPassengers().get(0).remove();
@@ -106,7 +112,7 @@ public class MobListener implements Listener {
                         as.addScoreboardTag("customMob");
 
                         as.setCustomNameVisible(false);
-                        ItemStack is = new ItemStack(org.bukkit.Material.DIAMOND_SWORD);
+                        ItemStack is = new ItemStack(type.getMaterial());
                         is.setDurability(type.getModelID());
 
                         ItemMeta meta = is.getItemMeta();
@@ -127,18 +133,26 @@ public class MobListener implements Listener {
         Entity entity = e.getDismounted();
         if (entity.getScoreboardTags().contains("customMob")) {
             e.setCancelled(true);
+            if(e.getDismounted().isDead()){ //if the entity despawns, ensure the armorstands are removed
+                e.getEntity().remove();
+            }
         }
     }
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent e) {
         for (Entity entity : e.getChunk().getEntities()) {
-            if (entity != null) {
+            if (entity.getScoreboardTags().contains("customMob")) {
                 MobType type = MobType.getRegisteredMobType(entity);
-                if (type != null && type.getBehaviour() instanceof WalkingBehaviour && !WalkingBehaviour.registeredMobs.containsKey(entity.getUniqueId())) {
-                    WalkingBehaviour.registerMob(entity, type, type.getModelID());
+                if (type != null && type.getBehaviour() instanceof AnimationBehaviour && !AnimationBehaviour.registeredMobs.containsKey(entity.getUniqueId())) {
+                    AnimationBehaviour.registerMob(entity, type, type.getModelID());
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void playerJoin(PlayerAnimationEvent e){
+        e.getPlayer().playSound(e.getPlayer().getLocation(), "test", 1F, 5F);
     }
 }

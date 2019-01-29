@@ -1,6 +1,6 @@
 package com.offz.spigot.custommobs.Mobs;
 
-import com.offz.spigot.custommobs.Behaviours.WalkingBehaviour;
+import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.entity.Pig;
@@ -24,12 +24,12 @@ public class Neritantan extends EntityPig {
         neritantan.setCustomName("Neritantan");
         this.setCustomNameVisible(false);
         this.setSilent(true);
-        neritantan.setRemoveWhenFarAway(false);
+        neritantan.setRemoveWhenFarAway(true);
 
         neritantan.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
 
         MobType type = MobType.getRegisteredMobType(neritantan);
-        WalkingBehaviour.registerMob(neritantan, type, type.getModelID());
+        AnimationBehaviour.registerMob(neritantan, type, type.getModelID());
 
         this.getWorld().addEntity(this);
     }

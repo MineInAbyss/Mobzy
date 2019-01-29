@@ -12,3 +12,6 @@ commands:
   removemobs:
     description: Removes all registered mobs
     usage: /removeMobs
+  mobsinfo:
+    description: Lists all registered mobs
+    usage: /mobsInfo

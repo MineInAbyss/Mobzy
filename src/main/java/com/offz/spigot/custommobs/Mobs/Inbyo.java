@@ -1,11 +1,12 @@
 package com.offz.spigot.custommobs.Mobs;
 
-import com.offz.spigot.custommobs.Behaviours.WalkingBehaviour;
+import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
-import net.minecraft.server.v1_13_R2.*;
-import org.bukkit.entity.Skeleton;
+import net.minecraft.server.v1_13_R2.EntityZombie;
+import net.minecraft.server.v1_13_R2.GenericAttributes;
+import net.minecraft.server.v1_13_R2.PathfinderGoalNearestAttackableTarget;
+import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.entity.Zombie;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -21,15 +22,12 @@ public class Inbyo extends EntityZombie {
         inbyo.setCustomName("Inbyo");
         this.setCustomNameVisible(false);
         this.setSilent(true);
-        inbyo.setBaby(false);
-        inbyo.setRemoveWhenFarAway(false);
-        inbyo.getEquipment().setArmorContents(new ItemStack[4]); //remove any possible items the mob might spawn with
-
+        inbyo.setRemoveWhenFarAway(true);
 
         inbyo.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
 
         MobType type = MobType.getRegisteredMobType(inbyo);
-        WalkingBehaviour.registerMob(inbyo, type, type.getModelID());
+        AnimationBehaviour.registerMob(inbyo, type, type.getModelID());
 
         this.getWorld().addEntity(this);
     }
@@ -38,6 +36,9 @@ public class Inbyo extends EntityZombie {
     public void k() {
         super.k();
         this.getBukkitEntity().setFireTicks(0);
+
+        this.setBaby(false); //TODO: SOMETIMES SPAWNS AS A BABY EVEN WITH THIS
+        ((Zombie) this.getBukkitEntity()).getEquipment().clear();
     }
 
     @Override

@@ -5,9 +5,7 @@ import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-import java.util.UUID;
-
-public class NeritantanBehaviour implements WalkingBehaviour, HeadRotateBehaviour, HitBehaviour, DeathBehaviour, MobBehaviour, SpawnModelBehaviour {
+public class SingleEntityMobBehaviour implements HitBehaviour, DeathBehaviour, MobBehaviour, AnimationBehaviour, WalkingBehaviour, HeadRotateBehaviour {
 
     MobType type;
 
@@ -22,16 +20,6 @@ public class NeritantanBehaviour implements WalkingBehaviour, HeadRotateBehaviou
     @Override
     public void setMobType(MobType type) {
         this.type = type;
-    }
-
-    @Override
-    public void animate(MobInfo mob) {
-
-    }
-
-    @Override
-    public void onDeath(UUID uuid) {
-
     }
 
     @Override

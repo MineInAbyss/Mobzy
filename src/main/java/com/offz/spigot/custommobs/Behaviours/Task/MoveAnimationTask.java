@@ -1,13 +1,13 @@
 package com.offz.spigot.custommobs.Behaviours.Task;
 
-import com.offz.spigot.custommobs.Behaviours.WalkingBehaviour;
+import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class MoveAnimationTask extends BukkitRunnable {
     @Override
     public void run() {
-        for (WalkingBehaviour.MobInfo mobInfo : WalkingBehaviour.registeredMobs.values()) {
-            ((WalkingBehaviour) mobInfo.mobType.getBehaviour()).animate(mobInfo);
+        for (AnimationBehaviour.MobInfo mobInfo : AnimationBehaviour.registeredMobs.values()) {
+            ((AnimationBehaviour) mobInfo.mobType.getBehaviour()).animate(mobInfo);
         }
     }
 }

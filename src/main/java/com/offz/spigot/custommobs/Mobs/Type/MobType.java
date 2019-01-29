@@ -1,10 +1,13 @@
 package com.offz.spigot.custommobs.Mobs.Type;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
+import net.minecraft.server.v1_13_R2.World;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public interface MobType {
     Map<MobTypeKey, MobType> registeredMobs = new HashMap<>();
@@ -12,6 +15,12 @@ public interface MobType {
     String getName();
 
     short getModelID();
+
+    Material getMaterial();
+
+    Class getEntityClass();
+
+    Function<? super World, ? extends net.minecraft.server.v1_13_R2.Entity> getEntityFromClass();
 
     MobBehaviour getBehaviour();
 
