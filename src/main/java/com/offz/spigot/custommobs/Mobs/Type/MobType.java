@@ -7,12 +7,21 @@ import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public interface MobType {
     Map<MobTypeKey, MobType> registeredMobs = new HashMap<>();
 
     String getName();
+
+    static String toEntityTypeName(String name) {
+        return name.toUpperCase().replace(' ', '_');
+    }
+
+    default String getEntityTypeName() {
+        return toEntityTypeName(getName());
+    }
 
     short getModelID();
 
@@ -39,7 +48,7 @@ public interface MobType {
             return null;
         }
 
-        String name = e.getCustomName();
+        Set name = e.getScoreboardTags();
         return getRegisteredMobType(name);
     }
 
@@ -51,17 +60,26 @@ public interface MobType {
         return registeredMobs.get(key);
     }
 
+    static MobType getRegisteredMobType(Set<String> tags) {
+        for (String tag : tags) {
+            MobType type = getRegisteredMobType(tag);
+            if (type != null)
+                return type;
+        }
+        return null;
+    }
+
     default MobTypeKey getKey() {
-        return new MobTypeKey(getName());
+        return new MobTypeKey(getEntityTypeName());
     }
 
 
-    class MobTypeKey {
+    class MobTypeKey { //TODO: Figure out if we really need an EntityTypeName, and implement it better
         private String name;
 //        private short modelID; //May add this back later, but it's not too good of a way to identify mobs
 
         public MobTypeKey(String name) {
-            this.name = name;
+            this.name = toEntityTypeName(name);
         }
 
         @Override

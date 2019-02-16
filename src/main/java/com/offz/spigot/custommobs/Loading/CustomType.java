@@ -1,17 +1,11 @@
 package com.offz.spigot.custommobs.Loading;
 
 import com.mojang.datafixers.types.Type;
-import com.offz.spigot.custommobs.Mobs.*;
-import com.offz.spigot.custommobs.Mobs.NPCs.Marulk;
-import com.offz.spigot.custommobs.Mobs.NPCs.Mitty;
-import com.offz.spigot.custommobs.Mobs.NPCs.Nanachi;
-import com.offz.spigot.custommobs.Mobs.NPCs.Ozen;
 import com.offz.spigot.custommobs.Mobs.Type.FlyingMobType;
 import com.offz.spigot.custommobs.Mobs.Type.GroundMobType;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import com.offz.spigot.custommobs.Mobs.Type.NPCMobType;
 import net.minecraft.server.v1_13_R2.*;
-import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,41 +14,20 @@ import java.util.function.Function;
 public class CustomType {
     // this is where we store our custom entity type (for use with spawning, etc)
 
-    public static Map<String, EntityTypes> ground = new HashMap<>();
-    public static Map<String, EntityTypes> flying = new HashMap<>();
-    public static Map<String, EntityTypes> npc = new HashMap<>();
-//    public static EntityTypes NERITANTAN;
-//    public static EntityTypes FUWAGI;
-//    public static EntityTypes INBYO;
-//    public static EntityTypes ROHANA;
-
-//    public static EntityTypes CORPSE_WEEPER;
-
-//    public static EntityTypes MITTY;
-//    public static EntityTypes NANACHI;
-//    public static EntityTypes OZEN;
-//    public static EntityTypes MARULK;
+    public static Map<String, EntityTypes> types = new HashMap<>();
 
     public static void registerAllMobs() {
         // register the custom entity in the server
-        for (GroundMobType mob : GroundMobType.values()) {
-            String name = mob.getName().toLowerCase().replace(' ', '_');
-            Class entityClass = mob.getEntityClass();
-            Function<? super World, ? extends Entity> entityFromClass = mob.getEntityFromClass();
-            ground.put(name.toUpperCase(), injectNewEntity(name, "zombie", entityClass, entityFromClass));
-        }
-        for (FlyingMobType mob : FlyingMobType.values()) {
-            String name = mob.getName().toLowerCase().replace(' ', '_');
-            Class entityClass = mob.getEntityClass();
-            Function<? super World, ? extends Entity> entityFromClass = mob.getEntityFromClass();
-            flying.put(name.toUpperCase(), injectNewEntity(name, "zombie", entityClass, entityFromClass));
-        }
-        for (NPCMobType mob : NPCMobType.values()) {
-            String name = mob.getName().toLowerCase().replace(' ', '_');
-            Class entityClass = mob.getEntityClass();
-            Function<? super World, ? extends Entity> entityFromClass = mob.getEntityFromClass();
-            npc.put(name.toUpperCase(), injectNewEntity(name, "zombie", entityClass, entityFromClass));
-        }
+        Class[] mobTypes = {GroundMobType.class, FlyingMobType.class, NPCMobType.class};
+
+        for (Class c : mobTypes)
+            for (Object o : c.getEnumConstants()) {
+                MobType mob = ((MobType) o);
+                String name = mob.getName().toLowerCase().replace(' ', '_');
+                Class entityClass = mob.getEntityClass();
+                Function<? super World, ? extends Entity> entityFromClass = mob.getEntityFromClass();
+                types.put(name.toUpperCase(), injectNewEntity(name, "zombie", entityClass, entityFromClass));
+            }
     }
     public static void unloadAllMobs() {
         // Unregister

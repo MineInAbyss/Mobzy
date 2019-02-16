@@ -16,6 +16,7 @@ public class Fuwagi extends EntityPig {
         Pig fuwagi = (Pig) this.getBukkitEntity();
 
         fuwagi.setBaby();
+        fuwagi.setAgeLock(true);
 
         this.targetSelector.a(0, new PathfinderGoalNearestAttackableTarget<Neritantan>(this, Neritantan.class, true));
 

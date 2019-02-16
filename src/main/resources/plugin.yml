@@ -9,9 +9,16 @@ prefix: CuMobs
 description: A mod that lets you climb and get exhausted
 
 commands:
-  removemobs:
+  cmrm:
     description: Removes all registered mobs
-    usage: /removeMobs
-  mobsinfo:
+    usage: /cmrm
+  cminfo:
     description: Lists all registered mobs
-    usage: /mobsInfo
+    usage: /cminfo
+  cms:
+    description: Spawns a custom mob
+    usage: /cms <Mob Name>
+  cml:
+    description: Lists all registered mobs
+    usage: /cml
+

@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +34,28 @@ public interface AnimationBehaviour extends MobBehaviour {
         registeredMobs.putAll(map);
     }
 
-    default void animate(MobInfo mob){
+    default void animate(MobInfo mob) {
         LivingEntity e = (LivingEntity) mob.entity;
+        //TODO: Fix this
+//        if (e.isDead()) {
+//            unregisterMob(e.getUniqueId());
+//            return;
+//        }
+
         MobBehaviour behaviour = mob.mobType.getBehaviour();
-        if(behaviour instanceof WalkingBehaviour) {
+
+        if (behaviour instanceof HeadRotateBehaviour) {
+            ((HeadRotateBehaviour) behaviour).rotateHead(mob);
+            try {
+                ArmorStand as = ((ArmorStand) e.getPassengers().get(0).getPassengers().get(0));
+                as.setHeadPose(new EulerAngle(0, Math.toRadians(e.getLocation().getYaw() - as.getLocation().getYaw()), 0));
+            } catch (IndexOutOfBoundsException iobe) {
+            }
+        }
+
+        if (behaviour instanceof WalkingBehaviour) {
             ((WalkingBehaviour) behaviour).walk(mob);
+            Vector v = e.getVelocity();
             try {
                 ArmorStand as = ((ArmorStand) e.getPassengers().get(0).getPassengers().get(0));
                 EntityEquipment ee = as.getEquipment();
@@ -45,13 +63,13 @@ public interface AnimationBehaviour extends MobBehaviour {
                 ItemStack is = ee.getHelmet();
                 if (is.getDurability() == mob.hitDamageValue)
                     return;
-                if (e.getVelocity().getX() == 0 && e.getVelocity().getZ() == 0)
+                if (v.getX() == 0 && v.getZ() == 0) //TODO: Fix mobs switching to moving animation from one frame while taking damage
                     is.setDurability(mob.stillDamageValue);
                 else
                     is.setDurability(mob.movingDamageValue);
                 ee.setHelmet(is);
             } catch (IndexOutOfBoundsException exception) { //One frame gets run without the ArmorStand because of the 1 tick delay, causing an error, maybe there is a better way we should handle it, this works for now
-                if (!(behaviour instanceof SpawnModelBehaviour)) {
+               /* if (!(behaviour instanceof SpawnModelBehaviour)) {
                     EntityEquipment ee = e.getEquipment();
                     ItemStack is = ee.getHelmet();
                     if (is.getDurability() == mob.hitDamageValue)
@@ -61,15 +79,7 @@ public interface AnimationBehaviour extends MobBehaviour {
                     else
                         is.setDurability(mob.movingDamageValue);
                     ee.setHelmet(is);
-                }
-            }
-        }
-        if(behaviour instanceof HeadRotateBehaviour) {
-            ((HeadRotateBehaviour) behaviour).rotateHead(mob);
-            try {
-                ArmorStand as = ((ArmorStand) e.getPassengers().get(0).getPassengers().get(0));
-                as.setHeadPose(new EulerAngle(0, Math.toRadians(e.getLocation().getYaw() - as.getLocation().getYaw()), 0));
-            } catch (IndexOutOfBoundsException iobe) {
+                }*/
             }
         }
     }

@@ -5,7 +5,7 @@ import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-public class LivingMobBehaviour implements HitBehaviour, DeathBehaviour, MobBehaviour, SpawnModelBehaviour, AnimationBehaviour, WalkingBehaviour, HeadRotateBehaviour {
+public class LivingMobBehaviour implements MobBehaviour, HitBehaviour, DeathBehaviour, SpawnModelBehaviour, AnimationBehaviour, WalkingBehaviour, HeadRotateBehaviour {
 
     MobType type;
 
@@ -23,13 +23,7 @@ public class LivingMobBehaviour implements HitBehaviour, DeathBehaviour, MobBeha
     }
 
     @Override
-    public void animate(MobInfo mob) {
-
-    }
-
-    @Override
     public void walk(MobInfo mob) {
-
     }
 
     @Override
