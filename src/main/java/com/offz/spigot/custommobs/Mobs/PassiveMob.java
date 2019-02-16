@@ -26,6 +26,7 @@ public class PassiveMob extends EntityPig {
 //        this.targetSelector.a(0, new PathfinderGoalNearestAttackableTarget<Neritantan>(this, Neritantan.class, true));
 //        this.goalSelector.a(4, new PathfinderGoalTempt(this, 1.2D, RecipeItemStack.a(new IMaterial[]{Items.CARROT,Items.APPLE}), false));
         this.addScoreboardTag("customMob");
+        this.addScoreboardTag("MOB");
         this.setCustomNameVisible(false);
         this.setSilent(true);
         passiveMob.setRemoveWhenFarAway(true);

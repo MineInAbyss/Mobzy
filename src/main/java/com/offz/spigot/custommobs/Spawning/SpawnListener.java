@@ -31,11 +31,6 @@ public class SpawnListener implements Listener {
         if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.DEFAULT) && manager.isAbyssWorld(e.getEntity().getWorld()) && original.getCustomName() == null) {
             if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth"))
                 switch (original.getType()) {
-                    case PIG:
-                    case COW:
-                    case SHEEP:
-                        spawnEntity("FUWAGI", e.getLocation(), original);
-                        break;
                 }
 
 

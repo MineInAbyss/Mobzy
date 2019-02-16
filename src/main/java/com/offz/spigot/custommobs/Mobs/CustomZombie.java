@@ -22,6 +22,7 @@ public class CustomZombie extends EntityZombie {
         Zombie passiveMob = (Zombie) this.getBukkitEntity();
 
         this.addScoreboardTag("customMob");
+        this.addScoreboardTag("MOB");
         this.setCustomNameVisible(false);
         this.setSilent(true);
         passiveMob.setRemoveWhenFarAway(true);

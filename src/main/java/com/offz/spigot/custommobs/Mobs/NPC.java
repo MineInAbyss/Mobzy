@@ -20,7 +20,7 @@ public class NPC extends EntityVillager {
         Villager npc = (Villager) this.getBukkitEntity();
 
         this.addScoreboardTag("customMob");
-        this.addScoreboardTag("npc");
+        this.addScoreboardTag("NPC");
         this.setCustomNameVisible(true);
         this.setSilent(true);
         this.setInvulnerable(true);
