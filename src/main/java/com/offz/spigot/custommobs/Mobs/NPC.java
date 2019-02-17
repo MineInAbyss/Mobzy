@@ -26,7 +26,7 @@ public class NPC extends EntityVillager {
         this.setInvulnerable(true);
         npc.setRemoveWhenFarAway(false);
 
-        npc.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
+        npc.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
 
         this.getWorld().addEntity(this);
     }

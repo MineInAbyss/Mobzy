@@ -19,15 +19,15 @@ public class CustomZombie extends EntityZombie {
 
     public CustomZombie(World world) {
         super(world);
-        Zombie passiveMob = (Zombie) this.getBukkitEntity();
+        Zombie customZombie = (Zombie) this.getBukkitEntity();
 
         this.addScoreboardTag("customMob");
         this.addScoreboardTag("MOB");
         this.setCustomNameVisible(false);
         this.setSilent(true);
-        passiveMob.setRemoveWhenFarAway(true);
+        customZombie.setRemoveWhenFarAway(true);
 
-        passiveMob.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
+        customZombie.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
 
         this.getWorld().addEntity(this);
     }

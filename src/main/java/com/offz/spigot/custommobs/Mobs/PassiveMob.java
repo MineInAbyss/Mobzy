@@ -31,7 +31,7 @@ public class PassiveMob extends EntityPig {
         this.setSilent(true);
         passiveMob.setRemoveWhenFarAway(true);
 
-        passiveMob.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
+        passiveMob.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
 
         this.getWorld().addEntity(this);
     }

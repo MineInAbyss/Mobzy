@@ -2,6 +2,8 @@ package com.offz.spigot.custommobs.Behaviours;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
+import org.bukkit.Particle;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -10,19 +12,20 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public interface SpawnModelBehaviour extends MobBehaviour {
     static void spawnModel(Entity e, MobType type) {
-        ArmorStand aec = (ArmorStand) e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.ARMOR_STAND);
-        aec.setGravity(false);
-        aec.setVisible(false);
-        aec.setArms(true);
-        aec.setSilent(true);
-        aec.setMarker(true);
+        AreaEffectCloud aec = (AreaEffectCloud) e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.AREA_EFFECT_CLOUD);
+        aec.setDuration(2147483600);
+        aec.clearCustomEffects();
+        aec.setRadius(0f);
+        //TODO The AEC spawns some particles for a bit, TOWN_AURA looks like the least noticeable particle, but there might be a way of getting completely invisible ones
+        aec.setParticle(Particle.TOWN_AURA);
         aec.addScoreboardTag("customMob");
 
         ArmorStand as = (ArmorStand) e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.ARMOR_STAND);
         as.setGravity(false);
         as.setVisible(false);
-        as.setArms(true);
+        as.setArms(false);
         as.setSilent(true);
+        as.setBasePlate(false);
         as.setMarker(true);
         as.addScoreboardTag("customMob");
 

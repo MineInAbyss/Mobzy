@@ -1,9 +1,12 @@
 package com.offz.spigot.custommobs.Mobs;
 
 import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
+import com.offz.spigot.custommobs.Behaviours.SpawnModelBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.entity.Ghast;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -11,22 +14,20 @@ import java.util.Random;
 
 public class CorpseWeeper extends EntityGhast {
 
+    private boolean firstSetName = true;
 
     public CorpseWeeper(World world) {
         super(world);
         Ghast corpse_weeper = (Ghast) this.getBukkitEntity();
 
         this.addScoreboardTag("customMob");
-        corpse_weeper.setCustomName("Corpse Weeper");
+        this.addScoreboardTag("MOB");
         this.setCustomNameVisible(false);
         this.setSilent(true);
         corpse_weeper.setRemoveWhenFarAway(true);
 
 
-        corpse_weeper.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
-
-        MobType type = MobType.getRegisteredMobType(corpse_weeper);
-        AnimationBehaviour.registerMob(corpse_weeper, type, type.getModelID());
+        corpse_weeper.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
 
         this.getWorld().addEntity(this);
     }
@@ -37,6 +38,42 @@ public class CorpseWeeper extends EntityGhast {
         this.goalSelector.a(2, new PathfinderGoalGhastMoveTowardsTarget(this));
         this.targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
         this.goalSelector.a(1, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 200.0F));
+    }
+
+    //TODO This is only a temp fix for Corpse Weeper, try to make a better system for this setCustomName method eventually, as noted by TODO in PassiveMob
+    @Override
+    public void setCustomName(IChatBaseComponent iChatBaseComponent) {
+        super.setCustomName(iChatBaseComponent);
+        if (firstSetName) {
+            firstSetName = false;
+            Ghast mob = (Ghast) this.getBukkitEntity();
+            MobType type = MobType.getRegisteredMobType(iChatBaseComponent.getString());
+
+            mob.addScoreboardTag(type.getEntityTypeName());
+            mob.setCustomName(type.getName());
+
+            AnimationBehaviour.registerMob(mob, type, type.getModelID());
+            if (type.getBehaviour() instanceof SpawnModelBehaviour)
+                SpawnModelBehaviour.spawnModel(mob, type);
+            else {
+                org.bukkit.inventory.ItemStack is = new ItemStack(org.bukkit.Material.DIAMOND_SWORD);
+                is.setDurability(type.getModelID());
+
+                ItemMeta meta = is.getItemMeta();
+                meta.setUnbreakable(true);
+                is.setItemMeta(meta);
+
+                mob.getEquipment().setHelmet(is);
+            }
+//            Map<String, Double> initAttributes = type.getInitAttributes();
+
+//            for (String attributeName : type.getInitAttributes().keySet()) {
+//                try {
+//                    this.getAttributeInstance((IAttribute) GenericAttributes.class.getField(attributeName).get(this)).setValue(initAttributes.get(attributeName));
+//                } catch (NoSuchFieldException | IllegalAccessException e) {
+//                }
+//            }
+        }
     }
 
     @Override

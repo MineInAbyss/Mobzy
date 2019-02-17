@@ -2,6 +2,7 @@ package com.offz.spigot.custommobs.Behaviours;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -57,7 +58,8 @@ public interface AnimationBehaviour extends MobBehaviour {
             ((WalkingBehaviour) behaviour).walk(mob);
             Vector v = e.getVelocity();
             try {
-                ArmorStand as = ((ArmorStand) e.getPassengers().get(0).getPassengers().get(0));
+                AreaEffectCloud aec = (AreaEffectCloud) e.getPassengers().get(0);
+                ArmorStand as = ((ArmorStand) aec.getPassengers().get(0));
                 EntityEquipment ee = as.getEquipment();
 
                 ItemStack is = ee.getHelmet();
