@@ -2,6 +2,7 @@ name: CustomMobs
 version: 1.0
 author: Offz
 main: com.offz.spigot.custommobs.CustomMobs
+api-version: 1.13
 softdepend: [DeeperWorld]
 depend: [MineInAbyss]
 

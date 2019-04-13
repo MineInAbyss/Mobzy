@@ -19,6 +19,7 @@ public interface SpawnModelBehaviour extends MobBehaviour {
         //TODO The AEC spawns some particles for a bit, TOWN_AURA looks like the least noticeable particle, but there might be a way of getting completely invisible ones
         aec.setParticle(Particle.TOWN_AURA);
         aec.addScoreboardTag("customMob");
+        aec.addScoreboardTag("additionalPart");
 
         ArmorStand as = (ArmorStand) e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.ARMOR_STAND);
         as.setGravity(false);
@@ -28,6 +29,7 @@ public interface SpawnModelBehaviour extends MobBehaviour {
         as.setBasePlate(false);
         as.setMarker(true);
         as.addScoreboardTag("customMob");
+        as.addScoreboardTag("additionalPart");
 
         as.setCustomNameVisible(false);
         ItemStack is = new ItemStack(type.getMaterial());

@@ -2,6 +2,9 @@ package com.offz.spigot.custommobs.Behaviours;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -61,6 +64,10 @@ public interface AnimationBehaviour extends MobBehaviour {
                 AreaEffectCloud aec = (AreaEffectCloud) e.getPassengers().get(0);
                 ArmorStand as = ((ArmorStand) aec.getPassengers().get(0));
                 EntityEquipment ee = as.getEquipment();
+                /*CraftEntity a = (CraftEntity) mob.entity;
+                net.minecraft.server.v1_13_R2.Entity b = a.getHandle();
+                Location l = e.getLocation();
+                b.setPositionRotation(l.getX(), l.getY(), l.getZ(), 1, 1);*/
 
                 ItemStack is = ee.getHelmet();
                 if (is.getDurability() == mob.hitDamageValue)
@@ -70,8 +77,8 @@ public interface AnimationBehaviour extends MobBehaviour {
                 else
                     is.setDurability(mob.movingDamageValue);
                 ee.setHelmet(is);
-            } catch (IndexOutOfBoundsException exception) { //One frame gets run without the ArmorStand because of the 1 tick delay, causing an error, maybe there is a better way we should handle it, this works for now
-               /* if (!(behaviour instanceof SpawnModelBehaviour)) {
+            } catch (IndexOutOfBoundsException exception) { //if the mob does not have any passengers, i.e. is not from SpawnModelBehaviour
+               if (!(behaviour instanceof SpawnModelBehaviour)) {
                     EntityEquipment ee = e.getEquipment();
                     ItemStack is = ee.getHelmet();
                     if (is.getDurability() == mob.hitDamageValue)
@@ -81,7 +88,7 @@ public interface AnimationBehaviour extends MobBehaviour {
                     else
                         is.setDurability(mob.movingDamageValue);
                     ee.setHelmet(is);
-                }*/
+                }
             }
         }
     }

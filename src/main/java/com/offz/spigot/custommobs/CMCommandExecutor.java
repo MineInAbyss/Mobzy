@@ -12,6 +12,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 import java.util.*;
 
@@ -33,7 +34,8 @@ public class CMCommandExecutor implements CommandExecutor, TabCompleter {
                 sender.sendMessage(ChatColor.RED + "Please specify a mob type");
                 return true;
             }
-            int num = 0;
+            int mobCount = 0;
+            int entityCount = 0;
             for (World world : worlds) {
                 for (Entity entity : world.getEntities()) {
                     Set<String> tags = entity.getScoreboardTags();
@@ -46,7 +48,9 @@ public class CMCommandExecutor implements CommandExecutor, TabCompleter {
                                     entity.remove();
                                     AnimationBehaviour.unregisterMob(uuid);
                                 }
-                                num++;
+                                entityCount++;
+                                if (!tags.contains("additionalPart"))
+                                    mobCount++;
                             }
                         } catch (NumberFormatException e) {
                             sender.sendMessage(ChatColor.RED + "Please input a valid integer as the range");
@@ -57,10 +61,12 @@ public class CMCommandExecutor implements CommandExecutor, TabCompleter {
             }
             String message = "";
             if (cminfo)
-                message += "There are " + num + " custom entities (around " + num / 3 + " mobs)";
+                message += "There are ";
             else
-                message += "Removed " + num + " custom entities (around " + num / 3 + " mobs)";
-            if(args.length < 2)
+                message += "Removed ";
+            message += mobCount + " custom mobs, composed of " + entityCount + " entities";
+
+            if (args.length < 2)
                 message += " in all loaded chunks";
             else
                 message += " in a radius of " + args[1] + " blocks";
@@ -70,6 +76,7 @@ public class CMCommandExecutor implements CommandExecutor, TabCompleter {
 
         if (sender.hasPermission("customMobs.spawn") && label.equalsIgnoreCase("cms")) {
             if (SpawnListener.spawnEntity(args[0], Bukkit.getPlayer(sender.getName()).getLocation()))
+//            if (SpawnTask.spawnMultiple(args[0], Bukkit.getPlayer(sender.getName()).getLocation(), Integer.parseInt(args[1]), Integer.parseInt(args[2]))) //spawn multiple
                 sender.sendMessage(ChatColor.GREEN + "Spawned " + args[0]);
             else
                 sender.sendMessage(ChatColor.RED + "Invalid mob name");
@@ -85,7 +92,7 @@ public class CMCommandExecutor implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        String cmdName= command.getName();
+        String cmdName = command.getName();
         if (cmdName.equalsIgnoreCase("cms"))
             if (args.length == 1) {
                 return CustomType.types.keySet()

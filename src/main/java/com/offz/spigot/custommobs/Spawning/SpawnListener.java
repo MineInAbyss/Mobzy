@@ -4,13 +4,16 @@ import com.derongan.minecraft.deeperworld.world.WorldManager;
 import com.derongan.minecraft.mineinabyss.AbyssContext;
 import com.derongan.minecraft.mineinabyss.world.AbyssWorldManager;
 import com.offz.spigot.custommobs.Loading.CustomType;
+import com.offz.spigot.custommobs.Loading.SpawnRegistry;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.ChatMessage;
 import net.minecraft.server.v1_13_R2.EntityTypes;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -24,73 +27,42 @@ public class SpawnListener implements Listener {
         this.worldManager = context.getRealWorldManager();
     }
 
-    @EventHandler
+    //probably not going to be replacing vanilla entities anymore
+    /*@EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent e) {
         AbyssWorldManager manager = context.getWorldManager();
         Entity original = e.getEntity();
-        if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.DEFAULT) && manager.isAbyssWorld(e.getEntity().getWorld()) && original.getCustomName() == null) {
-            if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Orth"))
-                switch (original.getType()) {
-                }
-
-
-            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Edge of the Abyss"))
-                switch (original.getType()) {
-                    case PIG:
-                    case COW:
-                    case SHEEP:
-                        spawnEntity("FUWAGI", e.getLocation(), original);
-                        break;
-                    case ZOMBIE:
-                        spawnEntity("ROHANA", e.getLocation(), original);
-                        break;
-                }
-
-
-            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Forest of Temptation"))
-                switch (original.getType()) {
-                    case WITCH:
-                        if (Math.random() >= 0.5)
-                            spawnEntity("CORPSE_WEEPER", e.getLocation(), original);
-                        break;
-                    case ZOMBIE:
-                        if (e.getEntity().getLocation().getY() > 130)
-                            spawnEntity("INBYO", e.getLocation(), original);
-                        break;
-                }
-
-            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Great Fault"))
-                switch (original.getType()) {
-                    case ZOMBIE:
-                        spawnEntity("NERITANTAN", e.getLocation(), original);
-                        break;
-                }
-
-            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("The Goblet of Giants"))
-                switch (original.getType()) {
-                    case ZOMBIE:
-                        spawnEntity("ROHANA", e.getLocation(), original);
-                        spawnEntity("ROHANA", e.getLocation(), original);
-                        spawnEntity("ROHANA", e.getLocation(), original);
-                        break;
-                }
-
-            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("Sea of Corpses"))
-                switch (original.getType()) {
-
-                }
-
-            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("The Capital of the Unreturned"))
-                switch (original.getType()) {
-
-                }
-
-            else if (manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName().equals("The Final Maelstrom"))
-                switch (original.getType()) {
-
-                }
+        if(original.getType().equals(EntityType.BAT)){
+            e.setCancelled(true);
+            return;
         }
-    }
+        if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.DEFAULT) && manager.isAbyssWorld(e.getEntity().getWorld()) && original.getCustomName() == null) {
+            String layerName = manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName();
+
+            *//*RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
+
+            for (MobSpawn spawn : SpawnRegistry.getLayerSpawns().get(layerName)) {
+                double weight = spawn.getPriority(e);
+                validSpawns.add(weight, spawn);
+            }
+
+            if(validSpawns.isEmpty()) {
+                e.setCancelled(true);
+                Bukkit.broadcastMessage("Spawn Failed");
+                return;
+            }*//*
+
+            //weighted random decision of valid spawn
+//            MobSpawn spawn = validSpawns.next();
+//            spawn.spawn(e.getLocation());
+            Bukkit.broadcastMessage("Replaced " + e.getEntity().getType() + " with " *//*+ spawn.getMobID()*//*);
+//            e.setCancelled(true);
+
+//            SpawnListener.spawnEntity("ROHANA", e.getLocation());
+//            e.getEntity().remove();
+            e.setCancelled(true);
+        }
+    }*/
 
     public static boolean spawnEntity(String name, Location loc, Entity remove) {
         remove.remove();

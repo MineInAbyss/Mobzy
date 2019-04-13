@@ -1,8 +1,9 @@
 package com.offz.spigot.custommobs.Mobs.Type;
 
-
+import com.offz.spigot.custommobs.Behaviours.DeathBehaviour;
 import com.offz.spigot.custommobs.Mobs.Behaviours.LivingMobBehaviour;
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
+import com.offz.spigot.custommobs.Mobs.Behaviours.MobDrops;
 import com.offz.spigot.custommobs.Mobs.Behaviours.SingleEntityMobBehaviour;
 import com.offz.spigot.custommobs.Mobs.CustomZombie;
 import com.offz.spigot.custommobs.Mobs.Inbyo;
@@ -10,10 +11,11 @@ import com.offz.spigot.custommobs.Mobs.Neritantan;
 import com.offz.spigot.custommobs.Mobs.PassiveMob;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.World;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public enum GroundMobType implements MobType {
@@ -26,6 +28,8 @@ public enum GroundMobType implements MobType {
             new LivingMobBehaviour(), PassiveMob.class, PassiveMob::new, true, new HashMap<String, Double>() {{
         put("maxHealth", 10.0);
         put("MOVEMENT_SPEED", 0.2);
+    }}, new ArrayList<MobDrops>() {{
+        add(new MobDrops(Material.PORKCHOP, "Raw Fuwagi", Arrays.asList(ChatColor.GRAY + "The fluffiest meal of the day"), 50));
     }}
     ),INBYO("Inbyo", (short) 8,
             new LivingMobBehaviour(), Inbyo.class, Inbyo::new, false, new HashMap<String, Double>() {{
@@ -39,6 +43,9 @@ public enum GroundMobType implements MobType {
         put("maxHealth", 5.0);
         put("MOVEMENT_SPEED", 0.3);
         put("ATTACK_DAMAGE", 0.2);
+    }}, new ArrayList<MobDrops>() {{
+        add(new MobDrops(Material.ROTTEN_FLESH, "Rohana flesh", 30));
+        add(new MobDrops(Material.GLOWSTONE_DUST, 30));
     }}
     );
 
@@ -64,6 +71,14 @@ public enum GroundMobType implements MobType {
         this.material = Material.DIAMOND_SWORD;
 
         behaviour.setMobType(this);
+    }
+
+    GroundMobType(String name, short modelID, MobBehaviour behaviour, Class entityClass, Function<? super World, ? extends Entity> entityFromClass, boolean isBaby, Map<String, Double> initAttributes, ArrayList<MobDrops> itemDrops) {
+        this(name, modelID, behaviour, entityClass, entityFromClass, isBaby, initAttributes);
+        if (behaviour instanceof DeathBehaviour) {
+            DeathBehaviour.setItemDrops(this, itemDrops);
+        }
+
     }
 
     @Override

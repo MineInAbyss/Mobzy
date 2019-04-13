@@ -20,10 +20,10 @@ public class PassiveMob extends EntityPig {
     public PassiveMob(World world) {
         super(world);
         Pig passiveMob = (Pig) this.getBukkitEntity();
-
         //TODO: Custom Pathfinders current have to be done by a class that extends this class.
         // Not a terrible way of doing things but we'll have to make a new method if we want text-based mob creation
 //        this.targetSelector.a(0, new PathfinderGoalNearestAttackableTarget<Neritantan>(this, Neritantan.class, true));
+        
 //        this.goalSelector.a(4, new PathfinderGoalTempt(this, 1.2D, RecipeItemStack.a(new IMaterial[]{Items.CARROT,Items.APPLE}), false));
         this.addScoreboardTag("customMob");
         this.addScoreboardTag("MOB");
@@ -32,6 +32,8 @@ public class PassiveMob extends EntityPig {
         passiveMob.setRemoveWhenFarAway(true);
 
         passiveMob.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
+
+        setHeadRotation(0);
 
         this.getWorld().addEntity(this);
     }

@@ -4,6 +4,7 @@ import com.offz.spigot.custommobs.Behaviours.*;
 import com.offz.spigot.custommobs.CustomMobs;
 import com.offz.spigot.custommobs.MobContext;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
@@ -15,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -22,6 +24,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.entity.EntityDismountEvent;
+
+import java.util.ArrayList;
 
 public class MobListener implements Listener {
     private MobContext context;
@@ -71,15 +75,21 @@ public class MobListener implements Listener {
             Entity entity = e.getEntity();
             if (type.getBehaviour() instanceof AnimationBehaviour)
                 ((AnimationBehaviour) type.getBehaviour()).onDeath(entity.getUniqueId());
-            if (type.getBehaviour() instanceof SpawnModelBehaviour) {
+            /*if (type.getBehaviour() instanceof SpawnModelBehaviour) {
                 entity.getPassengers().get(0).getPassengers().get(0).remove();
                 entity.getPassengers().get(0).remove();
-            }
+            }*/
             if (type.getBehaviour() instanceof DeathBehaviour) {
-                e.setCancelled(true);
+//                e.setCancelled(true);
                 ((DeathBehaviour) type.getBehaviour()).onDeath(e);
                 Location loc = entity.getLocation();
                 entity.getWorld().spawnParticle(Particle.CLOUD, loc.add(0, 0.75, 0), 10, 0.1, 0.25, 0.1, 0.025);
+
+                e.getDrops().clear();
+                ArrayList<ItemStack> drops = DeathBehaviour.getDroppedItemStacks(type);
+                if (drops != null)
+                    e.getDrops().addAll(drops);
+
                 e.getEntity().remove();
             }
         }
@@ -132,11 +142,20 @@ public class MobListener implements Listener {
     public void onVeichleExit(EntityDismountEvent e) {
         Entity entity = e.getDismounted();
         if (entity.getScoreboardTags().contains("customMob")) {
-            e.setCancelled(true);
-            if(e.getDismounted().isDead()){ //if the entity despawns, ensure the armorstands are removed
+            if (e.getDismounted().isDead()) { //if the entity despawns, ensure its additional parts are removed
                 e.getEntity().remove();
+                if (!e.getDismounted().getScoreboardTags().contains("additionalPart"))
+                    Bukkit.broadcastMessage("Despawned " + MobType.getRegisteredMobType(e.getDismounted()).getName());
+                return;
             }
+            e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onTransform(EntityTransformEvent e){
+        e.getEntity().remove();
+        e.setCancelled(true);
     }
 
     @EventHandler

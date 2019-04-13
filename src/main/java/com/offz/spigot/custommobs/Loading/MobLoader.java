@@ -16,6 +16,7 @@ public class MobLoader {
             for (Object o : c.getEnumConstants())
                 MobType.registerMobType((MobType) o);
         CustomType.registerAllMobs();
+        SpawnRegistry.registerMobSpawns();
     }
     public static void unloadAllMobs() {
         // Unregister

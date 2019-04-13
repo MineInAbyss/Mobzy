@@ -16,7 +16,7 @@ public class CustomType {
 
     public static Map<String, EntityTypes> types = new HashMap<>();
 
-    public static void registerAllMobs() {
+    static void registerAllMobs() {
         // register the custom entity in the server
         Class[] mobTypes = {GroundMobType.class, FlyingMobType.class, NPCMobType.class};
 
@@ -50,6 +50,5 @@ public class CustomType {
         // store this somewhere so you can reference it later (like for spawning)
         return EntityTypes.a(name, EntityTypes.a.a(clazz, function));
     }
-
 }
 
