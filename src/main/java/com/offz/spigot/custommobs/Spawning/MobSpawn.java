@@ -2,7 +2,6 @@ package com.offz.spigot.custommobs.Spawning;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 
 import java.util.Random;
 
@@ -35,12 +34,10 @@ public class MobSpawn {
         }
 
         for (int i = 0; i < amount; i++) {
-
             Location l = SpawnTask.getSpawnLocation(p, 0, radius);
-//
             if (l == null)
                 SpawnListener.spawnEntity(mobID, p);
-            else{
+            else {
                 SpawnListener.spawnEntity(mobID, l);
                 spawned += 1;
             }

@@ -8,7 +8,6 @@ import com.offz.spigot.custommobs.Behaviours.Task.MoveAnimationTask;
 import com.offz.spigot.custommobs.Loading.MobLoader;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import com.offz.spigot.custommobs.Spawning.SpawnListener;
-import com.offz.spigot.custommobs.Spawning.SpawnTask;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -37,8 +36,8 @@ public final class CustomMobs extends JavaPlugin {
         getServer().getScheduler().scheduleSyncRepeatingTask(this, mobTask, 0, 1);
         Runnable moveAnimationTask = new MoveAnimationTask();
         getServer().getScheduler().scheduleSyncRepeatingTask(this, moveAnimationTask, 0, 5);
-        Runnable spawnTask = new SpawnTask(abyssContext);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, spawnTask, 0, 100);
+//        Runnable spawnTask = new SpawnTask(abyssContext);
+//        getServer().getScheduler().scheduleSyncRepeatingTask(this, spawnTask, 0, 100);
 
         CMCommandExecutor commandExecutor = new CMCommandExecutor(context);
 
@@ -53,10 +52,10 @@ public final class CustomMobs extends JavaPlugin {
         for (World world : getServer().getWorlds()) {
             for (Entity entity : world.getEntities()) {
                 if (entity.getScoreboardTags().contains("customMob")) {
-                        MobType type = MobType.getRegisteredMobType(entity);
-                        if (type != null && type.getBehaviour() instanceof AnimationBehaviour && !AnimationBehaviour.registeredMobs.containsKey(entity.getUniqueId())) {
-                            AnimationBehaviour.registerMob(entity, type, type.getModelID());
-                        }
+                    MobType type = MobType.getRegisteredMobType(entity);
+                    if (type != null && type.getBehaviour() instanceof AnimationBehaviour && !AnimationBehaviour.registeredMobs.containsKey(entity.getUniqueId())) {
+                        AnimationBehaviour.registerMob(entity, type, type.getModelID());
+                    }
                     num++;
                 }
             }

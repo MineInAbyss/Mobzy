@@ -1,5 +1,5 @@
 name: CustomMobs
-version: 1.0
+version: 2.0
 author: Offz
 main: com.offz.spigot.custommobs.CustomMobs
 api-version: 1.13

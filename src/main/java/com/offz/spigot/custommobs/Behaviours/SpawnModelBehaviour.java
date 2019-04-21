@@ -16,7 +16,7 @@ public interface SpawnModelBehaviour extends MobBehaviour {
         aec.setDuration(2147483600);
         aec.clearCustomEffects();
         aec.setRadius(0f);
-        //TODO The AEC spawns some particles for a bit, TOWN_AURA looks like the least noticeable particle, but there might be a way of getting completely invisible ones
+        //TODO The AEC spawns some particles for entity bit, TOWN_AURA looks like the least noticeable particle, but there might be entity way of getting completely invisible ones
         aec.setParticle(Particle.TOWN_AURA);
         aec.addScoreboardTag("customMob");
         aec.addScoreboardTag("additionalPart");

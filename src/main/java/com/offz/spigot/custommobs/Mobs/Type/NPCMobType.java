@@ -3,7 +3,7 @@ package com.offz.spigot.custommobs.Mobs.Type;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import com.offz.spigot.custommobs.Mobs.Behaviours.NPCBehaviour;
-import com.offz.spigot.custommobs.Mobs.NPC;
+import com.offz.spigot.custommobs.Mobs.Passive.NPC;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;

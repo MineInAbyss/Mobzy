@@ -14,7 +14,7 @@ import java.util.function.Function;
 public class CustomType {
     // this is where we store our custom entity type (for use with spawning, etc)
 
-    public static Map<String, EntityTypes> types = new HashMap<>();
+    private static Map<String, EntityTypes> types = new HashMap<>();
 
     static void registerAllMobs() {
         // register the custom entity in the server
@@ -23,23 +23,30 @@ public class CustomType {
         for (Class c : mobTypes)
             for (Object o : c.getEnumConstants()) {
                 MobType mob = ((MobType) o);
-                String name = mob.getName().toLowerCase().replace(' ', '_');
+                String name = mob.getEntityTypeID().toLowerCase();
                 Class entityClass = mob.getEntityClass();
+
                 Function<? super World, ? extends Entity> entityFromClass = mob.getEntityFromClass();
-                types.put(name.toUpperCase(), injectNewEntity(name, "zombie", entityClass, entityFromClass));
+                types.put(name, injectNewEntity(name, "zombie", EntityZombie.class, entityFromClass));
             }
     }
+    public static EntityTypes getType(String name){
+        //TODO toEntityTypeID should be stored in here and only used in here
+        return types.get(MobType.toEntityTypeID(name));
+    }
+
+    public static Map<String, EntityTypes> getTypes(){
+        return types;
+    }
+
     public static void unloadAllMobs() {
         // Unregister
         MobType.unregisterAllMobs();
-
-        // Destroy
-//        mobClassLoader = null;
     }
 
     private static EntityTypes injectNewEntity(String name, String extend_from, Class<? extends Entity> clazz, Function<? super World, ? extends Entity> function) { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
         // get the server's datatypes (also referred to as "data fixers" by some)
-        // I still don't know where 15190 came from exactly, when a few of us
+        // I still don't know where 15190 came from exactly, when entity few of us
         // put our heads together that's the number someone else came up with
         Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) DataConverterRegistry.a().getSchema(15190).findChoiceType(DataConverterTypes.n).types();
         // inject the new custom entity (this registers the

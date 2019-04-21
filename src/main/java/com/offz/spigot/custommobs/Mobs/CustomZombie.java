@@ -1,75 +1,49 @@
 package com.offz.spigot.custommobs.Mobs;
 
-import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
-import com.offz.spigot.custommobs.Behaviours.SpawnModelBehaviour;
-import com.offz.spigot.custommobs.Mobs.Type.GroundMobType;
-import com.offz.spigot.custommobs.Mobs.Type.MobType;
-import net.minecraft.server.v1_13_R2.*;
-import org.bukkit.entity.Zombie;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import net.minecraft.server.v1_13_R2.EntityZombie;
+import net.minecraft.server.v1_13_R2.World;
 
-import java.util.Map;
+public class CustomZombie extends EntityZombie implements CustomMob {
 
-public class CustomZombie extends EntityZombie {
-
-    private boolean firstSetName = true;
-
+    //TODO rework aggressive mobs
     public CustomZombie(World world) {
         super(world);
-        Zombie customZombie = (Zombie) this.getBukkitEntity();
-
-        this.addScoreboardTag("customMob");
-        this.addScoreboardTag("MOB");
-        this.setCustomNameVisible(false);
-        this.setSilent(true);
-        customZombie.setRemoveWhenFarAway(true);
-
-        customZombie.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
-
-        this.getWorld().addEntity(this);
+        createCustomMob(this, new String[]{"MOB"});
     }
 
-    @Override
-    public void setCustomName(IChatBaseComponent iChatBaseComponent) {
-        super.setCustomName(iChatBaseComponent);
+    /*@Override
+    public void b(NBTTagCompound nbttagcompound) {
+        super.b(nbttagcompound);
+        ((Neritantan) this).a(nbttagcompound);
+    }*/
+
+    /*@Override
+    public void setCustomName(IChatBaseComponent iCBC) {
+        super.setCustomName(iCBC);
         if (firstSetName) {
             firstSetName = false;
-            Zombie mob = (Zombie) this.getBukkitEntity();
-            GroundMobType type = (GroundMobType) MobType.getRegisteredMobType(iChatBaseComponent.getString());
+            GroundMobType type = (GroundMobType) MobType.getRegisteredMobType(iCBC.getString());
+            MobBehaviour behaviour = type.getBehaviour();
+            Zombie asZombie = (Zombie) registerBehaviours(this, type, behaviour);
 
-            mob.addScoreboardTag(type.getEntityTypeName());
-            mob.setCustomName(type.getName());
-            mob.setBaby(type.isBaby());
-            mob.getEquipment().clear();
+            asZombie.setBaby(type.isBaby());
+            asZombie.getEquipment().clear();
 
-            AnimationBehaviour.registerMob(mob, type, type.getModelID());
-            if (type.getBehaviour() instanceof SpawnModelBehaviour) {
-                SpawnModelBehaviour.spawnModel(mob, type);
-                mob.getEquipment().setHelmet(new ItemStack(org.bukkit.Material.STONE_BUTTON)); //stop the mobs from burning (don't know of a better way yet)
+            if (behaviour instanceof SpawnModelBehaviour) {
+                asZombie.getEquipment().setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.STONE_BUTTON)); //stop the mobs from burning (don't know of entity better way yet)
             } else {
-                ItemStack is = new ItemStack(org.bukkit.Material.DIAMOND_SWORD);
-                is.setDurability(type.getModelID());
-
+                org.bukkit.inventory.ItemStack is = new ItemStack(org.bukkit.Material.DIAMOND_SWORD, 1, type.getModelID());
+//                is.setDurability(type.getModelID()); //this might be redundant since we can just pass the damage in the constructor
                 ItemMeta meta = is.getItemMeta();
                 meta.setUnbreakable(true);
                 is.setItemMeta(meta);
 
-                mob.getEquipment().setHelmet(is);
+                asZombie.getEquipment().setHelmet(is);
             }
 
-            Map<String, Double> initAttributes = type.getInitAttributes();
-
-            for (String attributeName : type.getInitAttributes().keySet()) {
-                try {
-                    this.getAttributeInstance((IAttribute) GenericAttributes.class.getField(attributeName).get(this)).setValue(initAttributes.get(attributeName));
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                }
-            }
         }
-    }
+
+    }*/
 
     //TODO: This does nothing; figure out different way of cancelling burning in daytime
 //    @Override

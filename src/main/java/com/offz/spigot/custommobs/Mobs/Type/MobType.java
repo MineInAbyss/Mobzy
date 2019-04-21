@@ -15,12 +15,12 @@ public interface MobType {
 
     String getName();
 
-    static String toEntityTypeName(String name) {
-        return name.toUpperCase().replace(' ', '_');
+    static String toEntityTypeID(String name) {
+        return name.toLowerCase().replace(' ', '_');
     }
 
-    default String getEntityTypeName() {
-        return toEntityTypeName(getName());
+    default String getEntityTypeID() {
+        return toEntityTypeID(getName());
     }
 
     short getModelID();
@@ -42,7 +42,7 @@ public interface MobType {
     }
 
     static MobType getRegisteredMobType(Entity e) {
-        if(e.getCustomName() == null)
+        if (e.getCustomName() == null)
             return null;
         if (!e.getScoreboardTags().contains("customMob")) {
             return null;
@@ -53,7 +53,12 @@ public interface MobType {
     }
 
     static MobType getRegisteredMobType(String name) {
-        return getRegisteredMobType(new MobTypeKey(name));
+        /* our entity name always gets converted into an ID so we can use either one to get the MobType
+        the idea is to always treat names as IDs internally, so we can avoid problems with spaces
+        (and follow Minecraft's existing naming conventions)
+        We let anything outside use either one since when we create new mobs we set their customName to their name,
+        but must treat their tags with IDs*/
+        return getRegisteredMobType(new MobTypeKey(toEntityTypeID(name)));
     }
 
     static MobType getRegisteredMobType(MobTypeKey key) {
@@ -70,16 +75,16 @@ public interface MobType {
     }
 
     default MobTypeKey getKey() {
-        return new MobTypeKey(getEntityTypeName());
+        return new MobTypeKey(getName());
     }
 
 
-    class MobTypeKey { //TODO: Figure out if we really need an EntityTypeName, and implement it better
+    class MobTypeKey { //TODO: Figure out if we really need an EntityTypeID, and implement it better
         private String name;
-//        private short modelID; //May add this back later, but it's not too good of a way to identify mobs
+//        private short modelID; //May add this back later, but it's not too good of entity way to identify mobs
 
         public MobTypeKey(String name) {
-            this.name = toEntityTypeName(name);
+            this.name = toEntityTypeID(name);
         }
 
         @Override
@@ -92,7 +97,7 @@ public interface MobType {
             if (!(o instanceof MobTypeKey))
                 return false;
             MobTypeKey other = (MobTypeKey) o;
-            return /*this.modelID.equals(other.modelID) &&*/ this.name.equals(other.name);
+            return this.name.equals(other.name);
         }
     }
 }

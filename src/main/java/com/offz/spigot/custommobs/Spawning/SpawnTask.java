@@ -6,7 +6,6 @@ import com.derongan.minecraft.mineinabyss.world.AbyssWorldManager;
 import com.offz.spigot.custommobs.Loading.SpawnRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -26,13 +25,13 @@ public class SpawnTask extends BukkitRunnable {
         this.worldManager = context.getRealWorldManager();
     }
 
-    public static boolean spawnMultiple(String name, Location p, int amount, int radius) {
+    //TODO decide if we need to remove, the same code is present in the MobSpawn class
+    /*public static boolean spawnMultiple(String name, Location p, int amount, int radius) {
         return spawnMultiple(name, p, amount, radius, null);
     }
 
     public static boolean spawnMultiple(String name, Location p, int amount, int radius, List<Material> spawnWhitelist) {
         int spawned = 0;
-//        Location l = p.toBlockLocation();
 
         for (int i = 0; i < amount; i++) {
             Location l = getSpawnLocation(p, 0, radius);
@@ -44,7 +43,7 @@ public class SpawnTask extends BukkitRunnable {
         }
         Bukkit.broadcastMessage(spawned + " spawned");
         return spawned > 0;
-    }
+    }*/
 
     public static Location getSpawnLocation(Location p, double minRad, double maxRad) {
         for (int i = 0; i < 30; i++) {
@@ -59,18 +58,18 @@ public class SpawnTask extends BukkitRunnable {
             Location l = p.toBlockLocation();
             l = l.add(new Vector(x, y, z));
 
+            //TODO I'd like this to go straight down for entity couple blocks, then diagonally in 4 sides
             if (!l.getBlock().getType().isSolid()) {
-                l = checkDown(l, 50);
+                l = checkDown(l, 25);
                 if (l != null)
                     return l;
             } else {
-                l = checkUp(l, 50);
+                l = checkUp(l, 25);
                 if (l != null)
                     return l;
             }
 //            if(l == null)
 //                Bukkit.broadcastMessage("getSpawnLocation Nulled");
-
         }
         return null;
     }
@@ -139,7 +138,7 @@ public class SpawnTask extends BukkitRunnable {
 
                     Bukkit.broadcastMessage(mobCount + " mobs");
 
-                    //instead of picking a random position, do it on chunk load
+                    //get the list of mob spawns for entity layer, then remove all impossible spawns, and make entity weighted decision on the spawn
                     RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
 
                     for (MobSpawn spawn : SpawnRegistry.getLayerSpawns().get(layerName)) {

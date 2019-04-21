@@ -1,0 +1,30 @@
+group 'com.offz.spigot'
+version '2.0-SNAPSHOT'
+
+apply plugin: 'java'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    repositories {
+        maven { url = 'https://papermc.io/repo/repository/maven-public/' }
+        maven { url "http://repo.dmulloy2.net/nexus/repository/public/" }
+    }
+    mavenLocal()
+}
+dependencies {
+    compile group: 'com.derongan.minecraft', name: 'MineInAbyss', version: '0.5b-SNAPSHOT'
+    compile group: 'com.derongan.minecraft', name: 'DeeperWorld', version: '1.0-SNAPSHOT'
+    compile group: 'LibsDisguises', name: 'LibsDisguises', version: '9.8.0-SNAPSHOT'
+    compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT' // PaperMC repo
+    compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // The full Spigot server with no shadowing. Requires mavenLocal.
+    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.4.0" //ProtocolLib
+}
+
+//Move into plugins folder
+/*task copyJar(type: Copy) {
+    from jar // here it automatically reads jar file produced from jar task
+    into 'C:/Users/Offz/Documents/Programming/Spigot servers/plugins'
+}
+
+build.dependsOn copyJar*/

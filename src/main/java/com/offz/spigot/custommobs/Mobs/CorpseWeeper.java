@@ -40,7 +40,7 @@ public class CorpseWeeper extends EntityGhast {
         this.goalSelector.a(1, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 200.0F));
     }
 
-    //TODO This is only a temp fix for Corpse Weeper, try to make a better system for this setCustomName method eventually, as noted by TODO in PassiveMob
+    //TODO This is only entity temp fix for Corpse Weeper, try to make entity better system for this setCustomName method eventually, as noted by TODO in PassiveMob
     @Override
     public void setCustomName(IChatBaseComponent iChatBaseComponent) {
         super.setCustomName(iChatBaseComponent);
@@ -49,7 +49,7 @@ public class CorpseWeeper extends EntityGhast {
             Ghast mob = (Ghast) this.getBukkitEntity();
             MobType type = MobType.getRegisteredMobType(iChatBaseComponent.getString());
 
-            mob.addScoreboardTag(type.getEntityTypeName());
+            mob.addScoreboardTag(type.getEntityTypeID());
             mob.setCustomName(type.getName());
 
             AnimationBehaviour.registerMob(mob, type, type.getModelID());

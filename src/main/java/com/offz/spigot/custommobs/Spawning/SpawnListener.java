@@ -2,21 +2,17 @@ package com.offz.spigot.custommobs.Spawning;
 
 import com.derongan.minecraft.deeperworld.world.WorldManager;
 import com.derongan.minecraft.mineinabyss.AbyssContext;
-import com.derongan.minecraft.mineinabyss.world.AbyssWorldManager;
 import com.offz.spigot.custommobs.Loading.CustomType;
-import com.offz.spigot.custommobs.Loading.SpawnRegistry;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.ChatMessage;
 import net.minecraft.server.v1_13_R2.EntityTypes;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class SpawnListener implements Listener {
     private WorldManager worldManager;
@@ -69,6 +65,18 @@ public class SpawnListener implements Listener {
         return spawnEntity(name, loc);
     }
 
+    public static boolean spawnEntity(MobType type, Location loc) {
+        return spawnEntity(type.getName(), loc);
+    }
+
+    public static boolean spawnEntity(MobType type, Location loc, NBTTagCompound compound) {
+        return spawnEntity(type.getName(), loc, compound);
+    }
+
+    public static boolean spawnEntity(String name, Location loc) {
+        return spawnEntity(name, loc, (NBTTagCompound) null);
+    }
+
     /**
      * Spawns entity at specified Location
      *
@@ -76,13 +84,14 @@ public class SpawnListener implements Listener {
      * @param loc  Location to spawn at
      * @return Reference to the spawned bukkit Entity
      */
-    public static boolean spawnEntity(String name, Location loc) {
-        EntityTypes entityTypes = CustomType.types.get(MobType.toEntityTypeName(name));
+    public static boolean spawnEntity(String name, Location loc, NBTTagCompound compound) {
+        Bukkit.broadcastMessage("Summon called!");
+        EntityTypes entityTypes = CustomType.getType(MobType.toEntityTypeID(name).toLowerCase());
         if (entityTypes == null)
             return false;
         net.minecraft.server.v1_13_R2.Entity nmsEntity = entityTypes.a( // NMS method to spawn an entity from an EntityTypes
                 ((CraftWorld) loc.getWorld()).getHandle(), // reference to the NMS world
-                null, // EntityTag NBT compound
+                compound, // EntityTag NBT compound
                 new ChatMessage(name), // custom name of entity
                 null, // player reference. used to know if player is OP to apply EntityTag NBT compound
                 new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), // the BlockPosition to spawn at
@@ -91,6 +100,6 @@ public class SpawnListener implements Listener {
         // feel free to further modify your entity here if wanted
         // it's already been added to the world at this point
         return true;
-//        return nmsEntity == null ? null : nmsEntity.getBukkitEntity(); // convert to a Bukkit entity (THIS ALWAYS RETURNS NULL)
+//        return nmsEntity == null ? null : nmsEntity.getBukkitEntity(); // convert to entity Bukkit entity (THIS ALWAYS RETURNS NULL)
     }
 }

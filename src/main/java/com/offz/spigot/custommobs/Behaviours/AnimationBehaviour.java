@@ -2,9 +2,6 @@ package com.offz.spigot.custommobs.Behaviours;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
 import com.offz.spigot.custommobs.Mobs.Type.MobType;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -21,7 +18,7 @@ import java.util.UUID;
 public interface AnimationBehaviour extends MobBehaviour {
     Map<UUID, MobInfo> registeredMobs = new HashMap<>();
 
-    static void registerMob(Entity e, MobType mobType, short stillDamageValue) { //Models follow a format of Regular, Walking, and Hit model
+    static void registerMob(Entity e, MobType mobType, short stillDamageValue) { //Models follow entity format of Regular, Walking, and Hit model
         registeredMobs.put(e.getUniqueId(), new MobInfo(mobType, stillDamageValue, (short) (stillDamageValue + 1), (short) (stillDamageValue + 2), e));
     }
 
@@ -64,10 +61,10 @@ public interface AnimationBehaviour extends MobBehaviour {
                 AreaEffectCloud aec = (AreaEffectCloud) e.getPassengers().get(0);
                 ArmorStand as = ((ArmorStand) aec.getPassengers().get(0));
                 EntityEquipment ee = as.getEquipment();
-                /*CraftEntity a = (CraftEntity) mob.entity;
-                net.minecraft.server.v1_13_R2.Entity b = a.getHandle();
+                /*CraftEntity entity = (CraftEntity) mob.entity;
+                net.minecraft.server.v1_13_R2.Entity lookAt = entity.getHandle();
                 Location l = e.getLocation();
-                b.setPositionRotation(l.getX(), l.getY(), l.getZ(), 1, 1);*/
+                lookAt.setPositionRotation(l.getX(), l.getY(), l.getZ(), 1, 1);*/
 
                 ItemStack is = ee.getHelmet();
                 if (is.getDurability() == mob.hitDamageValue)
