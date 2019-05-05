@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Behaviours;
 
 import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
@@ -20,3 +21,4 @@ public class NPCBehaviour implements MobBehaviour, SpawnModelBehaviour, Animatio
 
     }
 }
+*/

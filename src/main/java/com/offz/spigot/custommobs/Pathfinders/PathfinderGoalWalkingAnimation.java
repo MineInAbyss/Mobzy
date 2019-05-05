@@ -4,9 +4,10 @@ import net.minecraft.server.v1_13_R2.EntityCreature;
 import net.minecraft.server.v1_13_R2.EnumItemSlot;
 import net.minecraft.server.v1_13_R2.ItemStack;
 import net.minecraft.server.v1_13_R2.PathfinderGoal;
+import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
-public class PathfinderGoalWalkingAnimation extends PathfinderGoal {
+public class PathfinderGoalWalkingAnimation extends PathfinderGoal implements Listener {
     private final EntityCreature a;
     private final int modelID;
 
@@ -18,6 +19,8 @@ public class PathfinderGoalWalkingAnimation extends PathfinderGoal {
 
     public boolean a() {
         ItemStack model = this.a.getEquipment(EnumItemSlot.HEAD);
+        if (model.getDamage() == modelID + 2) //if showing hit model
+            return false;
         Vector v = this.a.getBukkitEntity().getVelocity();
         //TODO this.a.velocityChanged exists in entity, but seems to do nothing, is it a better way of checking for movement?
         if (v.getX() == 0 && v.getZ() == 0)

@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Type;
 
 import com.offz.spigot.custommobs.Behaviours.DeathBehaviour;
@@ -99,3 +100,4 @@ public enum GroundMobType implements MobType {
     }
 
 }
+*/

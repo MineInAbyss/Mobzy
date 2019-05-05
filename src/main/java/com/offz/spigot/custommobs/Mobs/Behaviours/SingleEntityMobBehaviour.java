@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Behaviours;
 
 import com.offz.spigot.custommobs.Behaviours.*;
@@ -32,3 +33,4 @@ public class SingleEntityMobBehaviour implements HitBehaviour, DeathBehaviour, M
 
     }
 }
+*/

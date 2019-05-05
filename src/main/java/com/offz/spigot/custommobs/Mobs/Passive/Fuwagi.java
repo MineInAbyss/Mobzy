@@ -1,25 +1,23 @@
 package com.offz.spigot.custommobs.Mobs.Passive;
 
+import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalTemptPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
-import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import net.minecraft.server.v1_13_R2.*;
 
 public class Fuwagi extends PassiveMob {
-    private static final Item[] temptItems = new Item[]{Items.CARROT, Items.APPLE};
-    private static final String name = "Fuwagi";
-    private static final int modelID = 5;
-    private static DisguiseType disguiseAs = DisguiseType.SKELETON;
+    static MobBuilder builder = new MobBuilder("Fuwagi", 5)
+            .setTemptItems(new Item[]{Items.CARROT, Items.APPLE});
 
     public Fuwagi(World world) {
-        super(world, name, modelID);
+        super(world, builder);
     }
 
     @Override
     protected void createPathfinders() {
         super.createPathfinders();
-        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, modelID));
-        this.goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, temptItems));
+        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
+        this.goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, builder.getTemptItems()));
     }
 
     @Override
@@ -29,8 +27,8 @@ public class Fuwagi extends PassiveMob {
         this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.2D);
     }
 
-    DisguiseType getDisguiseType() {
-        return disguiseAs;
+    public MobBuilder getBuilder() {
+        return builder;
     }
 
     @Override

@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Type;
 
 
@@ -101,4 +102,4 @@ public enum NPCMobType implements MobType {
     public boolean isBaby() {
         return isBaby;
     }
-}
+}*/

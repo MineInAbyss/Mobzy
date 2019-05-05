@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Behaviours;
 
 import com.offz.spigot.custommobs.Behaviours.*;
@@ -43,4 +44,4 @@ public class NeritantanBehaviour implements WalkingBehaviour, HeadRotateBehaviou
     public void walk(MobInfo mob) {
 
     }
-}
+}*/

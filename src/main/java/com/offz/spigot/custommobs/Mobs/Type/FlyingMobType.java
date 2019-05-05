@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Type;
 
 
@@ -71,4 +72,4 @@ public enum FlyingMobType implements MobType {
     public Map<String, Double> getInitAttributes() {
         return initAttributes;
     }
-}
+}*/

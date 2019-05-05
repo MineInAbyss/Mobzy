@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Behaviours;
 
 import com.offz.spigot.custommobs.Behaviours.*;
@@ -30,4 +31,4 @@ public class LivingMobBehaviour implements MobBehaviour, HitBehaviour, DeathBeha
     public void rotateHead(MobInfo mob) {
 
     }
-}
+}*/

@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs.Type;
 
 import com.offz.spigot.custommobs.Mobs.Behaviours.MobBehaviour;
@@ -53,11 +54,13 @@ public interface MobType {
     }
 
     static MobType getRegisteredMobType(String name) {
-        /* our entity name always gets converted into an ID so we can use either one to get the MobType
+        */
+/* our entity name always gets converted into an ID so we can use either one to get the MobType
         the idea is to always treat names as IDs internally, so we can avoid problems with spaces
         (and follow Minecraft's existing naming conventions)
         We let anything outside use either one since when we create new mobs we set their customName to their name,
-        but must treat their tags with IDs*/
+        but must treat their tags with IDs*//*
+
         return getRegisteredMobType(new MobTypeKey(toEntityTypeID(name)));
     }
 
@@ -100,4 +103,4 @@ public interface MobType {
             return this.name.equals(other.name);
         }
     }
-}
+}*/

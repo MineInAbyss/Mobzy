@@ -1,36 +1,41 @@
 package com.offz.spigot.custommobs.Mobs.Passive;
 
+import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Loading.CustomType;
+import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
 import org.bukkit.entity.Animals;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
 
-public abstract class PassiveMob extends EntityAnimal {
+public abstract class PassiveMob extends EntityAnimal implements CustomMob {
     private static final DataWatcherObject<Boolean> bC;
     private static final DataWatcherObject<Integer> bD;
 
     static {
-        bC = DataWatcher.a(PassiveMob.class, DataWatcherRegistry.i);
-        bD = DataWatcher.a(PassiveMob.class, DataWatcherRegistry.b);
+        bC = DataWatcher.a(EntityZombie.class, DataWatcherRegistry.i);
+        bD = DataWatcher.a(EntityZombie.class, DataWatcherRegistry.b);
     }
 
+    private MobBuilder builder = getBuilder();
     private boolean bG;
     private int bH;
     private int bI;
 
     //TODO eventually have a builder class for passing parameters here
-    public PassiveMob(World world, String name, int modelID) {
-        super(CustomType.getType(name), world);
-
+    public PassiveMob(World world, MobBuilder builder) {
+        super(CustomType.getType(builder), world);
         this.setSize(0.5F, 0.5F);
 
         this.addScoreboardTag("customMob");
@@ -38,17 +43,23 @@ public abstract class PassiveMob extends EntityAnimal {
 
         Animals asAnimal = ((Animals) this.getBukkitEntity());
         asAnimal.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
+        asAnimal.setCustomName(builder.getName());
 
-        this.addScoreboardTag(name);
-        org.bukkit.inventory.ItemStack is = new org.bukkit.inventory.ItemStack(org.bukkit.Material.DIAMOND_SWORD);
-        is.setDurability((short) modelID);
+        this.addScoreboardTag(builder.getName());
 
+        //create an item based on model ID in head slot
+        ItemStack is = new ItemStack(builder.getModelMaterial(), (short) builder.getModelID());
         ItemMeta meta = is.getItemMeta();
         meta.setUnbreakable(true);
         is.setItemMeta(meta);
         asAnimal.getEquipment().setHelmet(is);
+//        asAnimal.setRemoveWhenFarAway(false);
 
-        DisguiseAPI.disguiseEntity(this.getBukkitEntity(), new MobDisguise(DisguiseType.ZOMBIE/*getDisguiseType()*/));
+        DisguiseAPI.disguiseEntity(this.getBukkitEntity(), new MobDisguise(builder.getDisguiseAs()/*getBuilder()*/));
+    }
+
+    public EntityTypes getType(Entity e) {
+        return CustomType.getType(CustomType.toEntityTypeID(getBuilder().getName()));
     }
 
     protected void n() {
@@ -75,16 +86,6 @@ public abstract class PassiveMob extends EntityAnimal {
         return this.bP().isEmpty() ? null : this.bP().get(0);
     }
 
-    public boolean dh() {
-        Entity entity = this.bO();
-        if (!(entity instanceof EntityHuman)) {
-            return false;
-        } else {
-            EntityHuman entityhuman = (EntityHuman) entity;
-            return entityhuman.getItemInMainHand().getItem() == Items.CARROT_ON_A_STICK || entityhuman.getItemInOffHand().getItem() == Items.CARROT_ON_A_STICK;
-        }
-    }
-
     public void a(DataWatcherObject<?> datawatcherobject) {
         if (bD.equals(datawatcherobject) && this.world.isClientSide) {
             this.bG = true;
@@ -95,27 +96,42 @@ public abstract class PassiveMob extends EntityAnimal {
         super.a(datawatcherobject);
     }
 
+    protected void x_() {
+        super.x_();
+        this.datawatcher.register(bC, false);
+        this.datawatcher.register(bD, 0);
+    }
+
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
-        Bukkit.broadcastMessage("Neritantan saved");
+        Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Neritantan saved");
     }
 
     public void a(NBTTagCompound nbttagcompound) {
         super.a(nbttagcompound);
-        Bukkit.broadcastMessage("Neritantan loaded");
+        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "Neritantan loaded");
 
-        //we actually want to reload this even if it's already disguised to fix visibility for players
-//        if (!DisguiseAPI.isDisguised(this.getBukkitEntity())) { //if not disguised
-        Bukkit.broadcastMessage("Disguised entity");
-        //TODO do we need to undisguise?
-        DisguiseAPI.disguiseEntity(this.getBukkitEntity(), new MobDisguise(getDisguiseType()));
-//        }
+        CraftEntity asEntity = this.getBukkitEntity();
+        if (!DisguiseAPI.isDisguised(asEntity)) { //if not disguised
+//            Bukkit.broadcastMessage("Disguised entity");
+            DisguiseAPI.disguiseEntity(asEntity, new MobDisguise(builder.getDisguiseAs()));
+        }
     }
-
-    abstract DisguiseType getDisguiseType();
 
     protected SoundEffect D() {
         return soundAmbient();
+    }
+
+    protected SoundEffect d(DamageSource damagesource) {
+        return soundHurt();
+    }
+
+    protected SoundEffect cs() {
+        return soundDeath();
+    }
+
+    protected void a(BlockPosition blockposition, IBlockData iblockdata) {
+        this.a(soundStep(), 0.15F, 1.0F);
     }
 
     //TODO have a builder for sounds?
@@ -123,33 +139,45 @@ public abstract class PassiveMob extends EntityAnimal {
         return SoundEffects.ENTITY_PIG_AMBIENT;
     }
 
-    protected SoundEffect d(DamageSource damagesource) {
-        return soundHurt();
-    }
-
     protected SoundEffect soundHurt() {
         return SoundEffects.ENTITY_PIG_HURT;
-    }
-
-    protected SoundEffect cs() {
-        return soundDeath();
     }
 
     protected SoundEffect soundDeath() {
         return SoundEffects.ENTITY_PIG_DEATH;
     }
 
-    protected void a(BlockPosition blockposition, IBlockData iblockdata) {
-        this.a(soundStep(), 0.15F, 1.0F);
-    }
-
     protected SoundEffect soundStep() {
         return SoundEffects.ENTITY_PIG_STEP;
     }
 
-
+    //TODO: Make a clean way of sharing methods like this between Hostile and PassiveMob
     public void die(DamageSource damagesource) {
-        super.die(damagesource);
+        if (!this.killed) {
+            Entity entity = damagesource.getEntity();
+            EntityLiving entityliving = this.cv();
+            if (this.be >= 0 && entityliving != null)
+                entityliving.a(this, this.be, damagesource);
+
+            //TODO: This causes the entity to send a statistics update on death (we don't want this),
+            // make sure it doesn't do anything else
+            /*if (entity != null)
+                entity.b(this);*/
+
+            this.killed = true;
+            this.getCombatTracker().g();
+            if (!this.world.isClientSide) {
+                if (this.isDropExperience() && this.world.getGameRules().getBoolean("doMobLoot")) {
+                    boolean flag = this.lastDamageByPlayerTime > 0;
+                    this.a(flag, 0, damagesource);
+                    CraftEventFactory.callEntityDeathEvent(this, builder.getDrops());
+                } else {
+                    CraftEventFactory.callEntityDeathEvent(this);
+                }
+            }
+
+            this.world.broadcastEntityEffect(this, (byte) 3);
+        }
     }
 
     @Nullable
@@ -216,8 +244,10 @@ public abstract class PassiveMob extends EntityAnimal {
         }
     }
 
+    @Override
     public abstract EntityAgeable createChild(EntityAgeable entityageable);
-//        public boolean f(ItemStack itemstack) {
-//        return bE.a(itemstack);
-//    }
+
+    /*public boolean f(ItemStack itemstack) {
+        return bE.a(itemstack);
+    }*/
 }

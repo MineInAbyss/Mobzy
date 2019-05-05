@@ -1,36 +1,33 @@
 package com.offz.spigot.custommobs.Mobs.Passive;
 
+import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_13_R2.EntityAgeable;
+import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.World;
 
 public class NPC extends PassiveMob {
-    private static final Item[] temptItems = new Item[]{Items.CARROT, Items.POTATO, Items.BEETROOT};
-    private static final String name = "NPC";
-    private static final int modelID = 0;
-    private static DisguiseType disguiseAs = DisguiseType.VILLAGER;
+    static MobBuilder builder = new MobBuilder("NPC", 8)
+            .setDisguiseAs(DisguiseType.VILLAGER);
 
     public NPC(World world, String name, int modelID) {
-        super(world, name, modelID);
-        this.setCustomNameVisible(true);
-        this.setInvulnerable(true);
-    }
+        super(world, new MobBuilder(builder)
+                .setName(name)
+                .setModelID(modelID));
 
-    public NPC(World world) {
-        super(world, name, modelID);
         this.setCustomNameVisible(true);
         this.setInvulnerable(true);
     }
 
     @Override
-    protected void createPathfinders(){
+    protected void createPathfinders() {
         this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 6.0F));
     }
 
-    //TODO eventually this'll just be a getBuilder and we'll pass along the builder into super() for the constructor
     @Override
-    DisguiseType getDisguiseType() {
-        return disguiseAs;
+    public MobBuilder getBuilder() {
+        return builder;
     }
 
     //TODO get this method to work in the abstract class

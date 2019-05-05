@@ -132,11 +132,11 @@ public class SpawnTask extends BukkitRunnable {
                 if (mobCount < 20) {
                     Location l = getSpawnLocation(p.getLocation(), 20, 30);
                     if (l == null) {
-                        Bukkit.broadcastMessage("getSpawnLocation nulled");
+//                        Bukkit.broadcastMessage("getSpawnLocation nulled");
                         return;
                     }
 
-                    Bukkit.broadcastMessage(mobCount + " mobs");
+//                    Bukkit.broadcastMessage(mobCount + " mobs");
 
                     //get the list of mob spawns for entity layer, then remove all impossible spawns, and make entity weighted decision on the spawn
                     RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
@@ -147,14 +147,14 @@ public class SpawnTask extends BukkitRunnable {
                     }
 
                     if (validSpawns.isEmpty()) {
-                        Bukkit.broadcastMessage("Spawn Failed");
+//                        Bukkit.broadcastMessage("Spawn Failed");
                         return;
                     }
 
                     //weighted random decision of valid spawn
                     MobSpawn spawn = validSpawns.next();
                     spawn.spawn(l);
-                    Bukkit.broadcastMessage("Spawned " + spawn.getMobID());
+//                    Bukkit.broadcastMessage("Spawned " + spawn.getMobID());
                 }
             }
         }

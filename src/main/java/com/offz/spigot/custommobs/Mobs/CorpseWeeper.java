@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.custommobs.Mobs;
 
 import com.offz.spigot.custommobs.Behaviours.AnimationBehaviour;
@@ -147,3 +148,4 @@ public class CorpseWeeper extends EntityGhast {
         }
     }
 }
+*/
