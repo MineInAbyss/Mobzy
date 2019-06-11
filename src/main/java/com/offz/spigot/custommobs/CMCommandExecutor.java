@@ -36,9 +36,9 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
             for (World world : worlds)
                 for (Entity entity : world.getEntities()) {
                     Set<String> tags = entity.getScoreboardTags();
-                    if (tags.contains("customMob")
-                            && args[0].equalsIgnoreCase("all")
-                            || tags.contains(CustomType.toEntityTypeID(args[0]).toLowerCase()))
+                    if (CustomMobsAPI.isCustomMob(entity)
+                            && (args[0].equalsIgnoreCase("all")
+                            || CustomMobsAPI.isMobOfType(entity, args[0])))
                         try {
                             if (args.length < 2 || entity.getLocation().distance(Bukkit.getPlayer(sender.getName()).getLocation()) < Integer.parseInt(args[1])) {
                                 if (!cminfo) entity.remove(); //only kill mobs if command was cmrm and not cminfo

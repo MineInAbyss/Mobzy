@@ -1,14 +1,17 @@
 package com.offz.spigot.custommobs.Mobs.Hostile;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
+import com.offz.spigot.custommobs.CustomMobsAPI;
 import com.offz.spigot.custommobs.Loading.CustomType;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Mobs.Passive.Neritantan;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalMeleeAttackPitchLock;
 import me.libraryaddict.disguise.DisguiseAPI;
+import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import net.minecraft.server.v1_13_R2.*;
+import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
 import org.bukkit.entity.Monster;
@@ -18,18 +21,16 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
-import java.util.UUID;
 
 public abstract class HostileMob extends EntityMonster implements CustomMob {
-    private static final UUID a = UUID.fromString("B9766B59-9566-4402-BC1F-2EE2A276D836");
-    private int bI;
 
-    private MobBuilder builder = getBuilder();
-
+    protected MobBuilder builder;
 
     //TODO eventually have a builder class for passing parameters here
     public HostileMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
+        this.builder = builder;
+
         this.setSize(0.6F, 1.95F);
 
         this.addScoreboardTag("customMob");
@@ -42,18 +43,15 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         this.addScoreboardTag(builder.getName());
 
         //create an item based on model ID in head slot
-        ItemStack is = new ItemStack(builder.getModelMaterial(), (short) builder.getModelID());
+        ItemStack is = new ItemStack(builder.getModelMaterial());
+        is.setDurability((short) builder.getModelID());
         ItemMeta meta = is.getItemMeta();
         meta.setUnbreakable(true);
         is.setItemMeta(meta);
         asMonster.getEquipment().setHelmet(is);
-        asMonster.setRemoveWhenFarAway(false);
 
-        DisguiseAPI.disguiseEntity(this.getBukkitEntity(), new MobDisguise(builder.getDisguiseAs()/*getBuilder()*/));
-    }
-
-    public EntityTypes getType(Entity e) {
-        return CustomType.getType(CustomType.toEntityTypeID(getBuilder().getName()));
+        Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
+        DisguiseAPI.disguiseEntity(this.getBukkitEntity(), disguise);
     }
 
     protected void n() {
@@ -61,6 +59,7 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     }
 
     protected void createPathfinders() {
+        this.goalSelector.a(1, new PathfinderGoalFloat(this));
         this.goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
 //        this.goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
         this.goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
@@ -70,6 +69,11 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityPlayer.class, true));
         this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, Neritantan.class, true));
         this.goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
+    }
+
+    @Override
+    public MobBuilder getBuilder() {
+        return builder;
     }
 
     protected void initAttributes() {
@@ -85,17 +89,10 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
-//        if (this.isBaby()) {
-//            nbttagcompound.setBoolean("IsBaby", true);
-//        }
     }
 
     public void a(NBTTagCompound nbttagcompound) {
         super.a(nbttagcompound);
-
-//        if (nbttagcompound.getBoolean("IsBaby")) {
-//            this.setBaby(true);
-//        }
         CraftEntity asEntity = this.getBukkitEntity();
 
         if (!DisguiseAPI.isDisguised(asEntity)) { //if not disguised
@@ -119,32 +116,12 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         this.a(soundStep(), 0.15F, 1.0F);
     }
 
-    //TODO have a builder for sounds?
-    protected SoundEffect soundAmbient() {
-        return SoundEffects.ENTITY_PIG_AMBIENT;
-    }
-
-    protected SoundEffect soundHurt() {
-        return SoundEffects.ENTITY_PIG_HURT;
-    }
-
-    protected SoundEffect soundDeath() {
-        return SoundEffects.ENTITY_PIG_DEATH;
-    }
-
-    protected SoundEffect soundStep() {
-        return SoundEffects.ENTITY_PIG_STEP;
-    }
-
     public void die(DamageSource damagesource) {
+        CustomMobsAPI.debug(ChatColor.RED + "Hostile died at coords " + (int) this.locX + " " + (int) this.locY + " " + (int) this.locZ);
         if (!this.killed) {
-            Entity entity = damagesource.getEntity();
             EntityLiving entityliving = this.cv();
             if (this.be >= 0 && entityliving != null)
                 entityliving.a(this, this.be, damagesource);
-
-            /*if (entity != null)
-                entity.b(this);*/
 
             this.killed = true;
             this.getCombatTracker().g();
@@ -160,10 +137,5 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
             this.world.broadcastEntityEffect(this, (byte) 3);
         }
-    }
-
-    @Nullable
-    protected MinecraftKey getDefaultLootTable() {
-        return LootTables.L;
     }
 }

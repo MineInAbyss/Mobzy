@@ -1,13 +1,19 @@
 package com.offz.spigot.custommobs.Mobs.Passive;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
+import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalTemptPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.*;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
-public class Fuwagi extends PassiveMob {
+import java.util.Arrays;
+
+public class Fuwagi extends PassiveMob implements HitBehaviour {
     static MobBuilder builder = new MobBuilder("Fuwagi", 5)
-            .setTemptItems(new Item[]{Items.CARROT, Items.APPLE});
+            .setTemptItems(new Item[]{Items.CARROT, Items.APPLE})
+            .setDrops(Arrays.asList(new ItemStack(Material.PORKCHOP, 1)));
 
     public Fuwagi(World world) {
         super(world, builder);
@@ -27,21 +33,26 @@ public class Fuwagi extends PassiveMob {
         this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.2D);
     }
 
-    public MobBuilder getBuilder() {
-        return builder;
+    @Override
+    public SoundEffect soundHurt() {
+        return SoundEffects.ENTITY_RABBIT_ATTACK;
     }
 
     @Override
-    protected MinecraftKey getDefaultLootTable() {
-        return new MinecraftKey("entities/pig");
+    public SoundEffect soundAmbient() {
+        return SoundEffects.ENTITY_RABBIT_AMBIENT;
     }
 
     @Override
-    protected SoundEffect soundHurt() {
-        return SoundEffects.ENTITY_GENERIC_EXPLODE;
+    public SoundEffect soundStep() {
+        return SoundEffects.ENTITY_RABBIT_JUMP;
     }
 
-    //creating children
+    @Override
+    public SoundEffect soundDeath() {
+        return SoundEffects.ENTITY_RABBIT_DEATH;
+    }
+
     public PassiveMob createChild(EntityAgeable entityageable) {
         return new Neritantan(this.world);
     }

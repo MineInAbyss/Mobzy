@@ -1,19 +1,20 @@
 package com.offz.spigot.custommobs.Mobs.Hostile;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
+import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.Passive.Neritantan;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.GenericAttributes;
-import net.minecraft.server.v1_13_R2.MinecraftKey;
 import net.minecraft.server.v1_13_R2.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.server.v1_13_R2.World;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 
-public class Inbyo extends HostileMob {
+public class Inbyo extends HostileMob implements HitBehaviour {
     static MobBuilder builder = new MobBuilder("Inbyo", 8)
-            .setDrops(Arrays.asList(new ItemStack(org.bukkit.Material.GOLD_INGOT)));
+            .setDrops(Arrays.asList(new ItemStack(Material.BEEF), new ItemStack(Material.BLACK_WOOL)));
 
     public Inbyo(World world) {
         super(world, builder);
@@ -34,15 +35,5 @@ public class Inbyo extends HostileMob {
         this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.45D);
         this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(7.0);
         this.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(64.0);
-    }
-
-    @Override
-    public MobBuilder getBuilder() {
-        return builder;
-    }
-
-    @Override
-    protected MinecraftKey getDefaultLootTable() {
-        return new MinecraftKey("entities/zombie");
     }
 }

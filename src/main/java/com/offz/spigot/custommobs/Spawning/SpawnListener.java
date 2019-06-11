@@ -2,7 +2,11 @@ package com.offz.spigot.custommobs.Spawning;
 
 import com.derongan.minecraft.deeperworld.world.WorldManager;
 import com.derongan.minecraft.mineinabyss.AbyssContext;
+import com.derongan.minecraft.mineinabyss.world.AbyssWorldManager;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class SpawnListener implements Listener {
     private WorldManager worldManager;
@@ -14,39 +18,41 @@ public class SpawnListener implements Listener {
     }
 
     //probably not going to be replacing vanilla entities anymore
-    /*@EventHandler
+    @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent e) {
         AbyssWorldManager manager = context.getWorldManager();
         Entity original = e.getEntity();
-        if(original.getType().equals(EntityType.BAT)){
-            e.setCancelled(true);
+        /*if(original.getType().equals(EntityType.BAT)){
             return;
         }
-        if (MobType.getRegisteredMobType(e.getEntity()) == null && e.getEntity().getType() != null && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) && !e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.DEFAULT) && manager.isAbyssWorld(e.getEntity().getWorld()) && original.getCustomName() == null) {
+        net.minecraft.server.v1_13_R2.Entity entity = (((CraftEntity) e.getEntity()).getHandle());
+        if (!(entity instanceof CustomMob)) {
+//            e.setCancelled(true);
             String layerName = manager.getLayerForSection(worldManager.getSectionFor(e.getLocation())).getName();
 
-            *//*RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
+            RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
 
             for (MobSpawn spawn : SpawnRegistry.getLayerSpawns().get(layerName)) {
-                double weight = spawn.getPriority(e);
+                double weight = spawn.getPriority(e.getLocation());
                 validSpawns.add(weight, spawn);
             }
 
             if(validSpawns.isEmpty()) {
                 e.setCancelled(true);
-                Bukkit.broadcastMessage("Spawn Failed");
+                CustomMobsAPI.debug(ChatColor.RED + "Spawn Failed");
                 return;
-            }*//*
+            }
 
             //weighted random decision of valid spawn
 //            MobSpawn spawn = validSpawns.next();
 //            spawn.spawn(e.getLocation());
-            Bukkit.broadcastMessage("Replaced " + e.getEntity().getType() + " with " *//*+ spawn.getMobID()*//*);
+            CustomMobsAPI.debug(ChatColor.GREEN + "Spawned Fuwagi");
 //            e.setCancelled(true);
-
-//            SpawnListener.spawnEntity("ROHANA", e.getLocation());
-//            e.getEntity().remove();
-            e.setCancelled(true);
-        }
-    }*/
+            Fuwagi fuwagi = new Fuwagi(((CraftWorld) e.getLocation().getWorld()).getHandle());
+            ((CraftWorld) e.getLocation().getWorld()).getHandle().addEntity(fuwagi, CreatureSpawnEvent.SpawnReason.NATURAL);
+//            CustomType.spawnEntity("fuwagi", e.getLocation());
+            e.getEntity().remove();
+        } else
+            CustomMobsAPI.debug(e.getSpawnReason() + " Spawn reason");*/
+    }
 }

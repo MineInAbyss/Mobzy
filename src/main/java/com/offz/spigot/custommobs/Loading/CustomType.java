@@ -3,26 +3,28 @@ package com.offz.spigot.custommobs.Loading;
 import com.mojang.datafixers.types.Type;
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Hostile.Inbyo;
+import com.offz.spigot.custommobs.Mobs.Hostile.Rohana;
 import com.offz.spigot.custommobs.Mobs.Passive.Fuwagi;
 import com.offz.spigot.custommobs.Mobs.Passive.NPC;
 import com.offz.spigot.custommobs.Mobs.Passive.Neritantan;
-import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
 import net.minecraft.server.v1_13_R2.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class CustomType {
     public static EntityTypes NERITANTAN;
     public static EntityTypes FUWAGI;
 
     //Hostile
     public static EntityTypes INBYO;
+    public static EntityTypes ROHANA;
 
     //NPCs
     public static EntityTypes MITTY, NANACHI, BONDREWD, HABO, JIRUO, KIYUI, MARULK, NAT, OZEN, REG, RIKO, SHIGGY, TORKA;
@@ -36,6 +38,7 @@ public class CustomType {
 
         //Hostile
         INBYO = registerEntity(Inbyo.class, Inbyo::new);
+        INBYO = registerEntity(Rohana.class, Rohana::new);
 
 
         //NPCs
@@ -58,12 +61,18 @@ public class CustomType {
         return name.toLowerCase().replace(' ', '_');
     }
 
+    public static EntityTypes getType(Set<String> tags) {
+        for (String tag : tags)
+            if (types.containsKey(toEntityTypeID(tag)))
+                return types.get(toEntityTypeID(tag));
+        return null;
+    }
+
     public static EntityTypes getType(String name) {
         return types.get(toEntityTypeID(name));
     }
 
     public static EntityTypes getType(MobBuilder builder) {
-        Bukkit.broadcastMessage(toEntityTypeID(builder.getName()));
         return types.get(toEntityTypeID(builder.getName()));
     }
 
@@ -71,21 +80,8 @@ public class CustomType {
         return types;
     }
 
-    public static MobBuilder getBuilder(org.bukkit.entity.Entity e) {
-        return getBuilder(((CraftEntity) e).getHandle());
-    }
-
-    public static MobBuilder getBuilder(Entity e) {
-        if (e instanceof PassiveMob) {
-            return ((PassiveMob) e).getBuilder();
-        }
-        return null;
-    }
-
-
     private static EntityTypes registerEntity(Class entityClass, Function<? super World, ? extends Entity> entityFromClass) {
         String name = toEntityTypeID(entityClass.getSimpleName());
-        Bukkit.getConsoleSender().sendMessage(name);
         return registerEntity(name, entityClass, entityFromClass);
     }
 
@@ -106,28 +102,28 @@ public class CustomType {
         return EntityTypes.a(name, EntityTypes.a.a(clazz, function));
     }
 
+    public static org.bukkit.entity.Entity spawnEntity(String name, Location loc) {
+        EntityTypes entityTypes = CustomType.getType(name);
+        return entityTypes == null ? null : spawnEntity(entityTypes, loc);
+    }
 
     /**
      * Spawns entity at specified Location
      *
-     * @param name name of entity to spawn
+     * @param entityTypes type of entity to spawn
      * @param loc  Location to spawn at
      * @return Reference to the spawned bukkit Entity
      */
-    public static org.bukkit.entity.Entity spawnEntity(String name, Location loc) {
-        Bukkit.broadcastMessage("Summon called!");
-        EntityTypes entityTypes = CustomType.getType(CustomType.toEntityTypeID(name).toLowerCase());
-        if (entityTypes == null)
-            return null;
-
-        net.minecraft.server.v1_13_R2.Entity nmsEntity = entityTypes.a( // NMS method to spawn an entity from an EntityTypes
+    public static org.bukkit.entity.Entity spawnEntity(EntityTypes entityTypes, Location loc) {
+        net.minecraft.server.v1_13_R2.Entity nmsEntity = entityTypes.spawnCreature( // NMS method to spawn an entity from an EntityTypes
                 ((CraftWorld) loc.getWorld()).getHandle(), // reference to the NMS world
                 null, // EntityTag NBT compound
                 null, // custom name of entity
                 null, // player reference. used to know if player is OP to apply EntityTag NBT compound
                 new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), // the BlockPosition to spawn at
                 true, // center entity on BlockPosition and correct Y position for Entity's height
-                false); // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
+                false,
+                CreatureSpawnEvent.SpawnReason.CUSTOM); // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
         // feel free to further modify your entity here if wanted
         // it's already been added to the world at this point
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity(); // convert to a Bukkit entity

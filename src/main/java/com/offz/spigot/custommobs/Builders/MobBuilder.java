@@ -19,6 +19,17 @@ public final class MobBuilder {
     private Double movementSpeed;
     private Double followRange;
     private Double attackDamage;
+
+    private boolean isAdult = true;
+
+    public boolean isAdult() {
+        return isAdult;
+    }
+
+    public MobBuilder setAdult(boolean adult) {
+        isAdult = adult;
+        return this;
+    }
     private List<ItemStack> drops = new ArrayList<>();
 
     public MobBuilder(String name, int modelID) {

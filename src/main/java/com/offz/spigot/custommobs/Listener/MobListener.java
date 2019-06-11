@@ -2,12 +2,11 @@ package com.offz.spigot.custommobs.Listener;
 
 import com.offz.spigot.custommobs.CustomMobs;
 import com.offz.spigot.custommobs.MobContext;
+import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.EnumItemSlot;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Statistic;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.event.EventHandler;
@@ -38,7 +37,7 @@ public class MobListener implements Listener {
         //if the statistic is entity related and the entity is null, it must be custom, therefore we cancel the event
         if (e.getStatistic().getType().equals(Statistic.Type.ENTITY) && e.getEntityType() == null) {
             e.setCancelled(true);
-            Bukkit.broadcastMessage(ChatColor.RED + "Overrode statistic");
+//            CustomMobsAPI.debug(ChatColor.RED + "Overrode statistic");
         }
     }
 
@@ -50,10 +49,7 @@ public class MobListener implements Listener {
     @EventHandler
     public void onHit(EntityDamageEvent e) {
         Entity entity = (((CraftEntity) e.getEntity()).getHandle());
-        //TODO: After reload, existing entities' classes are considered completely separate from their actual classes, so instanceof or casting doesn't work
-        // However, after the entities' NBT is reloaded (the a() and b() methods), they go back to normal
-        // Most likely, just force an NBT reload on all custom entities on plugin reload
-        if (entity instanceof CustomMob) {
+        if (entity instanceof HitBehaviour) {
             int modelID = ((CustomMob) entity).getBuilder().getModelID();
             net.minecraft.server.v1_13_R2.ItemStack is = ((EntityLiving) entity).getEquipment(EnumItemSlot.HEAD);
             is.setDamage(modelID + 2);
