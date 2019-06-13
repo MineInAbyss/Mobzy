@@ -1,11 +1,13 @@
 package com.offz.spigot.custommobs.Builders;
 
+import com.offz.spigot.custommobs.Mobs.MobDrop;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import net.minecraft.server.v1_13_R2.Item;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class MobBuilder {
@@ -21,16 +23,7 @@ public final class MobBuilder {
     private Double attackDamage;
 
     private boolean isAdult = true;
-
-    public boolean isAdult() {
-        return isAdult;
-    }
-
-    public MobBuilder setAdult(boolean adult) {
-        isAdult = adult;
-        return this;
-    }
-    private List<ItemStack> drops = new ArrayList<>();
+    private List<MobDrop> drops = new ArrayList<>();
 
     public MobBuilder(String name, int modelID) {
         this.name = name;
@@ -49,12 +42,26 @@ public final class MobBuilder {
         this.attackDamage = copy.attackDamage;
     }
 
-    public List<ItemStack> getDrops() {
-        return drops;
+    public boolean isAdult() {
+        return isAdult;
     }
 
-    public MobBuilder setDrops(List<ItemStack> drops) {
-        this.drops = drops;
+    public MobBuilder setAdult(boolean adult) {
+        isAdult = adult;
+        return this;
+    }
+
+    public List<ItemStack> getDrops() {
+        List<ItemStack> chosenDrops = new ArrayList<>();
+        for(MobDrop drop: drops){
+            ItemStack chosenDrop = drop.chooseDrop();
+            chosenDrops.add(chosenDrop);
+        }
+        return chosenDrops;
+    }
+
+    public MobBuilder setDrops(MobDrop... drops) {
+        this.drops = Arrays.asList(drops);
         return this;
     }
 
