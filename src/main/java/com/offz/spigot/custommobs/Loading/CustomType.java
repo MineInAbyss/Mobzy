@@ -2,6 +2,7 @@ package com.offz.spigot.custommobs.Loading;
 
 import com.mojang.datafixers.types.Type;
 import com.offz.spigot.custommobs.Builders.MobBuilder;
+import com.offz.spigot.custommobs.Mobs.Behaviours.AfterSpawnBehaviour;
 import com.offz.spigot.custommobs.Mobs.Hostile.Inbyo;
 import com.offz.spigot.custommobs.Mobs.Hostile.Rohana;
 import com.offz.spigot.custommobs.Mobs.Passive.Fuwagi;
@@ -124,8 +125,11 @@ public class CustomType {
                 true, // center entity on BlockPosition and correct Y position for Entity's height
                 false,
                 CreatureSpawnEvent.SpawnReason.CUSTOM); // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
-        // feel free to further modify your entity here if wanted
-        // it's already been added to the world at this point
+
+        //Call a method after the entity has been spawned and things like location have been determined
+        if(nmsEntity instanceof AfterSpawnBehaviour)
+            ((AfterSpawnBehaviour) nmsEntity).afterSpawn();
+
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity(); // convert to a Bukkit entity
     }
 }
