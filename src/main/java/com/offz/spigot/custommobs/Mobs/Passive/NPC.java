@@ -15,13 +15,14 @@ public class NPC extends PassiveMob {
                 .setDisguiseAs(DisguiseType.VILLAGER)
                 .setModelMaterial(Material.DIAMOND_AXE));
 
-        this.setCustomNameVisible(true);
-        this.setInvulnerable(true);
+        setCustomNameVisible(true);
+        setInvulnerable(true);
+        setSize(0, 0);
     }
 
     @Override
     protected void createPathfinders() {
-        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 6.0F));
+        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 6.0F, 1F));
     }
 
     //TODO get this method to work in the abstract class

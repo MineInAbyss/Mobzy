@@ -11,7 +11,7 @@ public class PathfinderGoalLookAtPlayerPitchLock extends PathfinderGoal {
     protected Class<? extends Entity> d;
 
     public PathfinderGoalLookAtPlayerPitchLock(EntityInsentient var1, Class<? extends Entity> var2, float var3) {
-        this(var1, var2, var3, 2F);
+        this(var1, var2, var3, 0.02F);
     }
 
     public PathfinderGoalLookAtPlayerPitchLock(EntityInsentient var1, Class<? extends Entity> var2, float var3, float var4) {

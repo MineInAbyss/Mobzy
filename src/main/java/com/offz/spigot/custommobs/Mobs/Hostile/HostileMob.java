@@ -4,7 +4,6 @@ import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.CustomMobsAPI;
 import com.offz.spigot.custommobs.Loading.CustomType;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
-import com.offz.spigot.custommobs.Mobs.Passive.Neritantan;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalMeleeAttackPitchLock;
 import me.libraryaddict.disguise.DisguiseAPI;
@@ -14,44 +13,20 @@ import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
-import org.bukkit.entity.Monster;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
 
+/**
+ * Lots of code taken from EntityZombie
+ */
 public abstract class HostileMob extends EntityMonster implements CustomMob {
-
     protected MobBuilder builder;
 
-    //TODO eventually have a builder class for passing parameters here
     public HostileMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
         this.builder = builder;
 
-        this.setSize(0.6F, 1.95F);
-
-        this.addScoreboardTag("customMob");
-        this.setCustomNameVisible(true);
-
-        Monster asMonster = ((Monster) this.getBukkitEntity());
-        asMonster.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
-        asMonster.setCustomName(builder.getName());
-
-        this.addScoreboardTag(builder.getName());
-
-        //create an item based on model ID in head slot
-        ItemStack is = new ItemStack(builder.getModelMaterial());
-        is.setDurability((short) builder.getModelID());
-        ItemMeta meta = is.getItemMeta();
-        meta.setUnbreakable(true);
-        is.setItemMeta(meta);
-        asMonster.getEquipment().setHelmet(is);
-
-        Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
-        DisguiseAPI.disguiseEntity(this.getBukkitEntity(), disguise);
+        createCustomMob(world, builder, this);
     }
 
     protected void n() {
@@ -59,16 +34,36 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     }
 
     protected void createPathfinders() {
-        this.goalSelector.a(1, new PathfinderGoalFloat(this));
-        this.goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
+//        this.goalSelector.a(4, new EntityZombie.a(Blocks.TURTLE_EGG, this, 1.0D, 3));
 //        this.goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
         this.goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
         this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
 
-        //Hostile attributes
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityPlayer.class, true));
-        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, Neritantan.class, true));
+
+        this.goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
         this.goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
+        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
+//        if (this.world.spigotConfig.zombieAggressiveTowardsVillager) {
+//            this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityVillager.class, false));
+//        }
+
+//        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityIronGolem.class, true));
+//        this.targetSelector.a(5, new PathfinderGoalNearestAttackableTarget(this, EntityTurtle.class, 10, true, false, EntityTurtle.bC));
+
+
+//        goalSelector.a(1, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F, 1));
+
+
+
+        /*goalSelector.a(1, new PathfinderGoalFloat(this));
+        goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
+        goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
+        goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
+
+        //Hostile attributes
+        targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityPlayer.class, true));
+        targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, Neritantan.class, true));
+        goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));*/
     }
 
     @Override
@@ -78,13 +73,14 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
     protected void initAttributes() {
         super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.25D);
+        getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
+        getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.25D);
+        getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(35.0D);
     }
 
     @Nullable
     public Entity bO() {
-        return this.bP().isEmpty() ? null : this.bP().get(0);
+        return bP().isEmpty() ? null : bP().get(0);
     }
 
     public void b(NBTTagCompound nbttagcompound) {
@@ -93,10 +89,12 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
     public void a(NBTTagCompound nbttagcompound) {
         super.a(nbttagcompound);
-        CraftEntity asEntity = this.getBukkitEntity();
+        CraftEntity asEntity = getBukkitEntity();
 
         if (!DisguiseAPI.isDisguised(asEntity)) { //if not disguised
-            DisguiseAPI.disguiseEntity(asEntity, new MobDisguise(builder.getDisguiseAs()));
+            Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
+            DisguiseAPI.disguiseEntity(asEntity, disguise);
+            disguise.getWatcher().setInvisible(true);
         }
     }
 
@@ -113,29 +111,29 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     }
 
     protected void a(BlockPosition blockposition, IBlockData iblockdata) {
-        this.a(soundStep(), 0.15F, 1.0F);
+        a(soundStep(), 0.15F, 1.0F);
     }
 
     public void die(DamageSource damagesource) {
-        CustomMobsAPI.debug(ChatColor.RED + "Hostile died at coords " + (int) this.locX + " " + (int) this.locY + " " + (int) this.locZ);
-        if (!this.killed) {
-            EntityLiving entityliving = this.cv();
-            if (this.be >= 0 && entityliving != null)
-                entityliving.a(this, this.be, damagesource);
+        CustomMobsAPI.debug(ChatColor.RED + "Hostile died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
+        if (!killed) {
+            EntityLiving entityliving = cv();
+            if (be >= 0 && entityliving != null)
+                entityliving.a(this, be, damagesource);
 
-            this.killed = true;
-            this.getCombatTracker().g();
-            if (!this.world.isClientSide) {
-                if (this.isDropExperience() && this.world.getGameRules().getBoolean("doMobLoot")) {
-                    boolean flag = this.lastDamageByPlayerTime > 0;
-                    this.a(flag, 0, damagesource);
+            killed = true;
+            getCombatTracker().g();
+            if (!world.isClientSide) {
+                if (isDropExperience() && world.getGameRules().getBoolean("doMobLoot")) {
+                    boolean flag = lastDamageByPlayerTime > 0;
+                    a(flag, 0, damagesource);
                     CraftEventFactory.callEntityDeathEvent(this, builder.getDrops());
                 } else {
                     CraftEventFactory.callEntityDeathEvent(this);
                 }
             }
 
-            this.world.broadcastEntityEffect(this, (byte) 3);
+            world.broadcastEntityEffect(this, (byte) 3);
         }
     }
 }

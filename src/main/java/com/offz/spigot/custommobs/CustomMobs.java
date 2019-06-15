@@ -19,11 +19,13 @@ public final class CustomMobs extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        CustomType.registerAllMobs();
+//        CustomType.registerAllMobs();
     }
 
     @Override
     public void onEnable() {
+        getLogger().info("On enable has been called");
+        CustomType.registerAllMobs();
         saveDefaultConfig();
         CustomMobsAPI.loadConfigValues(this);
         AbyssContext abyssContext = MineInAbyss.getContext();
@@ -32,7 +34,6 @@ public final class CustomMobs extends JavaPlugin {
         context.setPlugin(this);
         context.setLogger(getLogger());
 
-        getLogger().info("On enable has been called");
 
         //Register events
         getServer().getPluginManager().registerEvents(new MobListener(context), this);
@@ -59,18 +60,23 @@ public final class CustomMobs extends JavaPlugin {
          */
         for (World world : getServer().getWorlds()) {
             for (Entity entity : world.getEntities()) {
-                if (entity.getScoreboardTags().contains("customMob") && !(((CraftEntity) entity).getHandle() instanceof CustomMob)) {
+                if (entity.getScoreboardTags().contains("customMob2") && !(((CraftEntity) entity).getHandle() instanceof CustomMob)) {
                     EntityLiving nmsEntity = (EntityLiving) ((CraftEntity) entity).getHandle();
-                    EntityLiving replacement = (EntityLiving) ((CraftEntity) CustomType.spawnEntity(CustomType.getType(nmsEntity.getScoreboardTags()), entity.getLocation())).getHandle();
-                    NBTTagCompound nbt = new NBTTagCompound();
-                    nmsEntity.b(nbt); //.b copies over the entity's nbt data to the compound
+                    try {
+                        EntityLiving replacement = (EntityLiving) ((CraftEntity) CustomType.spawnEntity(CustomType.getType(nmsEntity.getScoreboardTags()), entity.getLocation())).getHandle();
+                        NBTTagCompound nbt = new NBTTagCompound();
+                        nmsEntity.b(nbt); //.b copies over the entity's nbt data to the compound
+                        entity.remove();
+                        replacement.a(nbt); //.a copies the nbt data to the new entity
+                    } catch (Exception e) {
+                        /*if any error ever occurs, just go on with removing the entity that caused the error, otherwise
+                        the plugin won't load*/
+                    }
+                } else if (entity.getScoreboardTags().contains("additionalPart"))
                     entity.remove();
-                    replacement.a(nbt); //.a copies the nbt data to the new entity
-                }
             }
         }
         getLogger().info(ChatColor.GREEN + "CustomMobs: Loaded " + num + " custom entities on startup");
-
     }
 
     @Override

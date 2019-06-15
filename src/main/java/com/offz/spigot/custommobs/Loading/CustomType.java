@@ -3,9 +3,10 @@ package com.offz.spigot.custommobs.Loading;
 import com.mojang.datafixers.types.Type;
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.AfterSpawnBehaviour;
-import com.offz.spigot.custommobs.Mobs.Hostile.Inbyo;
-import com.offz.spigot.custommobs.Mobs.Hostile.Rohana;
+import com.offz.spigot.custommobs.Mobs.Flying.*;
+import com.offz.spigot.custommobs.Mobs.Hostile.*;
 import com.offz.spigot.custommobs.Mobs.Passive.Fuwagi;
+import com.offz.spigot.custommobs.Mobs.Passive.Mount;
 import com.offz.spigot.custommobs.Mobs.Passive.NPC;
 import com.offz.spigot.custommobs.Mobs.Passive.Neritantan;
 import net.minecraft.server.v1_13_R2.*;
@@ -20,15 +21,17 @@ import java.util.function.Function;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class CustomType {
-    public static EntityTypes NERITANTAN;
-    public static EntityTypes FUWAGI;
+    //Passive
+    public static EntityTypes NERITANTAN, FUWAGI, MOUNT;
 
     //Hostile
-    public static EntityTypes INBYO;
-    public static EntityTypes ROHANA;
+    public static EntityTypes INBYO, ROHANA, TAMAGAUCHI, SILKFANG, KUONGATARI, NAKIKABANE, TESUCHI;
 
     //NPCs
-    public static EntityTypes MITTY, NANACHI, BONDREWD, HABO, JIRUO, KIYUI, MARULK, NAT, OZEN, REG, RIKO, SHIGGY, TORKA;
+    public static EntityTypes MITTY, NANACHI, BONDREWD, HABO, JIRUO, KIYUI, MARULK, NAT, OZEN, REG, RIKO, SHIGGY, TORKA, LYZA;
+
+    //FLYING
+    public static EntityTypes CORPSE_WEEPER, MADOKAJACK, HAMMERBEAK, KAZURA, BENIKUCHINAWA;
 
     //this is used for getting a MobType from a String, which makes it easier to access from MobBuilder
     private static Map<String, EntityTypes> types = new HashMap<>();
@@ -36,11 +39,23 @@ public class CustomType {
     public static void registerAllMobs() {
         NERITANTAN = registerEntity(Neritantan.class, Neritantan::new);
         FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
+        MOUNT = registerEntity(Mount.class, Mount::new);
 
         //Hostile
         INBYO = registerEntity(Inbyo.class, Inbyo::new);
-        INBYO = registerEntity(Rohana.class, Rohana::new);
+        ROHANA = registerEntity(Rohana.class, Rohana::new);
+        TAMAGAUCHI = registerEntity(Tamaugachi.class, Tamaugachi::new);
+        SILKFANG = registerEntity(Silkfang.class, Silkfang::new);
+        KUONGATARI = registerEntity(Kuongatari.class, Kuongatari::new);
+        NAKIKABANE = registerEntity(Nakikabane.class, Nakikabane::new);
+        TESUCHI = registerEntity(Tesuchi.class, Tesuchi::new);
 
+        //FLYING
+        CORPSE_WEEPER = registerEntity(CorpseWeeper.class, CorpseWeeper::new);
+        MADOKAJACK = registerEntity(Madokajack.class, Madokajack::new);
+        HAMMERBEAK = registerEntity(Hammerbeak.class, Hammerbeak::new);
+        KAZURA = registerEntity(Kazura.class, Kazura::new);
+        BENIKUCHINAWA = registerEntity(Benikuchinawa.class, Benikuchinawa::new);
 
         //NPCs
         MITTY = registerEntity("mitty", NPC.class, (world -> new NPC(world, "Mitty", 2)));
@@ -56,10 +71,11 @@ public class CustomType {
         RIKO = registerEntity("riko", NPC.class, (world -> new NPC(world, "Riko", 12)));
         SHIGGY = registerEntity("shiggy", NPC.class, (world -> new NPC(world, "Shiggy", 13)));
         TORKA = registerEntity("torka", NPC.class, (world -> new NPC(world, "Torka", 14)));
+        LYZA = registerEntity("lyza", NPC.class, (world -> new NPC(world, "Lyza", 15)));
     }
 
     public static String toEntityTypeID(String name) {
-        return name.toLowerCase().replace(' ', '_');
+        return name.toLowerCase().replace(" ", "");
     }
 
     public static EntityTypes getType(Set<String> tags) {
@@ -112,7 +128,7 @@ public class CustomType {
      * Spawns entity at specified Location
      *
      * @param entityTypes type of entity to spawn
-     * @param loc  Location to spawn at
+     * @param loc         Location to spawn at
      * @return Reference to the spawned bukkit Entity
      */
     public static org.bukkit.entity.Entity spawnEntity(EntityTypes entityTypes, Location loc) {
@@ -127,7 +143,7 @@ public class CustomType {
                 CreatureSpawnEvent.SpawnReason.CUSTOM); // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
 
         //Call a method after the entity has been spawned and things like location have been determined
-        if(nmsEntity instanceof AfterSpawnBehaviour)
+        if (nmsEntity instanceof AfterSpawnBehaviour)
             ((AfterSpawnBehaviour) nmsEntity).afterSpawn();
 
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity(); // convert to a Bukkit entity

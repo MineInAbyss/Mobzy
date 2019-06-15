@@ -1,21 +1,22 @@
-package com.offz.spigot.custommobs.Mobs.Hostile;
+package com.offz.spigot.custommobs.Mobs.Passive;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.MobDrop;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
+import net.minecraft.server.v1_13_R2.EntityAgeable;
 import net.minecraft.server.v1_13_R2.GenericAttributes;
 import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;
 
-public class Rohana extends HostileMob implements HitBehaviour {
-    static MobBuilder builder = new MobBuilder("Rohana", 14)
-            .setAdult(false)
-            .setDrops(new MobDrop(Material.GLOWSTONE_DUST, 2));
+public class Mount extends PassiveMob implements HitBehaviour {
+    static MobBuilder builder = new MobBuilder("Mount", 38)
+            .setDrops(new MobDrop(Material.LEATHER, 3, 5));
 
-    public Rohana(World world) {
+    //TODO make rideable
+    public Mount(World world) {
         super(world, builder);
-        this.setSize(0.6F, 0.6F);
+        setSize(3, 3);
     }
 
     @Override
@@ -27,8 +28,11 @@ public class Rohana extends HostileMob implements HitBehaviour {
     @Override
     protected void initAttributes() {
         super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(7.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.3D);
-        this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(0.2);
+        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(50.0D);
+        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.25D);
+    }
+
+    public PassiveMob createChild(EntityAgeable entityageable) {
+        return new Mount(this.world);
     }
 }

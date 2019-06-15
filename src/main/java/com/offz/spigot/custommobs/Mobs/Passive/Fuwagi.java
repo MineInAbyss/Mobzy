@@ -2,18 +2,16 @@ package com.offz.spigot.custommobs.Mobs.Passive;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
+import com.offz.spigot.custommobs.Mobs.MobDrop;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalTemptPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
 
 public class Fuwagi extends PassiveMob implements HitBehaviour {
     static MobBuilder builder = new MobBuilder("Fuwagi", 5)
             .setTemptItems(new Item[]{Items.CARROT, Items.APPLE})
-            .setDrops(Arrays.asList(new ItemStack(Material.PORKCHOP, 1)));
+            .setDrops(new MobDrop(Material.PORKCHOP, 1));
 
     public Fuwagi(World world) {
         super(world, builder);

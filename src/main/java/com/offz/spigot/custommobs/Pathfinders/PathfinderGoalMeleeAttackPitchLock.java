@@ -102,6 +102,6 @@ public class PathfinderGoalMeleeAttackPitchLock extends PathfinderGoal {
     }
 
     protected double a(EntityLiving var0) {
-        return (double) (this.a.width * 2.0F * this.a.width * 2.0F + var0.width);
+        return (double) (this.a.width * 1.0F * this.a.width * 1.0F + var0.width);
     }
 }

@@ -7,13 +7,21 @@ import com.offz.spigot.custommobs.Mobs.CustomMob;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.EnumItemSlot;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Statistic;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 public class MobListener implements Listener {
     CustomMobs plugin;
@@ -55,16 +63,51 @@ public class MobListener implements Listener {
             is.setDamage(modelID + 2);
             entity.setEquipment(EnumItemSlot.HEAD, is);
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!entity.getBukkitEntity().isDead()) {
-                        is.setDamage(modelID + 1);
-                        entity.setEquipment(EnumItemSlot.HEAD, is);
+            try {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (!entity.getBukkitEntity().isDead()) {
+                            is.setDamage(modelID + 1);
+                            entity.setEquipment(EnumItemSlot.HEAD, is);
+                        }
                     }
-                }
-            }.runTaskLater(plugin, 5);
+                }.runTaskLater(plugin, 5);
+            } catch (NoClassDefFoundError error) { //this has happened to me once, where it couldn't get the runnable to start. Reloading the plugin fixed it
+                //TODO reload plugin
+            }
         }
     }
 
+    /**
+     * Remove all old entities, which still contain the "customMob" tag (now "customMob2")
+     *
+     * @param e the event
+     */
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent e) {
+        for (org.bukkit.entity.Entity entity : e.getChunk().getEntities()) {
+            if (entity.getScoreboardTags().contains("customMob"))
+                entity.remove();
+        }
+    }
+
+    /**
+     * The magic method that lets you hit entities in their server side hitboxes
+     *
+     * @param e
+     */
+    @EventHandler()
+    public void onLeftClick(PlayerInteractEvent e) {
+        //TODO i'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
+        // armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:
+        Player p = e.getPlayer();
+        if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
+            RayTraceResult trace = p.getWorld().rayTrace(p.getLocation().add(new Vector(0, p.getEyeHeight(), 0)), p.getLocation().getDirection(), 3, FluidCollisionMode.ALWAYS, true, 0, entity -> !entity.equals(p));
+            if (trace != null && trace.getHitEntity() != null) {
+                e.setCancelled(true);
+                ((CraftPlayer) p).getHandle().attack(((CraftEntity) trace.getHitEntity()).getHandle());
+            }
+        }
+    }
 }

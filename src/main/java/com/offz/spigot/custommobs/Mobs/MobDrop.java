@@ -9,16 +9,19 @@ public class MobDrop {
     private int minAmount;
     private int maxAmount;
 
-
-    public MobDrop(Material material, double dropChance) {
-        this(material, dropChance, 1, 1);
+    public MobDrop(Material material, int amount) {
+        this(material, amount, amount, 1);
     }
 
-    public MobDrop(Material material, double dropChance, int maxAmount) {
-        this(material, dropChance, 0, maxAmount);
+    public MobDrop(Material material, int amount, double dropChance) {
+        this(material, amount, amount, dropChance);
     }
 
-    public MobDrop(Material material, double dropChance, int minAmount, int maxAmount) {
+    public MobDrop(Material material, int minAmount, int maxAmount) {
+        this(material, minAmount, maxAmount, 1);
+    }
+
+    public MobDrop(Material material, int minAmount, int maxAmount, double dropChance) {
         this.material = material;
         this.dropChance = dropChance;
         this.minAmount = minAmount;
