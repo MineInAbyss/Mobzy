@@ -1,5 +1,6 @@
-package com.offz.spigot.custommobs.Spawning;
+package com.offz.spigot.custommobs.Spawning.Vertical;
 
+import com.offz.spigot.custommobs.Spawning.MobSpawn;
 import org.bukkit.Location;
 
 public class SpawnArea {
@@ -21,8 +22,10 @@ public class SpawnArea {
         return bottom;
     }
 
-    public Location getSpawnLocation(MobSpawn.SpawnPosition spawnPosition){
-        if(spawnPosition.equals(MobSpawn.SpawnPosition.GROUND))
+    public Location getSpawnLocation(MobSpawn.SpawnPosition spawnPosition) {
+        if (spawnPosition.equals(MobSpawn.SpawnPosition.AIR))
+            return getBottom().clone().add(0, Math.random() * (getTop().getY() - getBottom().getY()), 0);
+        else if (spawnPosition.equals(MobSpawn.SpawnPosition.GROUND))
             return getBottom();
         else
             return getTop();

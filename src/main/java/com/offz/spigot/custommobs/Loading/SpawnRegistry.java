@@ -12,36 +12,39 @@ public class SpawnRegistry {
     private static Map<String, List<MobSpawn>> layerSpawns = new HashMap<>();
 
     static {
-        layerSpawns.put("Orth", Arrays.asList(
-                new MobSpawn.MobSpawnBuilder().withMobID("FUWAGI").withMinLightLevel(7).withMinAmount(2).withMaxAmount(6).withRadius(6).withWhitelist(Arrays.asList(Material.GRASS_BLOCK)).build(),
-                new MobSpawn.MobSpawnBuilder().withMobID("ROHANA").withMaxLightLevel(7).withMinAmount(5).withRadius(6).withWhitelist(Arrays.asList(Material.GRASS_BLOCK)).build()
-        ));
-
-        layerSpawns.put("Edge of the Abyss", Arrays.asList(
-                new MobSpawn.MobSpawnBuilder().withMobID("FUWAGI").build())
+        addSpawn("Orth",
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.FUWAGI).withMinLightLevel(7).withMinAmount(2).withMaxAmount(3).withRadius(6).withWhitelist(Material.GRASS_BLOCK).build(),
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.ROHANA).withMaxLightLevel(7).withMinAmount(4).withMaxAmount(5).withRadius(6).withWhitelist(Material.GRASS_BLOCK).build(),
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.MOUNT).withMinAmount(1).withWhitelist(Material.GRASS_BLOCK, Material.STONE, Material.STONE_BRICKS, Material.COBBLESTONE).withBasePriority(0.2).build()
         );
 
-        layerSpawns.put("Forest of Temptation", Arrays.asList(
-                new MobSpawn.MobSpawnBuilder().withMobID("INBYO").build(),
-                new MobSpawn.MobSpawnBuilder().withMobID("CORPSE_WEEPER").build())
+        addSpawn("Edge of the Abyss",
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.FUWAGI).build(),
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.HAMMERBEAK).withBasePriority(0.4).withSpawnPos(MobSpawn.SpawnPosition.AIR).build()
         );
 
-        layerSpawns.put("Great Fault", Arrays.asList(
-                new MobSpawn.MobSpawnBuilder().withMobID("NERITANTAN").build())
+        addSpawn("Forest of Temptation",
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.INBYO).build(),
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.CORPSE_WEEPER).build()
         );
 
-        layerSpawns.put("The Goblet of Giants", Arrays.asList(
-                new MobSpawn.MobSpawnBuilder().withMobID("ROHANA").build())
+        addSpawn("Great Fault",
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.NERITANTAN).build()
         );
 
-        layerSpawns.put("Sea of Corpses", Arrays.asList()
+        addSpawn("The Goblet of Giants",
+                new MobSpawn.MobSpawnBuilder().withMobID(CustomType.ROHANA).build()
         );
 
-        layerSpawns.put("The Capital of the Unreturned", Arrays.asList()
-        );
+        addSpawn("Sea of Corpses");
 
-        layerSpawns.put("The Final Maelstrom", Arrays.asList()
-        );
+        addSpawn("The Capital of the Unreturned");
+
+        addSpawn("The Final Maelstrom");
+    }
+
+    private static void addSpawn(String name, MobSpawn... spawns) {
+        layerSpawns.put(name, Arrays.asList(spawns));
     }
 
     public static Map<String, List<MobSpawn>> getLayerSpawns() {

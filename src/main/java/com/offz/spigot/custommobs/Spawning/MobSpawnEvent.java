@@ -1,20 +1,16 @@
 package com.offz.spigot.custommobs.Spawning;
 
-import org.bukkit.Location;
+import com.offz.spigot.custommobs.Spawning.Vertical.SpawnArea;
 
 public class MobSpawnEvent {
     private MobSpawn mobSpawn;
-    private Location location;
+    private SpawnArea area;
     private int spawns;
 
-    public MobSpawnEvent(MobSpawn mobSpawn, Location location) {
+    public MobSpawnEvent(MobSpawn mobSpawn, SpawnArea location) {
         this.mobSpawn = mobSpawn;
-        this.location = location;
+        this.area = location;
         this.spawns = mobSpawn.chooseSpawnAmount();
-    }
-
-    public MobSpawnEvent(MobSpawn mobSpawn, SpawnArea area) {
-        this(mobSpawn, area.getSpawnLocation(mobSpawn.getSpawnPos()));
     }
 
     public int getSpawns() {
@@ -22,7 +18,6 @@ public class MobSpawnEvent {
     }
 
     public void spawn() {
-        mobSpawn.spawn(location, spawns);
+        mobSpawn.spawn(area, spawns);
     }
-
 }

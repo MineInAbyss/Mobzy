@@ -5,6 +5,7 @@ import com.derongan.minecraft.mineinabyss.MineInAbyss;
 import com.offz.spigot.custommobs.Listener.MobListener;
 import com.offz.spigot.custommobs.Loading.CustomType;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
+import com.offz.spigot.custommobs.Spawning.SpawnTask;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import org.bukkit.ChatColor;
@@ -17,9 +18,11 @@ public final class CustomMobs extends JavaPlugin {
 
     private MobContext context;
 
+
     @Override
-    public void onLoad() {
-//        CustomType.registerAllMobs();
+    public void reloadConfig() {
+        super.reloadConfig();
+        //TODO be able to trigger a config reload
     }
 
     @Override
@@ -40,10 +43,10 @@ public final class CustomMobs extends JavaPlugin {
 //        getServer().getPluginManager().registerEvents(new SpawnListener(abyssContext), this);
 
         //Register repeating tasks
-//        Runnable mobTask = new MobTask();
-//        getServer().getScheduler().scheduleSyncRepeatingTask(this, mobTask, 0, 1);
-//        Runnable spawnTask = new SpawnTask(this, abyssContext);
-//        getServer().getScheduler().scheduleSyncRepeatingTask(this, spawnTask, 0, 100);
+        if (CustomMobsAPI.doMobSpawns()) {
+            Runnable spawnTask = new SpawnTask(this, abyssContext);
+            getServer().getScheduler().scheduleSyncRepeatingTask(this, spawnTask, 0, 100);
+        }
 
         CMCommandExecutor commandExecutor = new CMCommandExecutor(context);
 
@@ -56,8 +59,7 @@ public final class CustomMobs extends JavaPlugin {
 
         /*Every loaded custom entity in the world stops relating to the CustomMob class heirarchy after reload, so we
         can't do something like customEntity instanceof CustomMob. Therefore, we "reload" those entities by deleting
-        them and copying their NBT data to new entities
-         */
+        them and copying their NBT data to new entities*/
         for (World world : getServer().getWorlds()) {
             for (Entity entity : world.getEntities()) {
                 if (entity.getScoreboardTags().contains("customMob2") && !(((CraftEntity) entity).getHandle() instanceof CustomMob)) {

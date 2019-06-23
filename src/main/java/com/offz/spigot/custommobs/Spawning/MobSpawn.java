@@ -1,15 +1,18 @@
 package com.offz.spigot.custommobs.Spawning;
 
 import com.offz.spigot.custommobs.Loading.CustomType;
+import com.offz.spigot.custommobs.Spawning.Vertical.SpawnArea;
+import net.minecraft.server.v1_13_R2.EntityTypes;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MobSpawn {
 
-    private String mobID;
+    private EntityTypes mobID;
     private int minAmount = 1;
     private int maxAmount = 1;
     private double radius = 0;
@@ -25,18 +28,19 @@ public class MobSpawn {
     private SpawnPosition spawnPos = SpawnPosition.GROUND;
     private List<Material> whitelist = new ArrayList<>();
 
+    private MobSpawn() {
+    }
+
     public SpawnPosition getSpawnPos() {
         return spawnPos;
     }
 
-    private MobSpawn() {
+    public int spawn(SpawnArea area) {
+        return spawn(area, chooseSpawnAmount());
     }
 
-    public int spawn(Location loc) {
-        return spawn(loc, chooseSpawnAmount());
-    }
-
-    public int spawn(Location loc, int spawns) {
+    public int spawn(SpawnArea area, int spawns) {
+        Location loc = area.getSpawnLocation(getSpawnPos());
         for (int i = 0; i < spawns; i++) {
             if (radius == 0) {
                 CustomType.spawnEntity(mobID, loc);
@@ -44,7 +48,7 @@ public class MobSpawn {
             }
 
             Location spawnLoc;
-            if (radius != 0 && (spawnLoc = SpawnTask.getSpawnLocation(loc, 0, radius)) != null)
+            if (radius != 0 && (spawnLoc = SpawnTask.getSpawnInRadius(loc, 0, radius)) != null)
                 CustomType.spawnEntity(mobID, spawnLoc);
             else
                 CustomType.spawnEntity(mobID, loc);
@@ -71,7 +75,7 @@ public class MobSpawn {
             return -1;
         if (l.getBlockY() < minY || l.getBlockY() > maxY)
             return -1;
-        if(!whitelist.isEmpty() && !whitelist.contains(l.toBlockLocation().add(0, -1, 0).getBlock().getType()))
+        if (!whitelist.isEmpty() && !whitelist.contains(l.clone().add(0, -1, 0).getBlock().getType()))
             return -1;
 
         return priority;
@@ -113,7 +117,7 @@ public class MobSpawn {
     }
 
     public static final class MobSpawnBuilder {
-        private String mobID;
+        private EntityTypes mobID;
         private int minAmount = 1;
         private int maxAmount = 1;
         private double radius = 0;
@@ -136,7 +140,7 @@ public class MobSpawn {
             return new MobSpawnBuilder();
         }
 
-        public MobSpawnBuilder withMobID(String mobID) {
+        public MobSpawnBuilder withMobID(EntityTypes mobID) {
             this.mobID = mobID;
             return this;
         }
@@ -206,8 +210,8 @@ public class MobSpawn {
             return this;
         }
 
-        public MobSpawnBuilder withWhitelist(List<Material> whitelist) {
-            this.whitelist = whitelist;
+        public MobSpawnBuilder withWhitelist(Material... whitelist) {
+            this.whitelist = Arrays.asList(whitelist);
             return this;
         }
 

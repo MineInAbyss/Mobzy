@@ -4,6 +4,8 @@ import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.CustomMobsAPI;
 import com.offz.spigot.custommobs.Loading.CustomType;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
+import com.offz.spigot.custommobs.Pathfinders.Flying.PathfinderGoalDiveOnTargetAttack;
+import com.offz.spigot.custommobs.Pathfinders.Flying.PathfinderGoalIdleFly;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
@@ -13,7 +15,6 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
@@ -29,6 +30,7 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         this.setSize(4.0F, 4.0F);
         this.builder = builder;
         this.moveController = new ControllerGhast(this);
+//        ((LivingEntity) this.getBukkitEntity()).setRemoveWhenFarAway(false);
 
         createCustomMob(world, builder, this);
     }
@@ -91,8 +93,8 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
     }
 
     protected void createPathfinders() {
-        this.goalSelector.a(5, new PathfinderGoalGhastIdleMove(this));
-        this.goalSelector.a(7, new PathfinderGoalGhastMoveTowardsTarget(this));
+        this.goalSelector.a(5, new PathfinderGoalIdleFly(this));
+        this.goalSelector.a(1, new PathfinderGoalDiveOnTargetAttack(this));
 //        this.goalSelector.a(7, new PathfinderGoalGhastAttackTarget(this));
         this.targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
 //        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 20.0F, 1F));
@@ -142,7 +144,7 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
 
     public void die(DamageSource damagesource) {
         if (!killed) {
-            CustomMobsAPI.debug(ChatColor.RED + "Died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
+            CustomMobsAPI.debug(ChatColor.RED + builder.getName() + " died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
             EntityLiving entityliving = cv();
             if (be >= 0 && entityliving != null)
                 entityliving.a(this, be, damagesource);
@@ -263,73 +265,6 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
             }
 
 //            this.ghast.a(this.a > 10);
-        }
-    }
-
-    static class PathfinderGoalGhastIdleMove extends PathfinderGoal {
-        private final FlyingMob a;
-
-        public PathfinderGoalGhastIdleMove(FlyingMob entityghast) {
-            this.a = entityghast;
-            this.a(1);
-        }
-
-        public boolean a() {
-            ControllerMove controllermove = this.a.getControllerMove();
-            if (!controllermove.b()) {
-                return true;
-            } else {
-                double d0 = controllermove.d() - this.a.locX;
-                double d1 = controllermove.e() - this.a.locY;
-                double d2 = controllermove.f() - this.a.locZ;
-                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-                return d3 < 1.0D || d3 > 3600.0D;
-            }
-        }
-
-        public boolean b() {
-            return false;
-        }
-
-        public void c() {
-            Random random = this.a.getRandom();
-            double d0 = this.a.locX + (double) ((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-            double d1 = this.a.locY + (double) ((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-            double d2 = this.a.locZ + (double) ((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-            this.a.getControllerMove().a(d0, d1, d2, 1.0D);
-        }
-    }
-
-    static class PathfinderGoalGhastMoveTowardsTarget extends PathfinderGoal {
-        private final FlyingMob a;
-
-        public PathfinderGoalGhastMoveTowardsTarget(FlyingMob entityghast) {
-            this.a = entityghast;
-            this.a(2);
-        }
-
-        public boolean a() {
-            return true;
-        }
-
-        public void e() {
-            if (this.a.getGoalTarget() == null) {
-                this.a.yaw = -((float) MathHelper.c(this.a.motX, this.a.motZ)) * 57.295776F;
-                this.a.aQ = this.a.yaw;
-            } else {
-                EntityLiving entityliving = this.a.getGoalTarget();
-//                double d0 = 64.0D;
-                if (entityliving.h(this.a) < 4096.0D) {
-                    double d1 = entityliving.locX - this.a.locX;
-                    double d2 = entityliving.locZ - this.a.locZ;
-                    this.a.yaw = -((float) MathHelper.c(d1, d2)) * 57.295776F;
-                    this.a.aQ = this.a.yaw;
-
-                    Entity target = this.a.getGoalTarget();
-
-                }
-            }
-
         }
     }
 }

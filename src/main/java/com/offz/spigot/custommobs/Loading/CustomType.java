@@ -103,7 +103,9 @@ public class CustomType {
     }
 
     private static EntityTypes registerEntity(String name, Class entityClass, Function<? super World, ? extends Entity> entityFromClass) {
-        return types.put(name, injectNewEntity(name, "zombie", entityClass, entityFromClass));
+        EntityTypes injected = injectNewEntity(name, "zombie", entityClass, entityFromClass);
+        types.put(name, injected);
+        return injected;
     }
 
     //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293

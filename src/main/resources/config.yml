@@ -1,2 +1,3 @@
 # Send debug messages
 debug: false
+doMobSpawns: true

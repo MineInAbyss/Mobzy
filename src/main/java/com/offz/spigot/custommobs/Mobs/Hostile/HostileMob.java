@@ -34,36 +34,12 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     }
 
     protected void createPathfinders() {
-//        this.goalSelector.a(4, new EntityZombie.a(Blocks.TURTLE_EGG, this, 1.0D, 3));
-//        this.goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
         this.goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
         this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
-
 
         this.goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
         this.goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
         this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
-//        if (this.world.spigotConfig.zombieAggressiveTowardsVillager) {
-//            this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityVillager.class, false));
-//        }
-
-//        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityIronGolem.class, true));
-//        this.targetSelector.a(5, new PathfinderGoalNearestAttackableTarget(this, EntityTurtle.class, 10, true, false, EntityTurtle.bC));
-
-
-//        goalSelector.a(1, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F, 1));
-
-
-
-        /*goalSelector.a(1, new PathfinderGoalFloat(this));
-        goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
-        goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
-        goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
-
-        //Hostile attributes
-        targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityPlayer.class, true));
-        targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, Neritantan.class, true));
-        goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));*/
     }
 
     @Override
@@ -115,7 +91,7 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     }
 
     public void die(DamageSource damagesource) {
-        CustomMobsAPI.debug(ChatColor.RED + "Hostile died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
+        CustomMobsAPI.debug(ChatColor.RED + builder.getName() + " died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
         if (!killed) {
             EntityLiving entityliving = cv();
             if (be >= 0 && entityliving != null)

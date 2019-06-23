@@ -4,10 +4,7 @@ import com.offz.spigot.custommobs.Builders.MobBuilder;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.SoundEffect;
-import net.minecraft.server.v1_13_R2.SoundEffects;
-import net.minecraft.server.v1_13_R2.World;
+import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -48,14 +45,18 @@ public interface CustomMob {
         is.setItemMeta(meta);
         asLiving.getEquipment().setHelmet(is);
 
-        //TODO this really doesn't like armorstands
-        //disguise the entity
-        Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
-        DisguiseAPI.disguiseEntity(entity.getBukkitEntity(), disguise);
-        disguise.getWatcher().setInvisible(true);
+        if (builder.getDisguiseAs() != null) {
+            //disguise the entity
+            Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
+            DisguiseAPI.disguiseEntity(entity.getBukkitEntity(), disguise);
+            disguise.getWatcher().setInvisible(true);
+        }
 //        asAnimal.setRemoveWhenFarAway(true);
     }
 
+    default void onRightClick(EntityHuman player) {
+
+    }
 
     //TODO This might be useful for multi entity mobs later
     /*default Model spawnModel(World world, MobBuilder builder, EntityLiving entity) {

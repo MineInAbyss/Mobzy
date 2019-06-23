@@ -5,6 +5,7 @@ import com.offz.spigot.custommobs.MobContext;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.EnumItemSlot;
 import org.bukkit.FluidCollisionMode;
@@ -94,6 +95,7 @@ public class MobListener implements Listener {
 
     /**
      * The magic method that lets you hit entities in their server side hitboxes
+     * TODO this doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do.
      *
      * @param e
      */
@@ -102,12 +104,32 @@ public class MobListener implements Listener {
         //TODO i'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
         // armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:
         Player p = e.getPlayer();
-        if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
+        if (leftClicked(e) || rightClicked(e)) {
             RayTraceResult trace = p.getWorld().rayTrace(p.getLocation().add(new Vector(0, p.getEyeHeight(), 0)), p.getLocation().getDirection(), 3, FluidCollisionMode.ALWAYS, true, 0, entity -> !entity.equals(p));
             if (trace != null && trace.getHitEntity() != null) {
-                e.setCancelled(true);
-                ((CraftPlayer) p).getHandle().attack(((CraftEntity) trace.getHitEntity()).getHandle());
+                Entity hit = ((CraftEntity) trace.getHitEntity()).getHandle();
+                if (!(hit instanceof CustomMob))
+                    return;
+
+                if (leftClicked(e)) {
+                    e.setCancelled(true);
+                    ((CraftPlayer) p).getHandle().attack(hit);
+                } else {
+                    EntityHuman nmsPlayer = ((CraftPlayer) p).getHandle();
+                    ((CustomMob) hit).onRightClick(nmsPlayer);
+                }
             }
         }
     }
+
+
+    public boolean leftClicked(PlayerInteractEvent e) {
+        return e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK;
+    }
+
+    //TODO this event doesn't send out a packet when right clicking air with an empty hand
+    public boolean rightClicked(PlayerInteractEvent e) {
+        return e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK;
+    }
+
 }

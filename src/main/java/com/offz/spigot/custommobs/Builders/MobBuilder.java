@@ -16,7 +16,6 @@ public final class MobBuilder {
     private Material modelMaterial = Material.DIAMOND_SWORD;
     private DisguiseType disguiseAs = DisguiseType.ZOMBIE;
     private Item[] temptItems;
-    //InitAttributes TODO is it better to just have classes override the initAttributes method?
     private Double maxHealth;
     private Double movementSpeed;
     private Double followRange;

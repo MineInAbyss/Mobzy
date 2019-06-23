@@ -15,11 +15,17 @@ import java.util.Map;
 
 public class CustomMobsAPI {
     private static boolean debug;
+    private static boolean doMobSpawns;
+
+    public static boolean doMobSpawns() {
+        return doMobSpawns;
+    }
 
     public static void loadConfigValues(CustomMobs plugin) {
         FileConfiguration config = plugin.getConfig();
 
         debug = config.getBoolean("debug");
+        doMobSpawns = config.getBoolean("doMobSpawns");
     }
 
     public static void debug(String message) {

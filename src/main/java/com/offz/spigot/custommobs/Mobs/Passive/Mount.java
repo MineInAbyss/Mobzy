@@ -5,6 +5,7 @@ import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.MobDrop;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.EntityAgeable;
+import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.GenericAttributes;
 import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;
@@ -13,10 +14,15 @@ public class Mount extends PassiveMob implements HitBehaviour {
     static MobBuilder builder = new MobBuilder("Mount", 38)
             .setDrops(new MobDrop(Material.LEATHER, 3, 5));
 
-    //TODO make rideable
+    //TODO change offset when riding and make controllable
     public Mount(World world) {
         super(world, builder);
         setSize(3, 3);
+    }
+
+    @Override
+    public void onRightClick(EntityHuman player) {
+        player.startRiding(this);
     }
 
     @Override

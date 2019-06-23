@@ -84,7 +84,7 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
     //TODO: Make a clean way of sharing methods like this between Hostile and PassiveMob
     public void die(DamageSource damagesource) {
         if (!killed) {
-            CustomMobsAPI.debug(ChatColor.RED + "Died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
+            CustomMobsAPI.debug(ChatColor.RED + builder.getName() + " died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
             EntityLiving entityliving = cv();
             if (be >= 0 && entityliving != null)
                 entityliving.a(this, be, damagesource);
