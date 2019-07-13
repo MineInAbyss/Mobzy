@@ -9,6 +9,7 @@ public class MobDrop {
     private int minAmount;
     private int maxAmount;
 
+    //TODO make work with ItemStack
     public MobDrop(Material material, int amount) {
         this(material, amount, amount, 1);
     }

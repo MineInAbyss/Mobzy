@@ -1,16 +1,15 @@
 package com.offz.spigot.custommobs;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
-import com.offz.spigot.custommobs.Loading.CustomType;
-import com.offz.spigot.custommobs.Loading.SpawnRegistry;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Spawning.MobSpawn;
+import com.offz.spigot.custommobs.Spawning.Regions.SpawnRegion;
+import com.offz.spigot.custommobs.Spawning.SpawnRegistry;
 import net.minecraft.server.v1_13_R2.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 
-import java.util.List;
 import java.util.Map;
 
 public class CustomMobsAPI {
@@ -33,18 +32,19 @@ public class CustomMobsAPI {
             Bukkit.broadcastMessage(message);
     }
 
-    public static void registerSpawn(String layerName, MobSpawn spawn) {
-        Map<String, List<MobSpawn>> spawns = SpawnRegistry.getLayerSpawns();
-        if (!spawns.containsKey(layerName))
-            return;
-        spawns.get(layerName).add(spawn);
+    public static boolean isRenamed(org.bukkit.entity.Entity mob) {
+        Entity nmsMob = toNMS(mob);
+        if (!isCustomMob(nmsMob) || mob.getCustomName() == null)
+            return false;
+
+        return !(mob.getCustomName().equals(((CustomMob) nmsMob).getBuilder().getName()));
     }
 
-    public static void unregisterSpawn(String layerName, MobSpawn spawn) {
-        Map<String, List<MobSpawn>> spawns = SpawnRegistry.getLayerSpawns();
+    public static void registerSpawn(String layerName, MobSpawn spawn) {
+        Map<String, SpawnRegion> spawns = SpawnRegistry.getLayerSpawns();
         if (!spawns.containsKey(layerName))
             return;
-        spawns.get(layerName).remove(spawn);
+        spawns.get(layerName).addSpawn(spawn);
     }
 
     public static Entity toNMS(org.bukkit.entity.Entity e) {

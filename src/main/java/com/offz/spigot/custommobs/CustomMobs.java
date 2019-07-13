@@ -3,7 +3,6 @@ package com.offz.spigot.custommobs;
 import com.derongan.minecraft.mineinabyss.AbyssContext;
 import com.derongan.minecraft.mineinabyss.MineInAbyss;
 import com.offz.spigot.custommobs.Listener.MobListener;
-import com.offz.spigot.custommobs.Loading.CustomType;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Spawning.SpawnTask;
 import net.minecraft.server.v1_13_R2.EntityLiving;
@@ -28,7 +27,7 @@ public final class CustomMobs extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("On enable has been called");
-        CustomType.registerAllMobs();
+        CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
         saveDefaultConfig();
         CustomMobsAPI.loadConfigValues(this);
         AbyssContext abyssContext = MineInAbyss.getContext();
@@ -83,6 +82,7 @@ public final class CustomMobs extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        super.onDisable();
         // Plugin shutdown logic
         getLogger().info("onDisable has been invoked!");
     }

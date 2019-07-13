@@ -1,18 +1,14 @@
 package com.offz.spigot.custommobs.Mobs.Hostile;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
-import com.offz.spigot.custommobs.CustomMobsAPI;
-import com.offz.spigot.custommobs.Loading.CustomType;
+import com.offz.spigot.custommobs.CustomType;
+import com.offz.spigot.custommobs.Mobs.Behaviours.CustomMobBase;
+import com.offz.spigot.custommobs.Mobs.Behaviours.Deathable;
+import com.offz.spigot.custommobs.Mobs.Behaviours.Disguiseable;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalMeleeAttackPitchLock;
-import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.disguisetypes.Disguise;
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import net.minecraft.server.v1_13_R2.*;
-import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
 
 import javax.annotation.Nullable;
 
@@ -21,19 +17,29 @@ import javax.annotation.Nullable;
  */
 public abstract class HostileMob extends EntityMonster implements CustomMob {
     protected MobBuilder builder;
+    private Deathable deathable = new Deathable(this);
+    private Disguiseable disguiseable = new Disguiseable(this);
 
     public HostileMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
         this.builder = builder;
-
-        createCustomMob(world, builder, this);
+        CustomMobBase base = new CustomMobBase(this);
+        base.apply();
+        addScoreboardTag("hostileMob");
     }
 
+    @Override
+    public EntityLiving getEntity() {
+        return this;
+    }
+
+    @Override
     protected void n() {
         createPathfinders();
     }
 
-    protected void createPathfinders() {
+    @Override
+    public void createPathfinders() {
         this.goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
         this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
 
@@ -47,6 +53,7 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         return builder;
     }
 
+    @Override
     protected void initAttributes() {
         super.initAttributes();
         getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
@@ -55,61 +62,86 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     }
 
     @Nullable
+    @Override
     public Entity bO() {
         return bP().isEmpty() ? null : bP().get(0);
     }
 
+
+    @Override
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
+        unloadMobNBT(nbttagcompound);
     }
 
+    @Override
+    public void unloadMobNBT(NBTTagCompound nbttagcompound) {
+
+    }
+
+    @Override
     public void a(NBTTagCompound nbttagcompound) {
         super.a(nbttagcompound);
-        CraftEntity asEntity = getBukkitEntity();
-
-        if (!DisguiseAPI.isDisguised(asEntity)) { //if not disguised
-            Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
-            DisguiseAPI.disguiseEntity(asEntity, disguise);
-            disguise.getWatcher().setInvisible(true);
-        }
+        loadMobNBT(nbttagcompound);
     }
 
+    @Override
+    public void loadMobNBT(NBTTagCompound nbttagcompound) {
+        disguiseable.disguise();
+    }
+
+    @Override
     protected SoundEffect D() {
         return soundAmbient();
     }
 
+    @Override
     protected SoundEffect d(DamageSource damagesource) {
         return soundHurt();
     }
 
+    @Override
     protected SoundEffect cs() {
         return soundDeath();
     }
 
+    @Override
     protected void a(BlockPosition blockposition, IBlockData iblockdata) {
         a(soundStep(), 0.15F, 1.0F);
     }
 
+    @Override
     public void die(DamageSource damagesource) {
-        CustomMobsAPI.debug(ChatColor.RED + builder.getName() + " died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
-        if (!killed) {
-            EntityLiving entityliving = cv();
-            if (be >= 0 && entityliving != null)
-                entityliving.a(this, be, damagesource);
+        deathable.die(damagesource);
+    }
 
-            killed = true;
-            getCombatTracker().g();
-            if (!world.isClientSide) {
-                if (isDropExperience() && world.getGameRules().getBoolean("doMobLoot")) {
-                    boolean flag = lastDamageByPlayerTime > 0;
-                    a(flag, 0, damagesource);
-                    CraftEventFactory.callEntityDeathEvent(this, builder.getDrops());
-                } else {
-                    CraftEventFactory.callEntityDeathEvent(this);
-                }
-            }
+    @Override
+    public boolean getKilled() {
+        return killed;
+    }
 
-            world.broadcastEntityEffect(this, (byte) 3);
-        }
+    @Override
+    public void setKilled(boolean killed) {
+        this.killed = killed;
+    }
+
+    @Override
+    public boolean dropsExperience() {
+        return isDropExperience();
+    }
+
+    @Override
+    public int lastDamageByPlayerTime() {
+        return lastDamageByPlayerTime;
+    }
+
+    @Override
+    public int getKillScore() {
+        return be;
+    }
+
+    @Override
+    public void dropEquipment(boolean flag, int i, DamageSource damageSource) {
+        a(flag, i, damageSource);
     }
 }

@@ -8,11 +8,11 @@ import org.bukkit.Location;
 import java.util.List;
 
 public class ChunkSpawn implements Comparable {
-    private double preference = Math.random(); //introduce a little noise into our preference so we don't end up with a specific order of chunks spawning entities
+    private double preference = 1; //introduce a little noise into our preference so we don't end up with a specific order of chunks spawning entities
+    private double preferenceOffset = 0; //
     private Chunk chunk;
     private int minY;
     private int maxY;
-
     public ChunkSpawn(Chunk chunk, int minY, int maxY) {
         this.chunk = chunk;
         this.minY = minY;
@@ -20,8 +20,12 @@ public class ChunkSpawn implements Comparable {
         calculatePreference();
     }
 
+    public void setPreferenceOffset(double preferenceOffset) {
+        this.preferenceOffset = preferenceOffset;
+    }
+
     public double getPreference() {
-        return preference;
+        return preference + preferenceOffset;
     }
 
     /**

@@ -13,7 +13,7 @@ public class Hammerbeak extends FlyingMob implements HitBehaviour {
 
     public Hammerbeak(World world) {
         super(world, builder);
-        setSize(0.6F, 0.6F);
+        setSize(3F, 3F);
     }
 
     @Override

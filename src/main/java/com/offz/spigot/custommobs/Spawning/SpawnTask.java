@@ -5,11 +5,14 @@ import com.derongan.minecraft.mineinabyss.AbyssContext;
 import com.derongan.minecraft.mineinabyss.world.AbyssWorldManager;
 import com.offz.spigot.custommobs.CustomMobs;
 import com.offz.spigot.custommobs.CustomMobsAPI;
-import com.offz.spigot.custommobs.Loading.SpawnRegistry;
-import com.offz.spigot.custommobs.Mobs.CustomMob;
+import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
+import com.offz.spigot.custommobs.Mobs.Hostile.HostileMob;
+import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
 import com.offz.spigot.custommobs.Spawning.Vertical.SpawnArea;
 import com.offz.spigot.custommobs.Spawning.Vertical.VerticalSpawn;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -18,12 +21,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class SpawnTask extends BukkitRunnable {
-    private final int MOB_CAP = 20;
+    private final int PASSIVE_MOB_CAP = 20;
+    private final int HOSTILE_MOB_CAP = 20;
+    private final int FLYING_MOB_CAP = 5;
     private final int MAX_TRIES = 100;
     private AbyssContext context;
     private WorldManager worldManager;
@@ -62,44 +67,6 @@ public class SpawnTask extends BukkitRunnable {
         return null;
     }
 
-    private static List<ChunkSpawn> generateChunkArray(Location loc, int minRad, int maxRad) {
-        List<ChunkSpawn> chunkSpawns = new ArrayList<>();
-        Chunk chunk = loc.getChunk();
-        int startX = chunk.getX();
-        int startZ = chunk.getZ();
-        World world = loc.getWorld();
-
-        //add chunks in a circle around player to the list
-        for (int x = -maxRad; x <= maxRad; x++) {
-            for (int z = -maxRad; z <= maxRad; z++) {
-                double dist = x * x + z * z;
-                //if we are within the maximum circular radius and not within minimum, add the chunk to the list
-                if (dist <= maxRad * maxRad) {
-                    Chunk spawnChunk = world.getChunkAt(startX + x, startZ + z);
-                    if (dist > minRad * minRad) {
-                        ChunkSpawn chunkSpawn = new ChunkSpawn(spawnChunk, 0, 254);
-                        if (chunkSpawn.getPreference() > 0) //add the chunk if we like its spawn chances
-                            chunkSpawns.add(chunkSpawn);
-                    } else {
-                        int minVertical = minRad * 16; //minimum vertical spawn distance is the number of chunks * width of chunks
-                        //do some checks to add areas above and below the player when we've reached inside the minimum radius
-                        if (loc.getY() + minVertical < 254) {
-                            ChunkSpawn topSpawn = new ChunkSpawn(spawnChunk, ((int) loc.getY() + minVertical), 254);
-                            if (topSpawn.getPreference() > 0)
-                                chunkSpawns.add(topSpawn);
-                        }
-                        if (loc.getY() - minVertical > 0) {
-                            ChunkSpawn bottomSpawn = new ChunkSpawn(spawnChunk, 0, ((int) loc.getY() - minVertical));
-                            if (bottomSpawn.getPreference() > 0)
-                                chunkSpawns.add(bottomSpawn);
-                        }
-                    }
-                }
-            }
-        }
-        return chunkSpawns;
-    }
-
     @Override
     public void run() {
         AbyssWorldManager manager = context.getWorldManager();
@@ -121,52 +88,75 @@ public class SpawnTask extends BukkitRunnable {
             String layerName = manager.getLayerForSection(worldManager.getSectionFor(p.getLocation())).getName();
 
             //decide spawns around player asynchronously
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    List<MobSpawnEvent> toSpawn = new ArrayList<>();
-                    int mobCount = 0;
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+//                try {
+                List<MobSpawnEvent> toSpawn = new ArrayList<>();
+                //0 = passive, 1 = hostile, 2 = flying
+                int[] originalMobCount = new int[3];
 
-                    //go through entities around player, adding nearby players to a list
-                    for (Entity e : p.getNearbyEntities(256, 256, 256)) {
-                        if (((CraftEntity) e).getHandle() instanceof CustomMob)
-                            mobCount++;
-                        //if a player was nearby, add them to the close players list so we don't overlap spawns
-                        if (e.getType().equals(EntityType.PLAYER))
-                            closePlayers.add(e.getUniqueId());
-                    }
+                //go through entities around player, adding nearby players to a list
+                for (Entity e : p.getNearbyEntities(256, 256, 256)) {
+                    if (((CraftEntity) e).getHandle() instanceof PassiveMob)
+                        originalMobCount[0]++;
+                    if (((CraftEntity) e).getHandle() instanceof HostileMob)
+                        originalMobCount[1]++;
+                    if (((CraftEntity) e).getHandle() instanceof FlyingMob)
+                        originalMobCount[2]++;
+                    //if a player was nearby, add them to the close players list so we don't overlap spawns
+                    if (e.getType().equals(EntityType.PLAYER))
+                        closePlayers.add(e.getUniqueId());
+                }
+                int[] mobCount = Arrays.copyOf(originalMobCount, 3);
+                int totalMobs = 0;
+                for (int mobs : mobCount)
+                    totalMobs += mobs;
 
-                    if (mobCount >= MOB_CAP)
-                        return;
-                    CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount + " mobs before"));
+                //if we've hit the cap, stop spawning
+                if (mobCount[0] >= PASSIVE_MOB_CAP && mobCount[1] >= HOSTILE_MOB_CAP && mobCount[2] >= FLYING_MOB_CAP)
+                    return;
 
-                    //STEP 1: Generate array of ChunkSpawns around player, and invalidate the ones that are empty
-                    List<ChunkSpawn> chunkSpawns = generateChunkArray(p.getLocation(), 2, 4);
-                    //sort by highest preference
-                    Collections.sort(chunkSpawns);
+                //STEP 1: Generate array of ChunkSpawns around player, and invalidate the ones that are empty
+                SpawnChunkGrid spawnChunkGrid = new SpawnChunkGrid(p.getLocation(), 2, 4);
+                //sort by highest preference
+
+                mobTypeLoop:
+                for (int mobType = 0; mobType < 3; mobType++) {
+                    List<ChunkSpawn> chunkSpawns = spawnChunkGrid.getShuffledSpawns();
 
                     for (ChunkSpawn chunkSpawn : chunkSpawns) {
-                        if (mobCount >= MOB_CAP)
-                            break;
+                        //if mob cap of that specific mob has been reached, skip it
+                        switch (mobType) {
+                            case 0:
+                                if (mobCount[0] >= PASSIVE_MOB_CAP)
+                                    continue mobTypeLoop;
+                                break;
+                            case 1:
+                                if (mobCount[1] >= HOSTILE_MOB_CAP)
+                                    continue mobTypeLoop;
+                                break;
+                            case 2:
+                                if (mobCount[2] >= FLYING_MOB_CAP)
+                                    continue mobTypeLoop;
+                                break;
+                        }
 
                         //STEP 2: Each chunk tries to choose one area inside it for which to attempt a spawn
                         SpawnArea spawnArea = chunkSpawn.getSpawnArea(3);
-                        if (spawnArea == null) {
-//                            CustomMobsAPI.debug(ChatColor.RED + "getSpawnArea nulled");
+                        if (spawnArea == null)
                             continue;
-                        }
 
                         //STEP 3: Pick mob to spawn
                         //get the list of mob spawns for entity layer, then remove all impossible spawns,
                         //and make entity weighted decision on the spawn
                         RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
 
-                        for (MobSpawn spawn : SpawnRegistry.getLayerSpawns().get(layerName)) {
+                        for (MobSpawn spawn : SpawnRegistry.getLayerSpawns().get(layerName).getSpawnsFor(mobType)) {
+//                            if(mobType == 1)
+//                                CustomMobsAPI.debug("Hostile priority: " + spawn.getPriority(spawnArea));
                             validSpawns.add(spawn.getPriority(spawnArea), spawn);
                         }
 
                         if (validSpawns.isEmpty()) {
-//                                CustomMobsAPI.debug(ChatColor.RED + "Spawn Choice Failed");
                             continue;
                         }
 
@@ -175,23 +165,28 @@ public class SpawnTask extends BukkitRunnable {
                         toSpawn.add(spawn);
 
                         int spawns = spawn.getSpawns();
-                        mobCount += spawns;
+                        mobCount[mobType] += spawns;
                     }
+                }
+
+                //spawn all the mobs we were planning to
+                int finalTotalMobs = totalMobs;
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    for (MobSpawnEvent spawn : toSpawn)
+                        spawn.spawn();
 
                     //after we've hit the mob cap, print mob count
-                    if (toSpawn.size() > 0)
-                        CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount + " mobs after"));
-
-                    //spawn all the mobs we were planning to
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            for (MobSpawnEvent spawn : toSpawn)
-                                spawn.spawn();
-                        }
-                    }.runTask(plugin);
-                }
-            }.runTaskAsynchronously(plugin);
+                    if (toSpawn.size() > 0) {
+                        CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + (finalTotalMobs + " mobs before"));
+                        if (mobCount[0] - originalMobCount[0] > 0)
+                            CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[0] - originalMobCount[0] + " passive mobs spawned"));
+                        if (mobCount[1] - originalMobCount[1] > 0)
+                            CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[1] - originalMobCount[1] + " hostile mobs spawned"));
+                        if (mobCount[2] - originalMobCount[2] > 0)
+                            CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[2] - originalMobCount[2] + " flying mobs spawned"));
+                    }
+                });
+            });
         }
     }
 }

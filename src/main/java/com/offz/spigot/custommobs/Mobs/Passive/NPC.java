@@ -2,7 +2,10 @@ package com.offz.spigot.custommobs.Mobs.Passive;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.EnumMoveType;
+import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;
 
 public class NPC extends PassiveMob {
@@ -11,9 +14,11 @@ public class NPC extends PassiveMob {
         super(world, new MobBuilder(name, modelID)
                 .setModelMaterial(Material.DIAMOND_AXE));
 
+        getBukkitEntity().setCustomName(name);
         setCustomNameVisible(true);
         setInvulnerable(true);
         setSize(0.6f, 0.6f);
+        addScoreboardTag("npc");
     }
 
     //Stop from being pushed around
@@ -26,12 +31,7 @@ public class NPC extends PassiveMob {
     }
 
     @Override
-    protected void createPathfinders() {
+    public void createPathfinders() {
         this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 6.0F, 1F));
-    }
-
-    //TODO get this method to work in the abstract class
-    public PassiveMob createChild(EntityAgeable entityageable) {
-        return new Neritantan(this.world);
     }
 }

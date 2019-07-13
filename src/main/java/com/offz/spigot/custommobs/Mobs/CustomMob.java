@@ -1,16 +1,35 @@
 package com.offz.spigot.custommobs.Mobs;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
-import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.disguisetypes.Disguise;
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import net.minecraft.server.v1_13_R2.*;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.Location;
 
 public interface CustomMob {
+    EntityLiving getEntity();
+
     MobBuilder getBuilder();
+
+    default double getX() {
+        return getEntity().locX;
+    }
+
+    default double getY() {
+        return getEntity().locY;
+    }
+
+    default double getZ() {
+        return getEntity().locZ;
+    }
+
+    default World getWorld() {
+        return getEntity().getWorld();
+    }
+
+    default Location getLocation() {
+        return new Location(getWorld().getWorld(), getX(), getY(), getZ());
+    }
+
+    void createPathfinders();
 
     default SoundEffect soundAmbient() {
         return SoundEffects.ENTITY_PIG_AMBIENT;
@@ -28,34 +47,39 @@ public interface CustomMob {
         return SoundEffects.ENTITY_PIG_STEP;
     }
 
-    default void createCustomMob(World world, MobBuilder builder, Entity entity) {
-        entity.setSize(0.5F, 0.5F);
-        entity.addScoreboardTag("customMob2");
-        entity.setCustomNameVisible(true);
-        entity.addScoreboardTag(builder.getName());
+    boolean getKilled();
 
-        LivingEntity asLiving = ((LivingEntity) entity.getBukkitEntity());
-        asLiving.setCustomName(builder.getName());
+    void setKilled(boolean killed);
 
-        //create an item based on model ID in head slot if entity will be using itself for the model
-        ItemStack is = new ItemStack(builder.getModelMaterial());
-        is.setDurability((short) builder.getModelID());
-        ItemMeta meta = is.getItemMeta();
-        meta.setUnbreakable(true);
-        is.setItemMeta(meta);
-        asLiving.getEquipment().setHelmet(is);
+    boolean dropsExperience();
 
-        if (builder.getDisguiseAs() != null) {
-            //disguise the entity
-            Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
-            DisguiseAPI.disguiseEntity(entity.getBukkitEntity(), disguise);
-            disguise.getWatcher().setInvisible(true);
-        }
-//        asAnimal.setRemoveWhenFarAway(true);
+    int lastDamageByPlayerTime();
+
+    void unloadMobNBT(NBTTagCompound nbttagcompound);
+
+    void loadMobNBT(NBTTagCompound nbttagcompound);
+
+    /**
+     * I suspect EntityLiving's "be" to be this, as Entity#die(DamageSource) calls Entity#a(Entity, int, DamageSource),
+     * which gets overriden by EntityPlayer to call EntityHuman#addScore(int) with the passed int.
+     *
+     * @return the score with which a player should be rewarded with when the current entity is killed
+     */
+    int getKillScore();
+
+    /**
+     * TODO Not 100% confident about this one, but the way Entity#die(DamageSource) uses it, makes sense for cv() to return the killer
+     *
+     * @return the killer of the current entity if it has one.
+     */
+    default EntityLiving getKiller() {
+        return getEntity().cv();
     }
 
-    default void onRightClick(EntityHuman player) {
+    //TODO I'm not sure this is what EntityInsentient#a(boolean, int, DamageSource) actually does, change this method's name if I'm wrong
+    void dropEquipment(boolean flag, int i, DamageSource damageSource);
 
+    default void onRightClick(EntityHuman player) {
     }
 
     //TODO This might be useful for multi entity mobs later

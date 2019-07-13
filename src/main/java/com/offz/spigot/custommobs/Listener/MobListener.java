@@ -8,6 +8,7 @@ import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.EnumItemSlot;
+import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Statistic;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
@@ -20,7 +21,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -64,19 +64,14 @@ public class MobListener implements Listener {
             is.setDamage(modelID + 2);
             entity.setEquipment(EnumItemSlot.HEAD, is);
 
-            try {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!entity.getBukkitEntity().isDead()) {
-                            is.setDamage(modelID + 1);
-                            entity.setEquipment(EnumItemSlot.HEAD, is);
-                        }
-                    }
-                }.runTaskLater(plugin, 5);
-            } catch (NoClassDefFoundError error) { //this has happened to me once, where it couldn't get the runnable to start. Reloading the plugin fixed it
-                //TODO reload plugin
-            }
+            //TODO One time I got a NoClassDefFoundError when trying to run the task, but I haven't been able to
+            // replicate it since. Reloading the plugin fixed it.
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (!entity.getBukkitEntity().isDead()) {
+                    is.setDamage(modelID + 1);
+                    entity.setEquipment(EnumItemSlot.HEAD, is);
+                }
+            }, 5);
         }
     }
 
@@ -101,7 +96,7 @@ public class MobListener implements Listener {
      */
     @EventHandler()
     public void onLeftClick(PlayerInteractEvent e) {
-        //TODO i'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
+        //TODO I'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
         // armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:
         Player p = e.getPlayer();
         if (leftClicked(e) || rightClicked(e)) {
@@ -131,5 +126,4 @@ public class MobListener implements Listener {
     public boolean rightClicked(PlayerInteractEvent e) {
         return e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK;
     }
-
 }

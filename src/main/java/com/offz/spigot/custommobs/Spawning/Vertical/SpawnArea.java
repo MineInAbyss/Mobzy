@@ -3,6 +3,11 @@ package com.offz.spigot.custommobs.Spawning.Vertical;
 import com.offz.spigot.custommobs.Spawning.MobSpawn;
 import org.bukkit.Location;
 
+//TODO name could be confused with SpawnRegion
+
+/**
+ * Defines a vertical area from a top and bottom location, with information about its gap
+ */
 public class SpawnArea {
     private Location top;
     private Location bottom;

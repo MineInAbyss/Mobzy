@@ -1,20 +1,14 @@
 package com.offz.spigot.custommobs.Mobs.Flying;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
-import com.offz.spigot.custommobs.CustomMobsAPI;
-import com.offz.spigot.custommobs.Loading.CustomType;
+import com.offz.spigot.custommobs.CustomType;
+import com.offz.spigot.custommobs.Mobs.Behaviours.CustomMobBase;
+import com.offz.spigot.custommobs.Mobs.Behaviours.Deathable;
+import com.offz.spigot.custommobs.Mobs.Behaviours.Disguiseable;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Pathfinders.Flying.PathfinderGoalDiveOnTargetAttack;
 import com.offz.spigot.custommobs.Pathfinders.Flying.PathfinderGoalIdleFly;
-import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.disguisetypes.Disguise;
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import net.minecraft.server.v1_13_R2.*;
-import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
-
-import javax.annotation.Nullable;
 
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
@@ -22,35 +16,61 @@ import javax.annotation.Nullable;
 public abstract class FlyingMob extends EntityFlying implements CustomMob, IMonster {
     //    private static final DataWatcherObject<Boolean> a = DataWatcher.a(EntityGhast.class, DataWatcherRegistry.i);
     protected MobBuilder builder;
-    private int b = 1;
+    private int power = 1;
+    private Deathable deathable = new Deathable(this);
+    private Disguiseable disguiseable = new Disguiseable(this);
 
     public FlyingMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
-
         this.setSize(4.0F, 4.0F);
         this.builder = builder;
         this.moveController = new ControllerGhast(this);
-//        ((LivingEntity) this.getBukkitEntity()).setRemoveWhenFarAway(false);
+        CustomMobBase base = new CustomMobBase(this);
+        base.apply();
+        addScoreboardTag("flying");
+    }
 
-        createCustomMob(world, builder, this);
+    @Override
+    public EntityLiving getEntity() {
+        return this;
+    }
+
+    @Override
+    protected void n() {
+        createPathfinders();
+    }
+
+    @Override
+    public void createPathfinders() {
+        this.goalSelector.a(5, new PathfinderGoalIdleFly(this));
+        this.goalSelector.a(1, new PathfinderGoalDiveOnTargetAttack(this));
+//        this.goalSelector.a(7, new PathfinderGoalGhastAttackTarget(this));
+        this.targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
+//        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 20.0F, 1F));
     }
 
 //    public void a(boolean flag) {
 //        this.datawatcher.set(a, flag);
 //    }
 
+    //TODO Only used by ghast's pathfinder, remove once we change it
     public int getPower() {
-        return this.b;
+        return this.power;
     }
 
+    /**
+     * Removes if not in peaceful mode
+     */
     public void tick() {
         super.tick();
         if (!this.world.isClientSide && this.world.getDifficulty() == EnumDifficulty.PEACEFUL) {
             this.die();
         }
-
     }
 
+    /**
+     * Makes fireballs hurt the entity a lot TODO don't think we'll need this
+     */
     public boolean damageEntity(DamageSource damagesource, float f) {
         if (this.isInvulnerable(damagesource)) {
             return false;
@@ -62,42 +82,25 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         }
     }
 
+    //TODO don't know what this does, seems to be data registry with NMS of a variable?
 //    protected void x_() {
 //        super.x_();
 //        this.datawatcher.register(a, false);
 //    }
 
-    @Nullable
-    protected MinecraftKey getDefaultLootTable() {
-        return LootTables.aq;
-    }
-
+    //TODO no idea what this is, but seems to be a larger number with bigger mobs
     protected float cD() {
         return 10.0F;
     }
 
+    //TODO aaaaaaaaaaaaaaaaaaaaa (don't know what it does)
     public boolean a(GeneratorAccess generatoraccess, boolean flag) {
         return this.random.nextInt(20) == 0 && super.a(generatoraccess, flag) && generatoraccess.getDifficulty() != EnumDifficulty.PEACEFUL;
     }
 
+    //TODO no idea what dg() is or whether it's important
     public int dg() {
         return 1;
-    }
-
-    public float getHeadHeight() {
-        return 2.6F;
-    }
-
-    protected void n() {
-        createPathfinders();
-    }
-
-    protected void createPathfinders() {
-        this.goalSelector.a(5, new PathfinderGoalIdleFly(this));
-        this.goalSelector.a(1, new PathfinderGoalDiveOnTargetAttack(this));
-//        this.goalSelector.a(7, new PathfinderGoalGhastAttackTarget(this));
-        this.targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
-//        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 20.0F, 1F));
     }
 
     @Override
@@ -105,25 +108,33 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         return builder;
     }
 
+    @Override
     protected void initAttributes() {
         super.initAttributes();
         this.getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
-        this.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(100.0D);
+        this.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(50.0D);
     }
 
+    @Override
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
+        unloadMobNBT(nbttagcompound);
     }
 
+    @Override
+    public void unloadMobNBT(NBTTagCompound nbttagcompound) {
+
+    }
+
+    @Override
     public void a(NBTTagCompound nbttagcompound) {
         super.a(nbttagcompound);
+        loadMobNBT(nbttagcompound);
+    }
 
-        CraftEntity asEntity = getBukkitEntity();
-        if (!DisguiseAPI.isDisguised(asEntity)) { //if not disguised
-            Disguise disguise = new MobDisguise(builder.getDisguiseAs(), builder.isAdult());
-            DisguiseAPI.disguiseEntity(asEntity, disguise);
-            disguise.getWatcher().setInvisible(true);
-        }
+    @Override
+    public void loadMobNBT(NBTTagCompound nbttagcompound) {
+        disguiseable.disguise();
     }
 
     protected SoundEffect D() {
@@ -142,27 +153,38 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         a(soundStep(), 0.15F, 1.0F);
     }
 
+    @Override
+    public boolean getKilled() {
+        return killed;
+    }
+
+    @Override
+    public void setKilled(boolean killed) {
+        this.killed = killed;
+    }
+
+    @Override
+    public boolean dropsExperience() {
+        return isDropExperience();
+    }
+
+    @Override
+    public int lastDamageByPlayerTime() {
+        return lastDamageByPlayerTime;
+    }
+
+    @Override
+    public int getKillScore() {
+        return be;
+    }
+
+    @Override
+    public void dropEquipment(boolean flag, int i, DamageSource damageSource) {
+        a(flag, i, damageSource);
+    }
+
     public void die(DamageSource damagesource) {
-        if (!killed) {
-            CustomMobsAPI.debug(ChatColor.RED + builder.getName() + " died at coords " + (int) locX + " " + (int) locY + " " + (int) locZ);
-            EntityLiving entityliving = cv();
-            if (be >= 0 && entityliving != null)
-                entityliving.a(this, be, damagesource);
-
-            killed = true;
-            getCombatTracker().g();
-            if (!world.isClientSide) {
-                if (isDropExperience() && world.getGameRules().getBoolean("doMobLoot")) {
-                    boolean flag = lastDamageByPlayerTime > 0;
-                    a(flag, 0, damagesource);
-                    CraftEventFactory.callEntityDeathEvent(this, builder.getDrops());
-                } else {
-                    CraftEventFactory.callEntityDeathEvent(this);
-                }
-            }
-
-            world.broadcastEntityEffect(this, (byte) 3);
-        }
+        deathable.die(damagesource);
     }
 
     static class ControllerGhast extends ControllerMove {
@@ -215,6 +237,7 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         }
     }
 
+    //The Ghast's pathfinder, eventually this will be our own custom one!
     static class PathfinderGoalGhastAttackTarget extends PathfinderGoal {
         private final FlyingMob ghast;
         public int a;

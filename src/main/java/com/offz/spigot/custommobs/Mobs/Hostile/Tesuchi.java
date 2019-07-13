@@ -18,7 +18,7 @@ public class Tesuchi extends HostileMob implements HitBehaviour {
     }
 
     @Override
-    protected void createPathfinders() {
+    public void createPathfinders() {
         super.createPathfinders();
         this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
     }

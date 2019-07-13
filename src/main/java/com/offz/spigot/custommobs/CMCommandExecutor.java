@@ -1,6 +1,8 @@
 package com.offz.spigot.custommobs;
 
-import com.offz.spigot.custommobs.Loading.CustomType;
+import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
+import com.offz.spigot.custommobs.Mobs.Hostile.HostileMob;
+import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -25,8 +27,8 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         List<World> worlds = context.getPlugin().getServer().getWorlds();
-        boolean cminfo = label.equalsIgnoreCase("cminfo");
-        if (sender.hasPermission("customMobs.remove") && label.equalsIgnoreCase("cmrm") || cminfo) {
+        boolean cminfo = command.getName().equalsIgnoreCase("cminfo");
+        if (sender.hasPermission("customMobs.remove") && command.getName().equalsIgnoreCase("cmrm") || cminfo) {
             if (args.length < 1) {
                 sender.sendMessage(ChatColor.RED + "Please specify entity mob type");
                 return true;
@@ -36,8 +38,14 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
             for (World world : worlds)
                 for (Entity entity : world.getEntities()) {
                     Set<String> tags = entity.getScoreboardTags();
+                    net.minecraft.server.v1_13_R2.Entity nmsEntity = CustomMobsAPI.toNMS(entity);
                     if (CustomMobsAPI.isCustomMob(entity)
-                            && (args[0].equalsIgnoreCase("all")
+                            && ((args[0].equalsIgnoreCase("all") && !CustomMobsAPI.isRenamed(entity) && !entity.getScoreboardTags().contains("npc"))
+                            || (args[0].equalsIgnoreCase("named") && CustomMobsAPI.isRenamed(entity))
+                            || (args[0].equalsIgnoreCase("npc") && entity.getScoreboardTags().contains("npc"))
+                            || (args[0].equalsIgnoreCase("passive") && !entity.getScoreboardTags().contains("npc") && nmsEntity instanceof PassiveMob)
+                            || (args[0].equalsIgnoreCase("hostile") && nmsEntity instanceof HostileMob)
+                            || (args[0].equalsIgnoreCase("flying") && nmsEntity instanceof FlyingMob)
                             || CustomMobsAPI.isMobOfType(entity, args[0])))
                         try {
                             if (args.length < 2 || entity.getLocation().distance(Bukkit.getPlayer(sender.getName()).getLocation()) < Integer.parseInt(args[1])) {
@@ -50,18 +58,24 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
                             return true;
                         }
                 }
-            String message = "";
+            String message = ChatColor.GREEN + "";
             if (cminfo) message += "There are ";
             else message += "Removed ";
-            message += mobCount + " custom mobs, composed of " + entityCount + " entities";
+            message += ChatColor.BOLD + "" + mobCount + "" + ChatColor.RESET + ChatColor.GREEN;
+            if (args[0].equalsIgnoreCase("all"))
+                message += " custom mobs ";
+            else
+                message += " " + args[0] + " ";
+            if (entityCount != mobCount)
+                message += "(" + entityCount + " entities) ";
 
-            if (args.length < 2) message += " in all loaded chunks";
+            if (args.length < 2) message += "in all loaded chunks";
             else message += " in entity radius of " + args[1] + " blocks";
-            sender.sendMessage(ChatColor.GREEN + message);
+            sender.sendMessage(message);
             return true;
         }
 
-        if (sender.hasPermission("customMobs.spawn") && label.equalsIgnoreCase("cms")) {
+        if (sender.hasPermission("customMobs.spawn") && command.getName().equalsIgnoreCase("cms")) {
             Player p = Bukkit.getPlayer(sender.getName());
             if (args.length == 0) {
                 sender.sendMessage(ChatColor.RED + "Enter a mob name");
@@ -79,7 +93,7 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
             return true;
         }
 
-        if (sender.hasPermission("customMobs.spawn.list") && label.equalsIgnoreCase("cml")) {
+        if (sender.hasPermission("customMobs.spawn.list") && command.getName().equalsIgnoreCase("cml")) {
             sender.sendMessage(ChatColor.GREEN + CustomType.getTypes().keySet().toString());
             return true;
         }
@@ -100,7 +114,7 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
             if (args.length == 1) {
                 List<String> mobs = new ArrayList<>();
                 mobs.addAll(CustomType.getTypes().keySet());
-                mobs.addAll(Arrays.asList("all", "npc", "mob"));
+                mobs.addAll(Arrays.asList("all", "npc", "mob", "named", "passive", "hostile", "flying"));
                 return mobs
                         .stream()
                         .filter(a -> a.toLowerCase().startsWith(args[0].toLowerCase()))

@@ -1,4 +1,4 @@
-package com.offz.spigot.custommobs.Loading;
+package com.offz.spigot.custommobs;
 
 import com.mojang.datafixers.types.Type;
 import com.offz.spigot.custommobs.Builders.MobBuilder;
@@ -21,57 +21,48 @@ import java.util.function.Function;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class CustomType {
-    //Passive
-    public static EntityTypes NERITANTAN, FUWAGI, MOUNT;
-
-    //Hostile
-    public static EntityTypes INBYO, ROHANA, TAMAGAUCHI, SILKFANG, KUONGATARI, NAKIKABANE, TESUCHI;
-
-    //NPCs
-    public static EntityTypes MITTY, NANACHI, BONDREWD, HABO, JIRUO, KIYUI, MARULK, NAT, OZEN, REG, RIKO, SHIGGY, TORKA, LYZA;
-
-    //FLYING
-    public static EntityTypes CORPSE_WEEPER, MADOKAJACK, HAMMERBEAK, KAZURA, BENIKUCHINAWA;
-
     //this is used for getting a MobType from a String, which makes it easier to access from MobBuilder
     private static Map<String, EntityTypes> types = new HashMap<>();
 
-    public static void registerAllMobs() {
-        NERITANTAN = registerEntity(Neritantan.class, Neritantan::new);
-        FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
-        MOUNT = registerEntity(Mount.class, Mount::new);
+    //Passive
+    public static final EntityTypes NERITANTAN = registerEntity(Neritantan.class, Neritantan::new);
+    public static final EntityTypes FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
+    public static final EntityTypes MOUNT = registerEntity(Mount.class, Mount::new);
 
-        //Hostile
-        INBYO = registerEntity(Inbyo.class, Inbyo::new);
-        ROHANA = registerEntity(Rohana.class, Rohana::new);
-        TAMAGAUCHI = registerEntity(Tamaugachi.class, Tamaugachi::new);
-        SILKFANG = registerEntity(Silkfang.class, Silkfang::new);
-        KUONGATARI = registerEntity(Kuongatari.class, Kuongatari::new);
-        NAKIKABANE = registerEntity(Nakikabane.class, Nakikabane::new);
-        TESUCHI = registerEntity(Tesuchi.class, Tesuchi::new);
+    //Hostile
+    public static final EntityTypes INBYO = registerEntity(Inbyo.class, Inbyo::new);
+    public static final EntityTypes ROHANA = registerEntity(Rohana.class, Rohana::new);
+    public static final EntityTypes TAMAGAUCHI = registerEntity(Tamaugachi.class, Tamaugachi::new);
+    public static final EntityTypes SILKFANG = registerEntity(Silkfang.class, Silkfang::new);
+    public static final EntityTypes KUONGATARI = registerEntity(Kuongatari.class, Kuongatari::new);
+    public static final EntityTypes NAKIKABANE = registerEntity(Nakikabane.class, Nakikabane::new);
+    public static final EntityTypes TESUCHI = registerEntity(Tesuchi.class, Tesuchi::new);
 
-        //FLYING
-        CORPSE_WEEPER = registerEntity(CorpseWeeper.class, CorpseWeeper::new);
-        MADOKAJACK = registerEntity(Madokajack.class, Madokajack::new);
-        HAMMERBEAK = registerEntity(Hammerbeak.class, Hammerbeak::new);
-        KAZURA = registerEntity(Kazura.class, Kazura::new);
-        BENIKUCHINAWA = registerEntity(Benikuchinawa.class, Benikuchinawa::new);
+    //Flying
+    public static final EntityTypes CORPSE_WEEPER = registerEntity(CorpseWeeper.class, CorpseWeeper::new);
+    public static final EntityTypes MADOKAJACK = registerEntity(Madokajack.class, Madokajack::new);
+    public static final EntityTypes HAMMERBEAK = registerEntity(Hammerbeak.class, Hammerbeak::new);
+    public static final EntityTypes KAZURA = registerEntity(Kazura.class, Kazura::new);
+    public static final EntityTypes BENIKUCHINAWA = registerEntity(Benikuchinawa.class, Benikuchinawa::new);
 
-        //NPCs
-        MITTY = registerEntity("mitty", NPC.class, (world -> new NPC(world, "Mitty", 2)));
-        NANACHI = registerEntity("nanachi", NPC.class, (world -> new NPC(world, "Nanachi", 3)));
-        BONDREWD = registerEntity("bondrewd", NPC.class, (world -> new NPC(world, "Bondrewd", 4)));
-        HABO = registerEntity("habo", NPC.class, (world -> new NPC(world, "Habo", 5)));
-        JIRUO = registerEntity("jiruo", NPC.class, (world -> new NPC(world, "Jiruo", 6)));
-        KIYUI = registerEntity("kiyui", NPC.class, (world -> new NPC(world, "Kiyui", 7)));
-        MARULK = registerEntity("marulk", NPC.class, (world -> new NPC(world, "Marulk", 8)));
-        NAT = registerEntity("nat", NPC.class, (world -> new NPC(world, "Nat", 9)));
-        OZEN = registerEntity("ozen", NPC.class, (world -> new NPC(world, "Ozen", 10)));
-        REG = registerEntity("reg", NPC.class, (world -> new NPC(world, "Reg", 11)));
-        RIKO = registerEntity("riko", NPC.class, (world -> new NPC(world, "Riko", 12)));
-        SHIGGY = registerEntity("shiggy", NPC.class, (world -> new NPC(world, "Shiggy", 13)));
-        TORKA = registerEntity("torka", NPC.class, (world -> new NPC(world, "Torka", 14)));
-        LYZA = registerEntity("lyza", NPC.class, (world -> new NPC(world, "Lyza", 15)));
+    //NPCs
+    public static final EntityTypes MITTY = registerEntity("mitty", NPC.class, (world -> new NPC(world, "Mitty", 2)));
+    public static final EntityTypes NANACHI = registerEntity("nanachi", NPC.class, (world -> new NPC(world, "Nanachi", 3)));
+    public static final EntityTypes BONDREWD = registerEntity("bondrewd", NPC.class, (world -> new NPC(world, "Bondrewd", 4)));
+    public static final EntityTypes HABO = registerEntity("habo", NPC.class, (world -> new NPC(world, "Habo", 5)));
+    public static final EntityTypes JIRUO = registerEntity("jiruo", NPC.class, (world -> new NPC(world, "Jiruo", 6)));
+    public static final EntityTypes KIYUI = registerEntity("kiyui", NPC.class, (world -> new NPC(world, "Kiyui", 7)));
+    public static final EntityTypes MARULK = registerEntity("marulk", NPC.class, (world -> new NPC(world, "Marulk", 8)));
+    public static final EntityTypes NAT = registerEntity("nat", NPC.class, (world -> new NPC(world, "Nat", 9)));
+    public static final EntityTypes OZEN = registerEntity("ozen", NPC.class, (world -> new NPC(world, "Ozen", 10)));
+    public static final EntityTypes REG = registerEntity("reg", NPC.class, (world -> new NPC(world, "Reg", 11)));
+    public static final EntityTypes RIKO = registerEntity("riko", NPC.class, (world -> new NPC(world, "Riko", 12)));
+    public static final EntityTypes SHIGGY = registerEntity("shiggy", NPC.class, (world -> new NPC(world, "Shiggy", 13)));
+    public static final EntityTypes TORKA = registerEntity("torka", NPC.class, (world -> new NPC(world, "Torka", 14)));
+    public static final EntityTypes LYZA = registerEntity("lyza", NPC.class, (world -> new NPC(world, "Lyza", 15)));
+
+    public static void registerTypes() {
+
     }
 
     public static String toEntityTypeID(String name) {

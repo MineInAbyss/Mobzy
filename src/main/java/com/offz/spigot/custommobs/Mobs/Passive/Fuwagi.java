@@ -18,7 +18,7 @@ public class Fuwagi extends PassiveMob implements HitBehaviour {
     }
 
     @Override
-    protected void createPathfinders() {
+    public void createPathfinders() {
         super.createPathfinders();
         this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
         this.goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, builder.getTemptItems()));
@@ -52,6 +52,6 @@ public class Fuwagi extends PassiveMob implements HitBehaviour {
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {
-        return new Neritantan(this.world);
+        return new Fuwagi(this.world);
     }
 }

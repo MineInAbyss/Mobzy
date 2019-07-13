@@ -12,7 +12,7 @@ import org.bukkit.Material;
 
 public class Inbyo extends HostileMob implements HitBehaviour {
     static MobBuilder builder = new MobBuilder("Inbyo", 8)
-            .setDrops(new MobDrop(Material.BEEF, 1, 3), new MobDrop(Material.BLACK_WOOL, 1, 3));
+            .setDrops(new MobDrop(Material.BEEF, 1, 2), new MobDrop(Material.BLACK_WOOL, 1, 3));
 
     public Inbyo(World world) {
         super(world, builder);
@@ -20,7 +20,7 @@ public class Inbyo extends HostileMob implements HitBehaviour {
     }
 
     @Override
-    protected void createPathfinders() {
+    public void createPathfinders() {
         super.createPathfinders();
         this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
         this.targetSelector.a(1, new PathfinderGoalNearestAttackableTarget<>(this, Neritantan.class, true));
@@ -29,9 +29,9 @@ public class Inbyo extends HostileMob implements HitBehaviour {
     @Override
     protected void initAttributes() {
         super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(40.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.45D);
-        this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(7.0);
+        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(30.0D);
+        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.42D);
+        this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(6.0);
         this.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(64.0);
     }
 }

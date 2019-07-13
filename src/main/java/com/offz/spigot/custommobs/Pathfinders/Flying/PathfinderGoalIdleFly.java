@@ -15,7 +15,6 @@ public class PathfinderGoalIdleFly extends PathfinderGoal {
 
     public PathfinderGoalIdleFly(FlyingMob flyingMob) {
         this.mob = flyingMob;
-        this.a(1);
     }
 
     public boolean a() {
