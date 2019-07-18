@@ -92,7 +92,7 @@ public class MobListener implements Listener {
      * The magic method that lets you hit entities in their server side hitboxes
      * TODO this doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do.
      *
-     * @param e
+     * @param e the event
      */
     @EventHandler
     public void onLeftClick(PlayerInteractEvent e) {
