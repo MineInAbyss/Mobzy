@@ -5,10 +5,12 @@ import com.offz.spigot.custommobs.CustomMobsAPI;
 import com.offz.spigot.custommobs.CustomType;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Spawning.Vertical.SpawnArea;
+import com.offz.spigot.custommobs.Spawning.Vertical.VerticalSpawn;
 import net.minecraft.server.v1_13_R2.EntityTypes;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +60,33 @@ public class MobSpawn {
         return entityType;
     }
 
+    public static Location getSpawnInRadius(Location loc, double minRad, double maxRad) {
+        for (int i = 0; i < 30; i++) {
+            double y = (Math.random() - 0.5) * maxRad;
+            if (Math.abs(y) > minRad) //if y is minRad blocks away from player, mobs can spawn directly under or above
+                minRad = 0;
+
+            double x = Math.signum(Math.random() - 0.5) * ((Math.random() * (maxRad - minRad)) + minRad);
+            double z = Math.signum(Math.random() - 0.5) * ((Math.random() * (maxRad - minRad)) + minRad);
+
+            if (!loc.isChunkLoaded())
+                return null;
+            Location searchLoc = loc.clone();
+            searchLoc = searchLoc.add(new Vector(x, y, z));
+
+            if (!searchLoc.getBlock().getType().isSolid()) {
+                searchLoc = VerticalSpawn.checkDown(searchLoc, 25);
+                if (searchLoc != null)
+                    return searchLoc;
+            } else {
+                searchLoc = VerticalSpawn.checkUp(searchLoc, 25);
+                if (searchLoc != null)
+                    return searchLoc;
+            }
+        }
+        return null;
+    }
+
     public int spawn(SpawnArea area, int spawns) {
         Location loc = area.getSpawnLocation(getSpawnPos());
         for (int i = 0; i < spawns; i++) {
@@ -68,13 +97,13 @@ public class MobSpawn {
 
                 Location spawnLoc;
 
-                if (radius != 0 && !spawnPos.equals(SpawnPosition.AIR) && (spawnLoc = SpawnTask.getSpawnInRadius(loc, 0, radius)) != null)
+                if (radius != 0 && !spawnPos.equals(SpawnPosition.AIR) && (spawnLoc = getSpawnInRadius(loc, 0, radius)) != null)
                     entity = CustomType.spawnEntity(entityType, spawnLoc);
                 else
                     entity = CustomType.spawnEntity(entityType, loc);
             }
             net.minecraft.server.v1_13_R2.Entity nmsEntity = CustomMobsAPI.toNMS(entity);
-            //TODO could be a better way of handling mobs spawning with too little space but this works well enough for now
+            //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
             if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) {
                 CustomMobsAPI.debug("Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
                 nmsEntity.die();
@@ -106,8 +135,6 @@ public class MobSpawn {
             return -1;
         if (!section.isEmpty() && !section.contains(MineInAbyss.getContext().getRealWorldManager().getSectionFor(l).toString()))
             return -1;
-
-        //TODO check if there's enough space to spawn the mob (on x and z)
 
         return priority;
     }

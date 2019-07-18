@@ -86,7 +86,6 @@ public class VerticalSpawn {
         return null;
     }
 
-    //TODO not sure if the built in method for this is any less expensive than checking it ourselves
     public static Location getHighestBlock(Location l, int minY, int maxY) {
         //make a copy of the given location so we don't change its coords.
         Location highest = l.clone();

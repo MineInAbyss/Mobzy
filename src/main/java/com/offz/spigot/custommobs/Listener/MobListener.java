@@ -68,7 +68,7 @@ public class MobListener implements Listener {
             // replicate it since. Reloading the plugin fixed it.
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (!entity.getBukkitEntity().isDead()) {
-                    is.setDamage(modelID + 1);
+                    is.setDamage(modelID);
                     entity.setEquipment(EnumItemSlot.HEAD, is);
                 }
             }, 5);
@@ -94,7 +94,7 @@ public class MobListener implements Listener {
      *
      * @param e
      */
-    @EventHandler()
+    @EventHandler
     public void onLeftClick(PlayerInteractEvent e) {
         //TODO I'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
         // armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:

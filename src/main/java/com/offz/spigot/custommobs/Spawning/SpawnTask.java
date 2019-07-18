@@ -9,16 +9,13 @@ import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
 import com.offz.spigot.custommobs.Mobs.Hostile.HostileMob;
 import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
 import com.offz.spigot.custommobs.Spawning.Vertical.SpawnArea;
-import com.offz.spigot.custommobs.Spawning.Vertical.VerticalSpawn;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,55 +37,29 @@ public class SpawnTask extends BukkitRunnable {
         this.plugin = plugin;
     }
 
-    //TODO cleanup/remove
-    public static Location getSpawnInRadius(Location p, double minRad, double maxRad) {
-        for (int i = 0; i < 30; i++) {
-            double y = (Math.random() - 0.5) * maxRad;
-            if (Math.abs(y) > minRad) //if y is minRad blocks away from player, mobs can spawn directly under or above
-                minRad = 0;
-
-            double x = Math.signum(Math.random() - 0.5) * ((Math.random() * (maxRad - minRad)) + minRad);
-            double z = Math.signum(Math.random() - 0.5) * ((Math.random() * (maxRad - minRad)) + minRad);
-            if (!p.isChunkLoaded())
-                return null;
-            Location l = p.clone();
-            l = l.add(new Vector(x, y, z));
-
-            if (!l.getBlock().getType().isSolid()) {
-                l = VerticalSpawn.checkDown(l, 25);
-                if (l != null)
-                    return l;
-            } else {
-                l = VerticalSpawn.checkUp(l, 25);
-                if (l != null)
-                    return l;
-            }
-        }
-        return null;
-    }
-
     @Override
     public void run() {
-        AbyssWorldManager manager = context.getWorldManager();
-        List<UUID> closePlayers = new ArrayList<>();
+        //run checks asynchronously
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            AbyssWorldManager manager = context.getWorldManager();
+            List<UUID> closePlayers = new ArrayList<>();
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            UUID uuid = p.getUniqueId();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                UUID uuid = p.getUniqueId();
 
-            //if this player has been registered as close to another, do not make additional spawns
-            if (closePlayers.contains(uuid)) {
-                closePlayers.remove(uuid);
-                continue;
-            }
+                //if this player has been registered as close to another, do not make additional spawns
+                if (closePlayers.contains(uuid)) {
+//                closePlayers.remove(uuid);
+                    continue;
+                }
 
-            if (!manager.isAbyssWorld(p.getWorld())) {
-                continue;
-            }
+                if (!manager.isAbyssWorld(p.getWorld())) {
+                    continue;
+                }
 
-            String layerName = manager.getLayerForSection(worldManager.getSectionFor(p.getLocation())).getName();
+                String layerName = manager.getLayerForSection(worldManager.getSectionFor(p.getLocation())).getName();
 
-            //decide spawns around player asynchronously
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                //decide spawns around player
 //                try {
                 List<MobSpawnEvent> toSpawn = new ArrayList<>();
                 //0 = passive, 1 = hostile, 2 = flying
@@ -103,7 +74,7 @@ public class SpawnTask extends BukkitRunnable {
                     if (((CraftEntity) e).getHandle() instanceof FlyingMob)
                         originalMobCount[2]++;
                     //if a player was nearby, add them to the close players list so we don't overlap spawns
-                    if (e.getType().equals(EntityType.PLAYER))
+                    if (e.getType().equals(EntityType.PLAYER) && e.getLocation().distance(p.getLocation()) < 30)
                         closePlayers.add(e.getUniqueId());
                 }
                 int[] mobCount = Arrays.copyOf(originalMobCount, 3);
@@ -186,7 +157,7 @@ public class SpawnTask extends BukkitRunnable {
                             CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[2] - originalMobCount[2] + " flying mobs spawned"));
                     }
                 });
-            });
-        }
+            }
+        });
     }
 }

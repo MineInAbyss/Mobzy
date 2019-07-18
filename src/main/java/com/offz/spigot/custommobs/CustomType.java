@@ -27,7 +27,7 @@ public class CustomType {
     //Passive
     public static final EntityTypes NERITANTAN = registerEntity(Neritantan.class, Neritantan::new);
     public static final EntityTypes FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
-    public static final EntityTypes MOUNT = registerEntity(Mount.class, Mount::new);
+    public static final EntityTypes OKIBO = registerEntity(Mount.class, Mount::new);
 
     //Hostile
     public static final EntityTypes INBYO = registerEntity(Inbyo.class, Inbyo::new);
@@ -37,6 +37,7 @@ public class CustomType {
     public static final EntityTypes KUONGATARI = registerEntity(Kuongatari.class, Kuongatari::new);
     public static final EntityTypes NAKIKABANE = registerEntity(Nakikabane.class, Nakikabane::new);
     public static final EntityTypes TESUCHI = registerEntity(Tesuchi.class, Tesuchi::new);
+    public static final EntityTypes OTTOBAS = registerEntity(Ottobas.class, Ottobas::new);
 
     //Flying
     public static final EntityTypes CORPSE_WEEPER = registerEntity(CorpseWeeper.class, CorpseWeeper::new);
@@ -62,7 +63,10 @@ public class CustomType {
     public static final EntityTypes LYZA = registerEntity("lyza", NPC.class, (world -> new NPC(world, "Lyza", 15)));
 
     public static void registerTypes() {
-
+        //TODO make sure we don't need to unregister things
+//        Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) DataConverterRegistry.a().getSchema(15190).findChoiceType(DataConverterTypes.n).types();
+//        dataTypes.keySet()
+//        Bukkit.broadcastMessage();
     }
 
     public static String toEntityTypeID(String name) {

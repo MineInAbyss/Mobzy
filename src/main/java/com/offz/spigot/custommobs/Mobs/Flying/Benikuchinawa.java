@@ -10,7 +10,7 @@ public class Benikuchinawa extends FlyingMob implements HitBehaviour {
 
     public Benikuchinawa(World world) {
         super(world, builder);
-        setSize(4f, 2f);
+        setSize(5f, 2f);
         //An alternative method for setting boundaries which doesn't seem to work anymore
 //        AxisAlignedBB boundingBox = new AxisAlignedBB(locX - 5, locY, locZ - 1, locX + 5, locY + 1, locZ + 1);
 //        a(boundingBox);
