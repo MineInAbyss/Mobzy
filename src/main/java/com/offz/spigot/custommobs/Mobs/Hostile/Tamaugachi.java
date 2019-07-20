@@ -16,8 +16,7 @@ public class Tamaugachi extends HostileMob implements HitBehaviour {
 
     public Tamaugachi(World world) {
         super(world, builder);
-        this.setSize(2F, 3F);
-
+        this.setSize(2.5F, 3F);
     }
 
     @Override
@@ -30,7 +29,7 @@ public class Tamaugachi extends HostileMob implements HitBehaviour {
     protected void initAttributes() {
         super.initAttributes();
         this.getAttributeInstance(GenericAttributes.maxHealth).setValue(100.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.5D);
+        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.4D);
         this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(7.0);
         this.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(64.0);
     }

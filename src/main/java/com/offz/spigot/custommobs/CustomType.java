@@ -144,6 +144,10 @@ public class CustomType {
         if (nmsEntity instanceof AfterSpawnBehaviour)
             ((AfterSpawnBehaviour) nmsEntity).afterSpawn();
 
+        //testing the enoughSpace method
+//        if (!MobSpawn.enoughSpace(loc, nmsEntity.width, nmsEntity.length))
+//            nmsEntity.die();
+
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity(); // convert to a Bukkit entity
     }
 }

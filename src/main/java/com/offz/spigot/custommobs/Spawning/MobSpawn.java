@@ -7,8 +7,10 @@ import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Spawning.Vertical.SpawnArea;
 import com.offz.spigot.custommobs.Spawning.Vertical.VerticalSpawn;
 import net.minecraft.server.v1_13_R2.EntityTypes;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
@@ -37,11 +39,16 @@ public class MobSpawn {
     private MobSpawn() {
     }
 
-    public static boolean enoughSpace(Location loc, double width, double length) {
-        for (int x = (int) -width / 2; x < (int) width / 2; x++) {
-            for (int z = (int) -length / 2; z < (int) length / 2; z++) {
-                if (!loc.clone().add(x, 0, z).getBlock().isPassable()) {
-                    return false;
+    public static boolean enoughSpace(Location loc, double width, double height) {
+        double checkRad = width / 2;
+
+        for (int y = 0; y < Math.ceil(height); y++) {
+            for (double x = -checkRad; x < checkRad; x++) {
+                for (double z = -checkRad; z < checkRad; z++) {
+                    Block checkBlock = loc.clone().add(x, y, z).getBlock();
+                    if (checkBlock.getType().isOccluding() && !checkBlock.isPassable()) {
+                        return false;
+                    }
                 }
             }
         }
@@ -104,10 +111,10 @@ public class MobSpawn {
             }
             net.minecraft.server.v1_13_R2.Entity nmsEntity = CustomMobsAPI.toNMS(entity);
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
-            if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) {
-                CustomMobsAPI.debug("Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
+            if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) { //length is actually the height, don't know why, it's just how it be
+                CustomMobsAPI.debug(ChatColor.YELLOW + "Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
                 nmsEntity.die();
-            } //TODO might not work with multiple spawns
+            }
         }
         return spawns;
     }
