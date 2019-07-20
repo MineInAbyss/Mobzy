@@ -1,6 +1,7 @@
 package com.offz.spigot.custommobs.Spawning.Vertical;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
@@ -62,9 +63,8 @@ public class VerticalSpawn {
             if (l.getY() >= 256)
                 l.setY(255);
 
-            if (l.getBlock().getType().isSolid()) {
+            if (l.getBlock().getType().isSolid())
                 return l.add(0, 1, 0);
-            }
         }
         return null;
     }
@@ -91,7 +91,7 @@ public class VerticalSpawn {
         Location highest = l.clone();
         highest.setY(maxY);
 
-        while (highest.getBlock().isPassable() && highest.getBlockY() > minY)
+        while (highest.getBlock().isPassable() && !highest.getBlock().getType().equals(Material.WATER) && highest.getBlockY() > minY)
             highest.add(0, -1, 0);
 
         return highest;

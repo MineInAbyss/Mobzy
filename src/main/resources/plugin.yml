@@ -26,4 +26,8 @@ commands:
     description: Lists all registered mobs
     aliases: [cml, cmlist]
     usage: /cml
+  cmreload:
+    description: Reloads the configuration files
+    aliases: [cmreload]
+    usage: /cmrm
 

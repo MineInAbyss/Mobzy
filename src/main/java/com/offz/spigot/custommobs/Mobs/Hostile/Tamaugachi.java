@@ -16,7 +16,7 @@ public class Tamaugachi extends HostileMob implements HitBehaviour {
 
     public Tamaugachi(World world) {
         super(world, builder);
-        this.setSize(2.1F, 3F);
+        this.setSize(2F, 3F);
 
     }
 

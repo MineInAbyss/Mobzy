@@ -2,6 +2,7 @@ package com.offz.spigot.custommobs;
 
 import org.bukkit.configuration.Configuration;
 import org.bukkit.plugin.Plugin;
+
 import java.util.logging.Logger;
 
 /**
@@ -12,8 +13,15 @@ public class MobContext {
     private Logger logger;
     private Configuration config;
 
-    public MobContext(Configuration config) {
+    private ConfigManager configManager;
+
+    public MobContext(Configuration config, ConfigManager configManager) {
         this.config = config;
+        this.configManager = configManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 
     public Plugin getPlugin() {

@@ -26,6 +26,11 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender.hasPermission("customMobs.reload") && command.getName().equalsIgnoreCase("cmreload")) {
+            context.getPlugin().reloadConfig();
+            sender.sendMessage(ChatColor.GREEN + "Reloaded config files");
+            return true;
+        }
         List<World> worlds = context.getPlugin().getServer().getWorlds();
         boolean cminfo = command.getName().equalsIgnoreCase("cminfo");
         if (sender.hasPermission("customMobs.remove") && command.getName().equalsIgnoreCase("cmrm") || cminfo) {

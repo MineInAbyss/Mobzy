@@ -22,9 +22,9 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
 
     public FlyingMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
-        this.setSize(4.0F, 4.0F);
+        setSize(4.0F, 4.0F);
         this.builder = builder;
-        this.moveController = new ControllerGhast(this);
+        moveController = new ControllerGhast(this);
         CustomMobBase base = new CustomMobBase(this);
         base.apply();
         addScoreboardTag("flying");
@@ -42,11 +42,12 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
 
     @Override
     public void createPathfinders() {
-        this.goalSelector.a(5, new PathfinderGoalIdleFly(this));
-        this.goalSelector.a(1, new PathfinderGoalDiveOnTargetAttack(this));
-//        this.goalSelector.a(7, new PathfinderGoalGhastAttackTarget(this));
-        this.targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
-//        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 20.0F, 1F));
+        goalSelector.a(1, new PathfinderGoalFloat(this));
+        goalSelector.a(5, new PathfinderGoalIdleFly(this));
+        goalSelector.a(1, new PathfinderGoalDiveOnTargetAttack(this));
+//        goalSelector.a(7, new PathfinderGoalGhastAttackTarget(this));
+        targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
+//        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 20.0F, 1F));
     }
 
 //    public void a(boolean flag) {
@@ -55,7 +56,7 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
 
     //TODO Only used by ghast's pathfinder, remove once we change it
     public int getPower() {
-        return this.power;
+        return power;
     }
 
     /**
@@ -63,8 +64,8 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
      */
     public void tick() {
         super.tick();
-        if (!this.world.isClientSide && this.world.getDifficulty() == EnumDifficulty.PEACEFUL) {
-            this.die();
+        if (!world.isClientSide && world.getDifficulty() == EnumDifficulty.PEACEFUL) {
+            die();
         }
     }
 

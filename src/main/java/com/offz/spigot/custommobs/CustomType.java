@@ -6,9 +6,9 @@ import com.offz.spigot.custommobs.Mobs.Behaviours.AfterSpawnBehaviour;
 import com.offz.spigot.custommobs.Mobs.Flying.*;
 import com.offz.spigot.custommobs.Mobs.Hostile.*;
 import com.offz.spigot.custommobs.Mobs.Passive.Fuwagi;
-import com.offz.spigot.custommobs.Mobs.Passive.Mount;
 import com.offz.spigot.custommobs.Mobs.Passive.NPC;
 import com.offz.spigot.custommobs.Mobs.Passive.Neritantan;
+import com.offz.spigot.custommobs.Mobs.Passive.Okibo;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
@@ -27,7 +27,7 @@ public class CustomType {
     //Passive
     public static final EntityTypes NERITANTAN = registerEntity(Neritantan.class, Neritantan::new);
     public static final EntityTypes FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
-    public static final EntityTypes OKIBO = registerEntity(Mount.class, Mount::new);
+    public static final EntityTypes OKIBO = registerEntity(Okibo.class, Okibo::new);
 
     //Hostile
     public static final EntityTypes INBYO = registerEntity(Inbyo.class, Inbyo::new);
@@ -61,6 +61,7 @@ public class CustomType {
     public static final EntityTypes SHIGGY = registerEntity("shiggy", NPC.class, (world -> new NPC(world, "Shiggy", 13)));
     public static final EntityTypes TORKA = registerEntity("torka", NPC.class, (world -> new NPC(world, "Torka", 14)));
     public static final EntityTypes LYZA = registerEntity("lyza", NPC.class, (world -> new NPC(world, "Lyza", 15)));
+    public static final EntityTypes PRUSHKA = registerEntity("prushka", NPC.class, (world -> new NPC(world, "Prushka", 16)));
 
     public static void registerTypes() {
         //TODO make sure we don't need to unregister things

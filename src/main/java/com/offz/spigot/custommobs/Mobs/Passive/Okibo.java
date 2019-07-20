@@ -10,12 +10,12 @@ import net.minecraft.server.v1_13_R2.GenericAttributes;
 import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;
 
-public class Mount extends PassiveMob implements HitBehaviour {
-    static MobBuilder builder = new MobBuilder("Mount", 38)
+public class Okibo extends PassiveMob implements HitBehaviour {
+    static MobBuilder builder = new MobBuilder("Okibo", 38)
             .setDrops(new MobDrop(Material.LEATHER, 3, 5));
 
     //TODO change offset when riding and make controllable
-    public Mount(World world) {
+    public Okibo(World world) {
         super(world, builder);
         setSize(3, 3);
     }
@@ -39,6 +39,6 @@ public class Mount extends PassiveMob implements HitBehaviour {
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {
-        return new Mount(this.world);
+        return new Okibo(this.world);
     }
 }

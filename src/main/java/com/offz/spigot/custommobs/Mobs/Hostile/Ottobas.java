@@ -16,7 +16,7 @@ public class Ottobas extends HostileMob implements HitBehaviour {
 
     public Ottobas(World world) {
         super(world, builder);
-        this.setSize(2.1F, 3F);
+        this.setSize(2F, 3F);
 
     }
 

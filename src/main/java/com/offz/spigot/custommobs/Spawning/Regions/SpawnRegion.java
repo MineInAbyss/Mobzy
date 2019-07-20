@@ -4,9 +4,11 @@ import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
 import com.offz.spigot.custommobs.Mobs.Hostile.HostileMob;
 import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
 import com.offz.spigot.custommobs.Spawning.MobSpawn;
+import net.minecraft.server.v1_13_R2.EntityTypes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A region with determined hostile, passive, flying, etc... spawns. Currently only layers are treated as regions.
@@ -17,6 +19,11 @@ public class SpawnRegion {
     private List<MobSpawn> passiveSpawns = new ArrayList<>();
     private List<MobSpawn> hostileSpawns = new ArrayList<>();
     private List<MobSpawn> flyingSpawns = new ArrayList<>();
+
+    public String getName() {
+        return name;
+    }
+
     private String name;
 
     public SpawnRegion(String name, MobSpawn... spawns) {
@@ -60,5 +67,23 @@ public class SpawnRegion {
             hostileSpawns.add(spawn);
         else if (FlyingMob.class.isAssignableFrom(entityClass))
             flyingSpawns.add(spawn);
+    }
+
+    public MobSpawn getSpawnOfType(EntityTypes type) {
+        return Stream.of(passiveSpawns, hostileSpawns, flyingSpawns)
+                .flatMap(List::stream)
+                .filter(spawn -> spawn.getEntityType().equals(type))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+        return "SpawnRegion{" +
+                "passiveSpawns=" + passiveSpawns +
+                ", hostileSpawns=" + hostileSpawns +
+                ", flyingSpawns=" + flyingSpawns +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

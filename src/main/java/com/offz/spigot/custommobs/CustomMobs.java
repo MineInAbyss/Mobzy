@@ -14,14 +14,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CustomMobs extends JavaPlugin {
-
+    private ConfigManager configManager;
     private MobContext context;
-
 
     @Override
     public void reloadConfig() {
         super.reloadConfig();
-        //TODO be able to trigger a config reload
+        CustomMobsAPI.loadConfigValues(this);
+        if (configManager == null)
+            loadConfigManager();
+        else configManager.reload();
     }
 
     @Override
@@ -29,10 +31,10 @@ public final class CustomMobs extends JavaPlugin {
         getLogger().info("On enable has been called");
         CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
         saveDefaultConfig();
-        CustomMobsAPI.loadConfigValues(this);
+
         AbyssContext abyssContext = MineInAbyss.getContext();
         // Plugin startup logic
-        context = new MobContext(getConfig()); //Create new context and add plugin and logger to it
+        context = new MobContext(getConfig(), configManager); //Create new context and add plugin and logger to it
         context.setPlugin(this);
         context.setLogger(getLogger());
 
@@ -53,6 +55,7 @@ public final class CustomMobs extends JavaPlugin {
         this.getCommand("cminfo").setExecutor(commandExecutor);
         this.getCommand("cms").setExecutor(commandExecutor);
         this.getCommand("cml").setExecutor(commandExecutor);
+        this.getCommand("cmreload").setExecutor(commandExecutor);
 
         int num = 0;
 
@@ -85,5 +88,14 @@ public final class CustomMobs extends JavaPlugin {
         super.onDisable();
         // Plugin shutdown logic
         getLogger().info("onDisable has been invoked!");
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public void loadConfigManager() {
+        configManager = new ConfigManager();
+        configManager.setup();
     }
 }

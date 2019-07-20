@@ -13,7 +13,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MobSpawn {
@@ -33,7 +32,7 @@ public class MobSpawn {
     private int maxGap = 256;
     private SpawnPosition spawnPos = SpawnPosition.GROUND;
     private List<Material> whitelist = new ArrayList<>();
-    private List<String> section = new ArrayList<>();
+    private List<String> sections = new ArrayList<>();
 
     private MobSpawn() {
     }
@@ -41,8 +40,9 @@ public class MobSpawn {
     public static boolean enoughSpace(Location loc, double width, double length) {
         for (int x = (int) -width / 2; x < (int) width / 2; x++) {
             for (int z = (int) -length / 2; z < (int) length / 2; z++) {
-                if (loc.clone().add(x, 0, z).getBlock().getType().isSolid())
+                if (!loc.clone().add(x, 0, z).getBlock().isPassable()) {
                     return false;
+                }
             }
         }
         return true;
@@ -107,7 +107,7 @@ public class MobSpawn {
             if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) {
                 CustomMobsAPI.debug("Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
                 nmsEntity.die();
-            }
+            } //TODO might not work with multiple spawns
         }
         return spawns;
     }
@@ -133,14 +133,14 @@ public class MobSpawn {
             return -1;
         if (!whitelist.isEmpty() && !whitelist.contains(l.clone().add(0, -1, 0).getBlock().getType()))
             return -1;
-        if (!section.isEmpty() && !section.contains(MineInAbyss.getContext().getRealWorldManager().getSectionFor(l).toString()))
+        if (!sections.isEmpty() && !sections.contains(MineInAbyss.getContext().getRealWorldManager().getSectionFor(l).toString()))
             return -1;
 
         return priority;
     }
 
     public int chooseSpawnAmount() {
-        if (minAmount == maxAmount)
+        if (minAmount >= maxAmount)
             return minAmount;
         return (int) (Math.random() * (maxAmount - minAmount + 1)) + minAmount;
     }
@@ -174,7 +174,7 @@ public class MobSpawn {
         OVERHANG
     }
 
-    public static final class MobSpawnBuilder {
+    public static final class Builder {
         private EntityTypes entityType;
         private int minAmount = 1;
         private int maxAmount = 1;
@@ -190,113 +190,117 @@ public class MobSpawn {
         private int maxGap = 256;
         private SpawnPosition spawnPos = SpawnPosition.GROUND;
         private List<Material> whitelist = new ArrayList<>();
-        private List<String> section = new ArrayList<>();
+        private List<String> sections = new ArrayList<>();
 
-        public MobSpawnBuilder() {
+        public Builder() {
         }
 
-        public static MobSpawnBuilder aMobSpawn() {
-            return new MobSpawnBuilder();
+        public Builder(MobSpawn old) {
+            setEntityType(old.entityType).setMinAmount(old.minAmount).setMaxAmount(old.maxAmount).setRadius(old.radius).setBasePriority(old.basePriority).setMinTime(old.minTime).setMaxTime(old.maxTime).setMinLightLevel(old.minLightLevel).setMaxLightLevel(old.maxLightLevel).setMinY(old.minY).setMaxY(old.maxY).setMinGap(old.minGap).setMaxGap(old.maxGap).setSpawnPos(old.spawnPos).setWhitelist(old.whitelist).setSections(old.sections);
         }
 
-        public MobSpawnBuilder setEntityType(EntityTypes entityType) {
+        public static Builder aMobSpawn() {
+            return new Builder();
+        }
+
+        public Builder setEntityType(EntityTypes entityType) {
             this.entityType = entityType;
             return this;
         }
 
-        public MobSpawnBuilder setMinAmount(int minAmount) {
+        public Builder setMinAmount(int minAmount) {
             this.minAmount = minAmount;
             return this;
         }
 
-        public MobSpawnBuilder setMaxAmount(int maxAmount) {
+        public Builder setMaxAmount(int maxAmount) {
             this.maxAmount = maxAmount;
             return this;
         }
 
-        public MobSpawnBuilder setRadius(double radius) {
+        public Builder setRadius(double radius) {
             this.radius = radius;
             return this;
         }
 
-        public MobSpawnBuilder setBasePriority(double basePriority) {
+        public Builder setBasePriority(double basePriority) {
             this.basePriority = basePriority;
             return this;
         }
 
-        public MobSpawnBuilder setMinTime(long minTime) {
+        public Builder setMinTime(long minTime) {
             this.minTime = minTime;
             return this;
         }
 
-        public MobSpawnBuilder setMaxTime(long maxTime) {
+        public Builder setMaxTime(long maxTime) {
             this.maxTime = maxTime;
             return this;
         }
 
-        public MobSpawnBuilder setMinLightLevel(long minLightLevel) {
+        public Builder setMinLightLevel(long minLightLevel) {
             this.minLightLevel = minLightLevel;
             return this;
         }
 
-        public MobSpawnBuilder setMaxLightLevel(long maxLightLevel) {
+        public Builder setMaxLightLevel(long maxLightLevel) {
             this.maxLightLevel = maxLightLevel;
             return this;
         }
 
-        public MobSpawnBuilder setMinY(int minY) {
+        public Builder setMinY(int minY) {
             this.minY = minY;
             return this;
         }
 
-        public MobSpawnBuilder setMaxY(int maxY) {
+        public Builder setMaxY(int maxY) {
             this.maxY = maxY;
             return this;
         }
 
-        public MobSpawnBuilder setMinGap(int minGap) {
+        public Builder setMinGap(int minGap) {
             this.minGap = minGap;
             return this;
         }
 
-        public MobSpawnBuilder setMaxGap(int maxGap) {
+        public Builder setMaxGap(int maxGap) {
             this.maxGap = maxGap;
             return this;
         }
 
-        public MobSpawnBuilder setSpawnPos(SpawnPosition spawnPos) {
+        public Builder setSpawnPos(SpawnPosition spawnPos) {
             this.spawnPos = spawnPos;
             return this;
         }
 
-        public MobSpawnBuilder setWhitelist(Material... whitelist) {
-            this.whitelist = Arrays.asList(whitelist);
+        public Builder setWhitelist(List<Material> whitelist) {
+            this.whitelist = whitelist;
             return this;
         }
 
-        public MobSpawnBuilder setSections(String... section) {
-            this.section = Arrays.asList(section);
+        public Builder setSections(List<String> sections) {
+            this.sections = sections;
             return this;
         }
 
         public MobSpawn build() {
             MobSpawn mobSpawn = new MobSpawn();
             mobSpawn.maxTime = this.maxTime;
-            mobSpawn.section = this.section;
+            mobSpawn.sections = this.sections;
             mobSpawn.radius = this.radius;
-            mobSpawn.minLightLevel = this.minLightLevel;
             mobSpawn.whitelist = this.whitelist;
-            mobSpawn.maxAmount = this.maxAmount;
-            mobSpawn.minGap = this.minGap;
-            mobSpawn.spawnPos = this.spawnPos;
-            mobSpawn.minTime = this.minTime;
-            mobSpawn.entityType = this.entityType;
-            mobSpawn.basePriority = this.basePriority;
-            mobSpawn.maxY = this.maxY;
-            mobSpawn.maxGap = this.maxGap;
-            mobSpawn.minY = this.minY;
             mobSpawn.minAmount = this.minAmount;
+            mobSpawn.spawnPos = this.spawnPos;
             mobSpawn.maxLightLevel = this.maxLightLevel;
+            mobSpawn.minLightLevel = this.minLightLevel;
+            mobSpawn.maxAmount = this.maxAmount;
+            mobSpawn.basePriority = this.basePriority;
+            mobSpawn.entityType = this.entityType;
+            mobSpawn.maxY = this.maxY;
+            mobSpawn.minY = this.minY;
+            mobSpawn.maxGap = this.maxGap;
+            mobSpawn.minTime = this.minTime;
+            mobSpawn.minGap = this.minGap;
             return mobSpawn;
         }
     }

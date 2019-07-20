@@ -40,12 +40,23 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
     @Override
     public void createPathfinders() {
-        this.goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
-        this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
+        goalSelector.a(1, new PathfinderGoalFloat(this));
+        goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
+        goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
 
-        this.goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
-        this.goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
+        goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
+        goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
+        targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
+    }
+
+    /**
+     * Removes if not in peaceful mode
+     */
+    public void tick() {
+        super.tick();
+        if (!world.isClientSide && world.getDifficulty() == EnumDifficulty.PEACEFUL) {
+            die();
+        }
     }
 
     @Override
