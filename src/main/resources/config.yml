@@ -1,3 +1,7 @@
 # Send debug messages
 debug: false
 doMobSpawns: true
+passiveMobCap: 20
+hostileMobCap: 20
+flyingMobCap: 5
+spawnSearchRadius: 128

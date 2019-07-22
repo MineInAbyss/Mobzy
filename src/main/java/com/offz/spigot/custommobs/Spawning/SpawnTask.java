@@ -23,10 +23,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpawnTask extends BukkitRunnable {
-    private final int PASSIVE_MOB_CAP = 20;
-    private final int HOSTILE_MOB_CAP = 20;
-    private final int FLYING_MOB_CAP = 5;
-    private final int MAX_TRIES = 100;
     private CustomMobs plugin;
 
     public SpawnTask(CustomMobs plugin) {
@@ -67,7 +63,7 @@ public class SpawnTask extends BukkitRunnable {
                     int[] originalMobCount = new int[3];
 
                     //go through entities around player, adding nearby players to a list
-                    for (Entity e : p.getNearbyEntities(256, 256, 256)) {
+                    for (Entity e : p.getNearbyEntities(CustomMobsAPI.getSpawnSearchRadius(), CustomMobsAPI.getSpawnSearchRadius(), CustomMobsAPI.getSpawnSearchRadius())) {
                         if (((CraftEntity) e).getHandle() instanceof PassiveMob)
                             originalMobCount[0]++;
                         if (((CraftEntity) e).getHandle() instanceof HostileMob)
@@ -84,7 +80,7 @@ public class SpawnTask extends BukkitRunnable {
                         totalMobs += mobs;
 
                     //if we've hit the cap, stop spawning
-                    if (mobCount[0] >= PASSIVE_MOB_CAP && mobCount[1] >= HOSTILE_MOB_CAP && mobCount[2] >= FLYING_MOB_CAP)
+                    if (mobCount[0] >= CustomMobsAPI.getPassiveMobCap() && mobCount[1] >= CustomMobsAPI.getHostileMobCap() && mobCount[2] >= CustomMobsAPI.getFlyingMobCap())
                         return;
 
                     //STEP 1: Generate array of ChunkSpawns around player, and invalidate the ones that are empty
@@ -99,15 +95,15 @@ public class SpawnTask extends BukkitRunnable {
                             //if mob cap of that specific mob has been reached, skip it
                             switch (mobType) {
                                 case 0:
-                                    if (mobCount[0] >= PASSIVE_MOB_CAP)
+                                    if (mobCount[0] >= CustomMobsAPI.getPassiveMobCap())
                                         continue mobTypeLoop;
                                     break;
                                 case 1:
-                                    if (mobCount[1] >= HOSTILE_MOB_CAP)
+                                    if (mobCount[1] >= CustomMobsAPI.getHostileMobCap())
                                         continue mobTypeLoop;
                                     break;
                                 case 2:
-                                    if (mobCount[2] >= FLYING_MOB_CAP)
+                                    if (mobCount[2] >= CustomMobsAPI.getFlyingMobCap())
                                         continue mobTypeLoop;
                                     break;
                             }

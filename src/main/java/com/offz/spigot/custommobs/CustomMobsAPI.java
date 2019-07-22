@@ -15,6 +15,26 @@ import java.util.Map;
 public class CustomMobsAPI {
     private static boolean debug;
     private static boolean doMobSpawns;
+    private static int passiveMobCap;
+    private static int hostileMobCap;
+    private static int flyingMobCap;
+    private static int spawnSearchRadius;
+
+    public static int getPassiveMobCap() {
+        return passiveMobCap;
+    }
+
+    public static int getHostileMobCap() {
+        return hostileMobCap;
+    }
+
+    public static int getFlyingMobCap() {
+        return flyingMobCap;
+    }
+
+    public static int getSpawnSearchRadius() {
+        return spawnSearchRadius;
+    }
 
     public static boolean doMobSpawns() {
         return doMobSpawns;
@@ -25,6 +45,10 @@ public class CustomMobsAPI {
 
         debug = config.getBoolean("debug");
         doMobSpawns = config.getBoolean("doMobSpawns");
+        passiveMobCap = config.getInt("passiveMobCap");
+        hostileMobCap = config.getInt("hostileMobCap");
+        flyingMobCap = config.getInt("flyingMobCap");
+        spawnSearchRadius = config.getInt("spawnSearchRadius");
     }
 
     public static void debug(String message) {
