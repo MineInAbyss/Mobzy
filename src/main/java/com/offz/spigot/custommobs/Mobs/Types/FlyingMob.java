@@ -1,4 +1,4 @@
-package com.offz.spigot.custommobs.Mobs.Flying;
+package com.offz.spigot.custommobs.Mobs.Types;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.CustomType;
@@ -110,13 +110,6 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
     }
 
     @Override
-    protected void initAttributes() {
-        super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
-        this.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(50.0D);
-    }
-
-    @Override
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
         unloadMobNBT(nbttagcompound);
@@ -186,6 +179,11 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
 
     public void die(DamageSource damagesource) {
         deathable.die(damagesource);
+    }
+
+    @Override
+    public IChatBaseComponent getScoreboardDisplayName() {
+        return new ChatMessage(getBuilder().getName());
     }
 
     static class ControllerGhast extends ControllerMove {

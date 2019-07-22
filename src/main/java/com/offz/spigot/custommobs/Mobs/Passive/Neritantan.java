@@ -2,10 +2,14 @@ package com.offz.spigot.custommobs.Mobs.Passive;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
+import com.offz.spigot.custommobs.Mobs.Types.PassiveMob;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalTemptPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_13_R2.EntityAgeable;
+import net.minecraft.server.v1_13_R2.Item;
+import net.minecraft.server.v1_13_R2.Items;
+import net.minecraft.server.v1_13_R2.World;
 
 public class Neritantan extends PassiveMob implements HitBehaviour {
     static MobBuilder builder = new MobBuilder("Neritantan", 2)
@@ -21,13 +25,6 @@ public class Neritantan extends PassiveMob implements HitBehaviour {
         super.createPathfinders();
         this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
         this.goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, builder.getTemptItems()));
-    }
-
-    @Override
-    protected void initAttributes() {
-        super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.25D);
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {

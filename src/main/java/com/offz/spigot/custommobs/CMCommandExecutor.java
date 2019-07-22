@@ -1,8 +1,8 @@
 package com.offz.spigot.custommobs;
 
-import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
-import com.offz.spigot.custommobs.Mobs.Hostile.HostileMob;
-import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
+import com.offz.spigot.custommobs.Mobs.Types.FlyingMob;
+import com.offz.spigot.custommobs.Mobs.Types.HostileMob;
+import com.offz.spigot.custommobs.Mobs.Types.PassiveMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -27,7 +27,7 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender.hasPermission("customMobs.reload") && command.getName().equalsIgnoreCase("cmreload")) {
-            context.getPlugin().reloadConfig();
+            context.getConfigManager().reload();
             sender.sendMessage(ChatColor.GREEN + "Reloaded config files");
             return true;
         }

@@ -1,4 +1,4 @@
-package com.offz.spigot.custommobs.Mobs.Hostile;
+package com.offz.spigot.custommobs.Mobs.Types;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.CustomType;
@@ -41,6 +41,7 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     @Override
     public void createPathfinders() {
         goalSelector.a(1, new PathfinderGoalFloat(this));
+        goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
         goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
         goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
 
@@ -64,14 +65,7 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         return builder;
     }
 
-    @Override
-    protected void initAttributes() {
-        super.initAttributes();
-        getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
-        getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.25D);
-        getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(35.0D);
-    }
-
+    //TODO check what this does
     @Nullable
     @Override
     public Entity bO() {
@@ -154,5 +148,10 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     @Override
     public void dropEquipment(boolean flag, int i, DamageSource damageSource) {
         a(flag, i, damageSource);
+    }
+
+    @Override
+    public IChatBaseComponent getScoreboardDisplayName() {
+        return new ChatMessage(getBuilder().getName());
     }
 }

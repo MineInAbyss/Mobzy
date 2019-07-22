@@ -41,7 +41,7 @@ public class CustomMobsAPI {
     }
 
     public static void registerSpawn(String layerName, MobSpawn spawn) {
-        Map<String, SpawnRegion> spawns = SpawnRegistry.getLayerSpawns();
+        Map<String, SpawnRegion> spawns = SpawnRegistry.getRegionSpawns();
         if (!spawns.containsKey(layerName))
             return;
         spawns.get(layerName).addSpawn(spawn);

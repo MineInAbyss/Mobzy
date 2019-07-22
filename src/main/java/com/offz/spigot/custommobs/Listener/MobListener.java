@@ -117,7 +117,6 @@ public class MobListener implements Listener {
         }
     }
 
-
     public boolean leftClicked(PlayerInteractEvent e) {
         return e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK;
     }

@@ -1,13 +1,14 @@
 package com.offz.spigot.custommobs.Spawning;
 
 import com.offz.spigot.custommobs.ConfigManager;
+import com.offz.spigot.custommobs.CustomMobs;
 import com.offz.spigot.custommobs.CustomType;
 import com.offz.spigot.custommobs.Spawning.Regions.SpawnRegion;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class SpawnRegistry {
     public static void readCfg(ConfigManager configManager) {
         FileConfiguration config = configManager.getSpawnCfg();
         List<Map<?, ?>> regionList = config.getMapList("regions");
+        CustomMobs plugin = CustomMobs.getPlugin(CustomMobs.class);
 
         for (Map<?, ?> region : regionList) {
             String name = (String) region.get("name");
@@ -32,7 +34,7 @@ public class SpawnRegistry {
                     //create a new builder from the MobSpawn found inside of an already created layer
                     if (spawn.containsKey("reuse")) {
                         String reusedMob = (String) spawn.get("reuse");
-                        mobSpawn = new MobSpawn.Builder(getLayerSpawns().get(reusedMob.substring(0, reusedMob.indexOf(':'))).getSpawnOfType(CustomType.getType(reusedMob.substring(reusedMob.indexOf(':') + 1))));
+                        mobSpawn = new MobSpawn.Builder(getRegionSpawns().get(reusedMob.substring(0, reusedMob.indexOf(':'))).getSpawnOfType(CustomType.getType(reusedMob.substring(reusedMob.indexOf(':') + 1))));
                     }
                     //required information
                     else if (!spawn.containsKey("mob"))
@@ -94,18 +96,26 @@ public class SpawnRegistry {
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Skipped region in spawns.yml because of misformatted config");
+                plugin.getLogger().info(ChatColor.RED + "Skipped region in spawns.yml because of misformatted config");
             }
             layerSpawns.put(name, spawnRegion);
         }
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Reloaded spawns.yml");
+        plugin.getLogger().info(ChatColor.GREEN + "Reloaded spawns.yml");
     }
 
     private static void addSpawn(String name, MobSpawn... spawns) {
         layerSpawns.put(name, new SpawnRegion(name, spawns));
     }
 
-    public static Map<String, SpawnRegion> getLayerSpawns() {
+    public static Map<String, SpawnRegion> getRegionSpawns() {
         return layerSpawns;
+    }
+
+    public static List<MobSpawn> getMobSpawnsForRegions(List<String> regionIDs, int mobType) {
+        return regionIDs.stream()
+                .filter(name -> layerSpawns.containsKey(name))
+                .map(name -> layerSpawns.get(name).getSpawnsFor(mobType))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 }

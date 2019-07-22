@@ -1,6 +1,5 @@
 package com.offz.spigot.custommobs.Spawning;
 
-import com.derongan.minecraft.mineinabyss.MineInAbyss;
 import com.offz.spigot.custommobs.CustomMobsAPI;
 import com.offz.spigot.custommobs.CustomType;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
@@ -46,7 +45,7 @@ public class MobSpawn {
             for (double x = -checkRad; x < checkRad; x++) {
                 for (double z = -checkRad; z < checkRad; z++) {
                     Block checkBlock = loc.clone().add(x, y, z).getBlock();
-                    if (checkBlock.getType().isOccluding() && !checkBlock.isPassable()) {
+                    if (checkBlock.getType().isOccluding()) {
                         return false;
                     }
                 }
@@ -140,8 +139,9 @@ public class MobSpawn {
             return -1;
         if (!whitelist.isEmpty() && !whitelist.contains(l.clone().add(0, -1, 0).getBlock().getType()))
             return -1;
-        if (!sections.isEmpty() && !sections.contains(MineInAbyss.getContext().getRealWorldManager().getSectionFor(l).toString()))
-            return -1;
+        //TODO remove
+//        if (!sections.isEmpty() && !sections.contains(MineInAbyss.getContext().getRealWorldManager().getSectionFor(l).toString()))
+//            return -1;
 
         return priority;
     }

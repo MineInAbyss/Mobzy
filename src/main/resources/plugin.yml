@@ -1,10 +1,9 @@
 name: CustomMobs
-version: 2.0
+version: 2.1
 author: Offz
 main: com.offz.spigot.custommobs.CustomMobs
 api-version: 1.13
-softdepend: [DeeperWorld]
-depend: [MineInAbyss, LibsDisguises]
+depend: [WorldGuard, LibsDisguises]
 
 prefix: CuMobs
 description: A mod that lets you climb and get exhausted

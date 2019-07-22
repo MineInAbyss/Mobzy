@@ -1,4 +1,4 @@
-package com.offz.spigot.custommobs.Mobs.Passive;
+package com.offz.spigot.custommobs.Mobs.Types;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.CustomType;
@@ -83,12 +83,6 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
         a(flag, i, damageSource);
     }
 
-    protected void initAttributes() {
-        super.initAttributes();
-        getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
-        getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.25D);
-    }
-
     @Override
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
@@ -134,5 +128,10 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
     @Override
     public EntityAgeable createChild(EntityAgeable entityageable) {
         return null;
+    }
+
+    @Override
+    public IChatBaseComponent getScoreboardDisplayName() {
+        return new ChatMessage(getBuilder().getName());
     }
 }

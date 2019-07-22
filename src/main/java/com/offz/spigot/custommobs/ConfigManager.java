@@ -1,7 +1,6 @@
 package com.offz.spigot.custommobs;
 
 import com.offz.spigot.custommobs.Spawning.SpawnRegistry;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,6 +14,13 @@ public class ConfigManager {
     private FileConfiguration spawnCfg;
     private File spawnFile;
 
+    private FileConfiguration mobsCfg;
+    private File mobsFile;
+
+    public FileConfiguration getMobsCfg() {
+        return mobsCfg;
+    }
+
     public FileConfiguration getSpawnCfg() {
         return spawnCfg;
     }
@@ -25,30 +31,36 @@ public class ConfigManager {
 
         spawnFile = new File(plugin.getDataFolder(), "spawns.yml");
 
+        mobsFile = new File(plugin.getDataFolder(), "mobs.yml");
+
         if (!spawnFile.exists()) {
-            try {
-                spawnFile.createNewFile();
-                Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "The spawns.yml file has been created");
-            } catch (IOException e) {
-                Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "Could not create the players.yml file");
-            }
+            spawnFile.getParentFile().mkdirs();
+            plugin.saveResource("spawns.yml", false);
+            plugin.getLogger().info(ChatColor.GREEN + "The spawns.yml file has been created");
+        }
+        if (!mobsFile.exists()) {
+            mobsFile.getParentFile().mkdirs();
+            plugin.saveResource("mobs.yml", false);
+            plugin.getLogger().info(ChatColor.GREEN + "The mobs.yml file has been created");
         }
 
-        spawnCfg = YamlConfiguration.loadConfiguration(spawnFile);
-        SpawnRegistry.readCfg(this);
+        reload();
     }
 
     public void saveSpawns() {
         try {
             spawnCfg.save(spawnFile);
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.AQUA + "The spawns.yml file has been saved");
+            plugin.getLogger().info(ChatColor.AQUA + "The spawns.yml file has been saved");
         } catch (IOException e) {
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "Could not save the spawns.yml file");
+            e.printStackTrace();
+            plugin.getLogger().info(ChatColor.RED + "Could not save the spawns.yml file");
         }
     }
 
     public void reload() {
         spawnCfg = YamlConfiguration.loadConfiguration(spawnFile);
+        mobsCfg = YamlConfiguration.loadConfiguration(mobsFile);
         SpawnRegistry.readCfg(this);
+        CustomMobsAPI.loadConfigValues(plugin);
     }
 }

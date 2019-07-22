@@ -1,10 +1,13 @@
 package com.offz.spigot.custommobs;
 
-import com.derongan.minecraft.mineinabyss.AbyssContext;
-import com.derongan.minecraft.mineinabyss.MineInAbyss;
 import com.offz.spigot.custommobs.Listener.MobListener;
 import com.offz.spigot.custommobs.Mobs.CustomMob;
 import com.offz.spigot.custommobs.Spawning.SpawnTask;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.StringFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import org.bukkit.ChatColor;
@@ -14,16 +17,29 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CustomMobs extends JavaPlugin {
+    public static StringFlag CM_SPAWN_REGIONS;
     private ConfigManager configManager;
     private MobContext context;
 
     @Override
-    public void reloadConfig() {
-        super.reloadConfig();
-        CustomMobsAPI.loadConfigValues(this);
-        if (configManager == null)
-            loadConfigManager();
-        else configManager.reload();
+    public void onLoad() {
+
+        //Registering custom WorldGuard flag
+        FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+        Flag<?> existing = registry.get("cm-spawns");
+        if (existing instanceof StringFlag) {
+            CM_SPAWN_REGIONS = (StringFlag) existing;
+        } else
+            try {
+                //create a flag with the name "my-custom-flag", defaulting to an empty String
+                StringFlag flag = new StringFlag("cm-spawns", "");
+                registry.register(flag);
+                CM_SPAWN_REGIONS = flag; // only set our field if there was no error
+            } catch (FlagConflictException e) {
+                //some other plugin registered a flag by the same name already.
+                //you can use the existing flag, but this may cause conflicts - be sure to check type
+                e.printStackTrace();
+            }
     }
 
     @Override
@@ -31,8 +47,9 @@ public final class CustomMobs extends JavaPlugin {
         getLogger().info("On enable has been called");
         CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
         saveDefaultConfig();
+        loadConfigManager();
+        CustomMobsAPI.loadConfigValues(this);
 
-        AbyssContext abyssContext = MineInAbyss.getContext();
         // Plugin startup logic
         context = new MobContext(getConfig(), configManager); //Create new context and add plugin and logger to it
         context.setPlugin(this);
@@ -45,7 +62,7 @@ public final class CustomMobs extends JavaPlugin {
 
         //Register repeating tasks
         if (CustomMobsAPI.doMobSpawns()) {
-            Runnable spawnTask = new SpawnTask(this, abyssContext);
+            Runnable spawnTask = new SpawnTask(this);
             getServer().getScheduler().scheduleSyncRepeatingTask(this, spawnTask, 0, 100);
         }
 
@@ -72,6 +89,7 @@ public final class CustomMobs extends JavaPlugin {
                         nmsEntity.b(nbt); //.b copies over the entity's nbt data to the compound
                         entity.remove();
                         replacement.a(nbt); //.a copies the nbt data to the new entity
+                        num++;
                     } catch (Exception e) {
                         /*if any error ever occurs, just go on with removing the entity that caused the error, otherwise
                         the plugin won't load*/
@@ -80,7 +98,7 @@ public final class CustomMobs extends JavaPlugin {
                     entity.remove();
             }
         }
-        getLogger().info(ChatColor.GREEN + "CustomMobs: Loaded " + num + " custom entities on startup");
+        getLogger().info(ChatColor.GREEN + "Loaded " + num + " custom entities on startup");
     }
 
     @Override

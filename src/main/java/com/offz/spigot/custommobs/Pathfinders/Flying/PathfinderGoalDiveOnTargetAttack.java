@@ -1,6 +1,6 @@
 package com.offz.spigot.custommobs.Pathfinders.Flying;
 
-import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
+import com.offz.spigot.custommobs.Mobs.Types.FlyingMob;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.MathHelper;

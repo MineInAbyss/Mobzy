@@ -3,12 +3,15 @@ package com.offz.spigot.custommobs.Mobs.Hostile;
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.MobDrop;
-import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
-import net.minecraft.server.v1_13_R2.GenericAttributes;
+import com.offz.spigot.custommobs.Mobs.Types.FlyingMob;
+import com.offz.spigot.custommobs.Pathfinders.Flying.PathfinderGoalFlyTowardsTarget;
+import com.offz.spigot.custommobs.Pathfinders.Flying.PathfinderGoalIdleFlyAboveGround;
+import net.minecraft.server.v1_13_R2.PathfinderGoalFloat;
+import net.minecraft.server.v1_13_R2.PathfinderGoalTargetNearestPlayer;
 import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;
 
-public class Rohana extends HostileMob implements HitBehaviour {
+public class Rohana extends FlyingMob implements HitBehaviour {
     static MobBuilder builder = new MobBuilder("Rohana", 14)
             .setAdult(false)
             .setDrops(new MobDrop(Material.GLOWSTONE_DUST, 2));
@@ -20,15 +23,10 @@ public class Rohana extends HostileMob implements HitBehaviour {
 
     @Override
     public void createPathfinders() {
-        super.createPathfinders();
-        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
-    }
+        this.goalSelector.a(3, new PathfinderGoalFlyTowardsTarget(this));
+        this.goalSelector.a(7, new PathfinderGoalIdleFlyAboveGround(this, 2, 5));
+        this.goalSelector.a(0, new PathfinderGoalFloat(this));
 
-    @Override
-    protected void initAttributes() {
-        super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(7.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.3D);
-        this.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(0.2);
+        this.targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
     }
 }

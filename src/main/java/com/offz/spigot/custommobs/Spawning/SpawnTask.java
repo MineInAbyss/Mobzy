@@ -1,14 +1,16 @@
 package com.offz.spigot.custommobs.Spawning;
 
-import com.derongan.minecraft.deeperworld.world.WorldManager;
-import com.derongan.minecraft.mineinabyss.AbyssContext;
-import com.derongan.minecraft.mineinabyss.world.AbyssWorldManager;
 import com.offz.spigot.custommobs.CustomMobs;
 import com.offz.spigot.custommobs.CustomMobsAPI;
-import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
-import com.offz.spigot.custommobs.Mobs.Hostile.HostileMob;
-import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
+import com.offz.spigot.custommobs.Mobs.Types.FlyingMob;
+import com.offz.spigot.custommobs.Mobs.Types.HostileMob;
+import com.offz.spigot.custommobs.Mobs.Types.PassiveMob;
 import com.offz.spigot.custommobs.Spawning.Vertical.SpawnArea;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
@@ -17,32 +19,28 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpawnTask extends BukkitRunnable {
     private final int PASSIVE_MOB_CAP = 20;
     private final int HOSTILE_MOB_CAP = 20;
     private final int FLYING_MOB_CAP = 5;
     private final int MAX_TRIES = 100;
-    private AbyssContext context;
-    private WorldManager worldManager;
     private CustomMobs plugin;
 
-    public SpawnTask(CustomMobs plugin, AbyssContext context) {
-        this.context = context;
-        this.worldManager = context.getRealWorldManager();
+    public SpawnTask(CustomMobs plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public void run() {
+        if(!CustomMobsAPI.doMobSpawns())
+            cancel();
+
         try {
             //run checks asynchronously
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                AbyssWorldManager manager = context.getWorldManager();
                 List<UUID> closePlayers = new ArrayList<>();
 
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -54,11 +52,13 @@ public class SpawnTask extends BukkitRunnable {
                         continue;
                     }
 
-                    if (!manager.isAbyssWorld(p.getWorld())) {
+                    //Get WorldGuard regions for the spawn position
+                    RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                    RegionManager regions = container.get(BukkitAdapter.adapt(p.getWorld()));
+                    if (regions == null)
                         continue;
-                    }
 
-                    String layerName = manager.getLayerForSection(worldManager.getSectionFor(p.getLocation())).getName();
+//                    String layerName = manager.getLayerForSection(worldManager.getSectionFor(p.getLocation())).getName();
 
                     //decide spawns around player
 //                try {
@@ -118,19 +118,30 @@ public class SpawnTask extends BukkitRunnable {
                                 continue;
 
                             //STEP 3: Pick mob to spawn
-                            //get the list of mob spawns for entity layer, then remove all impossible spawns,
+                            //get the list of mob spawns based on WorldGuard regions, then remove all impossible spawns,
                             //and make entity weighted decision on the spawn
+
+                            //TODO Figure out something for determining the region in different spots in spawn area.
+                            // It'll need each mob to decide on a position first, then run it through here.
+                            // Maybe this entire system needs reworking
+                            Set<ProtectedRegion> inRegions = regions.getApplicableRegions(BukkitAdapter.asBlockVector(spawnArea.getBottom())).getRegions();
+                            List<String> regionIDs = inRegions.stream()
+                                    .filter(region -> region.getFlags().containsKey(CustomMobs.CM_SPAWN_REGIONS))
+                                    .map(region -> Arrays.asList(region.getFlag(CustomMobs.CM_SPAWN_REGIONS).split(",")))
+                                    .flatMap(Collection::stream)
+                                    .collect(Collectors.toList());
+
                             RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
 
-                            for (MobSpawn spawn : SpawnRegistry.getLayerSpawns().get(layerName).getSpawnsFor(mobType)) {
-//                            if(mobType == 1)
-//                                CustomMobsAPI.debug("Hostile priority: " + spawn.getPriority(spawnArea));
-                                validSpawns.add(spawn.getPriority(spawnArea), spawn);
-                            }
+                            List<MobSpawn> regionSpawns = SpawnRegistry.getMobSpawnsForRegions(regionIDs, mobType);
 
-                            if (validSpawns.isEmpty()) {
+                            if (regionSpawns == null)
                                 continue;
-                            }
+
+                            regionSpawns.forEach(mobSpawn -> validSpawns.add(mobSpawn.getPriority(spawnArea), mobSpawn));
+
+                            if (validSpawns.isEmpty())
+                                continue;
 
                             //weighted random decision of valid spawn
                             MobSpawnEvent spawn = new MobSpawnEvent(validSpawns.next(), spawnArea);

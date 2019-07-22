@@ -2,7 +2,9 @@ package com.offz.spigot.custommobs.Mobs.Flying;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
-import net.minecraft.server.v1_13_R2.GenericAttributes;
+import com.offz.spigot.custommobs.Mobs.Types.FlyingMob;
+import net.minecraft.server.v1_13_R2.SoundEffect;
+import net.minecraft.server.v1_13_R2.SoundEffects;
 import net.minecraft.server.v1_13_R2.World;
 
 public class Benikuchinawa extends FlyingMob implements HitBehaviour {
@@ -17,8 +19,37 @@ public class Benikuchinawa extends FlyingMob implements HitBehaviour {
     }
 
     @Override
-    protected void initAttributes() {
-        super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(50.0D);
+    public SoundEffect soundAmbient() {
+        return SoundEffects.ENTITY_LLAMA_AMBIENT;
     }
+
+    @Override
+    public SoundEffect soundDeath() {
+        return SoundEffects.ENTITY_LLAMA_DEATH;
+    }
+
+    @Override
+    public SoundEffect soundHurt() {
+        return SoundEffects.ENTITY_LLAMA_HURT;
+    }
+
+    /*@Override
+    public SoundEffect soundAmbient() {
+        return SoundEffects.;
+    }
+
+    @Override
+    public SoundEffect soundDeath() {
+        return SoundEffects.;
+    }
+
+    @Override
+    public SoundEffect soundHurt() {
+        return SoundEffects.;
+    }
+
+    @Override
+    public SoundEffect soundStep() {
+        return SoundEffects.;
+    }*/
 }

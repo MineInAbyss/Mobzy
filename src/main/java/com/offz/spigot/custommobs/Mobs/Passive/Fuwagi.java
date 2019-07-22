@@ -3,6 +3,7 @@ package com.offz.spigot.custommobs.Mobs.Passive;
 import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.MobDrop;
+import com.offz.spigot.custommobs.Mobs.Types.PassiveMob;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalTemptPitchLock;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.*;
@@ -20,8 +21,9 @@ public class Fuwagi extends PassiveMob implements HitBehaviour {
     @Override
     public void createPathfinders() {
         super.createPathfinders();
-        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
-        this.goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, builder.getTemptItems()));
+        goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
+        goalSelector.a(1, new PathfinderGoalAvoidTarget<>(this, EntityHuman.class, 8.0F, 1D, 1D));
+        goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, builder.getTemptItems()));
     }
 
     @Override

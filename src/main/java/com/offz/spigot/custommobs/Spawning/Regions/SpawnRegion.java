@@ -1,8 +1,8 @@
 package com.offz.spigot.custommobs.Spawning.Regions;
 
-import com.offz.spigot.custommobs.Mobs.Flying.FlyingMob;
-import com.offz.spigot.custommobs.Mobs.Hostile.HostileMob;
-import com.offz.spigot.custommobs.Mobs.Passive.PassiveMob;
+import com.offz.spigot.custommobs.Mobs.Types.FlyingMob;
+import com.offz.spigot.custommobs.Mobs.Types.HostileMob;
+import com.offz.spigot.custommobs.Mobs.Types.PassiveMob;
 import com.offz.spigot.custommobs.Spawning.MobSpawn;
 import net.minecraft.server.v1_13_R2.EntityTypes;
 

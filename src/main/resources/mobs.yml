@@ -1,0 +1,61 @@
+# Passive
+Neritantan:
+  max_health: 10
+  movement_speed: 0.25
+Fuwagi:
+  max_health: 10
+  movement_speed: 0.25
+Okibo:
+  max_health: 50
+  movement_speed: 0.25
+# Hostile
+Inbyo:
+  max_health: 30
+  movement_speed: 0.4
+  attack_damage: 5
+  follow_range: 64
+Rohana:
+  max_health: 7
+  movement_speed: 0.3
+Tamaugachi:
+  max_health: 100
+  movement_speed: 0.4
+  attack_damage: 7
+  follow_range: 64
+Silkfang:
+  max_health: 20
+  movement_speed: 0.3
+  attack_damage: 0.5
+Kuongatari:
+  max_health: 7
+  movement_speed: 0.3
+  attack_damage: 0.2
+Nakikabane:
+  max_health: 7
+  movement_speed: 0.3
+  attack_damage: 0.5
+Tesuchi:
+  max_health: 20
+  movement_speed: 0.3
+  attack_damage: 0.5
+Ottobas:
+  max_health: 80
+  movement_speed: 0.4
+  attack_damage: 7
+  follow_range: 64
+# Flying
+Corpse Weeper:
+  max_health: 20
+  follow_range: 50
+Madokajack:
+  max_health: 20
+  follow_range: 50
+Hammerbeak:
+  max_health: 20
+  follow_range: 50
+Kazura:
+  max_health: 20
+  follow_range: 50
+Benikuchinawa:
+  max_health: 20
+  follow_range: 50

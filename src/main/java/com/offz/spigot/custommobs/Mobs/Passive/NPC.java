@@ -1,6 +1,7 @@
 package com.offz.spigot.custommobs.Mobs.Passive;
 
 import com.offz.spigot.custommobs.Builders.MobBuilder;
+import com.offz.spigot.custommobs.Mobs.Types.PassiveMob;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityHuman;
