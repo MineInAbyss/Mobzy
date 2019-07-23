@@ -7,9 +7,11 @@ import com.offz.spigot.custommobs.Spawning.Regions.SpawnRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SpawnRegistry {
@@ -99,11 +101,6 @@ public class SpawnRegistry {
             layerSpawns.put(name, spawnRegion);
         }
         plugin.getLogger().info(ChatColor.GREEN + "Reloaded spawns.yml");
-        ItemStack stack = new ItemStack(Material.PORKCHOP);
-        stack.setLore(Arrays.asList("Woh!"));
-        stack.setAmount(2);
-        config.set("itemstack", stack);
-        configManager.saveSpawns();
     }
 
     private static void addSpawn(String name, MobSpawn... spawns) {

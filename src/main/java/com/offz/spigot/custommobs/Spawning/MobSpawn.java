@@ -74,7 +74,7 @@ public class MobSpawn {
             double x = Math.signum(Math.random() - 0.5) * ((Math.random() * (maxRad - minRad)) + minRad);
             double z = Math.signum(Math.random() - 0.5) * ((Math.random() * (maxRad - minRad)) + minRad);
 
-            if (!loc.isChunkLoaded())
+            if (!loc.getChunk().isLoaded())
                 return null;
             Location searchLoc = loc.clone();
             searchLoc = searchLoc.add(new Vector(x, y, z));
