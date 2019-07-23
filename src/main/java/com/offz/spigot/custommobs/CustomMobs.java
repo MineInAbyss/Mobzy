@@ -23,6 +23,7 @@ public final class CustomMobs extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        //TODO try to allow plugin spawning in WorldGuard's config automatically
 
         //Registering custom WorldGuard flag
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
@@ -45,10 +46,10 @@ public final class CustomMobs extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("On enable has been called");
-        CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
         saveDefaultConfig();
         loadConfigManager();
         CustomMobsAPI.loadConfigValues(this);
+        CustomType.registerTypes(this); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
         // Plugin startup logic
         context = new MobContext(getConfig(), configManager); //Create new context and add plugin and logger to it

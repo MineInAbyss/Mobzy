@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class SpawnTask extends BukkitRunnable {
     private CustomMobs plugin;
+    private static final int SPAWN_TRIES = 5;
 
     public SpawnTask(CustomMobs plugin) {
         this.plugin = plugin;
@@ -31,7 +32,7 @@ public class SpawnTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        if(!CustomMobsAPI.doMobSpawns())
+        if (!CustomMobsAPI.doMobSpawns())
             cancel();
 
         try {
@@ -84,7 +85,7 @@ public class SpawnTask extends BukkitRunnable {
                         return;
 
                     //STEP 1: Generate array of ChunkSpawns around player, and invalidate the ones that are empty
-                    SpawnChunkGrid spawnChunkGrid = new SpawnChunkGrid(p.getLocation(), 2, 4);
+                    SpawnChunkGrid spawnChunkGrid = new SpawnChunkGrid(p.getLocation(), CustomMobsAPI.getMinChunkSpawnRad(), CustomMobsAPI.getMaxChunkSpawnRad());
                     //sort by highest preference
 
                     mobTypeLoop:
@@ -109,7 +110,7 @@ public class SpawnTask extends BukkitRunnable {
                             }
 
                             //STEP 2: Each chunk tries to choose one area inside it for which to attempt a spawn
-                            SpawnArea spawnArea = chunkSpawn.getSpawnArea(3);
+                            SpawnArea spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES);
                             if (spawnArea == null)
                                 continue;
 

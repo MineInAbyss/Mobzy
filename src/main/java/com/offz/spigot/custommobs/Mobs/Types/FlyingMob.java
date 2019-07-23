@@ -20,6 +20,10 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
     private Deathable deathable = new Deathable(this);
     private Disguiseable disguiseable = new Disguiseable(this);
 
+    public FlyingMob(World world, String name) {
+        this(world, CustomType.getBuilder(name));
+    }
+
     public FlyingMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
         setSize(4.0F, 4.0F);
@@ -107,6 +111,11 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
     @Override
     public MobBuilder getBuilder() {
         return builder;
+    }
+
+    @Override
+    public MobBuilder getStaticBuilder() {
+        return CustomType.getBuilder(P().c().getSimpleName());
     }
 
     @Override

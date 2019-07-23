@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MobSpawn {
-
     private EntityTypes entityType;
     private int minAmount = 1;
     private int maxAmount = 1;

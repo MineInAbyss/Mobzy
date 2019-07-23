@@ -19,6 +19,12 @@ public class CustomMobsAPI {
     private static int hostileMobCap;
     private static int flyingMobCap;
     private static int spawnSearchRadius;
+    private static int minChunkSpawnRad;
+    private static int maxChunkSpawnRad;
+
+    public static boolean doMobSpawns() {
+        return doMobSpawns;
+    }
 
     public static int getPassiveMobCap() {
         return passiveMobCap;
@@ -36,8 +42,12 @@ public class CustomMobsAPI {
         return spawnSearchRadius;
     }
 
-    public static boolean doMobSpawns() {
-        return doMobSpawns;
+    public static int getMinChunkSpawnRad() {
+        return minChunkSpawnRad;
+    }
+
+    public static int getMaxChunkSpawnRad() {
+        return maxChunkSpawnRad;
     }
 
     public static void loadConfigValues(CustomMobs plugin) {
@@ -49,6 +59,8 @@ public class CustomMobsAPI {
         hostileMobCap = config.getInt("hostileMobCap");
         flyingMobCap = config.getInt("flyingMobCap");
         spawnSearchRadius = config.getInt("spawnSearchRadius");
+        minChunkSpawnRad = config.getInt("minChunkSpawnRad");
+        maxChunkSpawnRad = config.getInt("maxChunkSpawnRad");
     }
 
     public static void debug(String message) {

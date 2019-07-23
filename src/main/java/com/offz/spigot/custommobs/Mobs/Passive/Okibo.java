@@ -1,22 +1,16 @@
 package com.offz.spigot.custommobs.Mobs.Passive;
 
-import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
-import com.offz.spigot.custommobs.Mobs.MobDrop;
 import com.offz.spigot.custommobs.Mobs.Types.PassiveMob;
 import com.offz.spigot.custommobs.Pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.EntityAgeable;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.World;
-import org.bukkit.Material;
 
 public class Okibo extends PassiveMob implements HitBehaviour {
-    static MobBuilder builder = new MobBuilder("Okibo", 38)
-            .setDrops(new MobDrop(Material.LEATHER, 3, 5));
-
     //TODO change offset when riding and make controllable
     public Okibo(World world) {
-        super(world, builder);
+        super(world, "Okibo");
         setSize(3, 3);
     }
 
@@ -28,7 +22,7 @@ public class Okibo extends PassiveMob implements HitBehaviour {
     @Override
     public void createPathfinders() {
         super.createPathfinders();
-        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, builder.getModelID()));
+        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {

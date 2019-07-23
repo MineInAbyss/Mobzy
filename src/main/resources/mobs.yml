@@ -1,61 +1,91 @@
 # Passive
 Neritantan:
+  model: 2
   max_health: 10
   movement_speed: 0.25
+  tempt_items: [CARROT, POTATO, BEETROOT]
 Fuwagi:
+  model: 5
   max_health: 10
   movement_speed: 0.25
+  tempt_items: [CARROT, APPLE]
 Okibo:
+  model: 38
   max_health: 50
   movement_speed: 0.25
 # Hostile
 Inbyo:
+  model: 8
   max_health: 30
   movement_speed: 0.4
   attack_damage: 5
   follow_range: 64
+  #drops: BEEF, BLACK WOOL
 Rohana:
+  model: 14
   max_health: 7
   movement_speed: 0.3
+  # drops: GLOWSTONE DUST
 Tamaugachi:
+  model: 17
   max_health: 100
   movement_speed: 0.4
   attack_damage: 7
   follow_range: 64
+  # Nether wart, Quartz
 Silkfang:
+  model: 26
   max_health: 20
   movement_speed: 0.3
   attack_damage: 0.5
+  # drops: STRING
 Kuongatari:
+  model: 35
   max_health: 7
   movement_speed: 0.3
   attack_damage: 0.2
+  #drops: LIME DYE
 Nakikabane:
+  model: 41
   max_health: 7
   movement_speed: 0.3
   attack_damage: 0.5
 Tesuchi:
+  model: 44
   max_health: 20
   movement_speed: 0.3
   attack_damage: 0.5
 Ottobas:
+  model: 47
   max_health: 80
   movement_speed: 0.4
   attack_damage: 7
   follow_range: 64
 # Flying
-Corpse Weeper:
-  max_health: 20
+Corpseweeper:
+  name: Corpse Weeper
+  model: 11
+  max_health: 1
   follow_range: 50
 Madokajack:
+  model: 20
   max_health: 20
   follow_range: 50
 Hammerbeak:
+  model: 23
   max_health: 20
   follow_range: 50
+  drops:
+    - material: PORKCHOP
+      min_amount: 2
+      max_amount: 4
 Kazura:
+  model: 29
   max_health: 20
   follow_range: 50
 Benikuchinawa:
+  model: 32
   max_health: 20
   follow_range: 50
+NPC:
+  model: 1

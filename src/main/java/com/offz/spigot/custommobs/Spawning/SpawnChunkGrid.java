@@ -28,7 +28,7 @@ public class SpawnChunkGrid {
                         ChunkSpawn chunkSpawn = new ChunkSpawn(spawnChunk, 0, 254);
                         addSpawnIfValid(chunkSpawn);
                     } else {
-                        int minVertical = minRad * 16; //minimum vertical spawn distance is the number of chunks * width of chunks
+                        int minVertical = minRad * 16; //minimum vertical spawn distance is the number of chunks * width of a chunk
                         //do some checks to add areas above and below the player when we've reached inside the minimum radius
                         if (loc.getY() + minVertical < 254) {
                             ChunkSpawn topSpawn = new ChunkSpawn(spawnChunk, ((int) loc.getY() + minVertical), 254);

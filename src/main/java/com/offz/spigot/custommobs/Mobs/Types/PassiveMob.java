@@ -18,10 +18,13 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
     private Deathable deathable = new Deathable(this);
     private Disguiseable disguiseable = new Disguiseable(this);
 
+    public PassiveMob(World world, String name) {
+        this(world, CustomType.getBuilder(name));
+    }
+
     public PassiveMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
         this.builder = builder;
-//        ((LivingEntity) getBukkitEntity()).setRemoveWhenFarAway(true);
 
         CustomMobBase base = new CustomMobBase(this);
         base.apply();
@@ -51,6 +54,11 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
     @Override
     public MobBuilder getBuilder() {
         return builder;
+    }
+
+    @Override
+    public MobBuilder getStaticBuilder() {
+        return CustomType.getBuilder(P().c().getSimpleName());
     }
 
     @Override

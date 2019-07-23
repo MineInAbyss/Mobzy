@@ -28,6 +28,7 @@ public class Deathable extends MobBehaviour {
 
             mob.setKilled(true);
 
+
             entity.getCombatTracker().g();
             if (!mob.getWorld().isClientSide) {
                 if (mob.dropsExperience() && mob.getWorld().getGameRules().getBoolean("doMobLoot")) {

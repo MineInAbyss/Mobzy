@@ -9,6 +9,8 @@ public interface CustomMob {
 
     MobBuilder getBuilder();
 
+    MobBuilder getStaticBuilder();
+
     default double getX() {
         return getEntity().locX;
     }

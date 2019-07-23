@@ -58,9 +58,9 @@ public class ConfigManager {
     }
 
     public void reload() {
+        CustomMobsAPI.loadConfigValues(plugin);
         spawnCfg = YamlConfiguration.loadConfiguration(spawnFile);
         mobsCfg = YamlConfiguration.loadConfiguration(mobsFile);
         SpawnRegistry.readCfg(this);
-        CustomMobsAPI.loadConfigValues(plugin);
     }
 }

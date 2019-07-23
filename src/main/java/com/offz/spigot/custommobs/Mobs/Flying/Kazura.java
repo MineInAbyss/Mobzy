@@ -1,6 +1,5 @@
 package com.offz.spigot.custommobs.Mobs.Flying;
 
-import com.offz.spigot.custommobs.Builders.MobBuilder;
 import com.offz.spigot.custommobs.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.custommobs.Mobs.Types.FlyingMob;
 import com.offz.spigot.custommobs.Pathfinders.Flying.PathfinderGoalFlyTowardsTarget;
@@ -10,10 +9,8 @@ import net.minecraft.server.v1_13_R2.PathfinderGoalTargetNearestPlayer;
 import net.minecraft.server.v1_13_R2.World;
 
 public class Kazura extends FlyingMob implements HitBehaviour {
-    static MobBuilder builder = new MobBuilder("Kazura", 29);
-
     public Kazura(World world) {
-        super(world, builder);
+        super(world, "Kazura");
         setSize(1f, 1f);
     }
 

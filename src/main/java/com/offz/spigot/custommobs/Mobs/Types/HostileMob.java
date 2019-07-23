@@ -20,6 +20,10 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     private Deathable deathable = new Deathable(this);
     private Disguiseable disguiseable = new Disguiseable(this);
 
+    public HostileMob(World world, String name) {
+        this(world, CustomType.getBuilder(name));
+    }
+
     public HostileMob(World world, MobBuilder builder) {
         super(CustomType.getType(builder), world);
         this.builder = builder;
@@ -63,6 +67,11 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     @Override
     public MobBuilder getBuilder() {
         return builder;
+    }
+
+    @Override
+    public MobBuilder getStaticBuilder() {
+        return CustomType.getBuilder(P().c().getSimpleName());
     }
 
     //TODO check what this does

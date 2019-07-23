@@ -2,7 +2,6 @@ package com.offz.spigot.custommobs.Builders;
 
 import com.offz.spigot.custommobs.Mobs.MobDrop;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import net.minecraft.server.v1_13_R2.Item;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,7 +14,7 @@ public final class MobBuilder {
     private int modelID;
     private Material modelMaterial = Material.DIAMOND_SWORD;
     private DisguiseType disguiseAs = DisguiseType.ZOMBIE;
-    private Item[] temptItems;
+    private List<Material> temptItems;
     private Double maxHealth;
     private Double movementSpeed;
     private Double followRange;
@@ -52,15 +51,21 @@ public final class MobBuilder {
 
     public List<ItemStack> getDrops() {
         List<ItemStack> chosenDrops = new ArrayList<>();
-        for(MobDrop drop: drops){
+        for (MobDrop drop : drops) {
             ItemStack chosenDrop = drop.chooseDrop();
             chosenDrops.add(chosenDrop);
         }
         return chosenDrops;
     }
 
+    @Deprecated
     public MobBuilder setDrops(MobDrop... drops) {
         this.drops = Arrays.asList(drops);
+        return this;
+    }
+
+    public MobBuilder setDrops(List<MobDrop> drops) {
+        this.drops = drops;
         return this;
     }
 
@@ -100,11 +105,11 @@ public final class MobBuilder {
         return this;
     }
 
-    public Item[] getTemptItems() {
+    public List<Material> getTemptItems() {
         return temptItems;
     }
 
-    public MobBuilder setTemptItems(Item[] temptItems) {
+    public MobBuilder setTemptItems(List<Material> temptItems) {
         this.temptItems = temptItems;
         return this;
     }

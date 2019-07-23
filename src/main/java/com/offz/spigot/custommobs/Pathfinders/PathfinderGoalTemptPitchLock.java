@@ -1,15 +1,23 @@
 package com.offz.spigot.custommobs.Pathfinders;
 
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_13_R2.EntityCreature;
+import net.minecraft.server.v1_13_R2.EntityLiving;
+import net.minecraft.server.v1_13_R2.Navigation;
+import net.minecraft.server.v1_13_R2.PathfinderGoal;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.inventory.EntityEquipment;
+
+import java.util.List;
 
 public class PathfinderGoalTemptPitchLock extends PathfinderGoal {
     private final EntityCreature a;
     private final double b;
-    private final Item[] targetItems;
+    private final List<Material> targetItems;
     private final boolean l;
     private double c;
     private double d;
@@ -20,11 +28,11 @@ public class PathfinderGoalTemptPitchLock extends PathfinderGoal {
     private int i;
     private boolean j;
 
-    public PathfinderGoalTemptPitchLock(EntityCreature entitycreature, double d0, Item[] items, boolean flag) {
+    public PathfinderGoalTemptPitchLock(EntityCreature entitycreature, double d0, List<Material> items, boolean flag) {
         this(entitycreature, d0, flag, items);
     }
 
-    public PathfinderGoalTemptPitchLock(EntityCreature entitycreature, double d0, boolean flag, Item[] items) {
+    public PathfinderGoalTemptPitchLock(EntityCreature entitycreature, double d0, boolean flag, List<Material> items) {
         this.a = entitycreature;
         this.b = d0;
         this.targetItems = items;
@@ -42,12 +50,17 @@ public class PathfinderGoalTemptPitchLock extends PathfinderGoal {
         } else {
             this.target = this.a.world.findNearbyPlayer(this.a, 10.0D);
             boolean tempt = false;
-            if (this.target != null)
-                for (Item item : this.targetItems)
-                    if (this.target.getItemInMainHand().getItem().equals(item)) {
+            if (this.target != null) {
+                EntityEquipment equipment = ((LivingEntity) this.target.getBukkitEntity()).getEquipment();
+                if (equipment == null)
+                    return false;
+
+                for (Material material : this.targetItems)
+                    if (equipment.getItemInMainHand().getType().equals(material)) {
                         tempt = true;
                         break;
                     }
+            }
 //                    tempt = true = this.target == null ? false : this.k.choices(this.target.getItemInMainHand()) || this.a(this.target.getItemInOffHand());
             if (tempt) {
                 EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(this.a, this.target, EntityTargetEvent.TargetReason.TEMPT);
