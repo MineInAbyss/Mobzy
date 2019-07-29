@@ -1,4 +1,3 @@
-rootProject.name = 'custom-mobs'
+rootProject.name = 'Mobzy'
 
-//includeBuild '../MineInAbyss/'
-//includeBuild '../DeeperWorld'
+include 'Mobzy-API', 'AbyssialCreatures'

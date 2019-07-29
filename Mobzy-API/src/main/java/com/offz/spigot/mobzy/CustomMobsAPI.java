@@ -1,0 +1,124 @@
+package com.offz.spigot.mobzy;
+
+import com.offz.spigot.mobzy.Builders.MobBuilder;
+import com.offz.spigot.mobzy.Mobs.CustomMob;
+import net.minecraft.server.v1_13_R2.Entity;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+
+public class CustomMobsAPI {
+    private static Mobzy plugin;
+    private static boolean debug;
+    private static boolean doMobSpawns;
+    private static int passiveMobCap;
+    private static int hostileMobCap;
+    private static int flyingMobCap;
+    private static int spawnSearchRadius;
+    private static int minChunkSpawnRad;
+    private static int maxChunkSpawnRad;
+
+    public static boolean doMobSpawns() {
+        return doMobSpawns;
+    }
+
+    public static int getPassiveMobCap() {
+        return passiveMobCap;
+    }
+
+    public static int getHostileMobCap() {
+        return hostileMobCap;
+    }
+
+    public static int getFlyingMobCap() {
+        return flyingMobCap;
+    }
+
+    public static int getSpawnSearchRadius() {
+        return spawnSearchRadius;
+    }
+
+    public static int getMinChunkSpawnRad() {
+        return minChunkSpawnRad;
+    }
+
+    public static int getMaxChunkSpawnRad() {
+        return maxChunkSpawnRad;
+    }
+
+    static void loadConfigValues(Mobzy plugin) {
+        CustomMobsAPI.plugin = plugin;
+        FileConfiguration config = plugin.getConfig();
+
+        debug = config.getBoolean("debug");
+        doMobSpawns = config.getBoolean("doMobSpawns");
+        passiveMobCap = config.getInt("passiveMobCap");
+        hostileMobCap = config.getInt("hostileMobCap");
+        flyingMobCap = config.getInt("flyingMobCap");
+        spawnSearchRadius = config.getInt("spawnSearchRadius");
+        minChunkSpawnRad = config.getInt("minChunkSpawnRad");
+        maxChunkSpawnRad = config.getInt("maxChunkSpawnRad");
+    }
+
+    public static void debug(String message) {
+        if (debug)
+            Bukkit.broadcastMessage(message);
+    }
+
+    public static boolean isRenamed(org.bukkit.entity.Entity mob) {
+        Entity nmsMob = toNMS(mob);
+        if (!isCustomMob(nmsMob) || mob.getCustomName() == null)
+            return false;
+
+        return !(mob.getCustomName().equals(((CustomMob) nmsMob).getBuilder().getName()));
+    }
+
+    public static void registerSpawns(File configuration, JavaPlugin plugin) {
+        CustomMobsAPI.plugin.getConfigManager().registerSpawnCfg(configuration, plugin);
+    }
+
+    public static void registerMobConfig(File configuration, JavaPlugin plugin) {
+        CustomMobsAPI.plugin.getConfigManager().registerMobCfg(configuration, plugin);
+    }
+
+    public static Entity toNMS(org.bukkit.entity.Entity e) {
+        return ((CraftEntity) e).getHandle();
+    }
+
+    public static String getMobID(org.bukkit.entity.Entity e) {
+        return CustomType.toEntityTypeID(getBuilder(e).getName());
+    }
+
+    public static String getMobID(Entity e) {
+        return CustomType.toEntityTypeID(getBuilder(e).getName());
+    }
+
+    public static boolean isMobOfType(org.bukkit.entity.Entity e, String name) {
+        return isMobOfType(toNMS(e), name);
+    }
+
+    public static boolean isMobOfType(Entity e, String name) {
+        return getMobID(e).equals(name);
+    }
+
+    public static boolean isCustomMob(org.bukkit.entity.Entity e) {
+        return isCustomMob(toNMS(e));
+    }
+
+    public static boolean isCustomMob(Entity e) {
+        return e instanceof CustomMob;
+    }
+
+    public static MobBuilder getBuilder(org.bukkit.entity.Entity e) {
+        return getBuilder(((CraftEntity) e).getHandle());
+    }
+
+    public static MobBuilder getBuilder(Entity e) {
+        if (e instanceof CustomMob)
+            return ((CustomMob) e).getBuilder();
+        return null;
+    }
+}

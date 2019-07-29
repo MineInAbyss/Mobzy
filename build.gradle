@@ -1,54 +1,29 @@
-group 'com.github.MineInAbyss'
-version '2.1-SNAPSHOT'
+allprojects {
+    group = 'com.github.MineInAbyss'
+    version = '2.1-SNAPSHOT'
 
-apply plugin: 'java'
-apply plugin: 'maven'
+}
 
-sourceCompatibility = 1.8
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+//    id 'com.github.johnrengelman.shadow' version '5.0.0'
 
-repositories {
-    mavenCentral()
-    jcenter()
     repositories {
+        mavenCentral()
+        jcenter()
+        repositories {
 //        maven { url 'https://papermc.io/repo/repository/maven-public/' } //PaperMC
-        maven { url 'http://repo.dmulloy2.net/nexus/repository/public/' } //Spigot
-        maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
-        maven { url 'http://repo.md-5.net/content/groups/public/' } //LibsDisguises
-        maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
-    }
+            maven { url 'http://repo.dmulloy2.net/nexus/repository/public/' } //Spigot
+            maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+            maven { url 'http://repo.md-5.net/content/groups/public/' } //LibsDisguises
+            maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+            maven { url 'https://jitpack.io' }
+            maven { url 'https://erethon.de/repo/' }
+        }
 //    mavenLocal()
-}
+    }
 
-dependencies {
-//    implementation 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT' // PaperMC
-    implementation 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT' //Spigot
-    implementation 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // NMS
-    implementation 'LibsDisguises:LibsDisguises:9.8.0-SNAPSHOT' //LibsDisguises
-    implementation 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
-//    implementation 'com.sk89q.worldedit:worldedit-bukkit:7.0.0' //WorldEdit
-//    implementation 'com.github.ysl3000.pathfindergoalapi:PathfinderAPI:1.3.3.5'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    //feel free to comment these out for faster compilation
-    archives sourcesJar
-    archives javadocJar
-}
-
-//Move into plugins folder
-/*task copyJar(type: Copy) {
-    from jar // here it automatically reads jar file produced from jar task
-    into 'C:/Users/Offz/Documents/Programming/Spigot servers/plugins'
-}
-
-build.dependsOn copyJar*/
