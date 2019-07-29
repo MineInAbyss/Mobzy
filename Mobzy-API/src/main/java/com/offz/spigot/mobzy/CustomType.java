@@ -6,6 +6,8 @@ import com.offz.spigot.mobzy.Mobs.Behaviours.AfterSpawnBehaviour;
 import com.offz.spigot.mobzy.Mobs.MobDrop;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import net.minecraft.server.v1_13_R2.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -68,7 +70,7 @@ public class CustomType {
         //TODO make sure we don't need to unregister things
 //        Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) DataConverterRegistry.a().getSchema(15190).findChoiceType(DataConverterTypes.n).types();
 //        dataTypes.keySet()
-//        Bukkit.broadcastMessage();
+        Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "Registering types");
         for (EntityTypes type : types.values()) {
             String className = type.c().getSimpleName();
             String name = toEntityTypeID(className);
@@ -77,20 +79,27 @@ public class CustomType {
             if (!builders.containsKey(name))
                 builders.put(name, readBuilderConfig(className));
         }
+
+        Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + types.toString());
+
     }
 
     protected static MobBuilder readBuilderConfig(String className) {
         FileConfiguration mobCfg = null;
         className = className.substring(0, 1) + className.toLowerCase().substring(1); //config can't read mobs if a capital is present anywhere after the first character, so we set them all to lowercase
 
-        for (FileConfiguration readCfg : plugin.getConfigManager().getMobCfgs().values())
+        for (FileConfiguration readCfg : plugin.getMobzyConfig().getMobCfgs().values()) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_PURPLE + "Reading cfg for builder" + className);
             if (readCfg.contains(className)) {
                 mobCfg = readCfg;
                 break;
             }
+        }
 
-        if(mobCfg == null)
+        if(mobCfg == null) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "Builder config nulled");
             return null;
+        }
 
         String name = className;
 
@@ -122,6 +131,7 @@ public class CustomType {
         if (mobCfg.contains(className + ".follow_range"))
             builder.setFollowRange(mobCfg.getDouble(className + ".follow_range"));
 
+        Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "Built " + name);
         return builder;
     }
 
@@ -135,6 +145,7 @@ public class CustomType {
         // like the vanilla /summon command)
         dataTypes.put("minecraft:" + name, dataTypes.get("minecraft:" + extend_from));
         // create and return an EntityTypes for the custom entity store this somewhere so you can reference it later (like for spawning)
+        Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "Registering " + name);
         return EntityTypes.a(name, EntityTypes.a.a(clazz, function));
     }
 

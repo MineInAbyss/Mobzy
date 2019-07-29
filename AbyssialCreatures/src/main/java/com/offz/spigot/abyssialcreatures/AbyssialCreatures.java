@@ -1,6 +1,6 @@
 package com.offz.spigot.abyssialcreatures;
 
-import com.offz.spigot.mobzy.CustomMobsAPI;
+import com.offz.spigot.mobzy.MobzyAPI;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -11,9 +11,10 @@ public final class AbyssialCreatures extends JavaPlugin {
     public void onEnable() {
         getLogger().info("On enable has been called");
         saveDefaultConfig();
-        CustomMobsAPI.registerSpawns(new File(getDataFolder(), "spawns.yml"), this);
-        CustomMobsAPI.registerMobConfig(new File(getDataFolder(), "mobs.yml"), this);
+        MobzyAPI.registerMobConfig(new File(getDataFolder(), "mobs.yml"), this);
+        new AbyssialType();
         AbyssialType.registerTypes();
+        MobzyAPI.registerSpawnConfig(new File(getDataFolder(), "spawns.yml"), this);
     }
 
     @Override

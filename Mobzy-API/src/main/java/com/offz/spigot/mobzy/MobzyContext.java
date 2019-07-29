@@ -13,15 +13,15 @@ public class MobzyContext {
     private Logger logger;
     private Configuration config;
 
-    private ConfigManager configManager;
+    private MobzyConfig mobzyConfig;
 
-    public MobzyContext(Configuration config, ConfigManager configManager) {
+    public MobzyContext(Configuration config, MobzyConfig mobzyConfig) {
         this.config = config;
-        this.configManager = configManager;
+        this.mobzyConfig = mobzyConfig;
     }
 
-    public ConfigManager getConfigManager() {
-        return configManager;
+    public MobzyConfig getMobzyConfig() {
+        return mobzyConfig;
     }
 
     public Plugin getPlugin() {

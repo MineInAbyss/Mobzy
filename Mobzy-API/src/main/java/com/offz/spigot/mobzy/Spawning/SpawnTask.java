@@ -1,10 +1,11 @@
 package com.offz.spigot.mobzy.Spawning;
 
-import com.offz.spigot.mobzy.CustomMobsAPI;
 import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
 import com.offz.spigot.mobzy.Mobs.Types.HostileMob;
 import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import com.offz.spigot.mobzy.Mobzy;
+import com.offz.spigot.mobzy.MobzyAPI;
+import com.offz.spigot.mobzy.MobzyConfig;
 import com.offz.spigot.mobzy.Spawning.Vertical.SpawnArea;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
@@ -32,7 +33,7 @@ public class SpawnTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (!CustomMobsAPI.doMobSpawns())
+        if (!MobzyConfig.doMobSpawns())
             cancel();
 
         try {
@@ -64,7 +65,7 @@ public class SpawnTask extends BukkitRunnable {
                     int[] originalMobCount = new int[3];
 
                     //go through entities around player, adding nearby players to a list
-                    for (Entity e : p.getNearbyEntities(CustomMobsAPI.getSpawnSearchRadius(), CustomMobsAPI.getSpawnSearchRadius(), CustomMobsAPI.getSpawnSearchRadius())) {
+                    for (Entity e : p.getNearbyEntities(MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius())) {
                         if (((CraftEntity) e).getHandle() instanceof PassiveMob)
                             originalMobCount[0]++;
                         if (((CraftEntity) e).getHandle() instanceof HostileMob)
@@ -81,11 +82,11 @@ public class SpawnTask extends BukkitRunnable {
                         totalMobs += mobs;
 
                     //if we've hit the cap, stop spawning
-                    if (mobCount[0] >= CustomMobsAPI.getPassiveMobCap() && mobCount[1] >= CustomMobsAPI.getHostileMobCap() && mobCount[2] >= CustomMobsAPI.getFlyingMobCap())
+                    if (mobCount[0] >= MobzyConfig.getPassiveMobCap() && mobCount[1] >= MobzyConfig.getHostileMobCap() && mobCount[2] >= MobzyConfig.getFlyingMobCap())
                         return;
 
                     //STEP 1: Generate array of ChunkSpawns around player, and invalidate the ones that are empty
-                    SpawnChunkGrid spawnChunkGrid = new SpawnChunkGrid(p.getLocation(), CustomMobsAPI.getMinChunkSpawnRad(), CustomMobsAPI.getMaxChunkSpawnRad());
+                    SpawnChunkGrid spawnChunkGrid = new SpawnChunkGrid(p.getLocation(), MobzyConfig.getMinChunkSpawnRad(), MobzyConfig.getMaxChunkSpawnRad());
                     //sort by highest preference
 
                     mobTypeLoop:
@@ -96,15 +97,15 @@ public class SpawnTask extends BukkitRunnable {
                             //if mob cap of that specific mob has been reached, skip it
                             switch (mobType) {
                                 case 0:
-                                    if (mobCount[0] >= CustomMobsAPI.getPassiveMobCap())
+                                    if (mobCount[0] >= MobzyConfig.getPassiveMobCap())
                                         continue mobTypeLoop;
                                     break;
                                 case 1:
-                                    if (mobCount[1] >= CustomMobsAPI.getHostileMobCap())
+                                    if (mobCount[1] >= MobzyConfig.getHostileMobCap())
                                         continue mobTypeLoop;
                                     break;
                                 case 2:
-                                    if (mobCount[2] >= CustomMobsAPI.getFlyingMobCap())
+                                    if (mobCount[2] >= MobzyConfig.getFlyingMobCap())
                                         continue mobTypeLoop;
                                     break;
                             }
@@ -157,13 +158,13 @@ public class SpawnTask extends BukkitRunnable {
 
                         //after we've hit the mob cap, print mob count
                         if (toSpawn.size() > 0) {
-                            CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + (finalTotalMobs + " mobs before"));
+                            MobzyAPI.debug(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + (finalTotalMobs + " mobs before"));
                             if (mobCount[0] - originalMobCount[0] > 0)
-                                CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[0] - originalMobCount[0] + " passive mobs spawned"));
+                                MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[0] - originalMobCount[0] + " passive mobs spawned"));
                             if (mobCount[1] - originalMobCount[1] > 0)
-                                CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[1] - originalMobCount[1] + " hostile mobs spawned"));
+                                MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[1] - originalMobCount[1] + " hostile mobs spawned"));
                             if (mobCount[2] - originalMobCount[2] > 0)
-                                CustomMobsAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[2] - originalMobCount[2] + " flying mobs spawned"));
+                                MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[2] - originalMobCount[2] + " flying mobs spawned"));
                         }
                     });
                 }

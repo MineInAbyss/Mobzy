@@ -14,6 +14,7 @@ public class AbyssialType extends CustomType {
     //Passive
     public static final EntityTypes NERITANTAN = registerEntity(Neritantan.class, Neritantan::new);
     public static final EntityTypes OKIBO = registerEntity(Okibo.class, Okibo::new);
+    public static final EntityTypes FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
     //Hostile
     public static final EntityTypes INBYO = registerEntity(Inbyo.class, Inbyo::new);
     public static final EntityTypes ROHANA = registerEntity(Rohana.class, Rohana::new);
@@ -44,6 +45,5 @@ public class AbyssialType extends CustomType {
     public static final EntityTypes TORKA = registerEntity("torka", NPC.class, (world -> new NPC(world, "Torka", 14)));
     public static final EntityTypes LYZA = registerEntity("lyza", NPC.class, (world -> new NPC(world, "Lyza", 15)));
     public static final EntityTypes PRUSHKA = registerEntity("prushka", NPC.class, (world -> new NPC(world, "Prushka", 16)));
-    public static final EntityTypes FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
 }
 

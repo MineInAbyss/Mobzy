@@ -18,7 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Mobzy extends JavaPlugin {
     public static StringFlag CM_SPAWN_REGIONS;
-    private ConfigManager configManager;
+    private MobzyConfig mobzyConfig;
     private MobzyContext context;
 
     @Override
@@ -48,11 +48,10 @@ public final class Mobzy extends JavaPlugin {
         getLogger().info("On enable has been called");
         saveDefaultConfig();
         loadConfigManager();
-        CustomMobsAPI.loadConfigValues(this);
         CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
         // Plugin startup logic
-        context = new MobzyContext(getConfig(), configManager); //Create new context and add plugin and logger to it
+        context = new MobzyContext(getConfig(), mobzyConfig); //Create new context and add plugin and logger to it
         context.setPlugin(this);
         context.setLogger(getLogger());
 
@@ -62,13 +61,14 @@ public final class Mobzy extends JavaPlugin {
 //        getServer().getPluginManager().registerEvents(new SpawnListener(abyssContext), this);
 
         //Register repeating tasks
-        if (CustomMobsAPI.doMobSpawns()) {
+        if (MobzyConfig.doMobSpawns()) {
             Runnable spawnTask = new SpawnTask(this);
             getServer().getScheduler().scheduleSyncRepeatingTask(this, spawnTask, 0, 100);
         }
 
-        CMCommandExecutor commandExecutor = new CMCommandExecutor(context);
+        MobzyCommands commandExecutor = new MobzyCommands(context);
 
+        this.getCommand("mobzy").setExecutor(commandExecutor);
         this.getCommand("cmrm").setExecutor(commandExecutor);
         this.getCommand("cminfo").setExecutor(commandExecutor);
         this.getCommand("cms").setExecutor(commandExecutor);
@@ -109,12 +109,11 @@ public final class Mobzy extends JavaPlugin {
         getLogger().info("onDisable has been invoked!");
     }
 
-    public ConfigManager getConfigManager() {
-        return configManager;
+    public MobzyConfig getMobzyConfig() {
+        return mobzyConfig;
     }
 
     public void loadConfigManager() {
-        configManager = new ConfigManager();
-        configManager.setup();
+        mobzyConfig = new MobzyConfig(this);
     }
 }

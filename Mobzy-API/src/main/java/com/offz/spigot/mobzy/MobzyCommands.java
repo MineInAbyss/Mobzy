@@ -17,17 +17,17 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
-public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, TabCompleter {
+public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCompleter {
     private MobzyContext context;
 
-    CMCommandExecutor(MobzyContext context) {
+    MobzyCommands(MobzyContext context) {
         this.context = context;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender.hasPermission("customMobs.reload") && command.getName().equalsIgnoreCase("cmreload")) {
-            context.getConfigManager().reload();
+            context.getMobzyConfig().reload();
             sender.sendMessage(ChatColor.GREEN + "Reloaded config files");
             return true;
         }
@@ -43,15 +43,15 @@ public class CMCommandExecutor implements org.bukkit.command.CommandExecutor, Ta
             for (World world : worlds)
                 for (Entity entity : world.getEntities()) {
                     Set<String> tags = entity.getScoreboardTags();
-                    net.minecraft.server.v1_13_R2.Entity nmsEntity = CustomMobsAPI.toNMS(entity);
-                    if (CustomMobsAPI.isCustomMob(entity)
-                            && ((args[0].equalsIgnoreCase("all") && !CustomMobsAPI.isRenamed(entity) && !entity.getScoreboardTags().contains("npc"))
-                            || (args[0].equalsIgnoreCase("named") && CustomMobsAPI.isRenamed(entity))
+                    net.minecraft.server.v1_13_R2.Entity nmsEntity = MobzyAPI.toNMS(entity);
+                    if (MobzyAPI.isCustomMob(entity)
+                            && ((args[0].equalsIgnoreCase("all") && !MobzyAPI.isRenamed(entity) && !entity.getScoreboardTags().contains("npc"))
+                            || (args[0].equalsIgnoreCase("named") && MobzyAPI.isRenamed(entity))
                             || (args[0].equalsIgnoreCase("npc") && entity.getScoreboardTags().contains("npc"))
                             || (args[0].equalsIgnoreCase("passive") && !entity.getScoreboardTags().contains("npc") && nmsEntity instanceof PassiveMob)
                             || (args[0].equalsIgnoreCase("hostile") && nmsEntity instanceof HostileMob)
                             || (args[0].equalsIgnoreCase("flying") && nmsEntity instanceof FlyingMob)
-                            || CustomMobsAPI.isMobOfType(entity, args[0])))
+                            || MobzyAPI.isMobOfType(entity, args[0])))
                         try {
                             if (args.length < 2 || entity.getLocation().distance(Bukkit.getPlayer(sender.getName()).getLocation()) < Integer.parseInt(args[1])) {
                                 if (!cminfo) entity.remove(); //only kill mobs if command was cmrm and not cminfo

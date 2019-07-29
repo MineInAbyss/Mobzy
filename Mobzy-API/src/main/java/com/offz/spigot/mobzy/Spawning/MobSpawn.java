@@ -1,8 +1,8 @@
 package com.offz.spigot.mobzy.Spawning;
 
-import com.offz.spigot.mobzy.CustomMobsAPI;
 import com.offz.spigot.mobzy.CustomType;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
+import com.offz.spigot.mobzy.MobzyAPI;
 import com.offz.spigot.mobzy.Spawning.Vertical.SpawnArea;
 import com.offz.spigot.mobzy.Spawning.Vertical.VerticalSpawn;
 import net.minecraft.server.v1_13_R2.EntityTypes;
@@ -107,10 +107,10 @@ public class MobSpawn {
                 else
                     entity = CustomType.spawnEntity(entityType, loc);
             }
-            net.minecraft.server.v1_13_R2.Entity nmsEntity = CustomMobsAPI.toNMS(entity);
+            net.minecraft.server.v1_13_R2.Entity nmsEntity = MobzyAPI.toNMS(entity);
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
             if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) { //length is actually the height, don't know why, it's just how it be
-                CustomMobsAPI.debug(ChatColor.YELLOW + "Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
+                MobzyAPI.debug(ChatColor.YELLOW + "Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
                 nmsEntity.die();
             }
         }

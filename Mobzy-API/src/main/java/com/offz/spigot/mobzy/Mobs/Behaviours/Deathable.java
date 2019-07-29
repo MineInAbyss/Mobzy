@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.Mobs.Behaviours;
 
-import com.offz.spigot.mobzy.CustomMobsAPI;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
+import com.offz.spigot.mobzy.MobzyAPI;
 import net.minecraft.server.v1_13_R2.DamageSource;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import org.bukkit.ChatColor;
@@ -16,7 +16,7 @@ public class Deathable extends MobBehaviour {
         EntityLiving entity = mob.getEntity();
 
         if (!mob.getKilled()) {
-            CustomMobsAPI.debug(ChatColor.RED + mob.getBuilder().getName() + " died at coords " + (int) mob.getX() + " " + (int) mob.getY() + " " + (int) mob.getZ());
+            MobzyAPI.debug(ChatColor.RED + mob.getBuilder().getName() + " died at coords " + (int) mob.getX() + " " + (int) mob.getY() + " " + (int) mob.getZ());
             EntityLiving killer = mob.getKiller();
             if (mob.getKillScore() >= 0 && killer != null)
                 killer.a(entity, mob.getKillScore(), damageSource);

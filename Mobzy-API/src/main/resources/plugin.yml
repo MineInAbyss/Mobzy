@@ -5,10 +5,12 @@ main: com.offz.spigot.mobzy.Mobzy
 api-version: 1.13
 depend: [WorldGuard, LibsDisguises]
 
-prefix: CuMobs
-description: A mod that lets you climb and get exhausted
+prefix: Mobzy
+description: A custom entities API
 
 commands:
+  mobzy:
+    description: The main mobzy command
   cmrm:
     description: Removes all registered mobs
     aliases: [cmrm, cmremove]

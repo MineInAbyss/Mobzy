@@ -5,28 +5,5 @@ main: com.offz.spigot.abyssialcreatures.AbyssialCreatures
 api-version: 1.13
 depend: [Mobzy]
 
-prefix: CuMobs
-description: A mod that lets you climb and get exhausted
-
-commands:
-  cmrm:
-    description: Removes all registered mobs
-    aliases: [cmrm, cmremove]
-    usage: /cmrm
-  cminfo:
-    description: Lists all registered mobs
-    aliases: [cmi, cminfo]
-    usage: /cminfo
-  cms:
-    description: Spawns a custom mob
-    aliases: [cms, cmspawn]
-    usage: /cms <Mob Name>
-  cml:
-    description: Lists all registered mobs
-    aliases: [cml, cmlist]
-    usage: /cml
-  cmreload:
-    description: Reloads the configuration files
-    aliases: [cmreload]
-    usage: /cmrm
-
+prefix: AbyssialCreatures
+description: An implementation of the Mobzy API for the MineInAbyss server

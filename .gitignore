@@ -1,5 +1,10 @@
-.idea/
-.idea/modules.xml
-.gradle/
-gradle/
-build/
+.idea
+.gradle
+build
+
+.classpath
+.project
+.settings
+eclipse
+*.ipr
+*.iws
