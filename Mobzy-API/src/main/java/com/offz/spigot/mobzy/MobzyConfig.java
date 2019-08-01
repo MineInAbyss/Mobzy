@@ -9,7 +9,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MobzyConfig {
@@ -21,11 +23,10 @@ public class MobzyConfig {
     private static int spawnSearchRadius;
     private static int minChunkSpawnRad;
     private static int maxChunkSpawnRad;
-
+    private List<MobzyAddon> registeredAddons = new ArrayList<>();
     private Mobzy plugin;
     private Map<File, FileConfiguration> spawnCfgs = new HashMap<>();
     private Map<File, FileConfiguration> mobCfgs = new HashMap<>();
-
     public MobzyConfig(Mobzy plugin) {
         this.plugin = plugin;
         reload();
@@ -40,7 +41,7 @@ public class MobzyConfig {
 
     /**
      * @return the passive mob cap
-     * TODO eventually these should just be a map of caps that custom plugins can add to
+     * TODO eventually these should just be a map of maps that custom plugins can add to
      */
     public static int getPassiveMobCap() {
         return passiveMobCap;
@@ -81,6 +82,7 @@ public class MobzyConfig {
         return maxChunkSpawnRad;
     }
 
+
     /**
      * @return whether the plugin is in a debug state (used primarily for broadcasting messages)
      */
@@ -108,6 +110,10 @@ public class MobzyConfig {
         return mobCfgs;
     }
 
+    public Map<File, FileConfiguration> getSpawnCfgs() {
+        return spawnCfgs;
+    }
+
     /**
      * Registers a {@link FileConfiguration} of spawns to be used by the plugin.
      *
@@ -115,7 +121,7 @@ public class MobzyConfig {
      * @param plugin the plugin this file corresponds to
      */
     void registerSpawnCfg(File file, JavaPlugin plugin) {
-        registerCfg(spawnCfgs, ChatColor.GREEN + file.getName() + " has been created for spawn configuration", file, plugin);
+        registerCfg(spawnCfgs, file, plugin);
         SpawnRegistry.readCfg(spawnCfgs.get(file));
     }
 
@@ -126,10 +132,12 @@ public class MobzyConfig {
      * @param plugin the plugin this file corresponds to
      */
     void registerMobCfg(File file, JavaPlugin plugin) {
-        registerCfg(mobCfgs, ChatColor.GREEN + file.getName() + " has been created for mob configuration", file, plugin);
+        registerCfg(mobCfgs, file, plugin);
+        //TODO do static fields get kept after plugin reload?
+        registeredAddons.add((MobzyAddon) plugin);
     }
 
-    private void registerCfg(Map<File, FileConfiguration> config, String loadMsg, File file, JavaPlugin plugin) {
+    private void registerCfg(Map<File, FileConfiguration> config, File file, JavaPlugin plugin) {
         Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "Registering configuration " + file.getName());
         if (!plugin.getDataFolder().exists())
             plugin.getDataFolder().mkdir();
@@ -137,22 +145,24 @@ public class MobzyConfig {
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             plugin.saveResource(file.getName(), false);
-            plugin.getLogger().info(loadMsg);
+            plugin.getLogger().info(ChatColor.GREEN + file.getName() + " has been created");
         }
         FileConfiguration configuration = YamlConfiguration.loadConfiguration(file);
         config.put(file, configuration);
         Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + config.toString());
     }
 
-    @Deprecated
-    public void saveSpawns() {
+    public void saveSpawnCfg(FileConfiguration config) {
+        Map.Entry<File, FileConfiguration> configEntry = spawnCfgs.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(config))
+                .findFirst()
+                .get();
         try {
-            for (Map.Entry<File, FileConfiguration> entry : spawnCfgs.entrySet())
-                entry.getValue().save(entry.getKey());
+            configEntry.getValue().save(configEntry.getKey());
 
-            plugin.getLogger().info(ChatColor.AQUA + "Spawns files have been saved");
+            plugin.getLogger().info(ChatColor.AQUA + "Spawns file has been saved");
         } catch (IOException e) {
-            plugin.getLogger().info(ChatColor.RED + "Could not save the spawns files");
+            plugin.getLogger().info(ChatColor.RED + "Could not save the spawns file");
             e.printStackTrace();
         }
     }
@@ -163,6 +173,9 @@ public class MobzyConfig {
      */
     public void reload() {
         SpawnRegistry.unregisterAll();
+        CustomType.getTypes().clear();
+        Bukkit.broadcastMessage(registeredAddons.toString());
+        registeredAddons.forEach(MobzyAddon::loadTypes);
         loadConfigValues();
         reloadConfigurationMap(spawnCfgs);
         reloadConfigurationMap(mobCfgs);

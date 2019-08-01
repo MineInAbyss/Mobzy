@@ -139,4 +139,12 @@ public class MobzyAPI {
             return ((CustomMob) e).getBuilder();
         return null;
     }
+
+    /**
+     * @param name the name of an entity type
+     * @return its builder
+     */
+    public static MobBuilder getBuilder(String name) {
+        return CustomType.getBuilder(name);
+    }
 }

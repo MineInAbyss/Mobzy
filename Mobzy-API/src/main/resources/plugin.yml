@@ -10,25 +10,6 @@ description: A custom entities API
 
 commands:
   mobzy:
+    aliases: [mz, mobzy]
     description: The main mobzy command
-  cmrm:
-    description: Removes all registered mobs
-    aliases: [cmrm, cmremove]
-    usage: /cmrm
-  cminfo:
-    description: Lists all registered mobs
-    aliases: [cmi, cminfo]
-    usage: /cminfo
-  cms:
-    description: Spawns a custom mob
-    aliases: [cms, cmspawn]
-    usage: /cms <Mob Name>
-  cml:
-    description: Lists all registered mobs
-    aliases: [cml, cmlist]
-    usage: /cml
-  cmreload:
-    description: Reloads the configuration files
-    aliases: [cmreload]
-    usage: /cmrm
-
+    usage: /mobzy [sub command]

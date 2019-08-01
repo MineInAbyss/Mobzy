@@ -33,7 +33,6 @@ public class MobSpawn {
     private SpawnPosition spawnPos = SpawnPosition.GROUND;
     private List<Material> whitelist = new ArrayList<>();
     private List<String> sections = new ArrayList<>();
-
     private MobSpawn() {
     }
 
@@ -51,18 +50,6 @@ public class MobSpawn {
             }
         }
         return true;
-    }
-
-    public SpawnPosition getSpawnPos() {
-        return spawnPos;
-    }
-
-    public int spawn(SpawnArea area) {
-        return spawn(area, chooseSpawnAmount());
-    }
-
-    public EntityTypes getEntityType() {
-        return entityType;
     }
 
     public static Location getSpawnInRadius(Location loc, double minRad, double maxRad) {
@@ -90,6 +77,70 @@ public class MobSpawn {
             }
         }
         return null;
+    }
+
+    public int getMinAmount() {
+        return minAmount;
+    }
+
+    public int getMaxAmount() {
+        return maxAmount;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getBasePriority() {
+        return basePriority;
+    }
+
+    public long getMinTime() {
+        return minTime;
+    }
+
+    public long getMaxTime() {
+        return maxTime;
+    }
+
+    public long getMinLightLevel() {
+        return minLightLevel;
+    }
+
+    public long getMaxLightLevel() {
+        return maxLightLevel;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
+
+    public int getMinGap() {
+        return minGap;
+    }
+
+    public int getMaxGap() {
+        return maxGap;
+    }
+
+    public List<Material> getWhitelist() {
+        return whitelist;
+    }
+
+    public SpawnPosition getSpawnPos() {
+        return spawnPos;
+    }
+
+    public int spawn(SpawnArea area) {
+        return spawn(area, chooseSpawnAmount());
+    }
+
+    public EntityTypes getEntityType() {
+        return entityType;
     }
 
     public int spawn(SpawnArea area, int spawns) {

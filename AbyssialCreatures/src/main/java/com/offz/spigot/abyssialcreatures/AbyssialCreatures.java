@@ -1,19 +1,17 @@
 package com.offz.spigot.abyssialcreatures;
 
 import com.offz.spigot.mobzy.MobzyAPI;
+import com.offz.spigot.mobzy.MobzyAddon;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
-public final class AbyssialCreatures extends JavaPlugin {
-
+public final class AbyssialCreatures extends JavaPlugin implements MobzyAddon {
     @Override
     public void onEnable() {
         getLogger().info("On enable has been called");
         saveDefaultConfig();
-        MobzyAPI.registerMobConfig(new File(getDataFolder(), "mobs.yml"), this);
-        new AbyssialType();
-        AbyssialType.registerTypes();
+        loadTypes();
         MobzyAPI.registerSpawnConfig(new File(getDataFolder(), "spawns.yml"), this);
     }
 
@@ -22,5 +20,12 @@ public final class AbyssialCreatures extends JavaPlugin {
         super.onDisable();
         // Plugin shutdown logic
         getLogger().info("onDisable has been invoked!");
+    }
+
+    @Override
+    public void loadTypes() {
+        MobzyAPI.registerMobConfig(new File(getDataFolder(), "mobs.yml"), this);
+        new AbyssialType();
+        AbyssialType.registerTypes();
     }
 }

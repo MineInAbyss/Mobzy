@@ -4,6 +4,7 @@ import com.offz.spigot.mobzy.Mobs.MobDrop;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,6 +72,15 @@ public final class MobBuilder {
 
     public Material getModelMaterial() {
         return modelMaterial;
+    }
+
+    public ItemStack getModelItemStack() {
+        ItemStack is = new ItemStack(getModelMaterial(), 1, (short) getModelID());
+        ItemMeta meta = is.getItemMeta();
+        meta.setDisplayName(getName());
+        meta.setUnbreakable(true);
+        is.setItemMeta(meta);
+        return is;
     }
 
     public MobBuilder setModelMaterial(Material modelMaterial) {

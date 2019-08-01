@@ -1,5 +1,6 @@
 package com.offz.spigot.mobzy;
 
+import com.derongan.minecraft.guiy.GuiListener;
 import com.offz.spigot.mobzy.Listener.MobListener;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
 import com.offz.spigot.mobzy.Spawning.SpawnTask;
@@ -28,6 +29,7 @@ public final class Mobzy extends JavaPlugin {
         //Registering custom WorldGuard flag
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
         Flag<?> existing = registry.get("cm-spawns");
+
         if (existing instanceof StringFlag) {
             CM_SPAWN_REGIONS = (StringFlag) existing;
         } else
@@ -46,8 +48,11 @@ public final class Mobzy extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("On enable has been called");
+        getLogger().info(ChatColor.DARK_PURPLE + CustomType.getTypes().toString());
         saveDefaultConfig();
         loadConfigManager();
+
+//        getLogger().info("Before:\n" + ChatColor.GOLD + CustomType.getTypes().toString());
         CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
         // Plugin startup logic
@@ -58,7 +63,7 @@ public final class Mobzy extends JavaPlugin {
 
         //Register events
         getServer().getPluginManager().registerEvents(new MobListener(context), this);
-//        getServer().getPluginManager().registerEvents(new SpawnListener(abyssContext), this);
+        getServer().getPluginManager().registerEvents(new GuiListener(), this);
 
         //Register repeating tasks
         if (MobzyConfig.doMobSpawns()) {
@@ -67,19 +72,13 @@ public final class Mobzy extends JavaPlugin {
         }
 
         MobzyCommands commandExecutor = new MobzyCommands(context);
-
         this.getCommand("mobzy").setExecutor(commandExecutor);
-        this.getCommand("cmrm").setExecutor(commandExecutor);
-        this.getCommand("cminfo").setExecutor(commandExecutor);
-        this.getCommand("cms").setExecutor(commandExecutor);
-        this.getCommand("cml").setExecutor(commandExecutor);
-        this.getCommand("cmreload").setExecutor(commandExecutor);
-
-        int num = 0;
 
         /*Every loaded custom entity in the world stops relating to the CustomMob class heirarchy after reload, so we
         can't do something like customEntity instanceof CustomMob. Therefore, we "reload" those entities by deleting
         them and copying their NBT data to new entities*/
+        int num = 0;
+
         for (World world : getServer().getWorlds()) {
             for (Entity entity : world.getEntities()) {
                 if (entity.getScoreboardTags().contains("customMob2") && !(((CraftEntity) entity).getHandle() instanceof CustomMob)) {

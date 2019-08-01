@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SpawnRegistry {
-    private static Map<String, SpawnRegion> layerSpawns = new HashMap<>();
+    private static Map<String, SpawnRegion> regionSpawns = new HashMap<>();
 
     public static void unregisterAll() {
-        layerSpawns.clear();
+        regionSpawns.clear();
     }
 
     public static void readCfg(FileConfiguration config) {
@@ -36,7 +36,7 @@ public class SpawnRegistry {
                     //create a new builder from the MobSpawn found inside of an already created layer
                     if (spawn.containsKey("reuse")) {
                         String reusedMob = (String) spawn.get("reuse");
-                        mobSpawn = new MobSpawn.Builder(getRegionSpawns().get(reusedMob.substring(0, reusedMob.indexOf(':'))).getSpawnOfType(CustomType.getType(reusedMob.substring(reusedMob.indexOf(':') + 1))));
+                        mobSpawn = new MobSpawn.Builder(getReusedBuilder(reusedMob));
                     }
                     //required information
                     else if (!spawn.containsKey("mob"))
@@ -47,7 +47,7 @@ public class SpawnRegistry {
                     if (spawn.containsKey("priority"))
                         mobSpawn.setBasePriority((Double) spawn.get("priority"));
                     if (spawn.containsKey("min-amount"))
-                        mobSpawn.setMaxAmount((Integer) spawn.get("min-amount"));
+                        mobSpawn.setMinAmount((Integer) spawn.get("min-amount"));
                     if (spawn.containsKey("max-amount"))
                         mobSpawn.setMaxAmount((Integer) spawn.get("max-amount"));
                     if (spawn.containsKey("min-gap"))
@@ -100,19 +100,23 @@ public class SpawnRegistry {
                 e.printStackTrace();
                 plugin.getLogger().info(ChatColor.RED + "Skipped region in spawns.yml because of misformatted config");
             }
-            layerSpawns.put(name, spawnRegion);
+            regionSpawns.put(name, spawnRegion);
         }
         plugin.getLogger().info(ChatColor.GREEN + "Reloaded spawns.yml");
     }
 
+    public static MobSpawn getReusedBuilder(String reusedMob) {
+        return getRegionSpawns().get(reusedMob.substring(0, reusedMob.indexOf(':'))).getSpawnOfType(CustomType.getType(reusedMob.substring(reusedMob.indexOf(':') + 1)));
+    }
+
     public static Map<String, SpawnRegion> getRegionSpawns() {
-        return layerSpawns;
+        return regionSpawns;
     }
 
     public static List<MobSpawn> getMobSpawnsForRegions(List<String> regionIDs, int mobType) {
         return regionIDs.stream()
-                .filter(name -> layerSpawns.containsKey(name))
-                .map(name -> layerSpawns.get(name).getSpawnsFor(mobType))
+                .filter(name -> regionSpawns.containsKey(name))
+                .map(name -> regionSpawns.get(name).getSpawnsFor(mobType))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
