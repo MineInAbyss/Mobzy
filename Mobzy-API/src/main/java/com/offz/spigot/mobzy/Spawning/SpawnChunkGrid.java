@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,7 +58,6 @@ public class SpawnChunkGrid {
             if (minY - minVertical > 0)
                 addSpawnIfValid(new ChunkSpawn(chunk, 0, minY - minVertical));
         }
-        Collections.sort(chunkSpawns);
     }
 
     private void addSpawnIfValid(ChunkSpawn spawn) {
@@ -75,10 +74,10 @@ public class SpawnChunkGrid {
     }
 
     public List<ChunkSpawn> getShuffledSpawns() {
-        for (ChunkSpawn spawn : chunkSpawns) {
+        for (ChunkSpawn spawn : chunkSpawns)
             spawn.setPreferenceOffset(Math.random());
-        }
-        Collections.sort(chunkSpawns);
+
+        chunkSpawns.sort(Comparator.comparing(ChunkSpawn::getPreference));
         return chunkSpawns;
     }
 }

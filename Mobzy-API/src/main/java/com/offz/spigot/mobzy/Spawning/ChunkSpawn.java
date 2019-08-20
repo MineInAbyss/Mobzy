@@ -7,7 +7,7 @@ import org.bukkit.Location;
 
 import java.util.List;
 
-public class ChunkSpawn implements Comparable {
+public class ChunkSpawn {
     private double preference = 1; //introduce a little noise into our preference so we don't end up with a specific order of chunks spawning entities
     private double preferenceOffset = 0; //
     private Chunk chunk;
@@ -69,12 +69,5 @@ public class ChunkSpawn implements Comparable {
             return weightedChoice.next(); //pick one
         }
         return null;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof ChunkSpawn))
-            return 0;
-        return ((int) (getPreference() - ((ChunkSpawn) o).getPreference()));
     }
 }
