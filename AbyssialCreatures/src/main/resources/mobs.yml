@@ -4,7 +4,7 @@ config:
 # Passive
 Neritantan:
   model: 2
-  max-health: 10
+  max-health: 5
   movement-speed: 0.25
   tempt-items: [CARROT, POTATO, BEETROOT]
   drops:
@@ -18,7 +18,7 @@ Neritantan:
       drop-chance: 0.5
 Fuwagi:
   model: 5
-  max-health: 10
+  max-health: 5
   movement-speed: 0.25
   tempt-items: [CARROT, APPLE]
   drops:
@@ -49,7 +49,7 @@ Fuwagi:
 Okibo:
   model: 38
   max-health: 50
-  movement-speed: 0.25
+  movement-speed: 0.2
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -66,7 +66,7 @@ Okibo:
 # Hostile
 Inbyo:
   model: 8
-  max-health: 30
+  max-health: 10
   movement-speed: 0.4
   attack-damage: 5
   follow-range: 64
@@ -92,10 +92,10 @@ Inbyo:
           display-name: §rRaw Inbyo Meat
 Rohana:
   model: 14
-  max-health: 6
-  movement-speed: 0.3
+  max-health: 1
+  movement-speed: 0.1
   adult: false
-  attack-damage: 3
+  attack-damage: 0
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -118,7 +118,7 @@ Rohana:
 Tamaugachi:
   model: 17
   max-health: 100
-  movement-speed: 0.4
+  movement-speed: 0.3
   attack-damage: 7
   follow-range: 64
   drops:
@@ -147,9 +147,9 @@ Tamaugachi:
       max-amount: 3
 Silkfang:
   model: 26
-  max-health: 20
+  max-health: 15
   movement-speed: 0.3
-  attack-damage: 0.5
+  attack-damage: 2
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -191,14 +191,14 @@ Kuongatari:
       drop-chance: 0.4
 Nakikabane:
   model: 41
-  max-health: 7
+  max-health: 10
   movement-speed: 0.3
   attack-damage: 0.5
 Tesuchi:
   model: 44
-  max-health: 20
+  max-health: 1
   movement-speed: 0.3
-  attack-damage: 0.5
+  attack-damage: 0
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -215,10 +215,10 @@ Tesuchi:
       drop-chance: 0.5
 Ottobas:
   model: 47
-  max-health: 35
-  movement-speed: 0.4
-  attack-damage: 5
-  follow-range: 30
+  max-health: 30
+  movement-speed: 0.3
+  attack-damage: 4
+  follow-range: 20
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -233,7 +233,11 @@ Corpseweeper:
   name: Corpse Weeper
   model: 11
   max-health: 20
-  follow-range: 50
+  follow-range: 40
+  attack-damage: 3
+  movement-speed: 0.12
+  min-exp: 5
+  max-exp: 7
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -252,6 +256,8 @@ Madokajack:
   model: 20
   max-health: 20
   follow-range: 50
+  attack-damage: 6
+  movement-speed: 0.12
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -269,8 +275,9 @@ Madokajack:
 Hammerbeak:
   model: 23
   max-health: 20
-  follow-range: 50
-  attack-damage: 5
+  follow-range: 10
+  attack-damage: 0.5
+  movement-speed: 0.12
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -287,18 +294,19 @@ Hammerbeak:
       max-amount: 4
 Kazura:
   model: 29
-  max-health: 10
-  follow-range: 50
-  attack-damage: 2
+  max-health: 5
+  follow-range: 0
+  attack-damage: 0
   drops:
     - material: INK_SAC
       min-amount: 1
       max-amount: 2
 Benikuchinawa:
   model: 32
-  max-health: 20
+  max-health: 50
   follow-range: 50
-  attack-damage: 10
+  attack-damage: 4
+  movement-speed: 0.12
   drops:
     - item:
         ==: org.bukkit.inventory.ItemStack
@@ -321,5 +329,17 @@ Benikuchinawa:
       drop-chance: 0.15
     - material: SLIME_BALL
       drop-chance: 0.5
+Dosetori:
+  model: 50
+  max-health: 20
+  follow-range: 50
+  attack-damage: 3
+  movement-speed: 0.13
+Cyatoria:
+  model: 53
+  max-health: 20
+  follow-range: 50
+  attack-damage: 10
+  movement-speed: 0.05
 NPC:
   model: 1

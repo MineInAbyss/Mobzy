@@ -64,11 +64,9 @@ public final class Mobzy extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("On enable has been called");
-//        getLogger().info(ChatColor.DARK_PURPLE + CustomType.getTypes().toString());
         saveDefaultConfig();
         loadConfigManager();
 
-//        getLogger().info("Before:\n" + ChatColor.GOLD + CustomType.getTypes().toString());
         CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
         // Plugin startup logic
@@ -103,17 +101,12 @@ public final class Mobzy extends JavaPlugin {
             for (Entity entity : world.getEntities()) {
                 if (entity.getScoreboardTags().contains("customMob2") && !(((CraftEntity) entity).getHandle() instanceof CustomMob)) {
                     EntityLiving nmsEntity = (EntityLiving) ((CraftEntity) entity).getHandle();
-//                    try {
                     EntityLiving replacement = (EntityLiving) ((CraftEntity) CustomType.spawnEntity(CustomType.getType(nmsEntity.getScoreboardTags()), entity.getLocation())).getHandle();
                     NBTTagCompound nbt = new NBTTagCompound();
                     nmsEntity.b(nbt); //.b copies over the entity's nbt data to the compound
                     entity.remove();
                     replacement.a(nbt); //.a copies the nbt data to the new entity
                     num++;
-//                    } catch (Exception e) {
-                        /*if any error ever occurs, just go on with removing the entity that caused the error, otherwise
-                        the plugin won't load*/
-//                    }
                 } else if (entity.getScoreboardTags().contains("additionalPart"))
                     entity.remove();
             }

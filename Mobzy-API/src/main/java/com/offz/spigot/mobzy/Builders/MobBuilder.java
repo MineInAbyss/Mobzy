@@ -3,13 +3,16 @@ package com.offz.spigot.mobzy.Builders;
 import com.offz.spigot.mobzy.Mobs.MobDrop;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import org.bukkit.Material;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public final class MobBuilder {
+public final class MobBuilder implements ConfigurationSerializable {
     private String name;
     private int modelID;
     private Material modelMaterial = Material.DIAMOND_SWORD;
@@ -19,25 +22,64 @@ public final class MobBuilder {
     private Double movementSpeed;
     private Double followRange;
     private Double attackDamage;
-
+    private Integer minExp;
+    private Integer maxExp;
     private boolean isAdult = true;
     private List<MobDrop> drops = new ArrayList<>();
-
     public MobBuilder(String name, int modelID) {
         this.name = name;
         this.modelID = modelID;
     }
 
-    public MobBuilder(MobBuilder copy) {
-        this.name = copy.name;
-        this.modelID = copy.modelID;
-        this.modelMaterial = copy.modelMaterial;
-        this.disguiseAs = copy.disguiseAs;
-        this.temptItems = copy.temptItems;
-        this.maxHealth = copy.maxHealth;
-        this.movementSpeed = copy.movementSpeed;
-        this.followRange = copy.followRange;
-        this.attackDamage = copy.attackDamage;
+    public static MobBuilder deserialize(Map<String, Object> args, String name) {
+        if (args.containsKey("name"))
+            name = (String) args.get("name");
+
+        MobBuilder builder = new MobBuilder(name, (int) args.get("model"));
+
+        if (args.containsKey("adult"))
+            builder.setAdult((boolean) args.get("adult"));
+        if (args.containsKey("disguise-as"))
+            builder.setDisguiseAs(DisguiseType.valueOf((String) args.get("disguise-as")));
+        if (args.containsKey("drops"))
+            builder.setDrops(((List<Map<String, Object>>) args.get("drops")).stream()
+                    .map(MobDrop::deserialize)
+                    .collect(Collectors.toList()));
+        if (args.containsKey("model-material"))
+            builder.setModelMaterial(Material.getMaterial((String) args.get("model-material")));
+        if (args.containsKey("tempt-items"))
+            builder.setTemptItems(((List<Object>) args.get("tempt-items")).stream()
+                    .map(item -> Material.getMaterial((String) item))
+                    .collect(Collectors.toList()));
+        if (args.containsKey("max-health"))
+            builder.setMaxHealth(((Number) args.get("max-health")).doubleValue());
+        if (args.containsKey("movement-speed"))
+            builder.setMovementSpeed(((Number) args.get("movement-speed")).doubleValue());
+        if (args.containsKey("attack-damage"))
+            builder.setAttackDamage(((Number) args.get("attack-damage")).doubleValue());
+        if (args.containsKey("follow-range"))
+            builder.setFollowRange(((Number) args.get("follow-range")).doubleValue());
+        if (args.containsKey("min-exp"))
+            builder.setMinExp(((Number) args.get("min-exp")).intValue());
+        if (args.containsKey("max-exp"))
+            builder.setMaxExp(((Number) args.get("max-exp")).intValue());
+        return builder;
+    }
+
+    public Integer getMaxExp() {
+        return maxExp;
+    }
+
+    public void setMaxExp(Integer maxExp) {
+        this.maxExp = maxExp;
+    }
+
+    public Integer getMinExp() {
+        return minExp;
+    }
+
+    public void setMinExp(Integer minExp) {
+        this.minExp = minExp;
     }
 
     public boolean isAdult() {
@@ -67,6 +109,11 @@ public final class MobBuilder {
         return modelMaterial;
     }
 
+    public MobBuilder setModelMaterial(Material modelMaterial) {
+        this.modelMaterial = modelMaterial;
+        return this;
+    }
+
     public ItemStack getModelItemStack() {
         ItemStack is = new ItemStack(getModelMaterial(), 1, (short) getModelID());
         ItemMeta meta = is.getItemMeta();
@@ -74,11 +121,6 @@ public final class MobBuilder {
         meta.setUnbreakable(true);
         is.setItemMeta(meta);
         return is;
-    }
-
-    public MobBuilder setModelMaterial(Material modelMaterial) {
-        this.modelMaterial = modelMaterial;
-        return this;
     }
 
     public String getName() {
@@ -151,5 +193,15 @@ public final class MobBuilder {
     public MobBuilder setAttackDamage(Double attackDamage) {
         this.attackDamage = attackDamage;
         return this;
+    }
+
+    /**
+     * Does nothing yet
+     *
+     * @return a serialized version of the mob builder
+     */
+    @Override
+    public Map<String, Object> serialize() {
+        return null;
     }
 }

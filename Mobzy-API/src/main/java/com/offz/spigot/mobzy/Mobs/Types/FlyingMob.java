@@ -2,10 +2,7 @@ package com.offz.spigot.mobzy.Mobs.Types;
 
 import com.offz.spigot.mobzy.Builders.MobBuilder;
 import com.offz.spigot.mobzy.CustomType;
-import com.offz.spigot.mobzy.Mobs.Behaviours.CustomMobBase;
-import com.offz.spigot.mobzy.Mobs.Behaviours.Deathable;
-import com.offz.spigot.mobzy.Mobs.Behaviours.Disguiseable;
-import com.offz.spigot.mobzy.Mobs.Behaviours.InitAttributeable;
+import com.offz.spigot.mobzy.Mobs.Behaviours.*;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
 import com.offz.spigot.mobzy.Pathfinders.Controllers.MZControllerMoveFlying;
 import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalFlyDamageTarget;
@@ -41,10 +38,10 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         return true;
     }
 
-    //TODO read config setting for minmax xp
     @Override
     protected int getExpValue(EntityHuman entityhuman) {
-        return 1 + this.world.random.nextInt(3);
+        Integer toDrop = new ExpDroppable(this).getExpToDrop();
+        return toDrop == null ? 1 + this.world.random.nextInt(3) : toDrop;
     }
 
     @Override

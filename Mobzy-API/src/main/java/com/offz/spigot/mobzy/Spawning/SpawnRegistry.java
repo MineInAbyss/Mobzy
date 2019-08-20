@@ -5,7 +5,6 @@ import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.Spawning.Regions.SpawnRegion;
 import net.minecraft.server.v1_13_R2.Entity;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Collection;
@@ -32,66 +31,18 @@ public class SpawnRegistry {
                 List<Map<?, ?>> spawnList = (List<Map<?, ?>>) region.get("spawns");
 
                 for (Map<?, ?> spawn : spawnList) {
-                    MobSpawn.Builder mobSpawn = new MobSpawn.Builder();
+                    MobSpawn.Builder mobSpawn = MobSpawn.newBuilder();
 
                     //create a new builder from the MobSpawn found inside of an already created layer
                     if (spawn.containsKey("reuse")) {
                         String reusedMob = (String) spawn.get("reuse");
-                        mobSpawn = new MobSpawn.Builder(getReusedBuilder(reusedMob));
+                        mobSpawn = MobSpawn.newBuilder(getReusedBuilder(reusedMob));
                     }
                     //required information
                     else if (!spawn.containsKey("mob"))
                         break;
 
-                    if (spawn.containsKey("mob"))
-                        mobSpawn.setEntityType(CustomType.getType((String) spawn.get("mob")));
-                    if (spawn.containsKey("priority"))
-                        mobSpawn.setBasePriority((Double) spawn.get("priority"));
-                    if (spawn.containsKey("min-amount"))
-                        mobSpawn.setMinAmount((Integer) spawn.get("min-amount"));
-                    if (spawn.containsKey("max-amount"))
-                        mobSpawn.setMaxAmount((Integer) spawn.get("max-amount"));
-                    if (spawn.containsKey("min-gap"))
-                        mobSpawn.setMinGap((Integer) spawn.get("min-gap"));
-                    if (spawn.containsKey("max-gap"))
-                        mobSpawn.setMaxGap((Integer) spawn.get("max-gap"));
-                    if (spawn.containsKey("min-light"))
-                        mobSpawn.setMinLightLevel((Integer) spawn.get("min-light"));
-                    if (spawn.containsKey("max-light"))
-                        mobSpawn.setMaxLightLevel((Integer) spawn.get("max-light"));
-                    if (spawn.containsKey("min-time"))
-                        mobSpawn.setMinTime((Long) spawn.get("min-time"));
-                    if (spawn.containsKey("max-time"))
-                        mobSpawn.setMaxTime((Long) spawn.get("max-time"));
-                    if (spawn.containsKey("min-y"))
-                        mobSpawn.setMinY((Integer) spawn.get("min-y"));
-                    if (spawn.containsKey("max-y"))
-                        mobSpawn.setMaxY((Integer) spawn.get("max-y"));
-                    if (spawn.containsKey("radius"))
-                        mobSpawn.setRadius((Integer) spawn.get("radius"));
-                    if (spawn.containsKey("spawn-pos")) {
-                        MobSpawn.SpawnPosition spawnPos = MobSpawn.SpawnPosition.GROUND;
-                        switch ((String) spawn.get("spawn-pos")) {
-                            case "AIR":
-                                spawnPos = MobSpawn.SpawnPosition.AIR;
-                                break;
-                            case "GROUND":
-                                spawnPos = MobSpawn.SpawnPosition.GROUND;
-                                break;
-                            case "OVERHANG":
-                                spawnPos = MobSpawn.SpawnPosition.OVERHANG;
-                                break;
-                        }
-                        mobSpawn.setSpawnPos(spawnPos);
-                    }
-                    if (spawn.containsKey("block-whitelist")) {
-                        List<Material> materialWhiteist = ((List<String>) spawn.get("block-whitelist")).stream()
-                                .map(Material::valueOf)
-                                .collect(Collectors.toList());
-
-                        mobSpawn.setWhitelist(materialWhiteist);
-                    }
-
+                    MobSpawn.deserialize((Map<String, Object>) spawn, mobSpawn);
                     spawnRegion.addSpawn(mobSpawn.build());
                 }
             } catch (NullPointerException e) {

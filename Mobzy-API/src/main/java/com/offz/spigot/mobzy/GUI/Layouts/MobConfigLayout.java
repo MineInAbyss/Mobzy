@@ -5,9 +5,12 @@ import com.offz.spigot.mobzy.GUI.MobzyGUI;
 import com.offz.spigot.mobzy.GUI.MobzyPropertyElement;
 import com.offz.spigot.mobzy.Spawning.MobSpawn;
 import de.erethon.headlib.HeadLib;
+import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -128,44 +131,25 @@ public class MobConfigLayout extends Layout {
     }
 
     public Object getDefaultValueForKey(String key) {
-        MobSpawn defaultSpawn = new MobSpawn.Builder().build();
-        if (key.equals("mob"))
-            return "ENITTY_TYPE_HERE";
-        if (key.equals("priority"))
-            return defaultSpawn.getBasePriority();
-        if (key.equals("min-amount"))
-            return defaultSpawn.getMinAmount();
-        if (key.equals("max-amount"))
-            return defaultSpawn.getMaxAmount();
-        if (key.equals("min-gap"))
-            return defaultSpawn.getMinGap();
-        if (key.equals("max-gap"))
-            return defaultSpawn.getMaxGap();
-        if (key.equals("min-light"))
-            return defaultSpawn.getMinLightLevel();
-        if (key.equals("max-light"))
-            return defaultSpawn.getMaxLightLevel();
-        if (key.equals("min-time"))
-            return defaultSpawn.getMinTime();
-        if (key.equals("max-time"))
-            return defaultSpawn.getMaxTime();
-        if (key.equals("min-y"))
-            return defaultSpawn.getMinY();
-        if (key.equals("max-y"))
-            return defaultSpawn.getMaxY();
-        if (key.equals("radius"))
-            return defaultSpawn.getRadius();
-        if (key.equals("spawn-pos")) {
-            return defaultSpawn.getSpawnPos();
-        }
-        if (key.equals("block-whitelist")) {
-            return defaultSpawn.getWhitelist();
-        } else
+        MobSpawn defaultSpawn = MobSpawn.newBuilder().build();
+        try {
+            //some customized values
+            if (key.equals("mob"))
+                return "ENITTY_TYPE_HERE";
+            if (key.equals("priority"))
+                return defaultSpawn.getBasePriority();
+//            return new PropertyDescriptor(WordUtils.capitalize(key, new char[]{'-'}).replace("-", ""), MobSpawn.class).getReadMethod().invoke(defaultSpawn);
+            //a default rule to turn key names into their respective method names
+            Object invoke = defaultSpawn.getClass().getMethod("get" + WordUtils.capitalize(key, new char[]{'-'}).replace("-", "")).invoke(defaultSpawn);
+            Bukkit.broadcastMessage("getting " + key + ": " + invoke);
+            return invoke;
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException  e) {
+            e.printStackTrace();
             return null;
+        }
     }
 
     private MobzyPropertyElement makeProperty(HeadLib head, MobzyPropertyElement.PropertyType type, String key, Object value) {
         return new MobzyPropertyElement(itemTemplate(head, key, value.toString()), type, key, value, main, spawn, this);
     }
-
 }

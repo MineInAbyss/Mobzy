@@ -3,13 +3,11 @@ package com.offz.spigot.mobzy;
 import com.mojang.datafixers.types.Type;
 import com.offz.spigot.mobzy.Builders.MobBuilder;
 import com.offz.spigot.mobzy.Mobs.Behaviours.AfterSpawnBehaviour;
-import com.offz.spigot.mobzy.Mobs.MobDrop;
-import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -18,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class CustomType {
@@ -67,8 +64,6 @@ public class CustomType {
     }
 
     public static void registerTypes() {
-//        Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) DataConverterRegistry.a().getSchema(15190).findChoiceType(DataConverterTypes.n).types();
-//        dataTypes.keySet()
         Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "Registering types");
         for (EntityTypes type : types.values()) {
             String className = type.c().getSimpleName();
@@ -93,37 +88,7 @@ public class CustomType {
         if (mobCfg == null)
             return null;
 
-        String name = className;
-
-        if (mobCfg.contains(className + ".name"))
-            name = mobCfg.getString(className + ".name");
-
-        MobBuilder builder = new MobBuilder(name, mobCfg.getInt(className + ".model"));
-
-        if (mobCfg.contains(className + ".adult"))
-            builder.setAdult(mobCfg.getBoolean(className + ".adult"));
-        if (mobCfg.contains(className + ".disguise-as"))
-            builder.setDisguiseAs(DisguiseType.valueOf(mobCfg.getString(className + ".disguise-as")));
-        if (mobCfg.contains(className + ".drops"))
-            builder.setDrops(mobCfg.getMapList(className + ".drops").stream()
-                    .map(drop -> MobDrop.deserialize((Map<String, Object>) drop))
-                    .collect(Collectors.toList()));
-        if (mobCfg.contains(className + ".model-material"))
-            builder.setModelMaterial(Material.getMaterial(mobCfg.getString(className + ".model-material")));
-        if (mobCfg.contains(className + ".tempt-items"))
-            builder.setTemptItems(mobCfg.getList(className + ".tempt-items").stream()
-                    .map(item -> Material.getMaterial((String) item))
-                    .collect(Collectors.toList()));
-        if (mobCfg.contains(className + ".max-health"))
-            builder.setMaxHealth(mobCfg.getDouble(className + ".max-health"));
-        if (mobCfg.contains(className + ".movement-speed"))
-            builder.setMovementSpeed(mobCfg.getDouble(className + ".movement-speed"));
-        if (mobCfg.contains(className + ".attack-damage"))
-            builder.setAttackDamage(mobCfg.getDouble(className + ".attack-damage"));
-        if (mobCfg.contains(className + ".follow-range"))
-            builder.setFollowRange(mobCfg.getDouble(className + ".follow-range"));
-
-        return builder;
+        return MobBuilder.deserialize(((MemorySection) mobCfg.get(className)).getValues(true), className);
     }
 
     //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293

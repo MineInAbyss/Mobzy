@@ -2,10 +2,7 @@ package com.offz.spigot.mobzy.Mobs.Types;
 
 import com.offz.spigot.mobzy.Builders.MobBuilder;
 import com.offz.spigot.mobzy.CustomType;
-import com.offz.spigot.mobzy.Mobs.Behaviours.CustomMobBase;
-import com.offz.spigot.mobzy.Mobs.Behaviours.Deathable;
-import com.offz.spigot.mobzy.Mobs.Behaviours.Disguiseable;
-import com.offz.spigot.mobzy.Mobs.Behaviours.InitAttributeable;
+import com.offz.spigot.mobzy.Mobs.Behaviours.*;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookWhereHeaded;
@@ -33,6 +30,12 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
         addScoreboardTag("passiveMob");
         //TODO this is a temporary fix to see if it affects performance
         ((LivingEntity) this.getBukkitEntity()).setRemoveWhenFarAway(true);
+    }
+
+    @Override
+    protected int getExpValue(EntityHuman entityhuman) {
+        Integer toDrop = new ExpDroppable(this).getExpToDrop();
+        return toDrop == null ? super.getExpValue(entityhuman) : toDrop;
     }
 
     @Override

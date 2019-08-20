@@ -48,19 +48,25 @@ regions:
         mob: Rohana
         min-light: 0
         max-light: 7
-      - mob: Ottobas
-        priority: 0.6
         block-whitelist:
-          - GRASS_BLOCK
+          - WATER
       - mob: Tesuchi
-        min-amount: 2
-        max-amount: 5
-        radius: 10
+        min-amount: 1
+        max-amount: 4
+        radius: 15
         block-whitelist:
           - GRASS_BLOCK
+      - mob: Ottobas
+        min-amount: 1
+        max-amount: 2
+        radius: 30
+        block-whitelist:
+          - WATER
+  - name: Inverted Forest
+    spawns:
+      - reuse: Template:Benikuchinawa
+        priority: 0.4
       - mob: Inbyo
-        sections:
-          - l2s5
         min-amount: 4
         max-amount: 8
         radius: 5
@@ -83,12 +89,6 @@ regions:
         spawn-pos: AIR
   - name: The Goblet of Giants
     spawns:
-      - mob: Ottobas
-        min-amount: 1
-        max-amount: 2
-        priority: 0.1
-        block-whitelist:
-          - GRASS_BLOCK
       - mob: Tamaugachi
         block-whitelist:
           - WATER
@@ -106,4 +106,4 @@ regions:
         max-amount: 4
         radius: 6
         block-whitelist:
-          - GRASS_BLOCK
+          - WATER
