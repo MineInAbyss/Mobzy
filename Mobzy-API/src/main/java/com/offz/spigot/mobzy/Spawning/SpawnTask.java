@@ -64,21 +64,22 @@ public class SpawnTask extends BukkitRunnable {
 
                     //go through entities around player, adding nearby players to a list
                     for (org.bukkit.entity.Entity entity : p.getNearbyEntities(MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius())) {
-                        for (Class<? extends Entity> type : config.getRegisteredMobTypes().values()) {
-                            if (type.isInstance(entity)) { //TODO isAssignableFrom might be right to use here?
-                                Bukkit.broadcastMessage("type is instance is working");
-                                MutableInt count = originalMobCount.get(type);
-                                count.increment();
-                            } else if (entity.getType().equals(EntityType.PLAYER)) {
-                                skippedPlayers.add(entity.getUniqueId());
-                                closePlayers.add(entity.getLocation());
-                            } else
-                                break;
-                            totalMobs.increment();
-                        }
+                        if (MobzyAPI.isCustomMob(entity))
+                            for (Class<? extends Entity> type : config.getRegisteredMobTypes().values()) {
+                                if (type.isInstance(MobzyAPI.toNMS(entity))) {
+                                    MutableInt count = originalMobCount.get(type);
+                                    count.increment();
+                                } else if (entity.getType().equals(EntityType.PLAYER)) {
+                                    skippedPlayers.add(entity.getUniqueId());
+                                    closePlayers.add(entity.getLocation());
+                                } else
+                                    continue;
+                                totalMobs.increment();
+                            }
                     }
 
-                    Map<Class<? extends net.minecraft.server.v1_13_R2.Entity>, MutableInt> mobCount = new HashMap<>(originalMobCount);
+                    Map<Class<? extends net.minecraft.server.v1_13_R2.Entity>, MutableInt> mobCount = new HashMap<>();
+                    originalMobCount.forEach((key, value) -> mobCount.put(key, new MutableInt(value.intValue())));
 
                     //if we've hit the cap, stop spawning
                     if (mobCount.entrySet().stream().anyMatch((entry) -> entry.getValue().intValue() > MobzyConfig.getMobCap(entry.getKey())))
@@ -143,6 +144,7 @@ public class SpawnTask extends BukkitRunnable {
                             MobSpawnEvent spawn = new MobSpawnEvent(validSpawns.next(), spawnArea);
                             toSpawn.add(spawn);
 
+                            //increment the number of existing mobs by the number we want to spawn
                             int spawns = spawn.getSpawns();
                             mobCount.get(type).add(spawns);
                         }
