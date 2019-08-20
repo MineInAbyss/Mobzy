@@ -5,6 +5,7 @@ import com.offz.spigot.mobzy.CustomType;
 import com.offz.spigot.mobzy.Mobs.Behaviours.CustomMobBase;
 import com.offz.spigot.mobzy.Mobs.Behaviours.Deathable;
 import com.offz.spigot.mobzy.Mobs.Behaviours.Disguiseable;
+import com.offz.spigot.mobzy.Mobs.Behaviours.InitAttributeable;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalMeleeAttackPitchLock;
@@ -28,8 +29,16 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         super(CustomType.getType(builder), world);
         this.builder = builder;
         CustomMobBase base = new CustomMobBase(this);
+        moveController = new ControllerMove(this);
         base.apply();
         addScoreboardTag("hostileMob");
+    }
+
+    @Override
+    protected void initAttributes() {
+        super.initAttributes();
+        InitAttributeable initAttributeable = new InitAttributeable(this);
+        initAttributeable.setConfiguredAttributes();
     }
 
     @Override
@@ -46,7 +55,7 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
     public void createPathfinders() {
         goalSelector.a(1, new PathfinderGoalFloat(this));
         goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
-        goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 8.0F));
+        goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 8.0F));
         goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
 
         goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
@@ -106,22 +115,25 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
     @Override
     protected SoundEffect D() {
-        return soundAmbient();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundAmbient(), 1, 1);
+        return null;
     }
 
     @Override
     protected SoundEffect d(DamageSource damagesource) {
-        return soundHurt();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundHurt(), 1, 1);
+        return null;
     }
 
     @Override
     protected SoundEffect cs() {
-        return soundDeath();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundDeath(), 1, 1);
+        return null;
     }
 
     @Override
     protected void a(BlockPosition blockposition, IBlockData iblockdata) {
-        a(soundStep(), 0.15F, 1.0F);
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundStep(), 1, 1);
     }
 
     @Override

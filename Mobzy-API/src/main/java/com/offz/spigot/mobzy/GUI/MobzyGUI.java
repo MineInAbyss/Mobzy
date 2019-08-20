@@ -26,7 +26,6 @@ public class MobzyGUI extends GuiHolder {
     private List<ClickableElement> mobConfigs = new ArrayList<>();
     private List<ClickableElement> spawnList = new ArrayList<>();
     private FileConfiguration config;
-
     public MobzyGUI(Player player, Mobzy plugin) {
         super(6, "Mobzy", plugin);
         this.plugin = plugin;
@@ -42,6 +41,10 @@ public class MobzyGUI extends GuiHolder {
         setElement(buildMobConfigLayout());
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     public void addBackButton(Layout layout) {
         history.add(layout);
         layout.addElement(8, 5, back);
@@ -52,8 +55,10 @@ public class MobzyGUI extends GuiHolder {
             player.closeInventory();
             return;
         }
-        setElement(history.get(history.size() - 2));
+        Layout previous = history.get(history.size() - 2);
         history.remove(history.size() - 1);
+
+        setElement(previous);
     }
 
     private Layout buildMobConfigLayout() {
@@ -62,7 +67,6 @@ public class MobzyGUI extends GuiHolder {
         FillableElement grid = new FillableElement(4, 8);
         layout.addElement(0, 0, grid);
 
-        player.sendMessage(plugin.getMobzyConfig().getMobCfgs().values() + "");
         Collection<FileConfiguration> values = plugin.getMobzyConfig().getSpawnCfgs().values();
         if (values.size() == 1)
             return buildRegions(values.iterator().next());
@@ -96,9 +100,15 @@ public class MobzyGUI extends GuiHolder {
 
         config.getMapList("regions").forEach(region -> {
             String regionName = (String) region.get("name");
-            player.sendMessage(regionName);
 
-            Element cell = Cell.forMaterial(Material.DIAMOND, regionName);
+            Material material = Material.BEDROCK;
+            if (region.containsKey("icon")) {
+                Material tempMaterial = Material.getMaterial((String) region.get("icon"));
+                if (tempMaterial != null)
+                    material = tempMaterial;
+            }
+
+            Element cell = Cell.forMaterial(material, regionName);
             ClickableElement mobConfig = new ClickableElement(cell);
             mobConfig.setClickAction(clickEvent -> setElement(buildSpawns((ArrayList<Map<String, Object>>) region.get("spawns"), (String) region.get("name"))));
             grid.addElement(mobConfig);
@@ -120,7 +130,6 @@ public class MobzyGUI extends GuiHolder {
                 spawnBuilder = MobzyAPI.getBuilder(SpawnRegistry.getReusedBuilder((String) spawn.get("reuse")).getEntityType().c().getSimpleName());
             else {
                 String mobName = (String) spawn.get("mob");
-                player.sendMessage(mobName);
                 spawnBuilder = MobzyAPI.getBuilder(mobName);
             }
             Element cell = Cell.forItemStack(spawnBuilder.getModelItemStack());

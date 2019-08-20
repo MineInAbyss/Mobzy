@@ -67,7 +67,6 @@ public class CustomType {
     }
 
     public static void registerTypes() {
-        //TODO make sure we don't need to unregister things
 //        Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) DataConverterRegistry.a().getSchema(15190).findChoiceType(DataConverterTypes.n).types();
 //        dataTypes.keySet()
         Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "Registering types");
@@ -75,11 +74,9 @@ public class CustomType {
             String className = type.c().getSimpleName();
             String name = toEntityTypeID(className);
 
-            //some entities reuse the same class (such as NPCs) and pass different parameters in the constructor. These should only be added once
-            if (!builders.containsKey(name))
-                builders.put(name, readBuilderConfig(className));
+            builders.put(name, readBuilderConfig(className));
         }
-        Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + types.toString());
+        Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + types.keySet().toString());
     }
 
     protected static MobBuilder readBuilderConfig(String className) {
@@ -93,7 +90,7 @@ public class CustomType {
             }
         }
 
-        if(mobCfg == null)
+        if (mobCfg == null)
             return null;
 
         String name = className;
@@ -105,26 +102,26 @@ public class CustomType {
 
         if (mobCfg.contains(className + ".adult"))
             builder.setAdult(mobCfg.getBoolean(className + ".adult"));
-        if (mobCfg.contains(className + ".disguise_as"))
-            builder.setDisguiseAs(DisguiseType.valueOf(mobCfg.getString(className + ".disguise_as")));
+        if (mobCfg.contains(className + ".disguise-as"))
+            builder.setDisguiseAs(DisguiseType.valueOf(mobCfg.getString(className + ".disguise-as")));
         if (mobCfg.contains(className + ".drops"))
             builder.setDrops(mobCfg.getMapList(className + ".drops").stream()
                     .map(drop -> MobDrop.deserialize((Map<String, Object>) drop))
                     .collect(Collectors.toList()));
-        if (mobCfg.contains(className + ".model_material"))
-            builder.setModelMaterial(Material.getMaterial(mobCfg.getString(className + ".model_material")));
-        if (mobCfg.contains(className + ".tempt_items"))
-            builder.setTemptItems(mobCfg.getList(className + ".tempt_items").stream()
+        if (mobCfg.contains(className + ".model-material"))
+            builder.setModelMaterial(Material.getMaterial(mobCfg.getString(className + ".model-material")));
+        if (mobCfg.contains(className + ".tempt-items"))
+            builder.setTemptItems(mobCfg.getList(className + ".tempt-items").stream()
                     .map(item -> Material.getMaterial((String) item))
                     .collect(Collectors.toList()));
-        if (mobCfg.contains(className + ".max_health"))
-            builder.setMaxHealth(mobCfg.getDouble(className + ".max_health"));
-        if (mobCfg.contains(className + ".movement_speed"))
-            builder.setMovementSpeed(mobCfg.getDouble(className + ".movement_speed"));
-        if (mobCfg.contains(className + ".attack_damage"))
-            builder.setAttackDamage(mobCfg.getDouble(className + ".attack_damage"));
-        if (mobCfg.contains(className + ".follow_range"))
-            builder.setFollowRange(mobCfg.getDouble(className + ".follow_range"));
+        if (mobCfg.contains(className + ".max-health"))
+            builder.setMaxHealth(mobCfg.getDouble(className + ".max-health"));
+        if (mobCfg.contains(className + ".movement-speed"))
+            builder.setMovementSpeed(mobCfg.getDouble(className + ".movement-speed"));
+        if (mobCfg.contains(className + ".attack-damage"))
+            builder.setAttackDamage(mobCfg.getDouble(className + ".attack-damage"));
+        if (mobCfg.contains(className + ".follow-range"))
+            builder.setFollowRange(mobCfg.getDouble(className + ".follow-range"));
 
         return builder;
     }
@@ -137,7 +134,10 @@ public class CustomType {
         Map<Object, Type<?>> dataTypes = (Map<Object, Type<?>>) DataConverterRegistry.a().getSchema(15190).findChoiceType(DataConverterTypes.n).types();
         // inject the new custom entity (this registers the name/id with the server so you can use it in things
         // like the vanilla /summon command)
+        if (dataTypes.containsKey("minecraft:" + name))
+            MobzyAPI.debug(ChatColor.YELLOW + "CONTAINING KEY " + name);
         dataTypes.put("minecraft:" + name, dataTypes.get("minecraft:" + extend_from));
+
         // create and return an EntityTypes for the custom entity store this somewhere so you can reference it later (like for spawning)
         return EntityTypes.a(name, EntityTypes.a.a(clazz, function));
     }

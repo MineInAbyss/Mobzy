@@ -1,5 +1,5 @@
 name: Mobzy
-version: 2.1
+version: @plugin_version@
 author: Offz
 main: com.offz.spigot.mobzy.Mobzy
 api-version: 1.13

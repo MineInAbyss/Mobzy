@@ -4,7 +4,11 @@ import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalTemptPitchLock;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalWalkingAnimation;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_13_R2.EntityAgeable;
+import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.PathfinderGoalAvoidTarget;
+import net.minecraft.server.v1_13_R2.World;
+import org.bukkit.Sound;
 
 public class Fuwagi extends PassiveMob implements HitBehaviour {
     public Fuwagi(World world) {
@@ -20,30 +24,23 @@ public class Fuwagi extends PassiveMob implements HitBehaviour {
     }
 
     @Override
-    protected void initAttributes() {
-        super.initAttributes();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(10.0D);
-        this.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.2D);
+    public Sound soundHurt() {
+        return Sound.ENTITY_RABBIT_ATTACK;
     }
 
     @Override
-    public SoundEffect soundHurt() {
-        return SoundEffects.ENTITY_RABBIT_ATTACK;
+    public Sound soundAmbient() {
+        return Sound.ENTITY_RABBIT_AMBIENT;
     }
 
     @Override
-    public SoundEffect soundAmbient() {
-        return SoundEffects.ENTITY_RABBIT_AMBIENT;
+    public Sound soundStep() {
+        return Sound.ENTITY_RABBIT_JUMP;
     }
 
     @Override
-    public SoundEffect soundStep() {
-        return SoundEffects.ENTITY_RABBIT_JUMP;
-    }
-
-    @Override
-    public SoundEffect soundDeath() {
-        return SoundEffects.ENTITY_RABBIT_DEATH;
+    public Sound soundDeath() {
+        return Sound.ENTITY_RABBIT_DEATH;
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {

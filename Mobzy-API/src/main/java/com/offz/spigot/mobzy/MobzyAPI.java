@@ -3,6 +3,7 @@ package com.offz.spigot.mobzy;
 import com.offz.spigot.mobzy.Builders.MobBuilder;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
 import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_13_R2.EntityTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -146,5 +147,9 @@ public class MobzyAPI {
      */
     public static MobBuilder getBuilder(String name) {
         return CustomType.getBuilder(name);
+    }
+
+    public static EntityTypes<?> getEntityType(Entity entity){
+        return entity.P();
     }
 }

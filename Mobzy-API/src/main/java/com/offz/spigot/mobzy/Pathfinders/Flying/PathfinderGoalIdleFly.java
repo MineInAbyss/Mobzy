@@ -2,7 +2,6 @@ package com.offz.spigot.mobzy.Pathfinders.Flying;
 
 import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
 import net.minecraft.server.v1_13_R2.ControllerMove;
-import net.minecraft.server.v1_13_R2.MathHelper;
 import net.minecraft.server.v1_13_R2.PathfinderGoal;
 
 import java.util.Random;
@@ -41,13 +40,7 @@ public class PathfinderGoalIdleFly extends PathfinderGoal {
         double z = mob.locZ + (double) ((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
         if (y > 16) { //keep mobs from going down and killing themselves
             this.mob.getControllerMove().a(x, y, z, 1.0D);
-
-
-            //look at where we're going
-            double deltaX = x - this.mob.locX;
-            double deltaZ = z - this.mob.locZ;
-            this.mob.yaw = -((float) MathHelper.c(deltaX, deltaZ)) * 57.295776F;
-            this.mob.aQ = this.mob.yaw;
+            mob.lookAt(x, y, z);
         }
     }
 }

@@ -6,15 +6,17 @@ import com.offz.spigot.mobzy.Mobs.Types.HostileMob;
 import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -33,14 +35,24 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
 
         String subCommand = args[0];
 
-        if (sender.hasPermission("customMobs.reload") && subCommand.equalsIgnoreCase("reload")) {
+        if (sender.hasPermission("mobzy.cfginfo") && subCommand.equalsIgnoreCase("cfginfo")) {
+            sender.sendMessage(ChatColor.GREEN + "LOG OF CURRENTLY REGISTERED STUFF:");
+            Mobzy plugin = JavaPlugin.getPlugin(Mobzy.class);
+            MobzyConfig config = plugin.getMobzyConfig();
+            sender.sendMessage("Mob configs: " + config.getMobCfgs());
+            sender.sendMessage("Spawn configs: " + config.getSpawnCfgs());
+            sender.sendMessage("Registered addons: " + config.getRegisteredAddons());
+            sender.sendMessage("Registered EntityTypes: " + CustomType.getTypes());
+        }
+
+        if (sender.hasPermission("mobzy.reload") && subCommand.equalsIgnoreCase("reload")) {
             context.getMobzyConfig().reload();
-            sender.sendMessage(ChatColor.GREEN + "Reloaded config files");
+            sender.sendMessage("Reloaded config files (not necessarily successfully) :p");
             return true;
         }
         List<World> worlds = context.getPlugin().getServer().getWorlds();
         boolean info = subCommand.equalsIgnoreCase("info") || subCommand.equalsIgnoreCase("i");
-        if (sender.hasPermission("customMobs.remove") && (subCommand.equalsIgnoreCase("remove") || subCommand.equalsIgnoreCase("rm")) || info) {
+        if (sender.hasPermission("mobzy.remove") && (subCommand.equalsIgnoreCase("remove") || subCommand.equalsIgnoreCase("rm")) || info) {
             if (args.length < 2) {
                 sender.sendMessage(ChatColor.RED + "Please specify entity mob type");
                 return true;
@@ -60,7 +72,8 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
                             || (args[1].equalsIgnoreCase("flying") && nmsEntity instanceof FlyingMob)
                             || MobzyAPI.isMobOfType(entity, args[1])))
                         try {
-                            if (args.length < 3 || entity.getLocation().distance(Bukkit.getPlayer(sender.getName()).getLocation()) < Integer.parseInt(args[2])) {
+                            Location playerLoc = Bukkit.getPlayer(sender.getName()).getLocation();
+                            if (args.length < 3 || entity.getWorld().equals(playerLoc.getWorld()) && entity.getLocation().distance(playerLoc) < Integer.parseInt(args[2])) {
                                 if (!info) entity.remove(); //only kill mobs if command was cmrm and not cminfo
                                 entityCount++;
                                 if (!tags.contains("additionalPart")) mobCount++;
@@ -87,7 +100,7 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
             return true;
         }
 
-        if (sender.hasPermission("customMobs.spawn") && (subCommand.equalsIgnoreCase("spawn") || subCommand.equalsIgnoreCase("s"))) {
+        if (sender.hasPermission("mobzy.spawn") && (subCommand.equalsIgnoreCase("spawn") || subCommand.equalsIgnoreCase("s"))) {
             Player p = Bukkit.getPlayer(sender.getName());
             if (args.length == 1) {
                 sender.sendMessage(ChatColor.RED + "Enter a mob name");
@@ -99,18 +112,31 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
                     sender.sendMessage(ChatColor.RED + "No such entity " + args[1]);
                     return true;
                 }
-                LivingEntity entity = (LivingEntity) CustomType.spawnEntity(args[1], p.getLocation());
+                int numOfSpawns = 1;
+                try {
+                    if (args.length == 3 && args[2] != null)
+                        numOfSpawns = Integer.parseInt(args[2]);
+
+                    if (numOfSpawns > MobzyConfig.getMaxSpawnAmount())
+                        numOfSpawns = MobzyConfig.getMaxSpawnAmount();
+
+                    for (int i = 0; i < numOfSpawns; i++)
+                        CustomType.spawnEntity(args[1], p.getLocation());
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED + args[2] + " is not a valid number");
+                }
+
             } else
                 sender.sendMessage(ChatColor.RED + "Invalid mob name");
             return true;
         }
 
-        if (sender.hasPermission("customMobs.spawn.list") && (subCommand.equalsIgnoreCase("list") || subCommand.equalsIgnoreCase("l"))) {
+        if (sender.hasPermission("mobzy.spawn.list") && (subCommand.equalsIgnoreCase("list") || subCommand.equalsIgnoreCase("l"))) {
             sender.sendMessage(ChatColor.GREEN + CustomType.getTypes().keySet().toString());
             return true;
         }
 
-        if (sender.hasPermission("customMobs.config") && (subCommand.equalsIgnoreCase("config"))) {
+        if (sender.hasPermission("mobzy.config") && (subCommand.equalsIgnoreCase("config"))) {
             if (args.length == 1) {
                 sender.sendMessage(ChatColor.RED + "Enter a config option");
                 return true;
@@ -118,8 +144,7 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
             if (args[1].equals("spawns")) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
-                    new MobzyGUI(player, Mobzy.getPlugin(Mobzy.class)).show(player);
-
+                    new MobzyGUI(player, JavaPlugin.getPlugin(Mobzy.class)).show(player);
                 }
                 return true;
             }
@@ -134,7 +159,9 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
             return Collections.emptyList();
 
         if (args.length <= 1)
-            return Stream.of("spawn", "info", "remove", "reload", "i", "rm", "s", "config").filter(a -> a.startsWith(args[0])).collect(toList());
+            return Stream.of("spawn", "info", "remove", "reload", "i", "rm", "s", "config")
+                    .filter(a -> a.startsWith(args[0]))
+                    .collect(toList());
 
         String subCommand = args[0];
         String cmdName = command.getName();
@@ -142,6 +169,17 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
             if (args.length == 2) {
                 return CustomType.getTypes().keySet().stream()
                         .filter(a -> a.startsWith(args[1].toLowerCase()))
+                        .collect(toList());
+            } else if (args.length == 3) {
+                int min = 1;
+
+                try {
+                    min = Integer.parseInt(args[2]);
+                } catch (NumberFormatException e) {
+                }
+                return IntStream.range(min, MobzyConfig.getMaxSpawnAmount() + 1)
+                        .boxed()
+                        .map(Object::toString)
                         .collect(toList());
             }
         if (subCommand.equalsIgnoreCase("remove") || subCommand.equalsIgnoreCase("rm") || subCommand.equalsIgnoreCase("info") || subCommand.equalsIgnoreCase("i"))
@@ -154,7 +192,9 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
                         .collect(toList());
             }
         if (subCommand.equalsIgnoreCase("config"))
-            return Arrays.asList("mobs", "spawns");
+            return Stream.of("mobs", "spawns")
+                    .filter(a -> a.toLowerCase().startsWith(args[1].toLowerCase()))
+                    .collect(toList());
 
         return Collections.emptyList();
     }

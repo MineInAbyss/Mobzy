@@ -1,8 +1,11 @@
 package com.offz.spigot.mobzy.Mobs;
 
 import com.offz.spigot.mobzy.Builders.MobBuilder;
+import com.offz.spigot.mobzy.MobzyAPI;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 
 public interface CustomMob {
     EntityLiving getEntity();
@@ -33,20 +36,20 @@ public interface CustomMob {
 
     void createPathfinders();
 
-    default SoundEffect soundAmbient() {
-        return SoundEffects.ENTITY_PIG_AMBIENT;
+    default Sound soundAmbient() {
+        return null;
     }
 
-    default SoundEffect soundHurt() {
-        return SoundEffects.ENTITY_PIG_HURT;
+    default Sound soundHurt() {
+        return null;
     }
 
-    default SoundEffect soundDeath() {
-        return SoundEffects.ENTITY_PIG_DEATH;
+    default Sound soundDeath() {
+        return null;
     }
 
-    default SoundEffect soundStep() {
-        return SoundEffects.ENTITY_PIG_STEP;
+    default Sound soundStep() {
+        return null;
     }
 
     boolean getKilled();
@@ -65,14 +68,14 @@ public interface CustomMob {
      * I suspect EntityLiving's "be" to be this, as Entity#die(DamageSource) calls Entity#a(Entity, int, DamageSource),
      * which gets overriden by EntityPlayer to call EntityHuman#addScore(int) with the passed int.
      *
-     * @return the score with which a player should be rewarded with when the current entity is killed
+     * @return The score with which a player should be rewarded with when the current entity is killed.
      */
     int getKillScore();
 
     /**
      * TODO Not 100% confident about this one, but the way Entity#die(DamageSource) uses it, makes sense for cv() to return the killer
      *
-     * @return the killer of the current entity if it has one.
+     * @return The killer of the current entity if it has one.
      */
     default EntityLiving getKiller() {
         return getEntity().cv();
@@ -81,7 +84,40 @@ public interface CustomMob {
     //TODO I'm not sure this is what EntityInsentient#a(boolean, int, DamageSource) actually does, change this method's name if I'm wrong
     void dropEquipment(boolean flag, int i, DamageSource damageSource);
 
+    /**
+     * @param other Another entity.
+     * @return The distance between the current entity and other entity's locations.
+     */
+    default double distanceToEntity(Entity other) {
+        return getLocation().distance(other.getLocation());
+    }
+
+    /**
+     * Looks at a target.
+     *
+     * @param target The target to look at.
+     */
+    default void lookAt(Entity target) {
+        Location location = target.getLocation();
+        lookAt(location.getX(), location.getY(), location.getZ());
+    }
+
+    default void lookAt(net.minecraft.server.v1_13_R2.Entity target) {
+        lookAt(target.getBukkitEntity());
+    }
+
+    default void lookAt(double x, double y, double z) {
+        double dX = x - getEntity().locX;
+        double dZ = z - getEntity().locZ;
+        getEntity().yaw = -((float) MathHelper.c(dX, dZ)) * 57.295776F;
+        getEntity().aQ = getEntity().yaw;
+    }
+
     default void onRightClick(EntityHuman player) {
+    }
+
+    default EntityTypes<?> getEntityType() {
+        return MobzyAPI.getEntityType(getEntity());
     }
 
     //TODO This might be useful for multi entity mobs later

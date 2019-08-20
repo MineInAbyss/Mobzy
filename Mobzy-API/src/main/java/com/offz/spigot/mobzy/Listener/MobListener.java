@@ -6,13 +6,12 @@ import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.MobzyContext;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityHuman;
-import net.minecraft.server.v1_13_R2.EntityLiving;
-import net.minecraft.server.v1_13_R2.EnumItemSlot;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Statistic;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +20,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -55,21 +58,33 @@ public class MobListener implements Listener {
      *
      * @param e the event
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onHit(EntityDamageEvent e) {
+
         Entity entity = (((CraftEntity) e.getEntity()).getHandle());
         if (entity instanceof HitBehaviour) {
+            //change the model to its hit version
             int modelID = ((CustomMob) entity).getBuilder().getModelID();
-            net.minecraft.server.v1_13_R2.ItemStack is = ((EntityLiving) entity).getEquipment(EnumItemSlot.HEAD);
-            is.setDamage(modelID + 2);
-            entity.setEquipment(EnumItemSlot.HEAD, is);
 
-            //TODO One time I got a NoClassDefFoundError when trying to run the task, but I haven't been able to
-            // replicate it since. Reloading the plugin fixed it.
+            EntityEquipment ee = ((LivingEntity) entity.getBukkitEntity()).getEquipment();
+            if (ee == null)
+                return;
+            ItemStack is = ee.getHelmet();
+            ItemMeta itemMeta = is.getItemMeta();
+            if (!(itemMeta instanceof Damageable))
+                return;
+            ((Damageable) itemMeta).setDamage(modelID + 2);
+            is.setItemMeta(itemMeta);
+            ee.setHelmet(is);
+
+            //in 5 ticks change the model back to the non hit version
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (!entity.getBukkitEntity().isDead()) {
-                    is.setDamage(modelID);
-                    entity.setEquipment(EnumItemSlot.HEAD, is);
+                    //get the meta again in case it has changed within the task's delay period
+                    ItemMeta newMeta = is.getItemMeta();
+                    ((Damageable) newMeta).setDamage(modelID);
+                    is.setItemMeta(newMeta);
+                    ee.setHelmet(is);
                 }
             }, 5);
         }

@@ -5,7 +5,6 @@ import com.offz.spigot.mobzy.GUI.MobzyGUI;
 import com.offz.spigot.mobzy.GUI.MobzyPropertyElement;
 import com.offz.spigot.mobzy.Spawning.MobSpawn;
 import de.erethon.headlib.HeadLib;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -38,7 +37,6 @@ public class MobConfigLayout extends Layout {
         //create scrolling pallet with unused properties
         scrollingPallet = new ScrollingPallet(9);
         addElement(0, 4, scrollingPallet);
-        Bukkit.broadcastMessage(unusedProperties.toString());
         unusedProperties.forEach(scrollingPallet::addTool);
 
         ClickableElement save = new ClickableElement(Cell.forItemStack(HeadLib.CHECKMARK.toItemStack(), "Save"));
@@ -56,6 +54,14 @@ public class MobConfigLayout extends Layout {
         meta.setLore(Collections.singletonList(lore));
         item.setItemMeta(meta);
         return (Cell) Cell.forItemStack(item);
+    }
+
+    public Map<String, Object> getSpawn() {
+        return spawn;
+    }
+
+    public String getRegionName() {
+        return regionName;
     }
 
     public List<MobzyPropertyElement> getMobProperties() {
@@ -115,14 +121,13 @@ public class MobConfigLayout extends Layout {
             mobProperties.add(property);
             return property;
         } else {
-            Bukkit.broadcastMessage("Loading: " + key);
             MobzyPropertyElement property = makeProperty(head, type, key, getDefaultValueForKey(key));
             unusedProperties.add(property);
             return property;
         }
     }
 
-    public Object getDefaultValueForKey(String key){
+    public Object getDefaultValueForKey(String key) {
         MobSpawn defaultSpawn = new MobSpawn.Builder().build();
         if (key.equals("mob"))
             return "ENITTY_TYPE_HERE";

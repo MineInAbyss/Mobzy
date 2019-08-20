@@ -21,8 +21,7 @@ public class Deathable extends MobBehaviour {
             if (mob.getKillScore() >= 0 && killer != null)
                 killer.a(entity, mob.getKillScore(), damageSource);
 
-            //TODO: This causes the entity to send a statistics update on death (we don't want this),
-            // make sure it doesn't do anything else
+            //this line causes the entity to send a statistics update on death (we don't want this as it causes a NPE exception and crash)
             /*if (entity != null)
                 entity.b(this);*/
 

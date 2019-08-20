@@ -5,10 +5,12 @@ import com.offz.spigot.mobzy.CustomType;
 import com.offz.spigot.mobzy.Mobs.Behaviours.CustomMobBase;
 import com.offz.spigot.mobzy.Mobs.Behaviours.Deathable;
 import com.offz.spigot.mobzy.Mobs.Behaviours.Disguiseable;
+import com.offz.spigot.mobzy.Mobs.Behaviours.InitAttributeable;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookWhereHeaded;
 import net.minecraft.server.v1_13_R2.*;
+import org.bukkit.entity.LivingEntity;
 
 /**
  * Lots of code taken from EntityPig
@@ -29,6 +31,8 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
         CustomMobBase base = new CustomMobBase(this);
         base.apply();
         addScoreboardTag("passiveMob");
+        //TODO this is a temporary fix to see if it affects performance
+        ((LivingEntity) this.getBukkitEntity()).setRemoveWhenFarAway(true);
     }
 
     @Override
@@ -47,8 +51,15 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
         goalSelector.a(3, new PathfinderGoalBreed(this, 1.0D));
         goalSelector.a(5, new PathfinderGoalFollowParent(this, 1.1D));
         goalSelector.a(6, new PathfinderGoalRandomStrollLand(this, 1.0D));
-        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 6.0F));
+        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0F));
         goalSelector.a(8, new PathfinderGoalLookWhereHeaded(this));
+    }
+
+    @Override
+    protected void initAttributes() {
+        super.initAttributes();
+        InitAttributeable initAttributeable = new InitAttributeable(this);
+        initAttributeable.setConfiguredAttributes();
     }
 
     @Override
@@ -113,20 +124,27 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
         disguiseable.disguise();
     }
 
+    @Override
     protected SoundEffect D() {
-        return soundAmbient();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundAmbient(), 1, 1);
+        return null;
     }
 
+    @Override
     protected SoundEffect d(DamageSource damagesource) {
-        return soundHurt();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundHurt(), 1, 1);
+        return null;
     }
 
+    @Override
     protected SoundEffect cs() {
-        return soundDeath();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundDeath(), 1, 1);
+        return null;
     }
 
+    @Override
     protected void a(BlockPosition blockposition, IBlockData iblockdata) {
-        a(soundStep(), 0.15F, 1.0F);
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundStep(), 1, 1);
     }
 
     public void die(DamageSource damagesource) {

@@ -4,10 +4,11 @@ import com.offz.spigot.mobzy.Builders.MobBuilder;
 import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.EntityTypes;
 import net.minecraft.server.v1_13_R2.EnumMoveType;
 import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 
 public class NPC extends PassiveMob {
 
@@ -20,6 +21,7 @@ public class NPC extends PassiveMob {
         setInvulnerable(true);
         setSize(0.6f, 0.6f);
         addScoreboardTag("npc");
+        ((LivingEntity) this.getBukkitEntity()).setRemoveWhenFarAway(false);
     }
 
     //Stop from being pushed around
@@ -33,6 +35,6 @@ public class NPC extends PassiveMob {
 
     @Override
     public void createPathfinders() {
-        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 6.0F, 1F));
+        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0F, 1F));
     }
 }

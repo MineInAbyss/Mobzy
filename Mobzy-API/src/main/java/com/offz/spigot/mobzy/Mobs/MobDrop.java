@@ -1,5 +1,6 @@
 package com.offz.spigot.mobzy.Mobs;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
@@ -8,11 +9,11 @@ import java.util.Map;
 
 public class MobDrop implements ConfigurationSerializable {
     private ItemStack item;
+    //TODO calculate looting
     private double dropChance;
     private int minAmount;
     private int maxAmount;
 
-    //TODO make work with ItemStack
     public MobDrop(Material material, int amount) {
         this(material, amount, amount, 1);
     }
@@ -52,23 +53,29 @@ public class MobDrop implements ConfigurationSerializable {
         if (args.containsKey("item"))
             item = ((ItemStack) args.get("item"));
         else if (args.containsKey("material"))
-            item = new ItemStack(Material.getMaterial((String) args.get("material")));
+            try {
+                item = new ItemStack(Material.getMaterial((String) args.get("material")));
+            } catch (Exception e) {
+                Bukkit.getConsoleSender().sendMessage("Deserializing " + args);
+                e.printStackTrace();
+                return null;
+            }
         else
             return null;
 
-        if (args.containsKey("drop_chance"))
-            dropChance = (Double) args.get("drop_chance");
+        if (args.containsKey("drop-chance"))
+            dropChance = (Double) args.get("drop-chance");
 
         if (args.containsKey("amount")) {
             int amount = (Integer) args.get("amount");
             return new MobDrop(item, amount, amount, dropChance);
         }
 
-        if (!(args.containsKey("min_amount") && args.containsKey("max_amount")))
-            return null;
+        if (!(args.containsKey("min-amount") && args.containsKey("max-amount")))
+            return new MobDrop(item, 1, 1, dropChance);
 
-        minAmount = (Integer) args.get("min_amount");
-        maxAmount = (Integer) args.get("max_amount");
+        minAmount = (Integer) args.get("min-amount");
+        maxAmount = (Integer) args.get("max-amount");
 
         return new MobDrop(item, minAmount, maxAmount, dropChance);
     }

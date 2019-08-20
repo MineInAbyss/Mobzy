@@ -3,6 +3,7 @@ package com.offz.spigot.mobzy.Spawning;
 import com.offz.spigot.mobzy.CustomType;
 import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.Spawning.Regions.SpawnRegion;
+import net.minecraft.server.v1_13_R2.Entity;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -68,9 +69,6 @@ public class SpawnRegistry {
                         mobSpawn.setMaxY((Integer) spawn.get("max-y"));
                     if (spawn.containsKey("radius"))
                         mobSpawn.setRadius((Integer) spawn.get("radius"));
-                    //TODO won't be needed when regions are defined in WorldGuard/by ourselves
-                    if (spawn.containsKey("sections"))
-                        mobSpawn.setSections((List<String>) spawn.get("sections"));
                     if (spawn.containsKey("spawn-pos")) {
                         MobSpawn.SpawnPosition spawnPos = MobSpawn.SpawnPosition.GROUND;
                         switch ((String) spawn.get("spawn-pos")) {
@@ -113,7 +111,7 @@ public class SpawnRegistry {
         return regionSpawns;
     }
 
-    public static List<MobSpawn> getMobSpawnsForRegions(List<String> regionIDs, int mobType) {
+    public static List<MobSpawn> getMobSpawnsForRegions(List<String> regionIDs, Class<? extends Entity> mobType) {
         return regionIDs.stream()
                 .filter(name -> regionSpawns.containsKey(name))
                 .map(name -> regionSpawns.get(name).getSpawnsFor(mobType))

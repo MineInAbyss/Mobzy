@@ -8,7 +8,7 @@ import net.minecraft.server.v1_13_R2.World;
 public class Tamaugachi extends HostileMob implements HitBehaviour {
     public Tamaugachi(World world) {
         super(world, "Tamaugachi");
-        this.setSize(2F, 3F);
+        this.setSize(2F, 2.5F);
     }
 
     @Override

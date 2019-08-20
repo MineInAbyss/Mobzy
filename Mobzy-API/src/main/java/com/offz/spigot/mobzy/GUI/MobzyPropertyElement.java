@@ -6,12 +6,14 @@ import com.derongan.minecraft.guiy.gui.Element;
 import com.derongan.minecraft.guiy.gui.Layout;
 import com.derongan.minecraft.guiy.gui.inputs.NumberInput;
 import com.offz.spigot.mobzy.GUI.Layouts.MobConfigLayout;
+import com.offz.spigot.mobzy.Mobzy;
 import de.erethon.headlib.HeadLib;
-import org.bukkit.Bukkit;
+import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.Map;
@@ -42,14 +44,13 @@ public class MobzyPropertyElement extends ClickableElement {
         this.mobConfigLayout = mobConfigLayout;
 
         setClickAction(clickEvent -> {
-            if (this.mobConfigLayout.getUnusedProperties().contains(this)) {
+            if (this.mobConfigLayout.getUnusedProperties().contains(this))
                 this.mobConfigLayout.moveToUsed(this);
-                Bukkit.broadcastMessage("moved to used");
-            } else if (type == PropertyType.INTEGER_INPUT || type == PropertyType.DOUBLE_INPUT)
+            else if (type == PropertyType.INTEGER_INPUT || type == PropertyType.DOUBLE_INPUT)
                 main.setElement(getNumber());
+            else if (type == PropertyType.STRING_INPUT)
+                getString();
         });
-        //TODO read String input
-        //else if(type == PropertyType.STRING_INPUT)
 
     }
 
@@ -73,6 +74,25 @@ public class MobzyPropertyElement extends ClickableElement {
             layout.addElement(0, 5, delete);
         }
         return layout;
+    }
+
+    private void getString() {
+        new AnvilGUI.Builder()
+                .onClose(player -> {                   //called when the inventory is closing
+                    main.show(player);
+                })
+                .onComplete((player, text) -> {        //called when the inventory output slot is clicked
+                    this.value = text;
+                    ItemStack item = wrapped.itemStack;
+                    ItemMeta meta = item.getItemMeta();
+                    meta.setLore(Collections.singletonList(text));
+                    item.setItemMeta(meta);
+
+                    return AnvilGUI.Response.close();
+                })
+                .text(value.toString())  //sets the text the GUI should start with
+                .plugin(JavaPlugin.getPlugin(Mobzy.class))              //set the plugin instance
+                .open(main.getPlayer());                       //opens the GUI for the player provided
     }
 
     private Layout getNumber() {

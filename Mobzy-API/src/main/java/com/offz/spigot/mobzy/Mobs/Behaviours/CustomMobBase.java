@@ -6,7 +6,6 @@ import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import net.minecraft.server.v1_13_R2.EntityLiving;
-import net.minecraft.server.v1_13_R2.GenericAttributes;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,7 +22,6 @@ public class CustomMobBase extends MobBehaviour {
     public void apply() {
         EntityLiving entity = mob.getEntity();
         MobBuilder builder = mob.getBuilder(); //get the mob's class name
-        setConfiguredAttributes();
 
         entity.setSize(0.5F, 0.5F);
         entity.addScoreboardTag("customMob2");
@@ -41,19 +39,5 @@ public class CustomMobBase extends MobBehaviour {
             DisguiseAPI.disguiseEntity(entity.getBukkitEntity(), disguise);
             disguise.getWatcher().setInvisible(true);
         }
-    }
-
-    private void setConfiguredAttributes() {
-        EntityLiving entity = mob.getEntity();
-        MobBuilder builder = mob.getBuilder();
-
-        if (builder.getMaxHealth() != null)
-            entity.getAttributeInstance(GenericAttributes.maxHealth).setValue(builder.getMaxHealth());
-        if (builder.getMovementSpeed() != null)
-            entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(builder.getMovementSpeed());
-        if (builder.getAttackDamage() != null)
-            entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(builder.getAttackDamage());
-        if (builder.getFollowRange() != null)
-            entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(builder.getFollowRange());
     }
 }

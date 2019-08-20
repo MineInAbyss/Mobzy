@@ -1,14 +1,8 @@
 dependencies {
-//    implementation 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT' // PaperMC
-    implementation 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT' //Spigot
-    implementation 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // NMS
-    implementation 'LibsDisguises:LibsDisguises:9.8.0-SNAPSHOT' //LibsDisguises
-    implementation 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
-    implementation 'com.github.MineInAbyss:guiy:master-SNAPSHOT'
-    compile group: 'de.erethon', name: 'headlib', version: '3.0.1'
+    compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT' //Spigot
+    compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // NMS
+    compileOnly 'com.github.MineInAbyss:guiy:master-SNAPSHOT'
     compile project(':Mobzy-API')
-//    implementation 'com.sk89q.worldedit:worldedit-bukkit:7.0.0' //WorldEdit
-//    implementation 'com.github.ysl3000.pathfindergoalapi:PathfinderAPI:1.3.3.5'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -25,6 +19,11 @@ artifacts {
     //feel free to comment these out for faster compilation
     archives sourcesJar
     archives javadocJar
+}
+
+jar {
+    archiveName = "AbyssialCreatures-${parent.version}.jar"
+    destinationDir = file '../target'
 }
 
 //Move into plugins folder

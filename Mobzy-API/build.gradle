@@ -3,24 +3,18 @@ plugins {
 }
 
 repositories {
-    maven {
-        name = 'dre-repo'
-        url = 'https://erethon.de/repo/'
-    }
+    maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+    maven { url 'http://repo.md-5.net/content/groups/public/' } //LibsDisguises
 }
 
 dependencies {
 //    implementation 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT' // PaperMC
-    compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT' //Spigot
-    compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // NMS
     compileOnly 'LibsDisguises:LibsDisguises:9.8.0-SNAPSHOT' //LibsDisguises
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
-    compileOnly group: 'de.erethon', name: 'headlib', version: '3.0.1'
-    //TODO merge guiy changes and use the main epo
-    implementation 'com.github.Mineinabyss:guiy:offz-additions-SNAPSHOT'
+    implementation 'com.github.Mineinabyss:guiy:master-SNAPSHOT'
 //    implementation group: 'com.github.MineInAbyss', name: 'guiy', version: "master-SNAPSHOT"
-//    implementation 'com.sk89q.worldedit:worldedit-bukkit:7.0.0' //WorldEdit
-//    implementation 'com.github.ysl3000.pathfindergoalapi:PathfinderAPI:1.3.3.5'
+//    implementation 'com.github.WesJD:AnvilGUI:master-SNAPSHOT'
+    implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -37,6 +31,11 @@ artifacts {
     //feel free to comment these out for faster compilation
     archives sourcesJar
     archives javadocJar
+}
+
+shadowJar {
+    archiveName = "Mobzy-${parent.version}.jar"
+    destinationDir = file '../target'
 }
 
 //Move into plugins folder

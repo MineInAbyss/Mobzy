@@ -1,5 +1,5 @@
 name: AbyssialCreatures
-version: 1.0
+version: @plugin_version@
 author: Offz
 main: com.offz.spigot.abyssialcreatures.AbyssialCreatures
 api-version: 1.13

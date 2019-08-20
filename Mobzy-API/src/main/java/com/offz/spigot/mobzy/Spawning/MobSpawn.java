@@ -32,10 +32,18 @@ public class MobSpawn {
     private int maxGap = 256;
     private SpawnPosition spawnPos = SpawnPosition.GROUND;
     private List<Material> whitelist = new ArrayList<>();
-    private List<String> sections = new ArrayList<>();
     private MobSpawn() {
     }
 
+    /**
+     * Checks if there is enough space to spawn an entity in a given location without it suffocating
+     * TODO currently gives many false positives
+     *
+     * @param loc    the location to check
+     * @param width  the width of the entity
+     * @param height the height of the entity
+     * @return whether it will spawn without suffocating
+     */
     public static boolean enoughSpace(Location loc, double width, double height) {
         double checkRad = width / 2;
 
@@ -52,6 +60,14 @@ public class MobSpawn {
         return true;
     }
 
+    /**
+     * Gets a location to spawn in a mob given an original location and min/max radii around it
+     *
+     * @param loc the location to check off of
+     * @param minRad the minimum radius for the new location to be picked at
+     * @param maxRad the maximum radius for the new location to be picked at
+     * @return a new position to spawn in
+     */
     public static Location getSpawnInRadius(Location loc, double minRad, double maxRad) {
         for (int i = 0; i < 30; i++) {
             double y = (Math.random() - 0.5) * maxRad;
@@ -189,9 +205,6 @@ public class MobSpawn {
             return -1;
         if (!whitelist.isEmpty() && !whitelist.contains(l.clone().add(0, -1, 0).getBlock().getType()))
             return -1;
-        //TODO remove
-//        if (!sections.isEmpty() && !sections.contains(MineInAbyss.getContext().getRealWorldManager().getSectionFor(l).toString()))
-//            return -1;
 
         return priority;
     }
@@ -247,13 +260,12 @@ public class MobSpawn {
         private int maxGap = 256;
         private SpawnPosition spawnPos = SpawnPosition.GROUND;
         private List<Material> whitelist = new ArrayList<>();
-        private List<String> sections = new ArrayList<>();
 
         public Builder() {
         }
 
         public Builder(MobSpawn old) {
-            setEntityType(old.entityType).setMinAmount(old.minAmount).setMaxAmount(old.maxAmount).setRadius(old.radius).setBasePriority(old.basePriority).setMinTime(old.minTime).setMaxTime(old.maxTime).setMinLightLevel(old.minLightLevel).setMaxLightLevel(old.maxLightLevel).setMinY(old.minY).setMaxY(old.maxY).setMinGap(old.minGap).setMaxGap(old.maxGap).setSpawnPos(old.spawnPos).setWhitelist(old.whitelist).setSections(old.sections);
+            setEntityType(old.entityType).setMinAmount(old.minAmount).setMaxAmount(old.maxAmount).setRadius(old.radius).setBasePriority(old.basePriority).setMinTime(old.minTime).setMaxTime(old.maxTime).setMinLightLevel(old.minLightLevel).setMaxLightLevel(old.maxLightLevel).setMinY(old.minY).setMaxY(old.maxY).setMinGap(old.minGap).setMaxGap(old.maxGap).setSpawnPos(old.spawnPos).setWhitelist(old.whitelist);
         }
 
         public static Builder aMobSpawn() {
@@ -335,15 +347,9 @@ public class MobSpawn {
             return this;
         }
 
-        public Builder setSections(List<String> sections) {
-            this.sections = sections;
-            return this;
-        }
-
         public MobSpawn build() {
             MobSpawn mobSpawn = new MobSpawn();
             mobSpawn.maxTime = this.maxTime;
-            mobSpawn.sections = this.sections;
             mobSpawn.radius = this.radius;
             mobSpawn.whitelist = this.whitelist;
             mobSpawn.minAmount = this.minAmount;

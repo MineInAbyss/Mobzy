@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class MobBuilder {
@@ -57,12 +56,6 @@ public final class MobBuilder {
             chosenDrops.add(chosenDrop);
         }
         return chosenDrops;
-    }
-
-    @Deprecated
-    public MobBuilder setDrops(MobDrop... drops) {
-        this.drops = Arrays.asList(drops);
-        return this;
     }
 
     public MobBuilder setDrops(List<MobDrop> drops) {

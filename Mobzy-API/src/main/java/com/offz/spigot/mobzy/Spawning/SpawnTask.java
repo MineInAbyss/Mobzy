@@ -1,8 +1,5 @@
 package com.offz.spigot.mobzy.Spawning;
 
-import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
-import com.offz.spigot.mobzy.Mobs.Types.HostileMob;
-import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.MobzyAPI;
 import com.offz.spigot.mobzy.MobzyConfig;
@@ -12,10 +9,11 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import net.minecraft.server.v1_13_R2.Entity;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
-import org.bukkit.entity.Entity;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,11 +22,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpawnTask extends BukkitRunnable {
-    private Mobzy plugin;
     private static final int SPAWN_TRIES = 5;
+    private Mobzy plugin;
+    private MobzyConfig config;
 
     public SpawnTask(Mobzy plugin) {
         this.plugin = plugin;
+        config = plugin.getMobzyConfig();
     }
 
     @Override
@@ -39,16 +39,16 @@ public class SpawnTask extends BukkitRunnable {
         try {
             //run checks asynchronously
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                List<UUID> closePlayers = new ArrayList<>();
+                List<UUID> skippedPlayers = new ArrayList<>();
 
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     UUID uuid = p.getUniqueId();
+                    List<Location> closePlayers = new ArrayList<>();
+                    closePlayers.add(p.getLocation());
 
                     //if this player has been registered as close to another, do not make additional spawns
-                    if (closePlayers.contains(uuid)) {
-//                closePlayers.remove(uuid);
+                    if (skippedPlayers.contains(uuid))
                         continue;
-                    }
 
                     //Get WorldGuard regions for the spawn position
                     RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -56,82 +56,80 @@ public class SpawnTask extends BukkitRunnable {
                     if (regions == null)
                         continue;
 
-//                    String layerName = manager.getLayerForSection(worldManager.getSectionFor(p.getLocation())).getName();
-
                     //decide spawns around player
-//                try {
                     List<MobSpawnEvent> toSpawn = new ArrayList<>();
-                    //0 = passive, 1 = hostile, 2 = flying
-                    int[] originalMobCount = new int[3];
+                    Map<Class<? extends net.minecraft.server.v1_13_R2.Entity>, MutableInt> originalMobCount = new HashMap<>();
+                    config.getRegisteredMobTypes().values().forEach(type -> originalMobCount.put(type, new MutableInt(0)));
+                    MutableInt totalMobs = new MutableInt(0);
 
                     //go through entities around player, adding nearby players to a list
-                    for (Entity e : p.getNearbyEntities(MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius())) {
-                        if (((CraftEntity) e).getHandle() instanceof PassiveMob)
-                            originalMobCount[0]++;
-                        if (((CraftEntity) e).getHandle() instanceof HostileMob)
-                            originalMobCount[1]++;
-                        if (((CraftEntity) e).getHandle() instanceof FlyingMob)
-                            originalMobCount[2]++;
-                        //if a player was nearby, add them to the close players list so we don't overlap spawns
-                        if (e.getType().equals(EntityType.PLAYER) && e.getLocation().distance(p.getLocation()) < 30)
-                            closePlayers.add(e.getUniqueId());
+                    for (org.bukkit.entity.Entity entity : p.getNearbyEntities(MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius())) {
+                        for (Class<? extends Entity> type : config.getRegisteredMobTypes().values()) {
+                            if (type.isInstance(entity)) { //TODO isAssignableFrom might be right to use here?
+                                Bukkit.broadcastMessage("type is instance is working");
+                                MutableInt count = originalMobCount.get(type);
+                                count.increment();
+                            } else if (entity.getType().equals(EntityType.PLAYER)) {
+                                skippedPlayers.add(entity.getUniqueId());
+                                closePlayers.add(entity.getLocation());
+                            } else
+                                break;
+                            totalMobs.increment();
+                        }
                     }
-                    int[] mobCount = Arrays.copyOf(originalMobCount, 3);
-                    int totalMobs = 0;
-                    for (int mobs : mobCount)
-                        totalMobs += mobs;
+
+                    Map<Class<? extends net.minecraft.server.v1_13_R2.Entity>, MutableInt> mobCount = new HashMap<>(originalMobCount);
 
                     //if we've hit the cap, stop spawning
-                    if (mobCount[0] >= MobzyConfig.getPassiveMobCap() && mobCount[1] >= MobzyConfig.getHostileMobCap() && mobCount[2] >= MobzyConfig.getFlyingMobCap())
+                    if (mobCount.entrySet().stream().anyMatch((entry) -> entry.getValue().intValue() > MobzyConfig.getMobCap(entry.getKey())))
                         return;
 
                     //STEP 1: Generate array of ChunkSpawns around player, and invalidate the ones that are empty
-                    SpawnChunkGrid spawnChunkGrid = new SpawnChunkGrid(p.getLocation(), MobzyConfig.getMinChunkSpawnRad(), MobzyConfig.getMaxChunkSpawnRad());
+                    SpawnChunkGrid spawnChunkGrid = new SpawnChunkGrid(closePlayers, MobzyConfig.getMinChunkSpawnRad(), MobzyConfig.getMaxChunkSpawnRad());
                     //sort by highest preference
 
                     mobTypeLoop:
-                    for (int mobType = 0; mobType < 3; mobType++) {
+                    for (Class<? extends Entity> type : config.getRegisteredMobTypes().values()) {
                         List<ChunkSpawn> chunkSpawns = spawnChunkGrid.getShuffledSpawns();
 
                         for (ChunkSpawn chunkSpawn : chunkSpawns) {
                             //if mob cap of that specific mob has been reached, skip it
-                            switch (mobType) {
-                                case 0:
-                                    if (mobCount[0] >= MobzyConfig.getPassiveMobCap())
-                                        continue mobTypeLoop;
-                                    break;
-                                case 1:
-                                    if (mobCount[1] >= MobzyConfig.getHostileMobCap())
-                                        continue mobTypeLoop;
-                                    break;
-                                case 2:
-                                    if (mobCount[2] >= MobzyConfig.getFlyingMobCap())
-                                        continue mobTypeLoop;
-                                    break;
-                            }
+                            if (mobCount.get(type).intValue() > MobzyConfig.getMobCap(type))
+                                continue mobTypeLoop;
 
                             //STEP 2: Each chunk tries to choose one area inside it for which to attempt a spawn
                             SpawnArea spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES);
                             if (spawnArea == null)
                                 continue;
 
-                            //STEP 3: Pick mob to spawn
-                            //get the list of mob spawns based on WorldGuard regions, then remove all impossible spawns,
-                            //and make entity weighted decision on the spawn
 
                             //TODO Figure out something for determining the region in different spots in spawn area.
                             // It'll need each mob to decide on a position first, then run it through here.
                             // Maybe this entire system needs reworking
+
+                            //STEP 3: Pick mob to spawn
+                            // get the list of mob spawns based on WorldGuard regions, then remove all impossible spawns,
+                            // and make entity weighted decision on the spawn
                             Set<ProtectedRegion> inRegions = regions.getApplicableRegions(BukkitAdapter.asBlockVector(spawnArea.getBottom())).getRegions();
+
+                            //If any of the overlapping regions is set to override, the highest priority one will set only its spawns as viable
+                            inRegions.stream().sorted()
+                                    .filter(region -> region.getFlags().containsKey(Mobzy.MZ_SPAWN_OVERLAP) && region.getFlag(Mobzy.MZ_SPAWN_OVERLAP).equals("override"))
+                                    .findFirst()
+                                    .ifPresent(region -> {
+                                        inRegions.clear();
+                                        inRegions.add(region);
+                                    });
+
                             List<String> regionIDs = inRegions.stream()
-                                    .filter(region -> region.getFlags().containsKey(Mobzy.CM_SPAWN_REGIONS))
-                                    .map(region -> Arrays.asList(region.getFlag(Mobzy.CM_SPAWN_REGIONS).split(",")))
+                                    .filter(region -> region.getFlags().containsKey(Mobzy.MZ_SPAWN_REGIONS))
+                                    .map(region -> Arrays.asList(region.getFlag(Mobzy.MZ_SPAWN_REGIONS).split(",")))
                                     .flatMap(Collection::stream)
                                     .collect(Collectors.toList());
 
                             RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
 
-                            List<MobSpawn> regionSpawns = SpawnRegistry.getMobSpawnsForRegions(regionIDs, mobType);
+                            List<MobSpawn> regionSpawns = SpawnRegistry.getMobSpawnsForRegions(regionIDs, type);
 
                             if (regionSpawns == null)
                                 continue;
@@ -146,25 +144,20 @@ public class SpawnTask extends BukkitRunnable {
                             toSpawn.add(spawn);
 
                             int spawns = spawn.getSpawns();
-                            mobCount[mobType] += spawns;
+                            mobCount.get(type).add(spawns);
                         }
                     }
 
                     //spawn all the mobs we were planning to
-                    int finalTotalMobs = totalMobs;
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         for (MobSpawnEvent spawn : toSpawn)
                             spawn.spawn();
 
                         //after we've hit the mob cap, print mob count
                         if (toSpawn.size() > 0) {
-                            MobzyAPI.debug(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + (finalTotalMobs + " mobs before"));
-                            if (mobCount[0] - originalMobCount[0] > 0)
-                                MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[0] - originalMobCount[0] + " passive mobs spawned"));
-                            if (mobCount[1] - originalMobCount[1] > 0)
-                                MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[1] - originalMobCount[1] + " hostile mobs spawned"));
-                            if (mobCount[2] - originalMobCount[2] > 0)
-                                MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (mobCount[2] - originalMobCount[2] + " flying mobs spawned"));
+                            MobzyAPI.debug(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + (totalMobs + " mobs before"));
+                            mobCount.entrySet().stream().filter(entry -> entry.getValue().intValue() - originalMobCount.get(entry.getKey()).intValue() > 0)
+                                    .forEach(entry -> MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (entry.getValue().intValue() - originalMobCount.get(entry.getKey()).intValue() + " " + config.getRegisteredMobTypes().inverse().get(entry.getKey()) + " mobs spawned")));
                         }
                     });
                 }

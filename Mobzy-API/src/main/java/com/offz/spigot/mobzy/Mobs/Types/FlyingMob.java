@@ -5,8 +5,10 @@ import com.offz.spigot.mobzy.CustomType;
 import com.offz.spigot.mobzy.Mobs.Behaviours.CustomMobBase;
 import com.offz.spigot.mobzy.Mobs.Behaviours.Deathable;
 import com.offz.spigot.mobzy.Mobs.Behaviours.Disguiseable;
+import com.offz.spigot.mobzy.Mobs.Behaviours.InitAttributeable;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
-import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalDiveOnTargetAttack;
+import com.offz.spigot.mobzy.Pathfinders.Controllers.MZControllerMoveFlying;
+import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalFlyDamageTarget;
 import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalIdleFly;
 import net.minecraft.server.v1_13_R2.*;
 
@@ -28,10 +30,21 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         super(CustomType.getType(builder), world);
         setSize(4.0F, 4.0F);
         this.builder = builder;
-        moveController = new ControllerGhast(this);
+        moveController = new MZControllerMoveFlying(this);
         CustomMobBase base = new CustomMobBase(this);
         base.apply();
         addScoreboardTag("flying");
+    }
+
+    @Override
+    protected boolean isDropExperience() {
+        return true;
+    }
+
+    //TODO read config setting for minmax xp
+    @Override
+    protected int getExpValue(EntityHuman entityhuman) {
+        return 1 + this.world.random.nextInt(3);
     }
 
     @Override
@@ -47,16 +60,21 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
     @Override
     public void createPathfinders() {
         goalSelector.a(1, new PathfinderGoalFloat(this));
+        goalSelector.a(1, new PathfinderGoalFlyDamageTarget(this));
         goalSelector.a(5, new PathfinderGoalIdleFly(this));
-        goalSelector.a(1, new PathfinderGoalDiveOnTargetAttack(this));
-//        goalSelector.a(7, new PathfinderGoalGhastAttackTarget(this));
         targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
-//        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityHuman.class, 20.0F, 1F));
     }
 
 //    public void a(boolean flag) {
 //        this.datawatcher.set(a, flag);
 //    }
+
+    @Override
+    protected void initAttributes() {
+        super.initAttributes();
+        InitAttributeable initAttributeable = new InitAttributeable(this);
+        initAttributeable.setConfiguredAttributes();
+    }
 
     //TODO Only used by ghast's pathfinder, remove once we change it
     public int getPower() {
@@ -70,20 +88,6 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         super.tick();
         if (!world.isClientSide && world.getDifficulty() == EnumDifficulty.PEACEFUL) {
             die();
-        }
-    }
-
-    /**
-     * Makes fireballs hurt the entity a lot TODO don't think we'll need this
-     */
-    public boolean damageEntity(DamageSource damagesource, float f) {
-        if (this.isInvulnerable(damagesource)) {
-            return false;
-        } else if (damagesource.j() instanceof EntityLargeFireball && damagesource.getEntity() instanceof EntityHuman) {
-            super.damageEntity(damagesource, 1000.0F);
-            return true;
-        } else {
-            return super.damageEntity(damagesource, f);
         }
     }
 
@@ -140,20 +144,27 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         disguiseable.disguise();
     }
 
+    @Override
     protected SoundEffect D() {
-        return soundAmbient();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundAmbient(), 1, 1);
+        return null;
     }
 
+    @Override
     protected SoundEffect d(DamageSource damagesource) {
-        return soundHurt();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundHurt(), 1, 1);
+        return null;
     }
 
+    @Override
     protected SoundEffect cs() {
-        return soundDeath();
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundDeath(), 1, 1);
+        return null;
     }
 
+    @Override
     protected void a(BlockPosition blockposition, IBlockData iblockdata) {
-        a(soundStep(), 0.15F, 1.0F);
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundStep(), 1, 1);
     }
 
     @Override
@@ -193,56 +204,6 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
     @Override
     public IChatBaseComponent getScoreboardDisplayName() {
         return new ChatMessage(getBuilder().getName());
-    }
-
-    static class ControllerGhast extends ControllerMove {
-        private final FlyingMob i;
-        private int j;
-
-        public ControllerGhast(FlyingMob entityghast) {
-            super(entityghast);
-            this.i = entityghast;
-        }
-
-        public void a() {
-            if (this.h == Operation.MOVE_TO) {
-                double d0 = this.b - this.i.locX;
-                double d1 = this.c - this.i.locY;
-                double d2 = this.d - this.i.locZ;
-                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-                if (this.j-- <= 0) {
-                    this.j += this.i.getRandom().nextInt(5) + 2;
-                    d3 = (double) MathHelper.sqrt(d3);
-                    if (this.b(this.b, this.c, this.d, d3)) {
-                        FlyingMob var10000 = this.i;
-                        var10000.motX += d0 / d3 * 0.1D;
-                        var10000 = this.i;
-                        var10000.motY += d1 / d3 * 0.1D;
-                        var10000 = this.i;
-                        var10000.motZ += d2 / d3 * 0.1D;
-                    } else {
-                        this.h = Operation.WAIT;
-                    }
-                }
-            }
-
-        }
-
-        private boolean b(double d0, double d1, double d2, double d3) {
-            double d4 = (d0 - this.i.locX) / d3;
-            double d5 = (d1 - this.i.locY) / d3;
-            double d6 = (d2 - this.i.locZ) / d3;
-            AxisAlignedBB axisalignedbb = this.i.getBoundingBox();
-
-            for (int i = 1; (double) i < d3; ++i) {
-                axisalignedbb = axisalignedbb.d(d4, d5, d6);
-                if (!this.i.world.getCubes(this.i, axisalignedbb)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
     }
 
     //The Ghast's pathfinder, eventually this will be our own custom one!

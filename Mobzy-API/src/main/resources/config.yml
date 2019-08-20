@@ -7,3 +7,5 @@ flyingMobCap: 5
 spawnSearchRadius: 128
 minChunkSpawnRad: 2
 maxChunkSpawnRad: 7
+maxSpawnAmount: 50
+spawnTaskDelay: 500

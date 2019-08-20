@@ -1,6 +1,12 @@
 package com.offz.spigot.mobzy;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
+import com.offz.spigot.mobzy.Mobs.Types.HostileMob;
+import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import com.offz.spigot.mobzy.Spawning.SpawnRegistry;
+import net.minecraft.server.v1_13_R2.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,19 +23,29 @@ import java.util.Map;
 public class MobzyConfig {
     private static boolean debug;
     private static boolean doMobSpawns;
-    private static int passiveMobCap;
-    private static int hostileMobCap;
-    private static int flyingMobCap;
     private static int spawnSearchRadius;
     private static int minChunkSpawnRad;
     private static int maxChunkSpawnRad;
+    private static int maxSpawnAmount;
+    private static int spawnTaskDelay;
+    private static Map<Class<? extends Entity>, Integer> mobCaps = new HashMap<>();
     private List<MobzyAddon> registeredAddons = new ArrayList<>();
     private Mobzy plugin;
     private Map<File, FileConfiguration> spawnCfgs = new HashMap<>();
     private Map<File, FileConfiguration> mobCfgs = new HashMap<>();
+    private BiMap<String, Class<? extends Entity>> registeredMobTypes = HashBiMap.create();
+
     public MobzyConfig(Mobzy plugin) {
         this.plugin = plugin;
         reload();
+    }
+
+    public BiMap<String, Class<? extends Entity>> getRegisteredMobTypes() {
+        return registeredMobTypes;
+    }
+
+    public void registerMobType(String name, Class<? extends Entity> type){
+        registeredMobTypes.put(name, type);
     }
 
     /**
@@ -40,25 +56,11 @@ public class MobzyConfig {
     }
 
     /**
-     * @return the passive mob cap
-     * TODO eventually these should just be a map of maps that custom plugins can add to
+     * @param type a specific mob type
+     * @return the registered mob cap for that mob
      */
-    public static int getPassiveMobCap() {
-        return passiveMobCap;
-    }
-
-    /**
-     * @return the hostile mob cap
-     */
-    public static int getHostileMobCap() {
-        return hostileMobCap;
-    }
-
-    /**
-     * @return the flying mob cap
-     */
-    public static int getFlyingMobCap() {
-        return flyingMobCap;
+    public static int getMobCap(Class<? extends Entity> type) {
+        return mobCaps.get(type);
     }
 
     /**
@@ -82,6 +84,22 @@ public class MobzyConfig {
         return maxChunkSpawnRad;
     }
 
+    /**
+     * @return the maximum number of mobs to spawn with /mobzy spawn
+     */
+    public static int getMaxSpawnAmount() {
+        return maxSpawnAmount;
+    }
+    /**
+     * @return the delay in ticks between each attempted mob spawn
+     */
+    public static int getSpawnTaskDelay() {
+        return spawnTaskDelay;
+    }
+
+    public List<MobzyAddon> getRegisteredAddons() {
+        return registeredAddons;
+    }
 
     /**
      * @return whether the plugin is in a debug state (used primarily for broadcasting messages)
@@ -98,12 +116,15 @@ public class MobzyConfig {
 
         debug = config.getBoolean("debug");
         doMobSpawns = config.getBoolean("doMobSpawns");
-        passiveMobCap = config.getInt("passiveMobCap");
-        hostileMobCap = config.getInt("hostileMobCap");
-        flyingMobCap = config.getInt("flyingMobCap");
         spawnSearchRadius = config.getInt("spawnSearchRadius");
         minChunkSpawnRad = config.getInt("minChunkSpawnRad");
         maxChunkSpawnRad = config.getInt("maxChunkSpawnRad");
+        maxSpawnAmount = config.getInt("maxSpawnAmount");
+        spawnTaskDelay = config.getInt("spawnTaskDelay");
+
+        //TODO make it so other plugins can register mob caps
+        //register mob caps
+        registeredMobTypes.forEach((name, type) -> mobCaps.put(type, (int) config.get("mobCaps." + name)));
     }
 
     public Map<File, FileConfiguration> getMobCfgs() {
@@ -134,7 +155,9 @@ public class MobzyConfig {
     void registerMobCfg(File file, JavaPlugin plugin) {
         registerCfg(mobCfgs, file, plugin);
         //TODO do static fields get kept after plugin reload?
-        registeredAddons.add((MobzyAddon) plugin);
+        if (!registeredAddons.contains(plugin))
+            registeredAddons.add((MobzyAddon) plugin);
+        plugin.getLogger().info(ChatColor.YELLOW + "Registered addons: " + registeredAddons);
     }
 
     private void registerCfg(Map<File, FileConfiguration> config, File file, JavaPlugin plugin) {
@@ -172,13 +195,18 @@ public class MobzyConfig {
      * TODO make it properly reload everything
      */
     public void reload() {
-        SpawnRegistry.unregisterAll();
         CustomType.getTypes().clear();
-        Bukkit.broadcastMessage(registeredAddons.toString());
+        registeredMobTypes.clear();
+        plugin.getLogger().info(ChatColor.YELLOW + "Registered addons: " + registeredAddons.toString());
+
+        registerMobType("passive", PassiveMob.class);
+        registerMobType("hostile", HostileMob.class);
+        registerMobType("flying", FlyingMob.class);
         registeredAddons.forEach(MobzyAddon::loadTypes);
         loadConfigValues();
-        reloadConfigurationMap(spawnCfgs);
         reloadConfigurationMap(mobCfgs);
+        SpawnRegistry.unregisterAll();
+        reloadConfigurationMap(spawnCfgs);
     }
 
     /**
