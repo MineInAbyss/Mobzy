@@ -19,7 +19,7 @@ public class Kazura extends FlyingMob implements HitBehaviour {
     public void createPathfinders() {
         goalSelector.a(1, new PathfinderGoalFlyDamageTarget(this));
         goalSelector.a(3, new PathfinderGoalFlyTowardsTarget(this));
-        goalSelector.a(7, new PathfinderGoalIdleFlyAboveGround(this, 5, 16));
+        goalSelector.a(7, new PathfinderGoalIdleFlyAboveGround(this, 2, 16));
         goalSelector.a(0, new PathfinderGoalFloat(this));
         targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
     }

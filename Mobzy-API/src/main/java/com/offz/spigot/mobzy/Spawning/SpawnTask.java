@@ -135,7 +135,7 @@ public class SpawnTask extends BukkitRunnable {
                             if (regionSpawns == null)
                                 continue;
 
-                            regionSpawns.forEach(mobSpawn -> validSpawns.add(mobSpawn.getPriority(spawnArea), mobSpawn));
+                            regionSpawns.forEach(mobSpawn -> validSpawns.add(mobSpawn.getPriority(spawnArea, toSpawn), mobSpawn));
 
                             if (validSpawns.isEmpty())
                                 continue;

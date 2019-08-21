@@ -33,6 +33,8 @@ public class MobSpawn implements ConfigurationSerializable {
     private int maxY = 256;
     private int minGap = 0;
     private int maxGap = 256;
+    private int maxLocalGroup = -1;
+    private double localGroupRadius = 10;
     private SpawnPosition spawnPos = SpawnPosition.GROUND;
     private List<Material> whitelist = new ArrayList<>();
 
@@ -53,6 +55,8 @@ public class MobSpawn implements ConfigurationSerializable {
         maxY = builder.maxY;
         minGap = builder.minGap;
         maxGap = builder.maxGap;
+        maxLocalGroup = builder.maxLocalGroup;
+        localGroupRadius = builder.localGroupRadius;
         spawnPos = builder.spawnPos;
         whitelist = builder.whitelist;
     }
@@ -85,7 +89,7 @@ public class MobSpawn implements ConfigurationSerializable {
     /**
      * Gets a location to spawn in a mob given an original location and min/max radii around it
      *
-     * @param loc the location to check off of
+     * @param loc    the location to check off of
      * @param minRad the minimum radius for the new location to be picked at
      * @param maxRad the maximum radius for the new location to be picked at
      * @return a new position to spawn in
@@ -136,9 +140,72 @@ public class MobSpawn implements ConfigurationSerializable {
         builder.maxY = copy.getMaxY();
         builder.minGap = copy.getMinGap();
         builder.maxGap = copy.getMaxGap();
+        builder.maxLocalGroup = copy.getMaxLocalGroup();
+        builder.localGroupRadius = copy.getLocalGroupRadius();
         builder.spawnPos = copy.getSpawnPos();
         builder.whitelist = copy.getWhitelist();
         return builder;
+    }
+
+    public static MobSpawn deserialize(Map<String, Object> args) {
+        return deserialize(args, newBuilder());
+    }
+
+    public static MobSpawn deserialize(Map<String, Object> args, Builder applyTo) {
+        if (args.containsKey("mob"))
+            applyTo.setEntityType(CustomType.getType((String) args.get("mob")));
+        if (args.containsKey("priority"))
+            applyTo.setBasePriority((Double) args.get("priority"));
+        if (args.containsKey("min-amount"))
+            applyTo.setMinAmount((Integer) args.get("min-amount"));
+        if (args.containsKey("max-amount"))
+            applyTo.setMaxAmount((Integer) args.get("max-amount"));
+        if (args.containsKey("min-gap"))
+            applyTo.setMinGap((Integer) args.get("min-gap"));
+        if (args.containsKey("max-gap"))
+            applyTo.setMaxGap((Integer) args.get("max-gap"));
+        if (args.containsKey("min-light"))
+            applyTo.setMinLight((Integer) args.get("min-light"));
+        if (args.containsKey("max-light"))
+            applyTo.setMaxLight((Integer) args.get("max-light"));
+        if (args.containsKey("min-time"))
+            applyTo.setMinTime((Long) args.get("min-time"));
+        if (args.containsKey("max-time"))
+            applyTo.setMaxTime((Long) args.get("max-time"));
+        if (args.containsKey("min-y"))
+            applyTo.setMinY((Integer) args.get("min-y"));
+        if (args.containsKey("max-y"))
+            applyTo.setMaxY((Integer) args.get("max-y"));
+        if (args.containsKey("max-local-group"))
+            applyTo.setMaxLocalGroup((Integer) args.get("max-local-group"));
+        if (args.containsKey("local-group-radius"))
+            applyTo.setLocalGroupRadius(((Number) args.get("local-group-radius")).doubleValue());
+        if (args.containsKey("radius"))
+            applyTo.setRadius((Integer) args.get("radius"));
+        if (args.containsKey("spawn-pos")) {
+            SpawnPosition spawnPos = SpawnPosition.GROUND;
+            switch ((String) args.get("spawn-pos")) {
+                case "AIR":
+                    spawnPos = SpawnPosition.AIR;
+                    break;
+                case "GROUND":
+                    spawnPos = SpawnPosition.GROUND;
+                    break;
+                case "OVERHANG":
+                    spawnPos = SpawnPosition.OVERHANG;
+                    break;
+            }
+            applyTo.setSpawnPos(spawnPos);
+        }
+        if (args.containsKey("block-whitelist")) {
+            List<Material> materialWhiteist = ((List<String>) args.get("block-whitelist")).stream()
+                    .map(Material::valueOf)
+                    .collect(Collectors.toList());
+
+            applyTo.setWhitelist(materialWhiteist);
+        }
+
+        return applyTo.build();
     }
 
     public int getMinAmount() {
@@ -189,6 +256,15 @@ public class MobSpawn implements ConfigurationSerializable {
         return maxGap;
     }
 
+
+    public int getMaxLocalGroup() {
+        return maxLocalGroup;
+    }
+
+    public double getLocalGroupRadius() {
+        return localGroupRadius;
+    }
+
     public List<Material> getWhitelist() {
         return whitelist;
     }
@@ -230,14 +306,14 @@ public class MobSpawn implements ConfigurationSerializable {
         return spawns;
     }
 
-    public double getPriority(SpawnArea spawnArea) {
+    public double getPriority(SpawnArea spawnArea, List<MobSpawnEvent> toSpawn) {
         if (spawnArea.getGap() < minGap || spawnArea.getGap() > maxGap)
             return -1;
 
-        return getPriority(spawnArea.getSpawnLocation(spawnPos));
+        return getPriority(spawnArea.getSpawnLocation(spawnPos), toSpawn);
     }
 
-    public double getPriority(Location l) {
+    public double getPriority(Location l, List<MobSpawnEvent> toSpawn) {
         double priority = basePriority;
         long time = l.getWorld().getTime();
         int lightLevel = l.getBlock().getLightLevel();
@@ -251,7 +327,22 @@ public class MobSpawn implements ConfigurationSerializable {
             return -1;
         if (!whitelist.isEmpty() && !whitelist.contains(l.clone().add(0, -1, 0).getBlock().getType()))
             return -1;
+        //if too many entities of the same type nearby
+        if (maxLocalGroup > 0) {
+            int nearbyEntities = 0;
+            for (Entity e : l.getWorld().getNearbyEntities(l, localGroupRadius, localGroupRadius, localGroupRadius)) { //TODO this doesnt factor in planned-to-spawn entities
+                if (MobzyAPI.isCustomMob(e) && ((CustomMob) MobzyAPI.toNMS(e)).getEntityType().equals(entityType))
+                    nearbyEntities++;
+                if (nearbyEntities >= maxLocalGroup) return -1;
+            }
 
+            for (MobSpawnEvent spawn : toSpawn) {
+                if(spawn.getLocation().getWorld().equals(l.getWorld()) && spawn.getLocation().distance(l) < localGroupRadius)
+                    nearbyEntities++;
+                if (nearbyEntities >= maxLocalGroup) return -1;
+            }
+
+        }
         return priority;
     }
 
@@ -283,62 +374,7 @@ public class MobSpawn implements ConfigurationSerializable {
         if (entityType != null ? !entityType.equals(mobSpawn.entityType) : mobSpawn.entityType != null) return false;
         return spawnPos == mobSpawn.spawnPos;
     }
-    public static MobSpawn deserialize(Map<String, Object> args){
-        return deserialize(args, newBuilder());
-    }
 
-    public static MobSpawn deserialize(Map<String, Object> args, MobSpawn.Builder applyTo){
-        if (args.containsKey("mob"))
-            applyTo.setEntityType(CustomType.getType((String) args.get("mob")));
-        if (args.containsKey("priority"))
-            applyTo.setBasePriority((Double) args.get("priority"));
-        if (args.containsKey("min-amount"))
-            applyTo.setMinAmount((Integer) args.get("min-amount"));
-        if (args.containsKey("max-amount"))
-            applyTo.setMaxAmount((Integer) args.get("max-amount"));
-        if (args.containsKey("min-gap"))
-            applyTo.setMinGap((Integer) args.get("min-gap"));
-        if (args.containsKey("max-gap"))
-            applyTo.setMaxGap((Integer) args.get("max-gap"));
-        if (args.containsKey("min-light"))
-            applyTo.setMinLight((Integer) args.get("min-light"));
-        if (args.containsKey("max-light"))
-            applyTo.setMaxLight((Integer) args.get("max-light"));
-        if (args.containsKey("min-time"))
-            applyTo.setMinTime((Long) args.get("min-time"));
-        if (args.containsKey("max-time"))
-            applyTo.setMaxTime((Long) args.get("max-time"));
-        if (args.containsKey("min-y"))
-            applyTo.setMinY((Integer) args.get("min-y"));
-        if (args.containsKey("max-y"))
-            applyTo.setMaxY((Integer) args.get("max-y"));
-        if (args.containsKey("radius"))
-            applyTo.setRadius((Integer) args.get("radius"));
-        if (args.containsKey("spawn-pos")) {
-            SpawnPosition spawnPos = SpawnPosition.GROUND;
-            switch ((String) args.get("spawn-pos")) {
-                case "AIR":
-                    spawnPos = SpawnPosition.AIR;
-                    break;
-                case "GROUND":
-                    spawnPos = SpawnPosition.GROUND;
-                    break;
-                case "OVERHANG":
-                    spawnPos = SpawnPosition.OVERHANG;
-                    break;
-            }
-            applyTo.setSpawnPos(spawnPos);
-        }
-        if (args.containsKey("block-whitelist")) {
-            List<Material> materialWhiteist = ((List<String>) args.get("block-whitelist")).stream()
-                    .map(Material::valueOf)
-                    .collect(Collectors.toList());
-
-            applyTo.setWhitelist(materialWhiteist);
-        }
-
-        return applyTo.build();
-    }
     @Override
     public Map<String, Object> serialize() {
         return null;
@@ -364,6 +400,8 @@ public class MobSpawn implements ConfigurationSerializable {
         private int maxY = 256;
         private int minGap = 0;
         private int maxGap = 256;
+        private int maxLocalGroup = -1;
+        private double localGroupRadius = 10;
         private SpawnPosition spawnPos = SpawnPosition.GROUND;
         private List<Material> whitelist = new ArrayList<>();
 
@@ -432,6 +470,16 @@ public class MobSpawn implements ConfigurationSerializable {
 
         public Builder setMaxGap(int val) {
             maxGap = val;
+            return this;
+        }
+
+        public Builder setMaxLocalGroup(int val) {
+            maxLocalGroup = val;
+            return this;
+        }
+
+        public Builder setLocalGroupRadius(double val) {
+            localGroupRadius = val;
             return this;
         }
 

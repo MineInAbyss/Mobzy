@@ -1,6 +1,7 @@
 package com.offz.spigot.mobzy.Spawning;
 
 import com.offz.spigot.mobzy.Spawning.Vertical.SpawnArea;
+import org.bukkit.Location;
 
 //TODO I don't know if it makes a lot of sense to call this an event, or to convert it into a proper
 // spigot event, but can't really think of something better to call it.
@@ -27,5 +28,9 @@ public class MobSpawnEvent {
 
     public void spawn() {
         mobSpawn.spawn(area, spawns);
+    }
+
+    public Location getLocation(){
+        return area.getSpawnLocation(mobSpawn.getSpawnPos());
     }
 }

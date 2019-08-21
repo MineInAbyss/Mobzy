@@ -92,6 +92,8 @@ regions:
       - mob: Tamaugachi
         block-whitelist:
           - WATER
+        max-local-group: 1
+        local-group-radius: 128
       - mob: Kuongatari
         min-amount: 2
         max-amount: 4

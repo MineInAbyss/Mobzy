@@ -24,6 +24,6 @@ public class PathfinderGoalIdleFlyAboveGround extends PathfinderGoalIdleFly {
         if (mob.getBukkitEntity().getWorld().getBlockAt((int) dx, (int) (dy - maxHeight), (int) dz).getType().isSolid())
             mob.getControllerMove().a(dx, dy, dz, 1.0D);
         else
-            mob.getControllerMove().a(dx, mob.locY - maxHeight, dz, 1.0D);
+            mob.getControllerMove().a(dx, mob.locY - 0.1, dz, 1.0D);
     }
 }
