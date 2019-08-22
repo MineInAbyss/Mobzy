@@ -16,6 +16,39 @@ Neritantan:
           meta-type: UNSPECIFIC
           display-name: §rRaw Neritantan Meat
       drop-chance: 0.5
+Ashimite:
+  model: 56
+  max-health: 10
+  movement-speed: 0.5
+  drops:
+    - item:
+        ==: org.bukkit.inventory.ItemStack
+        type: PORK
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: §rRaw Ashimite Meat
+      drop-chance: 0.5
+Makihige:
+  model: 59
+  max-health: 10
+  movement-speed: 0.2
+  drops:
+    - material: INK_SAC
+      min-amount: 1
+      max-amount: 2
+    - item:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1
+        type: OBSIDIAN
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: §rMakihige Shell
+      drop-chance: 0.2
+    - material: LEATHER
+      min-amount: 1
+      max-amount: 2
 Fuwagi:
   model: 5
   max-health: 5
@@ -228,6 +261,12 @@ Ottobas:
           meta-type: UNSPECIFIC
           display-name: §rRaw Ottobas Meat
       max-amount: 1
+Steve:
+  model: 62
+  max-health: 30
+  movement-speed: 0.3
+  attack-damage: 4
+  follow-range: 20
 # Flying
 Corpseweeper:
   name: Corpse Weeper

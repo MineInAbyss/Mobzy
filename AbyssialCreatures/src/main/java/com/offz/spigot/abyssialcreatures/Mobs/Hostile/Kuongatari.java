@@ -15,7 +15,7 @@ public class Kuongatari extends HostileMob implements HitBehaviour {
     @Override
     public void createPathfinders() {
         super.createPathfinders();
-        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
-        this.goalSelector.a(1, new PathfinderGoalLeapAtTarget(this, 0.6F));
+        goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
+        goalSelector.a(1, new PathfinderGoalLeapAtTarget(this, 0.6F));
     }
 }

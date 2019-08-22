@@ -28,6 +28,6 @@ public class Tamaugachi extends HostileMob implements HitBehaviour {
     @Override
     public void createPathfinders() {
         super.createPathfinders();
-        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
+        goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
     }
 }

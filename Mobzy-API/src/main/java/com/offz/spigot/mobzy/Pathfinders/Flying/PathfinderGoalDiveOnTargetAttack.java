@@ -72,7 +72,7 @@ public class PathfinderGoalDiveOnTargetAttack extends PathfinderGoal {
         LivingEntity target = (LivingEntity) this.mob.getGoalTarget().getBukkitEntity();
         mob.lookAt(target);
         Location targetLoc = target.getLocation();
-        if (mob.distanceToEntity(target) < 2 || entity.getVelocity().getY() == 0) {
+        if (mob.distanceToEntity(target) < 2 || entity.getVelocity().getY() == 0 || mob.getY() < target.getLocation().getY() - 2) {
             currentAction = Action.BASH;
             bashVelX = entity.getLocation().getDirection().getX() * bashVelMultiplier;
             bashVelZ = entity.getLocation().getDirection().getZ() * bashVelMultiplier;

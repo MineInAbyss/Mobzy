@@ -59,6 +59,8 @@ regions:
       - mob: Ottobas
         min-amount: 1
         max-amount: 2
+        max-local-group: 2
+        local-group-radius: 128
         radius: 30
         block-whitelist:
           - WATER

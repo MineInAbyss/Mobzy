@@ -7,11 +7,10 @@ import net.minecraft.server.v1_13_R2.EntityAgeable;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.World;
 
-public class Okibo extends PassiveMob implements HitBehaviour {
-    //TODO change offset when riding and make controllable
-    public Okibo(World world) {
-        super(world, "Okibo");
-        setSize(3, 3);
+public class Ashimite extends PassiveMob implements HitBehaviour {
+    public Ashimite(World world) {
+        super(world, "Ashimite");
+        setSize(2f, 2);
     }
 
     @Override
@@ -26,6 +25,6 @@ public class Okibo extends PassiveMob implements HitBehaviour {
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {
-        return new Okibo(this.world);
+        return new Ashimite(this.world);
     }
 }

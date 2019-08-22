@@ -35,6 +35,6 @@ public class NPC extends PassiveMob {
 
     @Override
     public void createPathfinders() {
-        this.goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0F, 1F));
+        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0F, 1F));
     }
 }

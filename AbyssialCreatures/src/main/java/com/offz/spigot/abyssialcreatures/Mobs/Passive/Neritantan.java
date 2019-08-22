@@ -15,8 +15,8 @@ public class Neritantan extends PassiveMob implements HitBehaviour {
     @Override
     public void createPathfinders() {
         super.createPathfinders();
-        this.goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
-        this.goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, getStaticBuilder().getTemptItems()));
+        goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
+        goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, getStaticBuilder().getTemptItems()));
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {

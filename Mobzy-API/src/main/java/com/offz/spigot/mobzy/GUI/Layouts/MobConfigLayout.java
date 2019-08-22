@@ -6,7 +6,6 @@ import com.offz.spigot.mobzy.GUI.MobzyPropertyElement;
 import com.offz.spigot.mobzy.Spawning.MobSpawn;
 import de.erethon.headlib.HeadLib;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -141,7 +140,6 @@ public class MobConfigLayout extends Layout {
 //            return new PropertyDescriptor(WordUtils.capitalize(key, new char[]{'-'}).replace("-", ""), MobSpawn.class).getReadMethod().invoke(defaultSpawn);
             //a default rule to turn key names into their respective method names
             Object invoke = defaultSpawn.getClass().getMethod("get" + WordUtils.capitalize(key, new char[]{'-'}).replace("-", "")).invoke(defaultSpawn);
-            Bukkit.broadcastMessage("getting " + key + ": " + invoke);
             return invoke;
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException  e) {
             e.printStackTrace();

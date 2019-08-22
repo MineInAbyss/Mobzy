@@ -5,13 +5,13 @@ import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.EntityAgeable;
 import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.PathfinderGoalAvoidTarget;
 import net.minecraft.server.v1_13_R2.World;
 
-public class Okibo extends PassiveMob implements HitBehaviour {
-    //TODO change offset when riding and make controllable
-    public Okibo(World world) {
-        super(world, "Okibo");
-        setSize(3, 3);
+public class Makihige extends PassiveMob implements HitBehaviour {
+    public Makihige(World world) {
+        super(world, "Makihige");
+        setSize(2, 2);
     }
 
     @Override
@@ -23,9 +23,10 @@ public class Okibo extends PassiveMob implements HitBehaviour {
     public void createPathfinders() {
         super.createPathfinders();
         goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
+        goalSelector.a(1, new PathfinderGoalAvoidTarget<>(this, EntityHuman.class, 8.0F, 1D, 1D));
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {
-        return new Okibo(this.world);
+        return new Makihige(this.world);
     }
 }

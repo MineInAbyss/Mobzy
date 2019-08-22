@@ -2,10 +2,7 @@ package com.offz.spigot.abyssialcreatures;
 
 import com.offz.spigot.abyssialcreatures.Mobs.Flying.*;
 import com.offz.spigot.abyssialcreatures.Mobs.Hostile.*;
-import com.offz.spigot.abyssialcreatures.Mobs.Passive.Fuwagi;
-import com.offz.spigot.abyssialcreatures.Mobs.Passive.NPC;
-import com.offz.spigot.abyssialcreatures.Mobs.Passive.Neritantan;
-import com.offz.spigot.abyssialcreatures.Mobs.Passive.Okibo;
+import com.offz.spigot.abyssialcreatures.Mobs.Passive.*;
 import com.offz.spigot.mobzy.CustomType;
 import net.minecraft.server.v1_13_R2.EntityTypes;
 
@@ -15,6 +12,8 @@ public class AbyssialType extends CustomType {
     public final EntityTypes NERITANTAN = registerEntity(Neritantan.class, Neritantan::new);
     public final EntityTypes OKIBO = registerEntity(Okibo.class, Okibo::new);
     public final EntityTypes FUWAGI = registerEntity(Fuwagi.class, Fuwagi::new);
+    public final EntityTypes ASHIMITE = registerEntity(Ashimite.class, Ashimite::new);
+    public final EntityTypes MAKIHIGE = registerEntity(Makihige.class, Makihige::new);
     //Hostile
     public final EntityTypes INBYO = registerEntity(Inbyo.class, Inbyo::new);
     public final EntityTypes ROHANA = registerEntity(Rohana.class, Rohana::new);
@@ -23,6 +22,7 @@ public class AbyssialType extends CustomType {
     public final EntityTypes KUONGATARI = registerEntity(Kuongatari.class, Kuongatari::new);
     public final EntityTypes TESUCHI = registerEntity(Tesuchi.class, Tesuchi::new);
     public final EntityTypes OTTOBAS = registerEntity(Ottobas.class, Ottobas::new);
+    public final EntityTypes STEVE = registerEntity(Steve.class, Steve::new);
     //Flying
     public final EntityTypes CORPSE_WEEPER = registerEntity(CorpseWeeper.class, CorpseWeeper::new);
     public final EntityTypes MADOKAJACK = registerEntity(Madokajack.class, Madokajack::new);
