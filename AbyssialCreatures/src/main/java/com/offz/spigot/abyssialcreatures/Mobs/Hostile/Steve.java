@@ -8,7 +8,7 @@ import net.minecraft.server.v1_13_R2.World;
 public class Steve extends HostileMob implements HitBehaviour {
     public Steve(World world) {
         super(world, "Steve");
-        setSize(10F, 10F);
+        setSize(2F, 7F);
     }
 
     @Override

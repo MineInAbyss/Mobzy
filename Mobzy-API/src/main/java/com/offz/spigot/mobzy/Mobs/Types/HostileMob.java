@@ -118,25 +118,25 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
     @Override
     protected SoundEffect D() {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundAmbient(), 1, 1);
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundAmbient(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
         return null;
     }
 
     @Override
     protected SoundEffect d(DamageSource damagesource) {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundHurt(), 1, 1);
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundHurt(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
         return null;
     }
 
     @Override
     protected SoundEffect cs() {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundDeath(), 1, 1);
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundDeath(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
         return null;
     }
 
     @Override
     protected void a(BlockPosition blockposition, IBlockData iblockdata) {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundStep(), 1, 1);
+        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundStep(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
 import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalDiveOnTargetAttack;
 import net.minecraft.server.v1_13_R2.World;
-import org.bukkit.Sound;
 
 public class Benikuchinawa extends FlyingMob implements HitBehaviour {
     public Benikuchinawa(World world) {
@@ -22,17 +21,17 @@ public class Benikuchinawa extends FlyingMob implements HitBehaviour {
     }
 
     @Override
-    public Sound soundAmbient() {
-        return Sound.ENTITY_LLAMA_AMBIENT;
+    public String soundAmbient() {
+        return "entity.llama.ambient";
     }
 
     @Override
-    public Sound soundDeath() {
-        return Sound.ENTITY_LLAMA_DEATH;
+    public String soundDeath() {
+        return "entity.llama.death";
     }
 
     @Override
-    public Sound soundHurt() {
-        return Sound.ENTITY_LLAMA_HURT;
+    public String soundHurt() {
+        return "entity.llama.hurt";
     }
 }

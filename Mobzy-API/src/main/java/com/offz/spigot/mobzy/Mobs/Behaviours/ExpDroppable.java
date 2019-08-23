@@ -11,7 +11,7 @@ public class ExpDroppable extends MobBehaviour {
     }
 
     public Integer getExpToDrop() {
-        MobBuilder builder = mob.getStaticBuilder();
+        MobBuilder builder = mob.getBuilder();
         if(builder.getMinExp() == null || builder.getMaxExp() == null)
             return null;
 

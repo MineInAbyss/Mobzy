@@ -3,10 +3,7 @@ package com.offz.spigot.abyssialcreatures.Mobs.Passive;
 import com.offz.spigot.mobzy.Builders.MobBuilder;
 import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
 import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookAtPlayerPitchLock;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityTypes;
-import net.minecraft.server.v1_13_R2.EnumMoveType;
-import net.minecraft.server.v1_13_R2.World;
+import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 
@@ -35,6 +32,7 @@ public class NPC extends PassiveMob {
 
     @Override
     public void createPathfinders() {
-        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0F, 1F));
+        goalSelector.a(2, new PathfinderGoalRandomLookaround(this));
+        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0F, 0.01F));
     }
 }

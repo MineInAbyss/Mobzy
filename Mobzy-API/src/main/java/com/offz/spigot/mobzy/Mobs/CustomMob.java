@@ -4,8 +4,9 @@ import com.offz.spigot.mobzy.Builders.MobBuilder;
 import com.offz.spigot.mobzy.MobzyAPI;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
+
+import java.util.Random;
 
 public interface CustomMob {
     EntityLiving getEntity();
@@ -36,20 +37,24 @@ public interface CustomMob {
 
     void createPathfinders();
 
-    default Sound soundAmbient() {
+    default String soundAmbient() {
         return null;
     }
 
-    default Sound soundHurt() {
+    default String soundHurt() {
         return null;
     }
 
-    default Sound soundDeath() {
+    default String soundDeath() {
         return null;
     }
 
-    default Sound soundStep() {
+    default String soundStep() {
         return null;
+    }
+
+    default String randomSound(String... sounds) {
+        return sounds[new Random().nextInt(sounds.length)];
     }
 
     boolean getKilled();

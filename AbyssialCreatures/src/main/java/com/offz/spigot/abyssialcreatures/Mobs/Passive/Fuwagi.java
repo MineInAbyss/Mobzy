@@ -8,7 +8,6 @@ import net.minecraft.server.v1_13_R2.EntityAgeable;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.PathfinderGoalAvoidTarget;
 import net.minecraft.server.v1_13_R2.World;
-import org.bukkit.Sound;
 
 public class Fuwagi extends PassiveMob implements HitBehaviour {
     public Fuwagi(World world) {
@@ -24,23 +23,23 @@ public class Fuwagi extends PassiveMob implements HitBehaviour {
     }
 
     @Override
-    public Sound soundHurt() {
-        return Sound.ENTITY_RABBIT_ATTACK;
+    public String soundHurt() {
+        return "entity.rabbit.attack";
     }
 
     @Override
-    public Sound soundAmbient() {
-        return Sound.ENTITY_RABBIT_AMBIENT;
+    public String soundAmbient() {
+        return "entity.rabbit.ambient";
     }
 
     @Override
-    public Sound soundStep() {
-        return Sound.ENTITY_RABBIT_JUMP;
+    public String soundStep() {
+        return "entity.rabbit.jump";
     }
 
     @Override
-    public Sound soundDeath() {
-        return Sound.ENTITY_RABBIT_DEATH;
+    public String soundDeath() {
+        return "entity.rabbit.death";
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {

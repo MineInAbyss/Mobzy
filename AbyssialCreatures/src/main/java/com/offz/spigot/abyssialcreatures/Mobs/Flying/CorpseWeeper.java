@@ -4,7 +4,6 @@ import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
 import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalDiveOnTargetAttack;
 import net.minecraft.server.v1_13_R2.World;
-import org.bukkit.Sound;
 
 public class CorpseWeeper extends FlyingMob implements HitBehaviour {
     public CorpseWeeper(World world) {
@@ -19,17 +18,17 @@ public class CorpseWeeper extends FlyingMob implements HitBehaviour {
     }
 
     @Override
-    public Sound soundAmbient() {
-        return Sound.ENTITY_BAT_AMBIENT;
+    public String soundAmbient() {
+        return randomSound("entity.corpseweeper.snarl2");
     }
 
     @Override
-    public Sound soundDeath() {
-        return Sound.ENTITY_BAT_DEATH;
+    public String soundDeath() {
+        return "entity.corpseweeper.snarl2";
     }
 
     @Override
-    public Sound soundHurt() {
-        return Sound.ENTITY_BAT_HURT;
+    public String soundHurt() {
+        return "entity.corpseweeper.snarl2";
     }
 }
