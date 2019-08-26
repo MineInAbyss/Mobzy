@@ -102,7 +102,6 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
 
     @Override
     public void saveMobNBT(NBTTagCompound nbttagcompound) {
-        disguiseable.undisguise();
     }
 
     @Override
