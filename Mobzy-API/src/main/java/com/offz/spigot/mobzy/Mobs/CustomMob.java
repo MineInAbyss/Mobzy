@@ -65,7 +65,7 @@ public interface CustomMob {
 
     int lastDamageByPlayerTime();
 
-    void unloadMobNBT(NBTTagCompound nbttagcompound);
+    void saveMobNBT(NBTTagCompound nbttagcompound);
 
     void loadMobNBT(NBTTagCompound nbttagcompound);
 

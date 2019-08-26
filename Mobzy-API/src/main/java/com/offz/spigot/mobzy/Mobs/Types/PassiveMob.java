@@ -108,12 +108,13 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
     @Override
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
-        unloadMobNBT(nbttagcompound);
+        saveMobNBT(nbttagcompound);
     }
 
     @Override
-    public void unloadMobNBT(NBTTagCompound nbttagcompound) {
-
+    public void saveMobNBT(NBTTagCompound nbttagcompound) {
+        //TODO make the mobs undisguise when unloaded, not just on death. It should ONLY happen when the chunk the mob is in gets unloaded,
+        // and this method gets called randomly sometimes. Perhaps a ChunkUnloadEvent or something similar is a good way to do this
     }
 
     @Override
@@ -152,6 +153,12 @@ public abstract class PassiveMob extends EntityAnimal implements CustomMob {
 
     public void die(DamageSource damagesource) {
         deathable.die(damagesource);
+    }
+
+    @Override
+    public void die() {
+        super.die();
+        disguiseable.undisguise();
     }
 
     @Override

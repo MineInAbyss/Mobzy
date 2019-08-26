@@ -122,12 +122,11 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
     @Override
     public void b(NBTTagCompound nbttagcompound) {
         super.b(nbttagcompound);
-        unloadMobNBT(nbttagcompound);
+        saveMobNBT(nbttagcompound);
     }
 
     @Override
-    public void unloadMobNBT(NBTTagCompound nbttagcompound) {
-
+    public void saveMobNBT(NBTTagCompound nbttagcompound) {
     }
 
     @Override
@@ -196,6 +195,12 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
 
     public void die(DamageSource damagesource) {
         deathable.die(damagesource);
+    }
+
+    @Override
+    public void die() {
+        super.die();
+        disguiseable.undisguise();
     }
 
     @Override

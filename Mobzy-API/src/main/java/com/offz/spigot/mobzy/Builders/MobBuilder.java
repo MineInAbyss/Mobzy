@@ -5,6 +5,7 @@ import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public final class MobBuilder implements ConfigurationSerializable {
     private Integer maxExp;
     private boolean isAdult = true;
     private List<MobDrop> drops = new ArrayList<>();
+
     public MobBuilder(String name, int modelID) {
         this.name = name;
         this.modelID = modelID;
@@ -115,8 +117,9 @@ public final class MobBuilder implements ConfigurationSerializable {
     }
 
     public ItemStack getModelItemStack() {
-        ItemStack is = new ItemStack(getModelMaterial(), 1, (short) getModelID());
+        ItemStack is = new ItemStack(getModelMaterial(), 1);
         ItemMeta meta = is.getItemMeta();
+        ((Damageable) meta).setDamage(getModelID());
         meta.setDisplayName(getName());
         meta.setUnbreakable(true);
         is.setItemMeta(meta);
