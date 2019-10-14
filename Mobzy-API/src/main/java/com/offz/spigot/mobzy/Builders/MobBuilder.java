@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * TODO make this into a proper immutable builder.
+ * A class which stores information on mobs that can be deserialized from the config.
+ */
 public final class MobBuilder implements ConfigurationSerializable {
     private String name;
     private int modelID;
@@ -27,6 +31,7 @@ public final class MobBuilder implements ConfigurationSerializable {
     private Integer maxExp;
     private boolean isAdult = true;
     private List<MobDrop> drops = new ArrayList<>();
+    private List<String> deathCommands = new ArrayList<>();
 
     public MobBuilder(String name, int modelID) {
         this.name = name;
@@ -65,7 +70,18 @@ public final class MobBuilder implements ConfigurationSerializable {
             builder.setMinExp(((Number) args.get("min-exp")).intValue());
         if (args.containsKey("max-exp"))
             builder.setMaxExp(((Number) args.get("max-exp")).intValue());
+        if (args.containsKey("on-death"))
+            builder.setDeathCommands((List<String>) args.get("on-death"));
+
         return builder;
+    }
+
+    public List<String> getDeathCommands() {
+        return deathCommands;
+    }
+
+    public void setDeathCommands(List<String> deathCommands) {
+        this.deathCommands = deathCommands;
     }
 
     public Integer getMaxExp() {

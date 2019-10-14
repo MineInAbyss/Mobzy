@@ -1,4 +1,7 @@
-# Custom Mobs
+
+# Mobzy
+
+[![Release](https://jitpack.io/v/MineInAbyss/Mobzy.svg)](https://jitpack.io/#MineInAbyss/Mobzy)
 
 ### Intro
 
@@ -10,4 +13,4 @@ It even goes a step further to implement custom hitboxes for larger entities, si
 
 ### Plans
 
-Its use case is currently very specific to the Mine In Abyss server, but these mobs will eventually be separated into their own plugin, and this one kept as an API of sorts.
+An API is being worked on, and while available on JitPack, it is not intended for use in other plugins yet.

@@ -4,6 +4,10 @@ allprojects {
     group = 'com.github.MineInAbyss'
     version = plugin_version + '-SNAPSHOT'
 
+    ext{
+        //Put your plugins folder directory here! If it is left as '', jars won't be copied
+        plugin_path = ''
+    }
 }
 
 subprojects {
@@ -17,13 +21,20 @@ subprojects {
         mavenCentral()
         jcenter()
         repositories {
-//        maven { url 'https://papermc.io/repo/repository/maven-public/' } //PaperMC
-            maven { url 'http://repo.dmulloy2.net/nexus/repository/public/' } //Spigot
+            maven { url 'https://papermc.io/repo/repository/maven-public/' } //PaperMC
+            maven {
+                url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+                content {
+                    includeGroup 'org.bukkit'
+                    includeGroup 'org.spigotmc'
+                }
+            } //Spigot
+            maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
             maven { url 'https://erethon.de/repo/' } //HeadLib
             maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
             maven { url 'https://jitpack.io' } //JitPack
         }
-//    mavenLocal()
+        mavenLocal()
     }
 
     dependencies {

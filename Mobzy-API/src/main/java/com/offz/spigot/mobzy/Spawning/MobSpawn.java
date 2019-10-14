@@ -151,6 +151,7 @@ public class MobSpawn implements ConfigurationSerializable {
         return deserialize(args, newBuilder());
     }
 
+    //TODO make these use @SerializableAs https://www.spigotmc.org/threads/tutorial-bukkit-custom-serialization.148781/
     public static MobSpawn deserialize(Map<String, Object> args, Builder applyTo) {
         if (args.containsKey("mob"))
             applyTo.setEntityType(CustomType.getType((String) args.get("mob")));

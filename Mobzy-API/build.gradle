@@ -5,43 +5,33 @@ plugins {
 repositories {
     maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
     maven { url 'http://repo.md-5.net/content/groups/public/' } //LibsDisguises
+//    maven { url 'http://repo.extendedclip.com/content/repositories/placeholderapi/' } //PlaceHolderAPI
 }
 
 dependencies {
-//    implementation 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT' // PaperMC
-    compileOnly 'LibsDisguises:LibsDisguises:9.8.0-SNAPSHOT' //LibsDisguises
+    compileOnly 'LibsDisguises:LibsDisguises:9.8.1-SNAPSHOT' //LibsDisguises
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
+//    compileOnly 'me.clip:placeholderapi:+'
     implementation 'com.github.Mineinabyss:guiy:master-SNAPSHOT'
-//    implementation group: 'com.github.MineInAbyss', name: 'guiy', version: "master-SNAPSHOT"
 //    implementation 'com.github.WesJD:AnvilGUI:master-SNAPSHOT'
     implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    //feel free to comment these out for faster compilation
-    archives sourcesJar
-    archives javadocJar
-}
-
 shadowJar {
-    archiveName = "Mobzy-${parent.version}.jar"
-    destinationDir = file '../target'
+    getArchiveBaseName().set("Mobzy")
+    getArchiveClassifier().set(null)
+    dependencies {
+        include(dependency('com.github.Mineinabyss:guiy:master-SNAPSHOT'))
+        include(dependency('de.erethon:headlib:3.0.1'))
+        include(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
+    }
 }
 
 //Move into plugins folder
-/*task copyJar(type: Copy) {
-    from jar // here it automatically reads jar file produced from jar task
-    into 'C:/Users/Offz/Documents/Programming/Spigot servers/plugins'
-}
-
-build.dependsOn copyJar*/
+if(plugin_path != '') {
+    task copyJar(type: Copy) {
+        from shadowJar // here it automatically reads jar file produced from jar task
+        into plugin_path
+    }
+    build.dependsOn copyJar
+} else println("Skipped copyJar for MobzyAPI")

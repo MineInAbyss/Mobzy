@@ -4,6 +4,7 @@ import com.offz.spigot.mobzy.Mobs.CustomMob;
 import com.offz.spigot.mobzy.MobzyAPI;
 import net.minecraft.server.v1_13_R2.DamageSource;
 import net.minecraft.server.v1_13_R2.EntityLiving;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
 
@@ -39,6 +40,8 @@ public class Deathable extends MobBehaviour {
             }
 
             mob.getWorld().broadcastEntityEffect(entity, (byte) 3);
+            //TODO add PlaceHolderAPI support
+            mob.getBuilder().getDeathCommands().forEach(command -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command));
         }
     }
 }

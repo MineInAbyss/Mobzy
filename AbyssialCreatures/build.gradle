@@ -1,35 +1,18 @@
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT' //Spigot
-    compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // NMS
     compileOnly 'com.github.MineInAbyss:guiy:master-SNAPSHOT'
     compile project(':Mobzy-API')
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    //feel free to comment these out for faster compilation
-    archives sourcesJar
-    archives javadocJar
-}
-
 jar {
-    archiveName = "AbyssialCreatures-${parent.version}.jar"
-    destinationDir = file '../target'
+    getArchiveBaseName().set("AbyssialCreatures")
+    getArchiveClassifier().set(null)
 }
 
 //Move into plugins folder
-/*task copyJar(type: Copy) {
-    from jar // here it automatically reads jar file produced from jar task
-    into 'C:/Users/Offz/Documents/Programming/Spigot servers/plugins'
+if (plugin_path != '') {
+    task copyJar(type: Copy) {
+        from jar // here it automatically reads jar file produced from jar task
+        into plugin_path
+    }
+    build.dependsOn copyJar
 }
-
-build.dependsOn copyJar*/
