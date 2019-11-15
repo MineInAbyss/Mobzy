@@ -1,5 +1,6 @@
 package com.offz.spigot.mobzy.Mobs;
 
+import com.google.auto.value.AutoValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -7,34 +8,22 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
-public class MobDrop implements ConfigurationSerializable {
-    private ItemStack item;
-    //TODO calculate looting
-    private double dropChance;
-    private int minAmount;
-    private int maxAmount;
-
-    public MobDrop(Material material, int amount) {
-        this(material, amount, amount, 1);
+@AutoValue
+public abstract class MobDrop implements ConfigurationSerializable {
+    public static MobDrop create(Material material, int amount, double dropChance) {
+        return create(material, amount, amount, dropChance);
     }
 
-    public MobDrop(Material material, int amount, double dropChance) {
-        this(material, amount, amount, dropChance);
+    public static MobDrop create(Material material, int minAmount, int maxAmount) {
+        return create(material, minAmount, maxAmount, 1);
     }
 
-    public MobDrop(Material material, int minAmount, int maxAmount) {
-        this(material, minAmount, maxAmount, 1);
+    public static MobDrop create(Material material, int minAmount, int maxAmount, double dropChance) {
+        return create(new ItemStack(material), minAmount, maxAmount, dropChance);
     }
 
-    public MobDrop(Material material, int minAmount, int maxAmount, double dropChance) {
-        this(new ItemStack(material), minAmount, maxAmount, dropChance);
-    }
-
-    public MobDrop(ItemStack item, int minAmount, int maxAmount, double dropChance) {
-        this.item = item;
-        this.dropChance = dropChance;
-        this.minAmount = minAmount;
-        this.maxAmount = maxAmount;
+    public static MobDrop create(ItemStack item, int minAmount, int maxAmount, double dropChance) {
+        return new AutoValue_MobDrop(item, minAmount, maxAmount, dropChance);
     }
 
     /**
@@ -68,22 +57,22 @@ public class MobDrop implements ConfigurationSerializable {
 
         if (args.containsKey("amount")) {
             int amount = (Integer) args.get("amount");
-            return new MobDrop(item, amount, amount, dropChance);
+            return create(item, amount, amount, dropChance);
         }
 
         if (!(args.containsKey("min-amount") && args.containsKey("max-amount")))
-            return new MobDrop(item, 1, 1, dropChance);
+            return create(item, 1, 1, dropChance);
 
         minAmount = (Integer) args.get("min-amount");
         maxAmount = (Integer) args.get("max-amount");
 
-        return new MobDrop(item, minAmount, maxAmount, dropChance);
+        return create(item, minAmount, maxAmount, dropChance);
     }
 
     public ItemStack chooseDrop() {
-        if (Math.random() < dropChance) {
-            ItemStack drop = item.clone();
-            drop.setAmount((int) ((Math.random() * (maxAmount - minAmount)) + minAmount));
+        if (Math.random() < dropChance()) {
+            ItemStack drop = item().clone();
+            drop.setAmount((int) ((Math.random() * (maxAmount() - minAmount())) + minAmount()));
             return drop;
         }
         return null;
@@ -93,4 +82,13 @@ public class MobDrop implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         return null;
     }
+
+    abstract ItemStack item();
+
+    abstract int minAmount();
+
+    abstract int maxAmount();
+
+    //TODO calculate looting
+    abstract double dropChance();
 }

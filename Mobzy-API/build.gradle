@@ -1,5 +1,6 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id 'idea'
 }
 
 repositories {
@@ -15,6 +16,8 @@ dependencies {
     implementation 'com.github.Mineinabyss:guiy:master-SNAPSHOT'
 //    implementation 'com.github.WesJD:AnvilGUI:master-SNAPSHOT'
     implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
+    compile "com.google.auto.value:auto-value-annotations:1.6.3"
+    annotationProcessor "com.google.auto.value:auto-value:1.6.3"
 }
 
 shadowJar {

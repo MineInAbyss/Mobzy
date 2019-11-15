@@ -257,7 +257,6 @@ public class MobSpawn implements ConfigurationSerializable {
         return maxGap;
     }
 
-
     public int getMaxLocalGroup() {
         return maxLocalGroup;
     }

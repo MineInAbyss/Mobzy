@@ -3,6 +3,7 @@ package com.offz.spigot.mobzy.Listener;
 import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.Mobs.CustomMob;
 import com.offz.spigot.mobzy.Mobzy;
+import com.offz.spigot.mobzy.MobzyAPI;
 import com.offz.spigot.mobzy.MobzyContext;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityHuman;
@@ -25,7 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Vector;
 
 public class MobListener implements Listener {
     Mobzy plugin;
@@ -115,9 +115,9 @@ public class MobListener implements Listener {
         // armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:
         Player p = e.getPlayer();
         if (leftClicked(e) || rightClicked(e)) {
-            RayTraceResult trace = p.getWorld().rayTrace(p.getLocation().add(new Vector(0, p.getEyeHeight(), 0)), p.getLocation().getDirection(), 3, FluidCollisionMode.ALWAYS, true, 0, entity -> !entity.equals(p));
+            RayTraceResult trace = p.getWorld().rayTrace(p.getEyeLocation(), p.getLocation().getDirection(), 3, FluidCollisionMode.ALWAYS, true, 0, entity -> !entity.equals(p));
             if (trace != null && trace.getHitEntity() != null) {
-                Entity hit = ((CraftEntity) trace.getHitEntity()).getHandle();
+                Entity hit = MobzyAPI.toNMS(trace.getHitEntity());
                 if (!(hit instanceof CustomMob))
                     return;
 
