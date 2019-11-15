@@ -30,6 +30,14 @@ public class NPC extends PassiveMob {
     public void move(EnumMoveType enummovetype, double d0, double d1, double d2) {
     }
 
+    /**
+     * Prevent NPCs from getting damaged by anything
+     */
+    @Override
+    public boolean damageEntity(DamageSource damagesource, float f) {
+        return false;
+    }
+
     @Override
     public void createPathfinders() {
         goalSelector.a(2, new PathfinderGoalRandomLookaround(this));
