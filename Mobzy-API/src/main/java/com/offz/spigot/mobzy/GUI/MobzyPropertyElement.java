@@ -13,7 +13,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.Map;
@@ -91,7 +90,7 @@ public class MobzyPropertyElement extends ClickableElement {
                     return AnvilGUI.Response.close();
                 })
                 .text(value.toString())  //sets the text the GUI should start with
-                .plugin(JavaPlugin.getPlugin(Mobzy.class))              //set the plugin instance
+                .plugin(Mobzy.getInstance())              //set the plugin instance
                 .open(main.getPlayer());                       //opens the GUI for the player provided
     }
 

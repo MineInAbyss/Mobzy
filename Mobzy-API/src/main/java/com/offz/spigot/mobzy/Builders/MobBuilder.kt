@@ -1,217 +1,50 @@
-package com.offz.spigot.mobzy.Builders;
+package com.offz.spigot.mobzy.Builders
 
-import com.offz.spigot.mobzy.Mobs.MobDrop;
-import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import org.bukkit.Material;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.offz.spigot.mobzy.Mobs.MobDrop
+import me.libraryaddict.disguise.disguisetypes.DisguiseType
+import org.bukkit.Material
+import org.bukkit.configuration.serialization.ConfigurationSerializable
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.Damageable
+import java.util.*
 
 /**
  * TODO make this into a proper immutable builder.
  * A class which stores information on mobs that can be deserialized from the config.
  */
-public final class MobBuilder implements ConfigurationSerializable {
-    private String name;
-    private int modelID;
-    private Material modelMaterial = Material.DIAMOND_SWORD;
-    private DisguiseType disguiseAs = DisguiseType.ZOMBIE;
-    private List<Material> temptItems;
-    private Double maxHealth;
-    private Double movementSpeed;
-    private Double followRange;
-    private Double attackDamage;
-    private Integer minExp;
-    private Integer maxExp;
-    private boolean isAdult = true;
-    private List<MobDrop> drops = new ArrayList<>();
-    private List<String> deathCommands = new ArrayList<>();
+data class MobBuilder(var name: String,
+                      var modelID: Int,
+                      var modelMaterial: Material = Material.DIAMOND_SWORD,
+                      var disguiseAs: DisguiseType = DisguiseType.ZOMBIE,
+                      var temptItems: List<Material>? = null,
+                      var maxHealth: Double? = null,
+                      var movementSpeed: Double? = null,
+                      var followRange: Double? = null,
+                      var attackDamage: Double? = null,
+                      var minExp: Int? = null,
+                      var maxExp: Int? = null,
+                      var isAdult: Boolean = true,
+                      var deathCommands: List<String> = ArrayList(),
+                      var drops: List<MobDrop> = ArrayList()) : ConfigurationSerializable {
+    constructor(aName: String, aModelID: Int) : this(name = aName, modelID = aModelID)
 
-    public MobBuilder(String name, int modelID) {
-        this.name = name;
-        this.modelID = modelID;
-    }
-
-    public static MobBuilder deserialize(Map<String, Object> args, String name) {
-        if (args.containsKey("name"))
-            name = (String) args.get("name");
-
-        MobBuilder builder = new MobBuilder(name, (int) args.get("model"));
-
-        if (args.containsKey("adult"))
-            builder.setAdult((boolean) args.get("adult"));
-        if (args.containsKey("disguise-as"))
-            builder.setDisguiseAs(DisguiseType.valueOf((String) args.get("disguise-as")));
-        if (args.containsKey("drops"))
-            builder.setDrops(((List<Map<String, Object>>) args.get("drops")).stream()
-                    .map(MobDrop::deserialize)
-                    .collect(Collectors.toList()));
-        if (args.containsKey("model-material"))
-            builder.setModelMaterial(Material.getMaterial((String) args.get("model-material")));
-        if (args.containsKey("tempt-items"))
-            builder.setTemptItems(((List<Object>) args.get("tempt-items")).stream()
-                    .map(item -> Material.getMaterial((String) item))
-                    .collect(Collectors.toList()));
-        if (args.containsKey("max-health"))
-            builder.setMaxHealth(((Number) args.get("max-health")).doubleValue());
-        if (args.containsKey("movement-speed"))
-            builder.setMovementSpeed(((Number) args.get("movement-speed")).doubleValue());
-        if (args.containsKey("attack-damage"))
-            builder.setAttackDamage(((Number) args.get("attack-damage")).doubleValue());
-        if (args.containsKey("follow-range"))
-            builder.setFollowRange(((Number) args.get("follow-range")).doubleValue());
-        if (args.containsKey("min-exp"))
-            builder.setMinExp(((Number) args.get("min-exp")).intValue());
-        if (args.containsKey("max-exp"))
-            builder.setMaxExp(((Number) args.get("max-exp")).intValue());
-        if (args.containsKey("on-death"))
-            builder.setDeathCommands((List<String>) args.get("on-death"));
-
-        return builder;
-    }
-
-    public List<String> getDeathCommands() {
-        return deathCommands;
-    }
-
-    public void setDeathCommands(List<String> deathCommands) {
-        this.deathCommands = deathCommands;
-    }
-
-    public Integer getMaxExp() {
-        return maxExp;
-    }
-
-    public void setMaxExp(Integer maxExp) {
-        this.maxExp = maxExp;
-    }
-
-    public Integer getMinExp() {
-        return minExp;
-    }
-
-    public void setMinExp(Integer minExp) {
-        this.minExp = minExp;
-    }
-
-    public boolean isAdult() {
-        return isAdult;
-    }
-
-    public MobBuilder setAdult(boolean adult) {
-        isAdult = adult;
-        return this;
-    }
-
-    public List<ItemStack> getDrops() {
-        List<ItemStack> chosenDrops = new ArrayList<>();
-        for (MobDrop drop : drops) {
-            ItemStack chosenDrop = drop.chooseDrop();
-            chosenDrops.add(chosenDrop);
+    fun chooseDrops(): List<ItemStack?> {
+        val chosenDrops: MutableList<ItemStack?> = ArrayList()
+        for (drop in drops) {
+            val chosenDrop = drop.chooseDrop()
+            chosenDrops.add(chosenDrop)
         }
-        return chosenDrops;
+        return chosenDrops
     }
 
-    public MobBuilder setDrops(List<MobDrop> drops) {
-        this.drops = drops;
-        return this;
-    }
-
-    public Material getModelMaterial() {
-        return modelMaterial;
-    }
-
-    public MobBuilder setModelMaterial(Material modelMaterial) {
-        this.modelMaterial = modelMaterial;
-        return this;
-    }
-
-    public ItemStack getModelItemStack() {
-        ItemStack is = new ItemStack(getModelMaterial(), 1);
-        ItemMeta meta = is.getItemMeta();
-        ((Damageable) meta).setDamage(getModelID());
-        meta.setDisplayName(getName());
-        meta.setUnbreakable(true);
-        is.setItemMeta(meta);
-        return is;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public MobBuilder setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public int getModelID() {
-        return modelID;
-    }
-
-    public MobBuilder setModelID(int modelID) {
-        this.modelID = modelID;
-        return this;
-    }
-
-    public DisguiseType getDisguiseAs() {
-        return disguiseAs;
-    }
-
-    public MobBuilder setDisguiseAs(DisguiseType disguiseAs) {
-        this.disguiseAs = disguiseAs;
-        return this;
-    }
-
-    public List<Material> getTemptItems() {
-        return temptItems;
-    }
-
-    public MobBuilder setTemptItems(List<Material> temptItems) {
-        this.temptItems = temptItems;
-        return this;
-    }
-
-    public Double getMaxHealth() {
-        return maxHealth;
-    }
-
-    public MobBuilder setMaxHealth(Double maxHealth) {
-        this.maxHealth = maxHealth;
-        return this;
-    }
-
-    public Double getMovementSpeed() {
-        return movementSpeed;
-    }
-
-    public MobBuilder setMovementSpeed(Double movementSpeed) {
-        this.movementSpeed = movementSpeed;
-        return this;
-    }
-
-    public Double getFollowRange() {
-        return followRange;
-    }
-
-    public MobBuilder setFollowRange(Double followRange) {
-        this.followRange = followRange;
-        return this;
-    }
-
-    public Double getAttackDamage() {
-        return attackDamage;
-    }
-
-    public MobBuilder setAttackDamage(Double attackDamage) {
-        this.attackDamage = attackDamage;
-        return this;
+    fun getModelItemStack(): ItemStack {
+        val itemStack = ItemStack(modelMaterial, 1)
+        val meta = itemStack.itemMeta
+        (meta as Damageable?)!!.damage = modelID
+        meta!!.setDisplayName(name)
+        meta.isUnbreakable = true
+        itemStack.itemMeta = meta
+        return itemStack
     }
 
     /**
@@ -219,8 +52,33 @@ public final class MobBuilder implements ConfigurationSerializable {
      *
      * @return a serialized version of the mob builder
      */
-    @Override
-    public Map<String, Object> serialize() {
-        return null;
+    override fun serialize(): Map<String, Any> {
+        return mapOf()
     }
+
+    companion object {
+        fun deserialize(args: Map<String?, Any?>, name: String): MobBuilder {
+            val name = if (args.containsKey("name")) args["name"] as String else name
+
+            val builder = MobBuilder(name, args["model"] as Int)
+            if (args.containsKey("adult")) builder.isAdult = args["adult"] as Boolean
+            if (args.containsKey("disguise-as")) builder.disguiseAs = DisguiseType.valueOf(args["disguise-as"] as String)
+            if (args.containsKey("drops")) builder.drops = (args["drops"] as List<Map<String, Any>>)
+                    .map { MobDrop.deserialize(it) }
+                    .toList().requireNoNulls() //TODO check back on this later
+            if (args.containsKey("model-material")) builder.modelMaterial = Material.getMaterial((args["model-material"] as String))!!
+            if (args.containsKey("tempt-items")) builder.temptItems = (args["tempt-items"] as List<Any?>?)!!
+                    .map { Material.getMaterial((it as String)) }
+                    .toList().requireNoNulls()
+            if (args.containsKey("max-health")) builder.maxHealth = (args["max-health"] as Number).toDouble()
+            if (args.containsKey("movement-speed")) builder.movementSpeed = (args["movement-speed"] as Number).toDouble()
+            if (args.containsKey("attack-damage")) builder.attackDamage = (args["attack-damage"] as Number).toDouble()
+            if (args.containsKey("follow-range")) builder.followRange = (args["follow-range"] as Number).toDouble()
+            if (args.containsKey("min-exp")) builder.minExp = (args["min-exp"] as Number).toInt()
+            if (args.containsKey("max-exp")) builder.maxExp = (args["max-exp"] as Number).toInt()
+            if (args.containsKey("on-death")) builder.deathCommands = args["on-death"] as List<String>
+            return builder
+        }
+    }
+
 }

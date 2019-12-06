@@ -19,12 +19,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Mobzy extends JavaPlugin {
+    private static final String REGISTERED_ADDONS_KEY = "addons";
     //TODO Make these into their own custom flags instead of StringFlag
     //TODO rename this to MZ_... in the WorldGuard config files :mittysweat:
     public static StringFlag MZ_SPAWN_REGIONS;
     public static StringFlag MZ_SPAWN_OVERLAP;
+    private static Mobzy instance;
     private MobzyConfig mobzyConfig;
     private MobzyContext context;
+    private MobzyAPI mobzyAPI;
+
+    public static Mobzy getInstance() {
+        return instance;
+    }
 
     @Override
     public void onLoad() {
@@ -63,13 +70,16 @@ public final class Mobzy extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
         getLogger().info("On enable has been called");
         saveDefaultConfig();
         loadConfigManager();
+        reloadConfig();
+        mobzyAPI = new MobzyAPI(this);
 
         CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
-        // Plugin startup logic
+        //Plugin startup logic
         context = new MobzyContext(getConfig(), mobzyConfig); //Create new context and add plugin and logger to it
         context.setPlugin(this);
         context.setLogger(getLogger());
@@ -84,6 +94,15 @@ public final class Mobzy extends JavaPlugin {
             Runnable spawnTask = new SpawnTask(this);
             getServer().getScheduler().scheduleSyncRepeatingTask(this, spawnTask, 0, MobzyConfig.getSpawnTaskDelay());
         }
+
+        //Reload existing addons
+        /*getLogger().info("Reloading addons: " + getConfig().getStringList(REGISTERED_ADDONS_KEY));
+        for (String name : getConfig().getStringList(REGISTERED_ADDONS_KEY)) {
+            PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+            Plugin addon = pluginManager.getPlugin(name);
+            if (addon instanceof MobzyAddon && pluginManager.isPluginEnabled(name) && !mobzyConfig.getRegisteredAddons().contains(addon))
+                ((MobzyAddon) addon).registerWithMobzy(this);
+        }*/
 
         MobzyCommands commandExecutor = new MobzyCommands(context);
         this.getCommand("mobzy").setExecutor(commandExecutor);
@@ -114,11 +133,19 @@ public final class Mobzy extends JavaPlugin {
         getLogger().info(ChatColor.GREEN + "Reloaded " + num + " custom entities");
     }
 
+    public MobzyAPI getApi() {
+        return mobzyAPI;
+    }
+
     @Override
     public void onDisable() {
-        super.onDisable();
         // Plugin shutdown logic
+        super.onDisable();
+        instance = null;
         getLogger().info("onDisable has been invoked!");
+//        Bukkit.broadcastMessage("Saving addons " + mobzyConfig.getRegisteredAddons().toString());
+//        getConfig().set(REGISTERED_ADDONS_KEY, mobzyConfig.getRegisteredAddons().stream().map(addon -> ((Plugin) addon).getName()).collect(Collectors.toList()));
+//        saveConfig();
     }
 
     public MobzyConfig getMobzyConfig() {

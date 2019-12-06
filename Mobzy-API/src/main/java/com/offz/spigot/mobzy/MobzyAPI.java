@@ -11,9 +11,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
 public class MobzyAPI {
-    private static Mobzy plugin = Mobzy.getPlugin(Mobzy.class);
+    private static Mobzy plugin;
 
-    private MobzyAPI() {
+    public MobzyAPI(Mobzy plugin) {
+        MobzyAPI.plugin = plugin;
     }
 
     /**
@@ -47,7 +48,6 @@ public class MobzyAPI {
     public static void registerSpawnConfig(File configuration, JavaPlugin plugin) {
         MobzyAPI.plugin.getMobzyConfig().registerSpawnCfg(configuration, plugin);
     }
-
 
     /**
      * Registers a separate plugin's the mob configuration file with the API (to read mob attributes)
@@ -149,7 +149,11 @@ public class MobzyAPI {
         return CustomType.getBuilder(name);
     }
 
-    public static EntityTypes<?> getEntityType(Entity entity){
+    public static EntityTypes<?> getEntityType(Entity entity) {
         return entity.P();
+    }
+
+    public MobzyAPI getInstance() {
+        return plugin.getApi();
     }
 }

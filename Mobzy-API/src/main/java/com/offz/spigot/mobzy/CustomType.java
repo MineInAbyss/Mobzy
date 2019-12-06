@@ -22,7 +22,7 @@ public class CustomType {
     //this is used for getting a MobType from a String, which makes it easier to access from MobBuilder
     private static Map<String, EntityTypes> types = new HashMap<>();
     private static Map<String, MobBuilder> builders = new HashMap<>();
-    private static Mobzy plugin = Mobzy.getPlugin(Mobzy.class);
+    private static Mobzy plugin = Mobzy.getInstance();
 
     public static String toEntityTypeID(String name) {
         return name.toLowerCase().replace(" ", "");
@@ -88,7 +88,7 @@ public class CustomType {
         if (mobCfg == null)
             return null;
 
-        return MobBuilder.deserialize(((MemorySection) mobCfg.get(className)).getValues(true), className);
+        return MobBuilder.Companion.deserialize(((MemorySection) mobCfg.get(className)).getValues(true), className);
     }
 
     //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
@@ -100,7 +100,7 @@ public class CustomType {
         // inject the new custom entity (this registers the name/id with the server so you can use it in things
         // like the vanilla /summon command)
         if (dataTypes.containsKey("minecraft:" + name))
-            MobzyAPI.debug(ChatColor.YELLOW + "CONTAINING KEY " + name);
+            MobzyAPI.debug(ChatColor.YELLOW + "ALREADY CONTAINS KEY: " + name);
         dataTypes.put("minecraft:" + name, dataTypes.get("minecraft:" + extend_from));
 
         // create and return an EntityTypes for the custom entity store this somewhere so you can reference it later (like for spawning)

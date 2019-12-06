@@ -33,7 +33,7 @@ public class Deathable extends MobBehaviour {
             if (!mob.getWorld().isClientSide) {
                 if (mob.dropsExperience() && mob.getWorld().getGameRules().getBoolean("doMobLoot")) {
                     mob.dropEquipment(mob.lastDamageByPlayerTime() > 0, 0, damageSource);
-                    CraftEventFactory.callEntityDeathEvent(entity, mob.getBuilder().getDrops());
+                    CraftEventFactory.callEntityDeathEvent(entity, mob.getBuilder().chooseDrops());
                 } else {
                     CraftEventFactory.callEntityDeathEvent(entity);
                 }

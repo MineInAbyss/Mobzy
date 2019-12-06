@@ -33,7 +33,7 @@ public class MobListener implements Listener {
 
     public MobListener(MobzyContext context) {
         this.context = context;
-        plugin = (Mobzy) context.getPlugin();
+        plugin = Mobzy.getInstance();
     }
 
     /**

@@ -22,7 +22,7 @@ public class SpawnRegistry {
 
     public static void readCfg(FileConfiguration config) {
         List<Map<?, ?>> regionList = config.getMapList("regions");
-        Mobzy plugin = Mobzy.getPlugin(Mobzy.class);
+        Mobzy plugin = Mobzy.getInstance();
 
         for (Map<?, ?> region : regionList) {
             String name = (String) region.get("name");

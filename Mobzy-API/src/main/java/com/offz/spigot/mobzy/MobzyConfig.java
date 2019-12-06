@@ -202,7 +202,7 @@ public class MobzyConfig {
         registerMobType("passive", PassiveMob.class);
         registerMobType("hostile", HostileMob.class);
         registerMobType("flying", FlyingMob.class);
-        registeredAddons.forEach(MobzyAddon::loadTypes);
+        registeredAddons.forEach(addon -> addon.registerWithMobzy(plugin));
         loadConfigValues();
         reloadConfigurationMap(mobCfgs);
         SpawnRegistry.unregisterAll();

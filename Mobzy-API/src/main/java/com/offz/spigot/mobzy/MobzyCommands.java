@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -37,7 +36,7 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
 
         if (sender.hasPermission("mobzy.cfginfo") && subCommand.equalsIgnoreCase("cfginfo")) {
             sender.sendMessage(ChatColor.GREEN + "LOG OF CURRENTLY REGISTERED STUFF:");
-            Mobzy plugin = JavaPlugin.getPlugin(Mobzy.class);
+            Mobzy plugin = Mobzy.getInstance();
             MobzyConfig config = plugin.getMobzyConfig();
             sender.sendMessage("Mob configs: " + config.getMobCfgs());
             sender.sendMessage("Spawn configs: " + config.getSpawnCfgs());
@@ -50,7 +49,7 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
             sender.sendMessage("Reloaded config files (not necessarily successfully) :p");
             return true;
         }
-        List<World> worlds = context.getPlugin().getServer().getWorlds();
+        List<World> worlds = Mobzy.getInstance().getServer().getWorlds();
         boolean info = subCommand.equalsIgnoreCase("info") || subCommand.equalsIgnoreCase("i");
         if (sender.hasPermission("mobzy.remove") && (subCommand.equalsIgnoreCase("remove") || subCommand.equalsIgnoreCase("rm")) || info) {
             if (args.length < 2) {
@@ -144,7 +143,7 @@ public class MobzyCommands implements org.bukkit.command.CommandExecutor, TabCom
             if (args[1].equals("spawns")) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
-                    new MobzyGUI(player, JavaPlugin.getPlugin(Mobzy.class)).show(player);
+                    new MobzyGUI(player, Mobzy.getInstance()).show(player);
                 }
                 return true;
             }

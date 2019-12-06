@@ -15,7 +15,7 @@ import java.util.*;
 public class SpawnRegion {
     //TODO maybe mob caps should be determined per region?
     private Map<Class<? extends Entity>, List<MobSpawn>> spawns = new HashMap<>();
-    private MobzyConfig config = Mobzy.getPlugin(Mobzy.class).getMobzyConfig();
+    private MobzyConfig config = (Mobzy.getInstance()).getMobzyConfig();
     private String name;
 
     public SpawnRegion(String name, MobSpawn... spawns) {

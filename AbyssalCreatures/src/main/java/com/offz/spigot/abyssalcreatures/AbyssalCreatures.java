@@ -12,9 +12,7 @@ public final class AbyssalCreatures extends JavaPlugin implements MobzyAddon {
     public void onEnable() {
         getLogger().info("On enable has been called");
         saveDefaultConfig();
-        loadTypes();
-        MobzyAPI.registerSpawnConfig(new File(getDataFolder(), "spawns.yml"), this);
-        JavaPlugin.getPlugin(Mobzy.class).reloadExistingEntities();
+        registerWithMobzy(Mobzy.getInstance());
     }
 
     @Override
@@ -25,9 +23,12 @@ public final class AbyssalCreatures extends JavaPlugin implements MobzyAddon {
     }
 
     @Override
-    public void loadTypes() {
+    public void registerWithMobzy(Mobzy mobzy) {
         MobzyAPI.registerMobConfig(new File(getDataFolder(), "mobs.yml"), this);
         new AbyssalType();
         AbyssalType.registerTypes();
+
+        MobzyAPI.registerSpawnConfig(new File(getDataFolder(), "spawns.yml"), this);
+        mobzy.reloadExistingEntities();
     }
 }

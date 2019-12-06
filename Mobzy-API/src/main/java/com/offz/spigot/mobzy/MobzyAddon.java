@@ -1,5 +1,6 @@
 package com.offz.spigot.mobzy;
 
 public interface MobzyAddon {
-    void loadTypes();
+    void registerWithMobzy(Mobzy mobzy);
+//    void loadTypes();
 }
