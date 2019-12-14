@@ -1,4 +1,4 @@
-package com.offz.spigot.abyssalcreatures.Mobs.Hostile;
+package com.offz.spigot.abyssalcreatures.mobs.hostile;
 
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.mobs.types.HostileMob;

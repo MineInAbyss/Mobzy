@@ -1,4 +1,4 @@
-package com.offz.spigot.abyssalcreatures.Mobs.Passive;
+package com.offz.spigot.abyssalcreatures.mobs.passive;
 
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.mobs.types.PassiveMob;

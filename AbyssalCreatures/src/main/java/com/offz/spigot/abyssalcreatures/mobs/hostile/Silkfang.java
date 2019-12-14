@@ -1,15 +1,14 @@
-package com.offz.spigot.abyssalcreatures.Mobs.Hostile;
+package com.offz.spigot.abyssalcreatures.mobs.hostile;
 
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.mobs.types.HostileMob;
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.World;
 
-public class Ottobas extends HostileMob implements HitBehaviour {
-    public Ottobas(World world) {
-        super(world, "Ottobas");
-        this.setSize(2F, 3F);
-
+public class Silkfang extends HostileMob implements HitBehaviour {
+    public Silkfang(World world) {
+        super(world, "Silkfang");
+        this.setSize(2F, 2F);
     }
 
     @Override

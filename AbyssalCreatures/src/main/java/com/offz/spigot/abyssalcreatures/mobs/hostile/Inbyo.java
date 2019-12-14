@@ -1,6 +1,6 @@
-package com.offz.spigot.abyssalcreatures.Mobs.Hostile;
+package com.offz.spigot.abyssalcreatures.mobs.hostile;
 
-import com.offz.spigot.abyssalcreatures.Mobs.Passive.Neritantan;
+import com.offz.spigot.abyssalcreatures.mobs.passive.Neritantan;
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.mobs.types.HostileMob;
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation;

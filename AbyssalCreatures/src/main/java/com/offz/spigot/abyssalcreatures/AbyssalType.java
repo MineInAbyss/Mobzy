@@ -1,8 +1,8 @@
 package com.offz.spigot.abyssalcreatures;
 
-import com.offz.spigot.abyssalcreatures.Mobs.Flying.*;
-import com.offz.spigot.abyssalcreatures.Mobs.Hostile.*;
-import com.offz.spigot.abyssalcreatures.Mobs.Passive.*;
+import com.offz.spigot.abyssalcreatures.mobs.flying.*;
+import com.offz.spigot.abyssalcreatures.mobs.hostile.*;
+import com.offz.spigot.abyssalcreatures.mobs.passive.*;
 import com.offz.spigot.mobzy.CustomType;
 import net.minecraft.server.v1_13_R2.EntityTypes;
 

@@ -1,25 +1,31 @@
-package com.offz.spigot.abyssalcreatures.Mobs.Passive;
+package com.offz.spigot.abyssalcreatures.mobs.passive;
 
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
 import com.offz.spigot.mobzy.mobs.types.PassiveMob;
-import com.offz.spigot.mobzy.pathfinders.PathfinderGoalTemptPitchLock;
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.EntityAgeable;
+import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.World;
 
-public class Neritantan extends PassiveMob implements HitBehaviour {
-    public Neritantan(World world) {
-        super(world, "Neritantan");
+public class Okibo extends PassiveMob implements HitBehaviour {
+    //TODO change offset when riding and make controllable
+    public Okibo(World world) {
+        super(world, "Okibo");
+        setSize(3, 3);
+    }
+
+    @Override
+    public void onRightClick(EntityHuman player) {
+        player.startRiding(this);
     }
 
     @Override
     public void createPathfinders() {
         super.createPathfinders();
         goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
-        goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, getStaticBuilder().getTemptItems()));
     }
 
     public PassiveMob createChild(EntityAgeable entityageable) {
-        return new Neritantan(this.world);
+        return new Okibo(this.world);
     }
 }
