@@ -1,8 +1,8 @@
 package com.offz.spigot.abyssalcreatures.Mobs.Hostile;
 
-import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.Mobs.Types.HostileMob;
-import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalWalkingAnimation;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
+import com.offz.spigot.mobzy.mobs.types.HostileMob;
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.World;
 
 public class Tesuchi extends HostileMob implements HitBehaviour {

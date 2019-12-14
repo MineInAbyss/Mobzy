@@ -2,10 +2,10 @@ package com.offz.spigot.mobzy;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
-import com.offz.spigot.mobzy.Mobs.Types.HostileMob;
-import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
-import com.offz.spigot.mobzy.Spawning.SpawnRegistry;
+import com.offz.spigot.mobzy.mobs.types.FlyingMob;
+import com.offz.spigot.mobzy.mobs.types.HostileMob;
+import com.offz.spigot.mobzy.mobs.types.PassiveMob;
+import com.offz.spigot.mobzy.spawning.SpawnRegistry;
 import net.minecraft.server.v1_13_R2.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

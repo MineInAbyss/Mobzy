@@ -1,8 +1,8 @@
 package com.offz.spigot.abyssalcreatures.Mobs.Passive;
 
-import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.Mobs.Types.PassiveMob;
-import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalWalkingAnimation;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
+import com.offz.spigot.mobzy.mobs.types.PassiveMob;
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation;
 import net.minecraft.server.v1_13_R2.EntityAgeable;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.World;

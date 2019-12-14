@@ -1,9 +1,9 @@
 package com.offz.spigot.mobzy;
 
 import com.derongan.minecraft.guiy.GuiListener;
-import com.offz.spigot.mobzy.Listener.MobListener;
-import com.offz.spigot.mobzy.Mobs.CustomMob;
-import com.offz.spigot.mobzy.Spawning.SpawnTask;
+import com.offz.spigot.mobzy.listener.MobListener;
+import com.offz.spigot.mobzy.mobs.CustomMob;
+import com.offz.spigot.mobzy.spawning.SpawnTask;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StringFlag;

@@ -4,12 +4,15 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.61'
 }
 
-allprojects {
+repositories{
+    mavenCentral()
+}
+
+subprojects {
     group = 'com.github.MineInAbyss'
     version = plugin_version + '-SNAPSHOT'
-    apply plugin: 'kotlin'
     apply plugin: 'java'
-    apply plugin: 'maven'
+    apply plugin: 'kotlin'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -35,15 +38,18 @@ allprojects {
             maven { url 'https://erethon.de/repo/' } //HeadLib
             maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
             maven { url 'https://jitpack.io' } //JitPack
+            maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+            maven { url 'http://repo.md-5.net/content/groups/public/' }
         }
         mavenLocal()
     }
 
     dependencies {
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        compileOnly 'LibsDisguises:LibsDisguises:9.8.1-SNAPSHOT' //LibsDisguises
         compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT' //Spigot
         compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // NMS
         compileOnly 'de.erethon:headlib:3.0.1'
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 //        implementation 'com.github.yannicklamprecht.PathfindergoalAPI:PathfindergoalAPI:1.3.3.6'
     }
 

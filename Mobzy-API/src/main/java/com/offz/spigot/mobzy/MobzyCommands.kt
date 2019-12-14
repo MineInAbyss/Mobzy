@@ -1,9 +1,9 @@
 package com.offz.spigot.mobzy
 
-import com.offz.spigot.mobzy.GUI.MobzyGUI
-import com.offz.spigot.mobzy.Mobs.Types.FlyingMob
-import com.offz.spigot.mobzy.Mobs.Types.HostileMob
-import com.offz.spigot.mobzy.Mobs.Types.PassiveMob
+import com.offz.spigot.mobzy.gui.MobzyGUI
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.mobs.types.HostileMob
+import com.offz.spigot.mobzy.mobs.types.PassiveMob
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.Command

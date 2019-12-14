@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy;
 
-import com.offz.spigot.mobzy.Builders.MobBuilder;
-import com.offz.spigot.mobzy.Mobs.CustomMob;
+import com.offz.spigot.mobzy.mobs.MobTemplate;
+import com.offz.spigot.mobzy.mobs.CustomMob;
 import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityTypes;
 import org.bukkit.Bukkit;
@@ -125,17 +125,17 @@ public class MobzyAPI {
 
     /**
      * @param e the given entity
-     * @return its {@link MobBuilder} or null if the entity is not registered with Mobzy
+     * @return its {@link MobTemplate} or null if the entity is not registered with Mobzy
      */
-    public static MobBuilder getBuilder(org.bukkit.entity.Entity e) {
+    public static MobTemplate getBuilder(org.bukkit.entity.Entity e) {
         return getBuilder(((CraftEntity) e).getHandle());
     }
 
     /**
      * @param e the given entity
-     * @return its {@link MobBuilder} or null if the entity is not registered with Mobzy
+     * @return its {@link MobTemplate} or null if the entity is not registered with Mobzy
      */
-    public static MobBuilder getBuilder(Entity e) {
+    public static MobTemplate getBuilder(Entity e) {
         if (isCustomMob(e))
             return ((CustomMob) e).getBuilder();
         return null;
@@ -145,7 +145,7 @@ public class MobzyAPI {
      * @param name the name of an entity type
      * @return its builder
      */
-    public static MobBuilder getBuilder(String name) {
+    public static MobTemplate getBuilder(String name) {
         return CustomType.getBuilder(name);
     }
 

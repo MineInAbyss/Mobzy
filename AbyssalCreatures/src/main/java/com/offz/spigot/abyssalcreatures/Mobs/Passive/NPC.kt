@@ -1,14 +1,14 @@
 package com.offz.spigot.abyssalcreatures.Mobs.Passive
 
-import com.offz.spigot.mobzy.Builders.MobBuilder
-import com.offz.spigot.mobzy.Mobs.Types.PassiveMob
-import com.offz.spigot.mobzy.Pathfinders.PathfinderGoalLookAtPlayerPitchLock
+import com.offz.spigot.mobzy.mobs.MobTemplate
+import com.offz.spigot.mobzy.mobs.types.PassiveMob
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import net.minecraft.server.v1_13_R2.*
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
 
 class NPC(world: World?, name: String?, modelID: Int) :
-        PassiveMob(world, MobBuilder(name = name!!, modelID = modelID, modelMaterial = Material.DIAMOND_AXE)) {
+        PassiveMob(world, MobTemplate(name = name!!, modelID = modelID, modelMaterial = Material.DIAMOND_AXE)) {
     //Stop from being pushed around
     override fun collide(entity: Entity) {}
 

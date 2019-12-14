@@ -1,8 +1,8 @@
 package com.offz.spigot.abyssalcreatures.Mobs.Flying;
 
-import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
-import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalDiveOnTargetAttack;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
+import com.offz.spigot.mobzy.mobs.types.FlyingMob;
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalDiveOnTargetAttack;
 import net.minecraft.server.v1_13_R2.World;
 
 public class Dosetori extends FlyingMob implements HitBehaviour {

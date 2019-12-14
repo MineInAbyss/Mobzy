@@ -1,11 +1,11 @@
 package com.offz.spigot.abyssalcreatures.Mobs.Flying;
 
-import com.offz.spigot.mobzy.Mobs.Behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.Mobs.Types.FlyingMob;
-import com.offz.spigot.mobzy.Pathfinders.Flying.MZGoalHurtByTarget;
-import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalFlyDamageTarget;
-import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalFlyTowardsTarget;
-import com.offz.spigot.mobzy.Pathfinders.Flying.PathfinderGoalIdleFlyAboveGround;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
+import com.offz.spigot.mobzy.mobs.types.FlyingMob;
+import com.offz.spigot.mobzy.pathfinders.flying.MZGoalHurtByTarget;
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget;
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyTowardsTarget;
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFlyAboveGround;
 import net.minecraft.server.v1_13_R2.PathfinderGoalFloat;
 import net.minecraft.server.v1_13_R2.World;
 

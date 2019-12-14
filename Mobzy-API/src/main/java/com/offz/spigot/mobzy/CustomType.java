@@ -1,8 +1,8 @@
 package com.offz.spigot.mobzy;
 
 import com.mojang.datafixers.types.Type;
-import com.offz.spigot.mobzy.Builders.MobBuilder;
-import com.offz.spigot.mobzy.Mobs.Behaviours.AfterSpawnBehaviour;
+import com.offz.spigot.mobzy.mobs.MobTemplate;
+import com.offz.spigot.mobzy.mobs.behaviours.AfterSpawnBehaviour;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class CustomType {
     //this is used for getting a MobType from a String, which makes it easier to access from MobBuilder
     private static Map<String, EntityTypes> types = new HashMap<>();
-    private static Map<String, MobBuilder> builders = new HashMap<>();
+    private static Map<String, MobTemplate> builders = new HashMap<>();
     private static Mobzy plugin = Mobzy.getInstance();
 
     public static String toEntityTypeID(String name) {
@@ -39,11 +39,11 @@ public class CustomType {
         return types.get(toEntityTypeID(name));
     }
 
-    public static MobBuilder getBuilder(String name) {
+    public static MobTemplate getBuilder(String name) {
         return builders.get(toEntityTypeID(name));
     }
 
-    public static EntityTypes getType(MobBuilder builder) {
+    public static EntityTypes getType(MobTemplate builder) {
         return types.get(toEntityTypeID(builder.getName()));
     }
 
@@ -74,7 +74,7 @@ public class CustomType {
         Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + types.keySet().toString());
     }
 
-    protected static MobBuilder readBuilderConfig(String className) {
+    protected static MobTemplate readBuilderConfig(String className) {
         FileConfiguration mobCfg = null;
         className = className.substring(0, 1) + className.toLowerCase().substring(1); //config can't read mobs if a capital is present anywhere after the first character, so we set them all to lowercase
 
@@ -88,7 +88,7 @@ public class CustomType {
         if (mobCfg == null)
             return null;
 
-        return MobBuilder.Companion.deserialize(((MemorySection) mobCfg.get(className)).getValues(true), className);
+        return MobTemplate.Companion.deserialize(((MemorySection) mobCfg.get(className)).getValues(true), className);
     }
 
     //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293

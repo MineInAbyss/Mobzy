@@ -1,13 +1,4 @@
-repositories {
-    maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
-    maven { url 'http://repo.md-5.net/content/groups/public/' }
-    mavenCentral() //LibsDisguises
-//    maven { url 'http://repo.extendedclip.com/content/repositories/placeholderapi/' } //PlaceHolderAPI
-}
-
-
 dependencies {
-    compileOnly 'LibsDisguises:LibsDisguises:9.8.1-SNAPSHOT' //LibsDisguises TODO clean this up
     compile project(':Mobzy-API')
 }
 
