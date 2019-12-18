@@ -1,17 +1,17 @@
 package com.offz.spigot.mobzy.listener;
 
-import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.mobs.CustomMob;
 import com.offz.spigot.mobzy.Mobzy;
-import com.offz.spigot.mobzy.MobzyAPI;
+import com.offz.spigot.mobzy.MobzyAPIKt;
 import com.offz.spigot.mobzy.MobzyContext;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityHuman;
+import com.offz.spigot.mobzy.mobs.CustomMob;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
+import net.minecraft.server.v1_15_R1.Entity;
+import net.minecraft.server.v1_15_R1.EntityHuman;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Statistic;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +27,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.RayTraceResult;
 
+//TODO convert to kotlin
 public class MobListener implements Listener {
     Mobzy plugin;
     private MobzyContext context;
@@ -60,7 +61,6 @@ public class MobListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onHit(EntityDamageEvent e) {
-
         Entity entity = (((CraftEntity) e.getEntity()).getHandle());
         if (entity instanceof HitBehaviour) {
             //change the model to its hit version
@@ -117,7 +117,7 @@ public class MobListener implements Listener {
         if (leftClicked(e) || rightClicked(e)) {
             RayTraceResult trace = p.getWorld().rayTrace(p.getEyeLocation(), p.getLocation().getDirection(), 3, FluidCollisionMode.ALWAYS, true, 0, entity -> !entity.equals(p));
             if (trace != null && trace.getHitEntity() != null) {
-                Entity hit = MobzyAPI.toNMS(trace.getHitEntity());
+                Entity hit = MobzyAPIKt.toNMS(trace.getHitEntity());
                 if (!(hit instanceof CustomMob))
                     return;
 

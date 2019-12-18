@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.mobzy.pathfinders.flying;
 
 import com.offz.spigot.mobzy.mobs.types.FlyingMob;
@@ -27,3 +28,4 @@ public class PathfinderGoalIdleFlyAboveGround extends PathfinderGoalIdleFly {
             mob.getControllerMove().a(dx, mob.locY - 0.1, dz, 1.0D);
     }
 }
+*/

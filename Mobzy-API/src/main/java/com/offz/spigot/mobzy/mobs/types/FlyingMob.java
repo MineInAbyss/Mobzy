@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.mobzy.mobs.types;
 
 import com.offz.spigot.mobzy.mobs.MobTemplate;
@@ -7,11 +8,13 @@ import com.offz.spigot.mobzy.mobs.CustomMob;
 import com.offz.spigot.mobzy.pathfinders.controllers.MZControllerMoveFlying;
 import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget;
 import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFly;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_15_R1.*;
 
+*/
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
- */
+ *//*
+
 public abstract class FlyingMob extends EntityFlying implements CustomMob, IMonster {
     //    private static final DataWatcherObject<Boolean> a = DataWatcher.a(EntityGhast.class, DataWatcherRegistry.i);
     protected MobTemplate builder;
@@ -78,9 +81,11 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         return power;
     }
 
-    /**
+    */
+/**
      * Removes if not in peaceful mode
-     */
+     *//*
+
     public void tick() {
         super.tick();
         if (!world.isClientSide && world.getDifficulty() == EnumDifficulty.PEACEFUL) {
@@ -262,3 +267,4 @@ public abstract class FlyingMob extends EntityFlying implements CustomMob, IMons
         }
     }
 }
+*/

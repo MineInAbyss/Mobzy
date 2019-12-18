@@ -1,11 +1,12 @@
 package com.offz.spigot.mobzy.mobs
 
+import com.offz.spigot.mobzy.damage
 import com.offz.spigot.mobzy.debug
+import com.offz.spigot.mobzy.editItemMeta
 import me.libraryaddict.disguise.disguisetypes.DisguiseType
 import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.Damageable
 import java.util.*
 
 /**
@@ -37,15 +38,12 @@ data class MobTemplate(var name: String,
         return chosenDrops
     }
 
-    fun getModelItemStack(): ItemStack {
-        val itemStack = ItemStack(modelMaterial, 1)
-        val meta = itemStack.itemMeta
-        (meta as Damageable?)!!.damage = modelID
-        meta!!.setDisplayName(name)
-        meta.isUnbreakable = true
-        itemStack.itemMeta = meta
-        return itemStack
-    }
+    val modelItemStack
+        get() = ItemStack(modelMaterial, 1).editItemMeta {
+            it.damage = modelID
+            it.isUnbreakable = true
+            it.setDisplayName(name)
+        }
 
     /**
      * Does nothing yet

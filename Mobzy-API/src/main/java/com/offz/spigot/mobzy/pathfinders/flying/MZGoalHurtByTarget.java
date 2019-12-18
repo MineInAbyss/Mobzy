@@ -1,9 +1,9 @@
 package com.offz.spigot.mobzy.pathfinders.flying;
 
-import net.minecraft.server.v1_13_R2.EntityHuman;
-import net.minecraft.server.v1_13_R2.EntityInsentient;
-import net.minecraft.server.v1_13_R2.EntityLiving;
-import net.minecraft.server.v1_13_R2.PathfinderGoal;
+import net.minecraft.server.v1_15_R1.EntityHuman;
+import net.minecraft.server.v1_15_R1.EntityInsentient;
+import net.minecraft.server.v1_15_R1.EntityLiving;
+import net.minecraft.server.v1_15_R1.PathfinderGoal;
 import org.bukkit.event.entity.EntityTargetEvent.TargetReason;
 
 public class MZGoalHurtByTarget extends PathfinderGoal {

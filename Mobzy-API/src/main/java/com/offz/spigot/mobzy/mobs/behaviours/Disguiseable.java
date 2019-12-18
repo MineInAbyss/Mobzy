@@ -4,7 +4,7 @@ import com.offz.spigot.mobzy.mobs.CustomMob;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 
 public class Disguiseable extends MobBehaviour {
     public Disguiseable(CustomMob mob) {

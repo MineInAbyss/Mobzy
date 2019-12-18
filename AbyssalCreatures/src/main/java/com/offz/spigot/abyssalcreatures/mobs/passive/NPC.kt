@@ -1,9 +1,10 @@
+/*
 package com.offz.spigot.abyssalcreatures.mobs.passive
 
 import com.offz.spigot.mobzy.mobs.MobTemplate
 import com.offz.spigot.mobzy.mobs.types.PassiveMob
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
-import net.minecraft.server.v1_13_R2.*
+import net.minecraft.server.v1_15_R1.*
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
 
@@ -13,9 +14,11 @@ class NPC(world: World?, name: String?, modelID: Int) :
     override fun collide(entity: Entity) {}
 
     override fun move(enummovetype: EnumMoveType, d0: Double, d1: Double, d2: Double) {}
-    /**
+    */
+/**
      * Prevent NPCs from getting damaged by anything
-     */
+     *//*
+
     override fun damageEntity(damagesource: DamageSource, f: Float): Boolean {
         return false
     }
@@ -33,4 +36,4 @@ class NPC(world: World?, name: String?, modelID: Int) :
         addScoreboardTag("npc")
         (getBukkitEntity() as LivingEntity).removeWhenFarAway = false
     }
-}
+}*/

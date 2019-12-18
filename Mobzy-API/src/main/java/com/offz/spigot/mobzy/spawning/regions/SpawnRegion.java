@@ -3,8 +3,8 @@ package com.offz.spigot.mobzy.spawning.regions;
 import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.MobzyConfig;
 import com.offz.spigot.mobzy.spawning.MobSpawn;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityTypes;
+import net.minecraft.server.v1_15_R1.Entity;
+import net.minecraft.server.v1_15_R1.EntityTypes;
 
 import java.util.*;
 
@@ -37,7 +37,7 @@ public class SpawnRegion {
     }
 
     public void addSpawn(MobSpawn spawn) {
-        Class entityClass = spawn.getEntityType().c();
+        Class entityClass = spawn.getEntityType().getClass(); //FIXME
         //add to a different spawn list depending on what kind of entity type it is (since we have separate mob caps per list)
         for (Class<? extends Entity> type : config.getRegisteredMobTypes().values()) {
             if (type.isAssignableFrom(entityClass)) {

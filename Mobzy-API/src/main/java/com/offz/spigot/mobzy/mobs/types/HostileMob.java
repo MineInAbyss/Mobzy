@@ -1,3 +1,4 @@
+/*
 package com.offz.spigot.mobzy.mobs.types;
 
 import com.offz.spigot.mobzy.mobs.MobTemplate;
@@ -6,13 +7,15 @@ import com.offz.spigot.mobzy.mobs.behaviours.*;
 import com.offz.spigot.mobzy.mobs.CustomMob;
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock;
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalMeleeAttackPitchLock;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_15_R1.*;
 
 import javax.annotation.Nullable;
 
+*/
 /**
  * Lots of code taken from EntityZombie
- */
+ *//*
+
 public abstract class HostileMob extends EntityMonster implements CustomMob {
     protected MobTemplate builder;
     private Deathable deathable = new Deathable(this);
@@ -66,9 +69,11 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
     }
 
-    /**
+    */
+/**
      * Removes if not in peaceful mode
-     */
+     *//*
+
     public void tick() {
         super.tick();
         if (!world.isClientSide && world.getDifficulty() == EnumDifficulty.PEACEFUL) {
@@ -184,3 +189,4 @@ public abstract class HostileMob extends EntityMonster implements CustomMob {
         return new ChatMessage(getBuilder().getName());
     }
 }
+*/

@@ -2,11 +2,9 @@ package com.offz.spigot.mobzy;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import com.offz.spigot.mobzy.mobs.types.HostileMob;
 import com.offz.spigot.mobzy.mobs.types.PassiveMob;
 import com.offz.spigot.mobzy.spawning.SpawnRegistry;
-import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_15_R1.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -143,7 +141,7 @@ public class MobzyConfig {
      */
     void registerSpawnCfg(File file, JavaPlugin plugin) {
         registerCfg(spawnCfgs, file, plugin);
-        SpawnRegistry.readCfg(spawnCfgs.get(file));
+        SpawnRegistry.INSTANCE.readCfg(spawnCfgs.get(file));
     }
 
     /**
@@ -195,17 +193,17 @@ public class MobzyConfig {
      * TODO make it properly reload everything
      */
     public void reload() {
-        CustomType.getTypes().clear();
+        CustomType.Companion.getTypes().clear();
         registeredMobTypes.clear();
         plugin.getLogger().info(ChatColor.YELLOW + "Registered addons: " + registeredAddons.toString());
 
         registerMobType("passive", PassiveMob.class);
-        registerMobType("hostile", HostileMob.class);
-        registerMobType("flying", FlyingMob.class);
+//        registerMobType("hostile", HostileMob.class); //FIXME
+//        registerMobType("flying", FlyingMob.class);
         registeredAddons.forEach(addon -> addon.registerWithMobzy(plugin));
         loadConfigValues();
         reloadConfigurationMap(mobCfgs);
-        SpawnRegistry.unregisterAll();
+        SpawnRegistry.INSTANCE.unregisterAll();
         reloadConfigurationMap(spawnCfgs);
     }
 
@@ -216,7 +214,7 @@ public class MobzyConfig {
         for (File file : configs.keySet()) {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
             configs.put(file, config);
-            SpawnRegistry.readCfg(config);
+            SpawnRegistry.INSTANCE.readCfg(config);
         }
     }
 }

@@ -9,12 +9,12 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import net.minecraft.server.v1_13_R2.EntityLiving;
-import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.EntityLiving;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,7 +27,6 @@ public final class Mobzy extends JavaPlugin {
     private static Mobzy instance;
     private MobzyConfig mobzyConfig;
     private MobzyContext context;
-    private MobzyAPI mobzyAPI;
 
     public static Mobzy getInstance() {
         return instance;
@@ -75,7 +74,6 @@ public final class Mobzy extends JavaPlugin {
         saveDefaultConfig();
         loadConfigManager();
         reloadConfig();
-        mobzyAPI = new MobzyAPI(this);
 
         CustomType.registerTypes(); //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
@@ -131,10 +129,6 @@ public final class Mobzy extends JavaPlugin {
             }
         }
         getLogger().info(ChatColor.GREEN + "Reloaded " + num + " custom entities");
-    }
-
-    public MobzyAPI getApi() {
-        return mobzyAPI;
     }
 
     @Override

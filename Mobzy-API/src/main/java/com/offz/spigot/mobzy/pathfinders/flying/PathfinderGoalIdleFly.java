@@ -1,14 +1,17 @@
+/*
 package com.offz.spigot.mobzy.pathfinders.flying;
 
 import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import net.minecraft.server.v1_13_R2.ControllerMove;
-import net.minecraft.server.v1_13_R2.PathfinderGoal;
+import net.minecraft.server.v1_15_R1.ControllerMove;
+import net.minecraft.server.v1_15_R1.PathfinderGoal;
 
 import java.util.Random;
 
+*/
 /**
  * Most code from EntityGhast's pathfinders
- */
+ *//*
+
 public class PathfinderGoalIdleFly extends PathfinderGoal {
     protected final FlyingMob mob;
 
@@ -43,4 +46,4 @@ public class PathfinderGoalIdleFly extends PathfinderGoal {
             mob.lookAt(x, y, z);
         }
     }
-}
+}*/

@@ -7,7 +7,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'LibsDisguises:LibsDisguises:9.8.1-SNAPSHOT' //LibsDisguises
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
     implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
     if (useLocalGuiy.toBoolean())
@@ -20,12 +19,14 @@ shadowJar {
     getArchiveBaseName().set("Mobzy")
     getArchiveClassifier().set(null)
     dependencies {
-        include(dependency('de.erethon:headlib:3.0.1'))
+        include(dependency('de.erethon:headlib:3.0.2'))
         include(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
         if (useLocalGuiy.toBoolean())
             include(project(':guiy'))
         else
             include(dependency('com.github.Mineinabyss:guiy:master-SNAPSHOT'))
+        include(dependency('com.github.yannicklamprecht.PathfindergoalAPI:PathfinderAPI:1.3.3.7'))
+        include(dependency("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"))
     }
 }
 

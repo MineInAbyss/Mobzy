@@ -1,48 +1,27 @@
-package com.offz.spigot.abyssalcreatures.mobs.passive;
+package com.offz.spigot.abyssalcreatures.mobs.passive
 
-import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.mobs.types.PassiveMob;
-import com.offz.spigot.mobzy.pathfinders.PathfinderGoalTemptPitchLock;
-import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation;
-import net.minecraft.server.v1_13_R2.EntityAgeable;
-import net.minecraft.server.v1_13_R2.EntityHuman;
-import net.minecraft.server.v1_13_R2.PathfinderGoalAvoidTarget;
-import net.minecraft.server.v1_13_R2.World;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
+import com.offz.spigot.mobzy.mobs.types.PassiveMob
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
+import net.minecraft.server.v1_15_R1.EntityAgeable
+import net.minecraft.server.v1_15_R1.EntityHuman
+import net.minecraft.server.v1_15_R1.PathfinderGoalAvoidTarget
+import net.minecraft.server.v1_15_R1.World
 
-public class Fuwagi extends PassiveMob implements HitBehaviour {
-    public Fuwagi(World world) {
-        super(world, "Fuwagi");
+class Fuwagi(world: World?) : PassiveMob(world, "Fuwagi"), HitBehaviour {
+    override fun createPathfinders() {
+        super.createPathfinders()
+        registerPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.modelID))
+        registerPathfinderGoal(1, PathfinderGoalAvoidTarget(this, EntityHuman::class.java, 8.0f, 1.0, 1.0))
+        //        goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, getStaticBuilder().getTemptItems()));
     }
 
-    @Override
-    public void createPathfinders() {
-        super.createPathfinders();
-        goalSelector.a(0, new PathfinderGoalWalkingAnimation(this, getStaticBuilder().getModelID()));
-        goalSelector.a(1, new PathfinderGoalAvoidTarget<>(this, EntityHuman.class, 8.0F, 1D, 1D));
-        goalSelector.a(4, new PathfinderGoalTemptPitchLock(this, 1.2D, false, getStaticBuilder().getTemptItems()));
-    }
+    override val soundHurt: String? = "entity.rabbit.attack"
+    override val soundAmbient: String? = "entity.rabbit.ambient"
+    override val soundStep: String? = "entity.rabbit.jump"
+    override val soundDeath: String? = "entity.rabbit.death"
 
-    @Override
-    public String soundHurt() {
-        return "entity.rabbit.attack";
-    }
-
-    @Override
-    public String soundAmbient() {
-        return "entity.rabbit.ambient";
-    }
-
-    @Override
-    public String soundStep() {
-        return "entity.rabbit.jump";
-    }
-
-    @Override
-    public String soundDeath() {
-        return "entity.rabbit.death";
-    }
-
-    public PassiveMob createChild(EntityAgeable entityageable) {
-        return new Fuwagi(this.world);
+    override fun createChild(entityageable: EntityAgeable): PassiveMob? {
+        return Fuwagi(this.world)
     }
 }

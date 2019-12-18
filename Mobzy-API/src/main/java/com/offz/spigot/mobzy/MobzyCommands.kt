@@ -1,8 +1,8 @@
 package com.offz.spigot.mobzy
 
 import com.offz.spigot.mobzy.gui.MobzyGUI
-import com.offz.spigot.mobzy.mobs.types.FlyingMob
-import com.offz.spigot.mobzy.mobs.types.HostileMob
+//import com.offz.spigot.mobzy.mobs.types.FlyingMob
+//import com.offz.spigot.mobzy.mobs.types.HostileMob
 import com.offz.spigot.mobzy.mobs.types.PassiveMob
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -37,7 +37,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
             sendInfo("Mob configs: ${config.mobCfgs}\n" +
                     "Spawn configs: ${config.spawnCfgs}\n" +
                     "Registered addons: ${config.registeredAddons}\n" +
-                    "Registered EntityTypes: ${CustomType.getTypes()}")
+                    "Registered EntityTypes: ${CustomType.types}")
         }
 
         //reload
@@ -57,10 +57,10 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
                 val map = context.mobzyConfig.registeredAddons.map { (it as JavaPlugin).name }
 
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().consoleSender, "plugman unload Mobzy")
-                map.forEach{Bukkit.getServer().dispatchCommand(Bukkit.getServer().consoleSender, "plugman unload $it")}
+                map.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getServer().consoleSender, "plugman unload $it") }
 
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().consoleSender, "plugman load Mobzy")
-                map.forEach{Bukkit.getServer().dispatchCommand(Bukkit.getServer().consoleSender, "plugman load $it")}
+                map.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getServer().consoleSender, "plugman load $it") }
             }
             return true
         }
@@ -81,15 +81,15 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
             var entityCount = 0
             for (world in worlds) for (entity in world.entities) {
                 val tags = entity.scoreboardTags
-                val nmsEntity = MobzyAPI.toNMS(entity)
-                if (MobzyAPI.isCustomMob(entity)
-                        && (args[1] == "all" && !MobzyAPI.isRenamed(entity) && !entity.scoreboardTags.contains("npc")
-                                || args[1] == "named" && MobzyAPI.isRenamed(entity)
+                val nmsEntity = entity.toNMS()
+                if (entity.isCustomMob
+                        && (args[1] == "all" && !entity.isRenamed && !entity.scoreboardTags.contains("npc")
+                                || args[1] == "named" && entity.isRenamed
                                 || args[1] == "npc" && entity.scoreboardTags.contains("npc")
                                 || args[1] == "passive" && !entity.scoreboardTags.contains("npc") && nmsEntity is PassiveMob
-                                || args[1] == "hostile" && nmsEntity is HostileMob
-                                || args[1] == "flying" && nmsEntity is FlyingMob
-                                || MobzyAPI.isMobOfType(entity, args[1])))
+//                                || args[1] == "hostile" && nmsEntity is HostileMob //FIXME
+//                                || args[1] == "flying" && nmsEntity is FlyingMob
+                                || entity.isOfType(args[1])))
                     try {
                         val playerLoc = sender.location
                         if (args.size < 3 || entity.world == playerLoc.world && entity.location.distance(playerLoc) < args[2].toInt()) {
@@ -115,13 +115,9 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
         else if ("mobzy.spawn".permitted("spawn", "s")) {
             if (sender !is Player) {
                 sendError("Command can only be used by a player"); return true
-            }
-
-            if (args.size == 1) {
+            } else if (args.size == 1) {
                 sendError("Enter a mob name"); return true
-            }
-
-            if (!CustomType.getTypes().containsKey(args[1])) {
+            } else if (!CustomType.types.containsKey(args[1])) {
                 sendError("No such entity ${args[1]}"); return true
             }
 
@@ -129,7 +125,8 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
             if (args.size == 3) numOfSpawns = try {
                 args[2].toInt()
             } catch (e: NumberFormatException) {
-                sendError("${args[2]} is not a valid number"); return true
+                sendError("${args[2]} is not a valid number")
+                return true
             }
 
             if (numOfSpawns > MobzyConfig.getMaxSpawnAmount()) numOfSpawns = MobzyConfig.getMaxSpawnAmount()
@@ -139,23 +136,18 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
 
         //list
         else if ("mobzy.spawn.list".permitted("list", "l")) {
-            sendSuccess(CustomType.getTypes().keys.toString())
+            sendSuccess(CustomType.types.keys.toString())
             return true
         }
 
         //config
         else if ("mobzy.config".permitted("config")) {
-            if (sender !is Player) {
-                sendError("Command can only be used by a player"); return true
+            when {
+                sender !is Player -> sendError("Command can only be used by a player")
+                args.size == 1 -> sendError("Enter a config option")
+                args[1] == "spawns" -> MobzyGUI(sender).show(sender)
             }
-
-            if (args.size == 1) {
-                sendError("Enter a config option")
-                return true
-            }
-            if (args[1] == "spawns") {
-                MobzyGUI(sender, Mobzy.getInstance()).show(sender); return true
-            }
+            return true
         }
         return false
     }
@@ -167,7 +159,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
         val subCommand = args[0]
         if (subCommand == "spawn" || subCommand == "s")
             if (args.size == 2) {
-                return CustomType.getTypes().keys
+                return CustomType.types.keys
                         .filter { a: String -> a.startsWith(args[1].toLowerCase()) }
             } else if (args.size == 3) {
                 var min = 1
@@ -181,12 +173,12 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
         if (subCommand in listOf("remove", "rm", "info", "i"))
             if (args.size == 2) {
                 val mobs: MutableList<String> = ArrayList()
-                mobs.addAll(CustomType.getTypes().keys)
+                mobs.addAll(CustomType.types.keys)
                 mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
-                return mobs.filter { a: String -> a.toLowerCase().startsWith(args[1].toLowerCase()) }
+                return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
             }
         return if (subCommand == "config") listOf("mobs", "spawns")
-                .filter { a: String -> a.toLowerCase().startsWith(args[1].toLowerCase()) }
+                .filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
         else emptyList()
     }
 

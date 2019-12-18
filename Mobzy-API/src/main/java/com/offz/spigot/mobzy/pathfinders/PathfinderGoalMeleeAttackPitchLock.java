@@ -1,6 +1,7 @@
+/*
 package com.offz.spigot.mobzy.pathfinders;
 
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_15_R1.*;
 
 public class PathfinderGoalMeleeAttackPitchLock extends PathfinderGoal {
     protected final int c = 20;
@@ -105,3 +106,4 @@ public class PathfinderGoalMeleeAttackPitchLock extends PathfinderGoal {
         return (double) (this.a.width * 1.0F * this.a.width * 1.0F + var0.width);
     }
 }
+*/

@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.spawning;
 
 import com.offz.spigot.mobzy.Mobzy;
-import com.offz.spigot.mobzy.MobzyAPI;
+import com.offz.spigot.mobzy.MobzyAPIKt;
 import com.offz.spigot.mobzy.MobzyConfig;
 import com.offz.spigot.mobzy.spawning.vertical.SpawnArea;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -9,7 +9,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_15_R1.Entity;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+//TODO convert to kotlin
 public class SpawnTask extends BukkitRunnable {
     private static final int SPAWN_TRIES = 5;
     private Mobzy plugin;
@@ -33,6 +34,7 @@ public class SpawnTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        cancel(); //FIXME getNearbyEntities is no longer async
         if (!MobzyConfig.doMobSpawns())
             cancel();
 
@@ -58,15 +60,15 @@ public class SpawnTask extends BukkitRunnable {
 
                     //decide spawns around player
                     List<MobSpawnEvent> toSpawn = new ArrayList<>();
-                    Map<Class<? extends net.minecraft.server.v1_13_R2.Entity>, MutableInt> originalMobCount = new HashMap<>();
+                    Map<Class<? extends net.minecraft.server.v1_15_R1.Entity>, MutableInt> originalMobCount = new HashMap<>();
                     config.getRegisteredMobTypes().values().forEach(type -> originalMobCount.put(type, new MutableInt(0)));
                     MutableInt totalMobs = new MutableInt(0);
 
                     //go through entities around player, adding nearby players to a list
                     for (org.bukkit.entity.Entity entity : p.getNearbyEntities(MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius(), MobzyConfig.getSpawnSearchRadius())) {
-                        if (MobzyAPI.isCustomMob(entity))
+                        if (MobzyAPIKt.isCustomMob(entity))
                             for (Class<? extends Entity> type : config.getRegisteredMobTypes().values()) {
-                                if (type.isInstance(MobzyAPI.toNMS(entity))) {
+                                if (type.isInstance(MobzyAPIKt.toNMS(entity))) {
                                     MutableInt count = originalMobCount.get(type);
                                     count.increment();
                                 } else if (entity.getType().equals(EntityType.PLAYER)) {
@@ -78,7 +80,7 @@ public class SpawnTask extends BukkitRunnable {
                             }
                     }
 
-                    Map<Class<? extends net.minecraft.server.v1_13_R2.Entity>, MutableInt> mobCount = new HashMap<>();
+                    Map<Class<? extends net.minecraft.server.v1_15_R1.Entity>, MutableInt> mobCount = new HashMap<>();
                     originalMobCount.forEach((key, value) -> mobCount.put(key, new MutableInt(value.intValue())));
 
                     //if we've hit the cap, stop spawning
@@ -130,7 +132,7 @@ public class SpawnTask extends BukkitRunnable {
 
                             RandomCollection<MobSpawn> validSpawns = new RandomCollection<>();
 
-                            List<MobSpawn> regionSpawns = SpawnRegistry.getMobSpawnsForRegions(regionIDs, type);
+                            List<MobSpawn> regionSpawns = SpawnRegistry.INSTANCE.getMobSpawnsForRegions(regionIDs, type);
 
                             if (regionSpawns == null)
                                 continue;
@@ -157,9 +159,9 @@ public class SpawnTask extends BukkitRunnable {
 
                         //after we've hit the mob cap, print mob count
                         if (toSpawn.size() > 0) {
-                            MobzyAPI.debug(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + (totalMobs + " mobs before"));
+                            MobzyAPIKt.debug(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + (totalMobs + " mobs before"));
                             mobCount.entrySet().stream().filter(entry -> entry.getValue().intValue() - originalMobCount.get(entry.getKey()).intValue() > 0)
-                                    .forEach(entry -> MobzyAPI.debug(ChatColor.LIGHT_PURPLE + (entry.getValue().intValue() - originalMobCount.get(entry.getKey()).intValue() + " " + config.getRegisteredMobTypes().inverse().get(entry.getKey()) + " mobs spawned")));
+                                    .forEach(entry -> MobzyAPIKt.debug(ChatColor.LIGHT_PURPLE + (entry.getValue().intValue() - originalMobCount.get(entry.getKey()).intValue() + " " + config.getRegisteredMobTypes().inverse().get(entry.getKey()) + " mobs spawned")));
                         }
                     });
                 }

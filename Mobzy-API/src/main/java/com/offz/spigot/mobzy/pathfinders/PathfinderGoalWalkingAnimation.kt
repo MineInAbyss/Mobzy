@@ -1,32 +1,37 @@
-package com.offz.spigot.mobzy.pathfinders;
+package com.offz.spigot.mobzy.pathfinders
 
-import net.minecraft.server.v1_13_R2.EntityCreature;
-import net.minecraft.server.v1_13_R2.EnumItemSlot;
-import net.minecraft.server.v1_13_R2.ItemStack;
-import net.minecraft.server.v1_13_R2.PathfinderGoal;
-import org.bukkit.util.Vector;
+import com.offz.spigot.mobzy.damage
+import com.offz.spigot.mobzy.editItemMeta
+import org.bukkit.entity.LivingEntity
 
-public class PathfinderGoalWalkingAnimation extends PathfinderGoal {
-    private final EntityCreature mob;
-    private final int modelID;
+class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID: Int) : PathfinderGoal() {
+    private val model
+        get() = mob.equipment!!.helmet!!
 
-    public PathfinderGoalWalkingAnimation(EntityCreature entitycreature, int modelID) {
-        this.mob = entitycreature;
-        this.modelID = modelID;
+    override fun execute() {
+        mob.equipment!!.helmet = model.editItemMeta {
+            it.damage = modelID + 1
+        }
     }
 
-    public boolean a() {
-        ItemStack model = this.mob.getEquipment(EnumItemSlot.HEAD);
-        if (model.getDamage() == modelID + 2) //if showing hit model
-            return false;
-        Vector v = mob.getBukkitEntity().getVelocity();
-
-
-        if (v.getX() == 0 && v.getZ() == 0)
-            model.setDamage(modelID);
-        else
-            model.setDamage(modelID + 1);
-        mob.setEquipment(EnumItemSlot.HEAD, model);
-        return true; //if this returns true, I think any less important behaviours don't get to run
+    override fun init() {
     }
+
+    override fun reset() {
+
+    }
+
+    override fun shouldExecute(): Boolean {
+        val velocity = mob.velocity
+        return model.damage != modelID + 2 && !(velocity.x in -0.001..0.001 && velocity.z in -0.001..0.001)
+    }
+
+    override fun shouldTerminate(): Boolean {
+        if (!shouldExecute() && model.damage != modelID + 2)
+            mob.equipment!!.helmet = model.editItemMeta {
+                it.damage = modelID
+            }
+        return false
+    }
+
 }

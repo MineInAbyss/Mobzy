@@ -1,7 +1,8 @@
+/*
 package com.offz.spigot.mobzy.pathfinders.flying;
 
 import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import net.minecraft.server.v1_13_R2.PathfinderGoal;
+import net.minecraft.server.v1_15_R1.PathfinderGoal;
 import org.bukkit.entity.LivingEntity;
 
 public class PathfinderGoalFlyDamageTarget extends PathfinderGoal {
@@ -28,4 +29,4 @@ public class PathfinderGoalFlyDamageTarget extends PathfinderGoal {
             }
         }
     }
-}
+}*/

@@ -1,8 +1,10 @@
+/*
 package com.offz.spigot.mobzy.pathfinders;
 
 public class PathfinderHelper {
 
-    /*private boolean hasLineOfSight(Entity entity, double dx, double dy, double dz, double distance) {
+    */
+/*private boolean hasLineOfSight(Entity entity, double dx, double dy, double dz, double distance) {
         Location loc = entity.getLocation();
         double x = (dx - loc.getX()) / distance;
         double y = (dy - loc.getY()) / distance;
@@ -19,5 +21,7 @@ public class PathfinderHelper {
         }
 
         return true;
-    }*/
+    }*//*
+
 }
+*/

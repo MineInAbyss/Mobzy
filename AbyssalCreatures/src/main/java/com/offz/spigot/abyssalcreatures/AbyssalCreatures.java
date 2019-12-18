@@ -1,7 +1,7 @@
 package com.offz.spigot.abyssalcreatures;
 
 import com.offz.spigot.mobzy.Mobzy;
-import com.offz.spigot.mobzy.MobzyAPI;
+import com.offz.spigot.mobzy.MobzyAPIKt;
 import com.offz.spigot.mobzy.MobzyAddon;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,11 +24,11 @@ public final class AbyssalCreatures extends JavaPlugin implements MobzyAddon {
 
     @Override
     public void registerWithMobzy(Mobzy mobzy) {
-        MobzyAPI.registerMobConfig(new File(getDataFolder(), "mobs.yml"), this);
+        MobzyAPIKt.registerMobConfig(new File(getDataFolder(), "mobs.yml"), this);
         new AbyssalType();
         AbyssalType.registerTypes();
 
-        MobzyAPI.registerSpawnConfig(new File(getDataFolder(), "spawns.yml"), this);
+        MobzyAPIKt.registerSpawnConfig(new File(getDataFolder(), "spawns.yml"), this);
         mobzy.reloadExistingEntities();
     }
 }

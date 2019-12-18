@@ -1,11 +1,11 @@
 package com.offz.spigot.mobzy.mobs.behaviours;
 
-import com.offz.spigot.mobzy.mobs.MobTemplate;
 import com.offz.spigot.mobzy.mobs.CustomMob;
+import com.offz.spigot.mobzy.mobs.MobTemplate;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
-import net.minecraft.server.v1_13_R2.EntityLiving;
+import net.minecraft.server.v1_15_R1.EntityLiving;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,7 +23,7 @@ public class CustomMobBase extends MobBehaviour {
         EntityLiving entity = mob.getEntity();
         MobTemplate builder = mob.getBuilder(); //get the mob's class name
 
-        entity.setSize(0.5F, 0.5F);
+//        entity.setSize(0.5F, 0.5F); //FIXME
         entity.addScoreboardTag("customMob2");
         entity.addScoreboardTag(builder.getName());
 
