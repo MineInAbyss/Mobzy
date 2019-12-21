@@ -5,8 +5,8 @@ import com.derongan.minecraft.guiy.gui.ClickableElement;
 import com.derongan.minecraft.guiy.gui.Element;
 import com.derongan.minecraft.guiy.gui.Layout;
 import com.derongan.minecraft.guiy.gui.inputs.NumberInput;
+import com.offz.spigot.mobzy.MobzyKt;
 import com.offz.spigot.mobzy.gui.layouts.MobConfigLayout;
-import com.offz.spigot.mobzy.Mobzy;
 import de.erethon.headlib.HeadLib;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.ChatColor;
@@ -90,7 +90,7 @@ public class MobzyPropertyElement extends ClickableElement {
                     return AnvilGUI.Response.close();
                 })
                 .text(value.toString())  //sets the text the GUI should start with
-                .plugin(Mobzy.getInstance())              //set the plugin instance
+                .plugin(MobzyKt.getMobzy())              //set the plugin instance
                 .open(main.getPlayer());                       //opens the GUI for the player provided
     }
 

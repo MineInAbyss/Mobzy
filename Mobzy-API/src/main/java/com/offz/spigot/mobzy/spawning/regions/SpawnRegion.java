@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.spawning.regions;
 
-import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.MobzyConfig;
+import com.offz.spigot.mobzy.MobzyKt;
 import com.offz.spigot.mobzy.spawning.MobSpawn;
 import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
@@ -15,7 +15,7 @@ import java.util.*;
 public class SpawnRegion {
     //TODO maybe mob caps should be determined per region?
     private Map<Class<? extends Entity>, List<MobSpawn>> spawns = new HashMap<>();
-    private MobzyConfig config = (Mobzy.getInstance()).getMobzyConfig();
+    private MobzyConfig config = (MobzyKt.getMobzy()).getMobzyConfig();
     private String name;
 
     public SpawnRegion(String name, MobSpawn... spawns) {

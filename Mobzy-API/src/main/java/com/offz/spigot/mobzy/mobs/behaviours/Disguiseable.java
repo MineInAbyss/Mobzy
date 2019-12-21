@@ -15,7 +15,7 @@ public class Disguiseable extends MobBehaviour {
         CraftEntity asEntity = mob.getEntity().getBukkitEntity();
 
         if (!DisguiseAPI.isDisguised(asEntity)) { //if not disguised
-            Disguise disguise = new MobDisguise(mob.getBuilder().getDisguiseAs(), mob.getBuilder().isAdult());
+            Disguise disguise = new MobDisguise(mob.getTemplate().getDisguiseAs(), mob.getTemplate().isAdult());
             DisguiseAPI.disguiseEntity(asEntity, disguise);
             disguise.getWatcher().setInvisible(true);
         }

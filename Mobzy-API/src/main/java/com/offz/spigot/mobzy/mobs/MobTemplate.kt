@@ -1,7 +1,6 @@
 package com.offz.spigot.mobzy.mobs
 
 import com.offz.spigot.mobzy.damage
-import com.offz.spigot.mobzy.debug
 import com.offz.spigot.mobzy.editItemMeta
 import me.libraryaddict.disguise.disguisetypes.DisguiseType
 import org.bukkit.Material
@@ -23,20 +22,13 @@ data class MobTemplate(var name: String,
                        var followRange: Double? = null,
                        var attackDamage: Double? = null,
                        var minExp: Int? = null,
-                       var maxExp: Int? = null,
+                       var maxExp: Int? = minExp,
                        var isAdult: Boolean = true,
                        var deathCommands: List<String> = ArrayList(),
                        var drops: List<MobDrop> = ArrayList()) : ConfigurationSerializable {
     constructor(aName: String, aModelID: Int) : this(name = aName, modelID = aModelID)
 
-    fun chooseDrops(): List<ItemStack?> {
-        val chosenDrops: MutableList<ItemStack?> = ArrayList()
-        for (drop in drops) {
-            val chosenDrop = drop.chooseDrop()
-            chosenDrops.add(chosenDrop)
-        }
-        return chosenDrops
-    }
+    fun chooseDrops(): List<ItemStack?> = drops.toList().map { it.chooseDrop() }
 
     val modelItemStack
         get() = ItemStack(modelMaterial, 1).editItemMeta {
@@ -57,7 +49,6 @@ data class MobTemplate(var name: String,
     companion object {
         fun deserialize(args: Map<String?, Any?>, name: String): MobTemplate {
             fun setArg(name: String, setValue: (Any) -> Unit) {
-                debug(name)
                 if (args.containsKey(name))
                     setValue(args[name] ?: error("Failed to parse argument while serializing MobTemplate"))
             }
@@ -83,7 +74,10 @@ data class MobTemplate(var name: String,
             setArg("movement-speed") { template.movementSpeed = (it as Number).toDouble() }
             setArg("attack-damage") { template.attackDamage = (it as Number).toDouble() }
             setArg("follow-range") { template.followRange = (it as Number).toDouble() }
-            setArg("min-exp") { template.minExp = (it as Number).toInt() }
+            setArg("min-exp") {
+                template.minExp = (it as Number).toInt()
+                template.maxExp = it.toInt() //make max not null for the null check on exp drop to proceed
+            }
             setArg("max-exp") { template.maxExp = (it as Number).toInt() }
             setArg("on-death") { template.deathCommands = it as List<String> }
             return template

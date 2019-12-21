@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta
 fun broadcast(message: String) = Bukkit.getConsoleSender().sendMessage(message)
 
 fun ItemStack.editItemMeta(edits: (ItemMeta) -> Unit): ItemStack {
-    val meta = this.itemMeta ?: return this.also { debug("No itemmeta found!") }
+    val meta = this.itemMeta ?: return this
     edits(meta)
     this.itemMeta = meta
     return this

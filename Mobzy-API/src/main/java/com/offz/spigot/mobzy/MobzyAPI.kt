@@ -3,14 +3,13 @@ package com.offz.spigot.mobzy
 import com.offz.spigot.mobzy.CustomType.Companion.toEntityTypeID
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
+import net.minecraft.server.v1_15_R1.EntityLiving
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
-
-val mobzy: Mobzy by lazy { Mobzy.getInstance() }
 
 /**
  * Broadcast a message if the debug option is enabled in config
@@ -21,14 +20,18 @@ fun debug(message: String) {
     if (mobzy.mobzyConfig.isDebug) Bukkit.broadcastMessage(message)
 }
 
-fun logInfo(message: String) {
-    mobzy.logger.info(message)
+fun logInfo(message: String, color: ChatColor = ChatColor.WHITE) {
+    mobzy.logger.info("$color$message")
 }
 fun logError(message: String) {
-    mobzy.logger.info("${ChatColor.RED}$message")
+    logInfo(message, ChatColor.RED)
 }
 fun logGood(message: String) {
-    mobzy.logger.info("${ChatColor.GREEN}$message")
+    logInfo(message, ChatColor.GREEN)
+}
+
+fun logWarn(message: String) {
+    logInfo(message, ChatColor.YELLOW)
 }
 
 /**
@@ -63,6 +66,8 @@ val Entity.isRenamed
  * Converts a Bukkit entity to an NMS entity
  */
 fun Entity.toNMS(): net.minecraft.server.v1_15_R1.Entity = (this as CraftEntity).handle
+
+fun <T : EntityLiving> Entity.toNMS(): net.minecraft.server.v1_15_R1.EntityLiving = (this as CraftEntity).handle as T
 
 /**
  * The mobzy ID for a registered custom mob
@@ -112,7 +117,7 @@ val Entity.template: MobTemplate
  * A custom mob's [MobTemplate] that is registered with Mobzy
  */
 val net.minecraft.server.v1_15_R1.Entity.template: MobTemplate
-    get() = (this as CustomMob).builder
+    get() = (this as CustomMob).template
 
 /**
  * @param name the name of an entity type

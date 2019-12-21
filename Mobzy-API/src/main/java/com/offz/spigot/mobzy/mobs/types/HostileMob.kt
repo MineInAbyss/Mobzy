@@ -1,192 +1,90 @@
-/*
-package com.offz.spigot.mobzy.mobs.types;
+package com.offz.spigot.mobzy.mobs.types
 
-import com.offz.spigot.mobzy.mobs.MobTemplate;
-import com.offz.spigot.mobzy.CustomType;
-import com.offz.spigot.mobzy.mobs.behaviours.*;
-import com.offz.spigot.mobzy.mobs.CustomMob;
-import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock;
-import com.offz.spigot.mobzy.pathfinders.PathfinderGoalMeleeAttackPitchLock;
-import net.minecraft.server.v1_15_R1.*;
+import com.offz.spigot.mobzy.CustomType
+import com.offz.spigot.mobzy.mobs.CustomMob
+import com.offz.spigot.mobzy.mobs.MobTemplate
+import com.offz.spigot.mobzy.mobs.behaviours.Disguiseable
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
+import net.minecraft.server.v1_15_R1.*
+import org.bukkit.entity.LivingEntity
 
-import javax.annotation.Nullable;
-
-*/
 /**
  * Lots of code taken from EntityZombie
- *//*
+ */
+abstract class HostileMob(world: World?, override var template: MobTemplate) : EntityMonster(CustomType.getType(template) as EntityTypes<out EntityMonster>, world), CustomMob {
+    constructor(world: World?, name: String?) : this(world, CustomType.getTemplate(name!!))
 
-public abstract class HostileMob extends EntityMonster implements CustomMob {
-    protected MobTemplate builder;
-    private Deathable deathable = new Deathable(this);
-    private Disguiseable disguiseable = new Disguiseable(this);
+    //shared behaviours
+    private val disguiseable = Disguiseable(this)
 
-    public HostileMob(World world, String name) {
-        this(world, CustomType.getBuilder(name));
-    }
-
-    public HostileMob(World world, MobTemplate builder) {
-        super(CustomType.getType(builder), world);
-        this.builder = builder;
-        CustomMobBase base = new CustomMobBase(this);
-        moveController = new ControllerMove(this);
-        base.apply();
-        addScoreboardTag("hostileMob");
-    }
-
-    @Override
-    protected int getExpValue(EntityHuman entityhuman) {
-        Integer toDrop = new ExpDroppable(this).getExpToDrop();
-        return toDrop == null ? super.getExpValue(entityhuman) : toDrop;
-    }
-
-    @Override
-    protected void initAttributes() {
-        super.initAttributes();
-        InitAttributeable initAttributeable = new InitAttributeable(this);
-        initAttributeable.setConfiguredAttributes();
-    }
-
-    @Override
-    public EntityLiving getEntity() {
-        return this;
-    }
-
-    @Override
-    protected void n() {
-        createPathfinders();
-    }
-
-    @Override
-    public void createPathfinders() {
-        goalSelector.a(1, new PathfinderGoalFloat(this));
-        goalSelector.a(5, new PathfinderGoalMoveTowardsRestriction(this, 1.0D));
-        goalSelector.a(8, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 8.0F));
-        goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
-
-        goalSelector.a(2, new PathfinderGoalMeleeAttackPitchLock(this, 1.0D, false));
-        goalSelector.a(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
-        targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
-    }
-
-    */
-/**
-     * Removes if not in peaceful mode
-     *//*
-
-    public void tick() {
-        super.tick();
-        if (!world.isClientSide && world.getDifficulty() == EnumDifficulty.PEACEFUL) {
-            die();
+    //implementation of properties from CustomMob
+    override var killedMZ: Boolean
+        get() = killed
+        set(value) {
+            killed = value
         }
+    override val entity: EntityLiving
+        get() = this
+
+    override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime //TODO I want a consistent fix for the ambiguity errors, this might be it
+    override val killScore: Int = aW
+
+    //implementation of behaviours
+
+    override fun createPathfinders() {
+        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.modelID))
+        addPathfinderGoal(1, PathfinderGoalFloat(this))
+//        addPathfinderGoal(2, PathfinderGoalZombieAttack(this, 1.0, false)) TODO rewrite attack goal
+        addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
+        addPathfinderGoal(8, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 8.0))
+        addPathfinderGoal(8, PathfinderGoalRandomLookaround(this))
+        //TODO make addTargetSelector
+        targetSelector.a(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
+        /*addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.modelID))
+        addPathfinderGoal(1, PathfinderGoalFloat(this))
+        addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
+        addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
+        addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
+        addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
+        addPathfinderGoal(7, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))*/
     }
 
-    @Override
-    public MobTemplate getBuilder() {
-        return builder;
-    }
+    override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
+    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = disguiseable.disguise()
 
-    @Override
-    public MobTemplate getStaticBuilder() {
-        return CustomType.getBuilder(P().c().getSimpleName());
-    }
+    override fun dropExp() = dropExperience()
 
-    //TODO check what this does
-    @Nullable
-    @Override
-    public Entity bO() {
-        return bP().isEmpty() ? null : bP().get(0);
-    }
+    //overriding NMS methods
 
+    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
+    override fun initPathfinder() = createPathfinders()
 
-    @Override
-    public void b(NBTTagCompound nbttagcompound) {
-        super.b(nbttagcompound);
-        saveMobNBT(nbttagcompound);
-    }
+    override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
+    override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
 
-    @Override
-    public void saveMobNBT(NBTTagCompound nbttagcompound) {
-    }
+    override fun die() = super.die().also { disguiseable.undisguise() }
+    override fun die(damagesource: DamageSource) = dieCM(damagesource)
+    override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name) //TODO I forget why I did this, maybe to change the death message
+//    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop().also { debug(expToDrop().toString()) } //TODO exp isnt dropping
 
-    @Override
-    public void a(NBTTagCompound nbttagcompound) {
-        super.a(nbttagcompound);
-        loadMobNBT(nbttagcompound);
-    }
+    override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
+    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
+    override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
+    override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
+//
 
-    @Override
-    public void loadMobNBT(NBTTagCompound nbttagcompound) {
-        disguiseable.disguise();
-    }
+    //EntityZombie specific overriding
 
-    @Override
-    protected SoundEffect D() {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundAmbient(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
-        return null;
-    }
+    /**
+     * Removes entity if not in peaceful mode
+     */
+    override fun tick() = super.tick().also { if (!world.isClientSide && world.difficulty == EnumDifficulty.PEACEFUL) die() }
 
-    @Override
-    protected SoundEffect d(DamageSource damagesource) {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundHurt(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
-        return null;
-    }
-
-    @Override
-    protected SoundEffect cs() {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundDeath(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
-        return null;
-    }
-
-    @Override
-    protected void a(BlockPosition blockposition, IBlockData iblockdata) {
-        this.getBukkitEntity().getWorld().playSound(this.getLocation(), soundStep(), org.bukkit.SoundCategory.HOSTILE, 1, (float) (1 + Math.random() * 0.2));
-    }
-
-    @Override
-    public void die(DamageSource damagesource) {
-        deathable.die(damagesource);
-    }
-
-    @Override
-    public void die() {
-        super.die();
-        disguiseable.undisguise();
-    }
-
-    @Override
-    public boolean getKilled() {
-        return killed;
-    }
-
-    @Override
-    public void setKilled(boolean killed) {
-        this.killed = killed;
-    }
-
-    @Override
-    public boolean dropsExperience() {
-        return isDropExperience();
-    }
-
-    @Override
-    public int lastDamageByPlayerTime() {
-        return lastDamageByPlayerTime;
-    }
-
-    @Override
-    public int getKillScore() {
-        return be;
-    }
-
-    @Override
-    public void dropEquipment(boolean flag, int i, DamageSource damageSource) {
-        a(flag, i, damageSource);
-    }
-
-    @Override
-    public IChatBaseComponent getScoreboardDisplayName() {
-        return new ChatMessage(getBuilder().getName());
+    init {
+        createFromBase()
+        addScoreboardTag("passiveMob")
+        //TODO this is a temporary fix to see if it affects performance
+        (bukkitEntity as LivingEntity).removeWhenFarAway = true
     }
 }
-*/

@@ -117,7 +117,7 @@ public class SpawnTask extends BukkitRunnable {
 
                             //If any of the overlapping regions is set to override, the highest priority one will set only its spawns as viable
                             inRegions.stream().sorted()
-                                    .filter(region -> region.getFlags().containsKey(Mobzy.MZ_SPAWN_OVERLAP) && region.getFlag(Mobzy.MZ_SPAWN_OVERLAP).equals("override"))
+                                    .filter(region -> region.getFlags().containsKey(Mobzy.getMZ_SPAWN_OVERLAP()) && region.getFlag(Mobzy.getMZ_SPAWN_OVERLAP()).equals("override"))
                                     .findFirst()
                                     .ifPresent(region -> {
                                         inRegions.clear();
@@ -125,8 +125,8 @@ public class SpawnTask extends BukkitRunnable {
                                     });
 
                             List<String> regionIDs = inRegions.stream()
-                                    .filter(region -> region.getFlags().containsKey(Mobzy.MZ_SPAWN_REGIONS))
-                                    .map(region -> Arrays.asList(region.getFlag(Mobzy.MZ_SPAWN_REGIONS).split(",")))
+                                    .filter(region -> region.getFlags().containsKey(Mobzy.getMZ_SPAWN_REGIONS()))
+                                    .map(region -> Arrays.asList(region.getFlag(Mobzy.getMZ_SPAWN_REGIONS()).split(",")))
                                     .flatMap(Collection::stream)
                                     .collect(Collectors.toList());
 

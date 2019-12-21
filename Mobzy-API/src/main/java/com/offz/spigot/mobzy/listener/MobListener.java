@@ -3,6 +3,7 @@ package com.offz.spigot.mobzy.listener;
 import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.MobzyAPIKt;
 import com.offz.spigot.mobzy.MobzyContext;
+import com.offz.spigot.mobzy.MobzyKt;
 import com.offz.spigot.mobzy.mobs.CustomMob;
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
 import net.minecraft.server.v1_15_R1.Entity;
@@ -34,7 +35,7 @@ public class MobListener implements Listener {
 
     public MobListener(MobzyContext context) {
         this.context = context;
-        plugin = Mobzy.getInstance();
+        plugin = MobzyKt.getMobzy();
     }
 
     /**
@@ -64,7 +65,7 @@ public class MobListener implements Listener {
         Entity entity = (((CraftEntity) e.getEntity()).getHandle());
         if (entity instanceof HitBehaviour) {
             //change the model to its hit version
-            int modelID = ((CustomMob) entity).getBuilder().getModelID();
+            int modelID = ((CustomMob) entity).getTemplate().getModelID();
 
             EntityEquipment ee = ((LivingEntity) entity.getBukkitEntity()).getEquipment();
             if (ee == null)

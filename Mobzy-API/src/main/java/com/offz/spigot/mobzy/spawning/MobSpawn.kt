@@ -2,7 +2,6 @@ package com.offz.spigot.mobzy.spawning
 
 import com.offz.spigot.mobzy.CustomType.Companion.getType
 import com.offz.spigot.mobzy.CustomType.Companion.spawnEntity
-import com.offz.spigot.mobzy.debug
 import com.offz.spigot.mobzy.isCustomMob
 import com.offz.spigot.mobzy.spawning.vertical.SpawnArea
 import com.offz.spigot.mobzy.spawning.vertical.VerticalSpawn
@@ -162,7 +161,6 @@ data class MobSpawn(val entityType: EntityTypes<*>,
         @JvmStatic
         fun deserialize(args: Map<String?, Any?>): MobSpawn? {
             fun setArg(name: String, setValue: (Any) -> Unit) {
-                debug(name)
                 if (args.containsKey(name))
                     setValue(args[name] ?: error("Failed to parse argument while serializing MobSpawn"))
             }

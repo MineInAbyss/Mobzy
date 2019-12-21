@@ -4,128 +4,80 @@ import com.offz.spigot.mobzy.CustomType.Companion.getTemplate
 import com.offz.spigot.mobzy.CustomType.Companion.getType
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
-import com.offz.spigot.mobzy.mobs.behaviours.CustomMobBase
 import com.offz.spigot.mobzy.mobs.behaviours.Disguiseable
-import com.offz.spigot.mobzy.mobs.behaviours.ExpDroppable
-import com.offz.spigot.mobzy.mobs.behaviours.InitAttributeable
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
+import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.entity.LivingEntity
 
 /**
- * Lots of code taken from EntityPig
+ * Originally based off EntityPig
  */
-abstract class PassiveMob(world: World?, override var builder: MobTemplate) : EntityAnimal(getType(builder) as EntityTypes<out EntityAnimal>, world), CustomMob {
-    private val disguiseable = Disguiseable(this)
-
+abstract class PassiveMob(world: World?, override var template: MobTemplate) : EntityAnimal(getType(template) as EntityTypes<out EntityAnimal>, world), CustomMob {
     constructor(world: World?, name: String?) : this(world, getTemplate(name!!))
 
-    override fun getExpValue(entityhuman: EntityHuman): Int {
-        val toDrop = ExpDroppable(this).expToDrop
-        return toDrop ?: super.getExpValue(entityhuman)
-    }
+    //shared behaviours
+    private val disguiseable = Disguiseable(this)
 
+    //implementation of properties from CustomMob
+    override var killedMZ: Boolean
+        get() = killed
+        set(value) {
+            killed = value
+        }
     override val entity: EntityLiving
         get() = this
 
-    override fun initPathfinder() {
-        createPathfinders()
-    }
+    override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime //TODO I want a consistent fix for the ambiguity errors, this might be it
+    override val killScore: Int = aW
 
-    override val soundAmbient: String? = null
-    override val soundDeath: String? = null
-    override val soundHurt: String? = null
-    override val soundStep: String? = null
-
-    //TODO fix getting sound
-    override fun getSoundAmbient(): SoundEffect? {
-        if(soundAmbient == null) return null
-        living.world.playSound(living.location, soundAmbient!!, org.bukkit.SoundCategory.NEUTRAL, 1f, (1 + Math.random() * 0.2).toFloat())
-        return null
-    }
-
-    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? {
-        if(soundHurt == null) return null
-        living.world.playSound(living.location, soundHurt!!, org.bukkit.SoundCategory.NEUTRAL, 1f, (1 + Math.random() * 0.2).toFloat())
-        return null
-    }
-
-    override fun getSoundDeath(): SoundEffect? {
-        if(soundDeath == null) return null
-        living.world.playSound(living.location, soundDeath!!, org.bukkit.SoundCategory.NEUTRAL, 1f, (1 + Math.random() * 0.2).toFloat())
-        return null
-    }
-
-    override fun a(blockposition: BlockPosition, iblockdata: IBlockData) {
-        if(soundStep == null) return
-        living.world.playSound(living.location, soundStep!!, org.bukkit.SoundCategory.NEUTRAL, 1f, (1 + Math.random() * 0.2).toFloat())
-        return
-    }
+    //implementation of behaviours
 
     override fun createPathfinders() {
-        goalSelector.a(1, PathfinderGoalFloat(this))
-        goalSelector.a(2, PathfinderGoalPanic(this, 1.25))
-        goalSelector.a(3, PathfinderGoalBreed(this, 1.0))
-        goalSelector.a(5, PathfinderGoalFollowParent(this, 1.1))
-        goalSelector.a(6, PathfinderGoalRandomStrollLand(this, 1.0))
-        //        goalSelector.a(7, new PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0F));
-//        goalSelector.a(8, new PathfinderGoalLookWhereHeaded(this));
+        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.modelID))
+        addPathfinderGoal(1, PathfinderGoalFloat(this))
+        addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
+        addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
+        addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
+        addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
+        addPathfinderGoal(7, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
     }
 
-    override fun initAttributes() {
-        super.initAttributes()
-        val initAttributeable = InitAttributeable(this)
-        initAttributeable.setConfiguredAttributes()
-    }
+    /**
+     * TODO make the mobs undisguise when unloaded, not just on death. It should ONLY happen when the chunk the mob is in gets unloaded,
+     *  and this method gets called randomly sometimes. Perhaps a ChunkUnloadEvent or something similar is a good way to do this
+     */
+    override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
 
-    override var killed: Boolean = false
+    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = disguiseable.disguise()
 
-    override fun lastDamageByPlayerTime(): Int {
-        return lastDamageByPlayerTime
-    }
+    override fun dropExp() = dropExperience()
 
-    //FIXME
-    override val killScore: Int
-        get() = 0 //FIXME
+    //overriding NMS methods
 
+    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
+    override fun initPathfinder() = createPathfinders()
 
-    override fun b(nbttagcompound: NBTTagCompound) {
-        super.b(nbttagcompound)
-        saveMobNBT(nbttagcompound)
-    }
+    override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
+    override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
 
-    override fun saveMobNBT(nbttagcompound: NBTTagCompound?) { //TODO make the mobs undisguise when unloaded, not just on death. It should ONLY happen when the chunk the mob is in gets unloaded,
-// and this method gets called randomly sometimes. Perhaps a ChunkUnloadEvent or something similar is a good way to do this
-    }
+    override fun die() = super.die().also { disguiseable.undisguise() }
+    override fun die(damagesource: DamageSource) = dieCM(damagesource)
+    override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name) //TODO I forget why I did this, maybe to change the death message
+    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
 
-    override fun a(nbttagcompound: NBTTagCompound) {
-        super.a(nbttagcompound)
-        loadMobNBT(nbttagcompound)
-    }
+    override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
+    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
+    override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
+    override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
+//
 
-    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) {
-        disguiseable.disguise()
-    }
+    //EntityAnimal specific overriding
 
-    override fun die(damagesource: DamageSource) {
-        dieCM(damagesource)
-    }
-
-    override fun die() {
-        super.die()
-        disguiseable.undisguise()
-    }
-
-    override fun createChild(entityageable: EntityAgeable): EntityAgeable? {
-        return null
-    }
-
-    override fun getScoreboardDisplayName(): IChatBaseComponent {
-        return ChatMessage(builder.name)
-    }
+    override fun createChild(entityageable: EntityAgeable): EntityAgeable? = null
 
     init {
-        val base = CustomMobBase(this)
-        base.apply()
+        createFromBase()
         addScoreboardTag("passiveMob")
         //TODO this is a temporary fix to see if it affects performance
         (bukkitEntity as LivingEntity).removeWhenFarAway = true

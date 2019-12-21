@@ -16,7 +16,7 @@ import java.util.*
 
 class MobzyCommands internal constructor(private val context: MobzyContext) : CommandExecutor, TabCompleter {
     private val errorColor = ChatColor.RED
-    private val successColor = ChatColor.GREEN
+    private val successColor = ChatColor.GREEN //TODO create methods in API to send players messages
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         if (command.name != "mobzy" || args.isEmpty()) return false
@@ -33,7 +33,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
         //cfginfo
         if ("mobzy.cfginfo".permitted("cfginfo")) {
             sendSuccess("LOG OF CURRENTLY REGISTERED STUFF:")
-            val config = Mobzy.getInstance().mobzyConfig
+            val config = mobzy.mobzyConfig
             sendInfo("Mob configs: ${config.mobCfgs}\n" +
                     "Spawn configs: ${config.spawnCfgs}\n" +
                     "Registered addons: ${config.registeredAddons}\n" +
@@ -53,7 +53,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
                 sendError("Plugman needs to be enabled for this command to work"); return true
             }
             sendSuccess("The plugin and its components have been reloaded")
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Mobzy.getInstance()) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(mobzy) {
                 val map = context.mobzyConfig.registeredAddons.map { (it as JavaPlugin).name }
 
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().consoleSender, "plugman unload Mobzy")
@@ -66,7 +66,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
         }
 
         //remove or info
-        val worlds = Mobzy.getInstance().server.worlds
+        val worlds = mobzy.server.worlds
         val info = "mobzy.info".permitted("info", "i")
         if (info || "mobzy.remove".permitted("remove", "rm")) {
             if (sender !is Player) {

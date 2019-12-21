@@ -6,20 +6,17 @@ import com.offz.spigot.mobzy.mobs.MobTemplate
 import com.offz.spigot.mobzy.mobs.MobTemplate.Companion.deserialize
 import com.offz.spigot.mobzy.mobs.behaviours.AfterSpawnBehaviour
 import net.minecraft.server.v1_15_R1.*
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
 import org.bukkit.event.entity.CreatureSpawnEvent
 
-
 open class CustomType {
     companion object {
         //this is used for getting a MobType from a String, which makes it easier to access from MobBuilder
-        val types: MutableMap<String, EntityTypes<*>> = HashMap()
-        private val builders: MutableMap<String, MobTemplate?> = HashMap()
-        private val plugin = Mobzy.getInstance()
+        val types: MutableMap<String, EntityTypes<*>> = mutableMapOf()
+        private val templateNames: MutableMap<String, String> = mutableMapOf()
+        private val templates: MutableMap<String, MobTemplate> = mutableMapOf()
 
         @JvmStatic
         fun toEntityTypeID(name: String): String {
@@ -27,10 +24,8 @@ open class CustomType {
         }
 
         @JvmStatic
-        fun getType(tags: Set<String>): EntityTypes<*>? {
-            for (tag in tags) if (types.containsKey(toEntityTypeID(tag))) return types[toEntityTypeID(tag)]
-            return null
-        }
+        fun getType(tags: Set<String>): EntityTypes<*> =
+                types[toEntityTypeID(tags.first { types.containsKey(toEntityTypeID(it)) })] ?: error("No type found for $tags registered types: $types")
 
         @JvmStatic
         fun getType(name: String): EntityTypes<*> {
@@ -39,7 +34,7 @@ open class CustomType {
 
         @JvmStatic
         fun getTemplate(name: String): MobTemplate {
-            return builders[toEntityTypeID(name)] ?: error("Template for $$name not found")
+            return templates[toEntityTypeID(name)] ?: error("Template for $$name not found")
         }
 
         @JvmStatic
@@ -51,40 +46,30 @@ open class CustomType {
         }
 
         @JvmStatic
-        fun registerEntity(name: String, b: EntityTypes.b<Entity>): EntityTypes<*> {
-            return registerEntity(name, bToa(b))
-        }
-
-        @JvmStatic
-        fun registerEntity(name: String, a: EntityTypes.a<Entity>): EntityTypes<*> {
-            val injected: EntityTypes<*> = injectNewEntity(name, "zombie", a)
+        fun registerEntity(name: String, templateName: String = name, width: Float = 1f, height: Float = 2f, func: (World) -> Entity): EntityTypes<*> {
+            val injected: EntityTypes<*> = injectNewEntity(name, "zombie", bToa(EntityTypes.b { _, world -> func(world)}).c().a(width, height))
             types[name] = injected
-
+            templateNames[name] = templateName
             return injected
         }
-        /*fun <T : Entity?> register(name: String, entitytypes_a: EntityTypes.a<*>): EntityTypes<T>? {
 
-        }*/
-
-        //fixme this might not work right for NPCs, could be getting the wrong thing!
         @JvmStatic
         fun getMobNameForEntityTypes(type: EntityTypes<*>) = type.f().removePrefix("entity.minecraft.")
 
         @JvmStatic
         fun registerTypes() {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE.toString() + "Registering types")
+            logInfo("Registering types")
             for (type in types.values) {
-                val className = getMobNameForEntityTypes(type)
-                val name = toEntityTypeID(className) //fixme don't think we need toEntityTypeID anymore
-                builders[name] = readBuilderConfig(className)
+                val name = getMobNameForEntityTypes(type)
+                templates[name] = readBuilderConfig(templateNames[name]!!)
             }
-            Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE.toString() + types.keys.toString())
+            logGood("Registered: ${types.keys}")
         }
 
         @JvmStatic
-        protected fun readBuilderConfig(name: String): MobTemplate? {
-            debug("reading builder config with $name") //fixme not all the names are lowercase in config
-            val mobCfg = plugin.mobzyConfig.mobCfgs.values.first { it.contains(name) }
+        protected fun readBuilderConfig(name: String): MobTemplate {
+            val mobCfg = mobzy.mobzyConfig.mobCfgs.values.firstOrNull { it.contains(name) }
+                    ?: error("$name's builder not found")
             return deserialize((mobCfg[name] as MemorySection).getValues(true), name)
         }
 
@@ -95,7 +80,7 @@ open class CustomType {
             val dataTypes = DataConverterRegistry.a()
                     .getSchema(DataFixUtils.makeKey(SharedConstants.getGameVersion().worldVersion))
                     .findChoiceType(DataConverterTypes.ENTITY).types() as MutableMap<String, Type<*>>
-            if (dataTypes.containsKey("minecraft:$name")) debug(ChatColor.YELLOW.toString() + "ALREADY CONTAINS KEY: " + name)
+            if (dataTypes.containsKey("minecraft:$name")) logWarn("ALREADY CONTAINS KEY: $name")
             dataTypes["minecraft:$name"] = dataTypes["minecraft:$extend_from"]!!
 
             return IRegistry.a(IRegistry.ENTITY_TYPE, name, a.a(name))
@@ -104,7 +89,7 @@ open class CustomType {
         @JvmStatic
         fun spawnEntity(name: String, loc: Location): org.bukkit.entity.Entity? {
             val entityTypes = getType(name)
-            return entityTypes.let { spawnEntity(it, loc) }
+            return spawnEntity(entityTypes, loc)
         }
 
         /**

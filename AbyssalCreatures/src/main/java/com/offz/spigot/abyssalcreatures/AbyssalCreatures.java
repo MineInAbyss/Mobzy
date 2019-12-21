@@ -3,6 +3,7 @@ package com.offz.spigot.abyssalcreatures;
 import com.offz.spigot.mobzy.Mobzy;
 import com.offz.spigot.mobzy.MobzyAPIKt;
 import com.offz.spigot.mobzy.MobzyAddon;
+import com.offz.spigot.mobzy.MobzyKt;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -12,7 +13,7 @@ public final class AbyssalCreatures extends JavaPlugin implements MobzyAddon {
     public void onEnable() {
         getLogger().info("On enable has been called");
         saveDefaultConfig();
-        registerWithMobzy(Mobzy.getInstance());
+        registerWithMobzy(MobzyKt.getMobzy());
     }
 
     @Override
