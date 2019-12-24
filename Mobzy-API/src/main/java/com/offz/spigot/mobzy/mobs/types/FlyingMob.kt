@@ -1,19 +1,16 @@
 package com.offz.spigot.mobzy.mobs.types
 
-import com.offz.spigot.mobzy.CustomType.Companion.getTemplate
-import com.offz.spigot.mobzy.CustomType.Companion.getType
+import com.offz.spigot.mobzy.CustomType
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
-import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
-import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.entity.LivingEntity
 
 /**
- * Originally based off EntityPig
+ * Lots of code taken from the EntityGhast class for flying mobs
  */
-abstract class PassiveMob(world: World?, override var template: MobTemplate) : EntityAnimal(getType(template) as EntityTypes<out EntityAnimal>, world), CustomMob {
-    constructor(world: World?, name: String?) : this(world, getTemplate(name!!))
+abstract class FlyingMob(world: World?, override var template: MobTemplate) : EntityFlying(CustomType.getType(template) as EntityTypes<out EntityFlying>, world), CustomMob {
+    constructor(world: World?, name: String?) : this(world, CustomType.getTemplate(name!!))
 
     //implementation of properties from CustomMob
     override var killedMZ: Boolean
@@ -30,21 +27,13 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
     //implementation of behaviours
 
     override fun createPathfinders() {
-        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.modelID))
         addPathfinderGoal(1, PathfinderGoalFloat(this))
-        addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
-        addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
-        addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
-        addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
-        addPathfinderGoal(7, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
+//        addPathfinderGoal(1, PathfinderGoalFlyDamageTarget(this));
+//        addPathfinderGoal(5, PathfinderGoalIdleFly(this));
+//        addTargetSelector(1, PathfinderGoalTargetNearestPlayer(this));
     }
 
-    /**
-     * TODO make the mobs undisguise when unloaded, not just on death. It should ONLY happen when the chunk the mob is in gets unloaded,
-     *  and this method gets called randomly sometimes. Perhaps a ChunkUnloadEvent or something similar is a good way to do this
-     */
     override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
-
     override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = disguise()
 
     override fun dropExp() = dropExperience()
@@ -60,7 +49,7 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
     override fun die() = super.die().also { undisguise() }
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
     override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name) //TODO I forget why I did this, maybe to change the death message
-    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
+//    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop().also { debug(expToDrop().toString()) } //TODO exp isnt dropping
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
@@ -68,9 +57,12 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
     override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
 //
 
-    //EntityAnimal specific overriding
+    //EntityFlying specific overriding
 
-    override fun createChild(entityageable: EntityAgeable): EntityAgeable? = null
+    /**
+     * Removes entity if not in peaceful mode
+     */
+    override fun tick() = super.tick().also { if (!world.isClientSide && world.difficulty == EnumDifficulty.PEACEFUL) die() }
 
     init {
         createFromBase()

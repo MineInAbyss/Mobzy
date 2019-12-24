@@ -8,11 +8,10 @@ import org.bukkit.craftbukkit.v1_15_R1.event.CraftEventFactory
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityTargetEvent
 
-class PathfinderGoalTemptPitchLock(private val mob: CustomMob, private val targetItems: List<Material>) : com.offz.spigot.mobzy.pathfinders.PathfinderGoal() {
+class PathfinderGoalTemptPitchLock(private val mob: CustomMob, private val targetItems: List<Material>, private val speed: Double = 1.0) : com.offz.spigot.mobzy.pathfinders.PathfinderGoal() {
     private var target: LivingEntity? = null
     private val navigation = mob.navigation
     private val entity = mob.entity
-    private var i: Int = 0
 
     override fun shouldExecute(): Boolean {
         /*return if (i > 0) {
@@ -40,8 +39,16 @@ class PathfinderGoalTemptPitchLock(private val mob: CustomMob, private val targe
     override fun reset() {
     }
 
+    private var cooldown: Int = 0
+
     override fun execute() {
         mob.lookAtPitchLock(target!!)
-        if (mob.distanceToEntity(target!!) < 6.25) navigation.moveToEntity(target!!)
+        cooldown--
+        if (cooldown < 0)
+            cooldown = 10
+        else return
+
+        val dist = mob.distanceToEntity(target!!)
+        if (dist in 1.0..6.25) navigation.moveToEntity(target!!, speed)
     }
 }

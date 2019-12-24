@@ -2,10 +2,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.0.0'
 }
 
-repositories {
-//    maven { url 'http://repo.extendedclip.com/content/repositories/placeholderapi/' } //PlaceHolderAPI
-}
-
 dependencies {
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
     implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'

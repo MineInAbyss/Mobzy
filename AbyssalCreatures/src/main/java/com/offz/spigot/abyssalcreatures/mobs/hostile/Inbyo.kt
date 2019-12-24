@@ -9,6 +9,6 @@ import net.minecraft.server.v1_15_R1.World
 class Inbyo(world: World?) : HostileMob(world, "Inbyo"), HitBehaviour {
     override fun createPathfinders() {
         super.createPathfinders()
-        targetSelector.a(1, PathfinderGoalNearestAttackableTarget(this, Neritantan::class.java, true))
+        addTargetSelector(1, PathfinderGoalNearestAttackableTarget(this, Neritantan::class.java, true))
     }
 }

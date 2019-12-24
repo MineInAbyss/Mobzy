@@ -4,6 +4,7 @@ import com.offz.spigot.mobzy.CustomType
 import com.offz.spigot.mobzy.debug
 import com.offz.spigot.mobzy.pathfinders.Navigation
 import me.libraryaddict.disguise.DisguiseAPI
+import me.libraryaddict.disguise.disguisetypes.Disguise
 import me.libraryaddict.disguise.disguisetypes.MobDisguise
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.Bukkit
@@ -32,7 +33,7 @@ interface CustomMob {
     private val world: World get() = (living.world as CraftWorld).handle
     private val location: Location get() = living.location
     val navigation: Navigation
-        get() = Navigation((entity as EntityInsentient).navigation, entity as EntityInsentient, staticTemplate.movementSpeed ?: 0.7)
+        get() = Navigation((entity as EntityInsentient).navigation, entity as EntityInsentient)
     val killer: EntityLiving? get() = entity.killer
     fun expToDrop(): Int {
         return if (template.minExp == null || template.maxExp == null) entity.expToDrop
@@ -58,6 +59,8 @@ interface CustomMob {
     fun loadMobNBT(nbttagcompound: NBTTagCompound?)
 
     fun onRightClick(player: EntityHuman) {}
+
+    fun dropExp()
 
     // ========== Pre-written behaviour ============
 
@@ -113,16 +116,29 @@ interface CustomMob {
         }
     }
 
-    fun dropExp()
-
     fun makeSound(sound: String?) {
         if (sound != null)
             living.world.playSound(location, sound, SoundCategory.NEUTRAL, 1f, (kotlin.random.Random.nextDouble(1.0, 1.02).toFloat()))
     }
 
+    fun disguise() {
+        if (!DisguiseAPI.isDisguised(living)) { //if not disguised
+            val disguise: Disguise = MobDisguise(template.disguiseAs, template.isAdult)
+            DisguiseAPI.disguiseEntity(living, disguise)
+            disguise.watcher.isInvisible = true
+        }
+    }
+
+    fun undisguise() {
+        if (DisguiseAPI.isDisguised(living)) DisguiseAPI.getDisguise(living).removeDisguise()
+    }
+
     // ========== Helper methods ===================
     fun addPathfinderGoal(priority: Int, goal: PathfinderGoal) {
         (entity as EntityInsentient).goalSelector.a(priority, goal)
+    }
+    fun addTargetSelector(priority: Int, goal: PathfinderGoalTarget) {
+        (entity as EntityInsentient).targetSelector.a(priority, goal)
     }
 
     fun randomSound(vararg sounds: String?): String? = sounds[Random.nextInt(sounds.size)]
