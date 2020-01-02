@@ -1,32 +1,21 @@
-/*
-package com.offz.spigot.mobzy.pathfinders.flying;
+package com.offz.spigot.mobzy.pathfinders.flying
 
-import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import net.minecraft.server.v1_15_R1.PathfinderGoal;
-import org.bukkit.entity.LivingEntity;
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.pathfinders.MobzyPathfinderGoal
 
-public class PathfinderGoalFlyDamageTarget extends PathfinderGoal {
-    private FlyingMob mob;
-    private long hitAt;
-    private long cooldown = 200;
-
-    public PathfinderGoalFlyDamageTarget(FlyingMob flyingMob) {
-        mob = flyingMob;
+class PathfinderGoalFlyDamageTarget(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
+    private var cooldown: Int = 0
+    override fun shouldExecute(): Boolean {
+        return target != null && --cooldown < 0
     }
 
-    public boolean a() {
-        return true;
-    }
+    override fun shouldKeepExecuting(): Boolean = target != null
 
-    public void e() {
-        if (mob.getGoalTarget() != null && hitAt + cooldown < System.currentTimeMillis()) {
-            LivingEntity target = (LivingEntity) mob.getGoalTarget().getBukkitEntity();
-            Double attackDamage = mob.getStaticBuilder().getAttackDamage();
-            //if within range, harm
-            if (attackDamage != null && mob.distanceToEntity(target) < mob.width / 2 + 1) {
-                hitAt = System.currentTimeMillis();
-                target.damage(attackDamage.floatValue(), mob.getBukkitEntity());
-            }
-        }
+    override fun execute() {
+        cooldown = 10
+        val target = target ?: return
+        val attackDamage: Double = mob.staticTemplate.attackDamage ?: return
+        //if within range, harm
+        if (mob.canReach(target)) target.damage(attackDamage, entity)
     }
-}*/
+}

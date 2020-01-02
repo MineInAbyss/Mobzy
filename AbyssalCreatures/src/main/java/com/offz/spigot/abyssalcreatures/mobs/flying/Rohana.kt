@@ -1,28 +1,20 @@
-/*
-package com.offz.spigot.abyssalcreatures.mobs.flying;
+package com.offz.spigot.abyssalcreatures.mobs.flying
 
-import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import com.offz.spigot.mobzy.pathfinders.flying.MZGoalHurtByTarget;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyTowardsTarget;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFlyAboveGround;
-import net.minecraft.server.v1_15_R1.PathfinderGoalFloat;
-import net.minecraft.server.v1_15_R1.World;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyTowardsTarget
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalHurtByTarget
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFlyAboveGround
+import net.minecraft.server.v1_15_R1.PathfinderGoalFloat
+import net.minecraft.server.v1_15_R1.World
 
-public class Rohana extends FlyingMob implements HitBehaviour {
-    public Rohana(World world) {
-        super(world, "Rohana");
-        this.setSize(0.6F, 0.6F);
+class Rohana(world: World?) : FlyingMob(world, "Rohana"), HitBehaviour {
+    override fun createPathfinders() {
+        addPathfinderGoal(1, PathfinderGoalFloat(this))
+        addPathfinderGoal(1, PathfinderGoalFlyDamageTarget(this))
+        addPathfinderGoal(3, PathfinderGoalFlyTowardsTarget(this))
+        addPathfinderGoal(7, PathfinderGoalIdleFlyAboveGround(this))
+        addPathfinderGoal(1, PathfinderGoalHurtByTarget(this)) //TODO convert to targetSelector
     }
-
-    @Override
-    public void createPathfinders() {
-        goalSelector.a(1, new PathfinderGoalFlyDamageTarget(this));
-        goalSelector.a(3, new PathfinderGoalFlyTowardsTarget(this));
-        goalSelector.a(7, new PathfinderGoalIdleFlyAboveGround(this, 2, 5));
-        goalSelector.a(0, new PathfinderGoalFloat(this));
-        targetSelector.a(1, new MZGoalHurtByTarget(this));
-//        targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
-    }
-}*/
+}

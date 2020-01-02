@@ -1,6 +1,7 @@
 package com.offz.spigot.abyssalcreatures
 
-import com.offz.spigot.abyssalcreatures.mobs.hostile.Inbyo
+import com.offz.spigot.abyssalcreatures.mobs.flying.*
+import com.offz.spigot.abyssalcreatures.mobs.hostile.*
 import com.offz.spigot.abyssalcreatures.mobs.passive.*
 import com.offz.spigot.mobzy.CustomType
 
@@ -16,21 +17,20 @@ class AbyssalType : CustomType() {
 
     //Hostile
     val INBYO = registerEntity("inbyo", width = 0.6f, height = 3f, func = ::Inbyo)
-//    val ROHANA = registerEntity(Rohana::class.java) { world: World? -> Rohana(world) }
-//    val TAMAGAUCHI = registerEntity(Tamaugachi::class.java) { world: World? -> Tamaugachi(world) }
-//    val SILKFANG = registerEntity(Silkfang::class.java) { world: World? -> Silkfang(world) }
-//    val KUONGATARI = registerEntity(Kuongatari::class.java) { world: World? -> Kuongatari(world) }
-//    val TESUCHI = registerEntity(Tesuchi::class.java) { world: World? -> Tesuchi(world) }
-//    val OTTOBAS = registerEntity(Ottobas::class.java) { world: World? -> Ottobas(world) }
-//    val STEVE = registerEntity(Steve::class.java) { world: World? -> Steve(world) }
+    val KUONGATARI = registerEntity("kuongatari", width = 0.6f, height = 0.6f, func = ::Kuongatari)
+    val OTTOBAS = registerEntity("ottobas", width = 2f, height = 3f, func = ::Ottobas)
+    val SILKFANG = registerEntity("silkfang", width = 2f, height = 2f, func = ::Silkfang)
+    val STEVE = registerEntity("steve", width = 2f, height = 7f, func = ::Steve)
+    val TAMAUGACHI = registerEntity("tamaugachi", width = 2.5f, height = 2.5f, func = ::Tamaugachi)
+    val TESUCHI = registerEntity("tesuchi", width = 0.6f, height = 0.6f, func = ::Tesuchi)
     //Flying
-//    val CORPSE_WEEPER = registerEntity(CorpseWeeper::class.java) { world: World? -> CorpseWeeper(world) }
-//    val MADOKAJACK = registerEntity(Madokajack::class.java) { world: World? -> Madokajack(world) }
-//    val HAMMERBEAK = registerEntity(Hammerbeak::class.java) { world: World? -> Hammerbeak(world) }
-//    val KAZURA = registerEntity(Kazura::class.java) { world: World? -> Kazura(world) }
-//    val BENIKUCHINAWA = registerEntity(Benikuchinawa::class.java) { world: World? -> Benikuchinawa(world) }
-//    val DOSETORI = registerEntity(Dosetori::class.java) { world: World? -> Dosetori(world) }
-//    val CYATORIA = registerEntity(Cyatoria::class.java) { world: World? -> Cyatoria(world) }
+    val CORPSE_WEEPER = registerEntity("corpse_weeper", width = 3f, height = 3f, func = ::CorpseWeeper)
+    val CYATORIA = registerEntity("cyatoria", width = 3f, height = 2f, func = ::Cyatoria)
+    val DOSETORI = registerEntity("dosetori", width = 3f, height = 2f, func = ::Dosetori)
+    val HAMMERBEAK = registerEntity("hammerbeak", width = 3f, height = 2f, func = ::Hammerbeak)
+    val KAZURA = registerEntity("kazura", width = 1f, height = 1f, func = ::Kazura)
+    val MADOKAJACK = registerEntity("madokajack", width = 4.5f, height = 3f, func = ::Madokajack)
+    val ROHANA = registerEntity("rohana", width = 0.6f, height = 0.6f, func = ::Rohana)
 
     fun registerNPC(name: String, modelID: Int) = registerEntity(toEntityTypeID(name), "npc", width = 0.6f, height = 2f) { NPC(it, name, modelID) }
     //NPCs

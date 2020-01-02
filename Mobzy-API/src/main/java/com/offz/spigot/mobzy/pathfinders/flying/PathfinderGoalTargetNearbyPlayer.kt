@@ -6,7 +6,7 @@ import com.offz.spigot.mobzy.pathfinders.living
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
-class PathfinderGoalHurtByTarget(mob: CustomMob) : MobzyPathfinderGoal(mob) {
+class PathfinderGoalTargetNearbyPlayer(mob: CustomMob) : MobzyPathfinderGoal(mob) {
     private lateinit var playerDamager: Player
     override fun shouldExecute(): Boolean {
         val damager = (nmsEntity.lastDamager ?: return false).living

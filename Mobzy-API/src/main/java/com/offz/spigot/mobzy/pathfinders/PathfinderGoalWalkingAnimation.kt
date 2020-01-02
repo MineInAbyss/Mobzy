@@ -26,7 +26,7 @@ class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID:
         return model.damage != modelID + 2 && !(velocity.x in -0.001..0.001 && velocity.z in -0.001..0.001)
     }
 
-    override fun shouldTerminate(): Boolean {
+    override fun shouldKeepExecuting(): Boolean {
         if (!shouldExecute() && model.damage != modelID + 2)
             mob.equipment!!.helmet = model.editItemMeta {
                 it.damage = modelID

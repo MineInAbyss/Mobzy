@@ -1,16 +1,9 @@
 /*
 package com.offz.spigot.mobzy.pathfinders
 
-import com.github.ysl3000.bukkit.pathfinding.pathfinding.PathfinderGoal
-import net.minecraft.server.v1_15_R1.EntityInsentient
-import net.minecraft.server.v1_15_R1.MathHelper
+import com.offz.spigot.mobzy.mobs.CustomMob
 
-*/
-/**
- * Most code from EntityGhast's pathfinders
- *//*
-
-class PathfinderGoalLookWhereHeaded(protected val mob: EntityInsentient) : PathfinderGoal {
+class PathfinderGoalLookWhereHeaded(mob: CustomMob) : MobzyPathfinderGoal(mob) {
     override fun execute() {
         val controllermove = mob.controllerMove
         val x = controllermove.d() - mob.locX
@@ -21,13 +14,8 @@ class PathfinderGoalLookWhereHeaded(protected val mob: EntityInsentient) : Pathf
         val deltaZ = z - mob.locZ
 
     }
-    override fun init() {}
-    override fun reset() {}
     override fun shouldExecute(): Boolean {
-        return !mob.controllerMove.b()
+        return !nmsEntity.controllerMove.b()
     }
-
-    override fun shouldTerminate(): Boolean {
-        return false
-    }
-}*/
+}
+*/

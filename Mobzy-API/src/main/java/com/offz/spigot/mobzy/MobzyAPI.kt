@@ -10,6 +10,12 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
+import net.minecraft.server.v1_15_R1.Entity as EntityNMS
+
+fun <T> T.debugVal(message: String = ""): T {
+    debug("$message $this")
+    return this
+}
 
 /**
  * Broadcast a message if the debug option is enabled in config
@@ -23,9 +29,11 @@ fun debug(message: String) {
 fun logInfo(message: String, color: ChatColor = ChatColor.WHITE) {
     mobzy.logger.info("$color$message")
 }
+
 fun logError(message: String) {
     logInfo(message, ChatColor.RED)
 }
+
 fun logGood(message: String) {
     logInfo(message, ChatColor.GREEN)
 }
@@ -65,9 +73,9 @@ val Entity.isRenamed
 /**
  * Converts a Bukkit entity to an NMS entity
  */
-fun Entity.toNMS(): net.minecraft.server.v1_15_R1.Entity = (this as CraftEntity).handle
+fun Entity.toNMS(): EntityNMS = (this as CraftEntity).handle
 
-fun <T : EntityLiving> Entity.toNMS(): net.minecraft.server.v1_15_R1.EntityLiving = (this as CraftEntity).handle as T
+fun <T : EntityLiving> Entity.toNMS(): EntityLiving = (this as CraftEntity).handle as T
 
 /**
  * The mobzy ID for a registered custom mob
@@ -77,13 +85,13 @@ val Entity.mobzyID
 
 fun Entity.toMobzy() = this.toNMS().toMobzy()
 
-fun net.minecraft.server.v1_15_R1.Entity.toMobzy() = this as CustomMob
+fun EntityNMS.toMobzy() = this as CustomMob
 
 
 /**
  * The mobzy ID for a registered custom mob
  */
-val net.minecraft.server.v1_15_R1.Entity.mobzyID
+val EntityNMS.mobzyID
     get() = toEntityTypeID(this.template.name)
 
 /**
@@ -94,7 +102,7 @@ fun Entity.isOfType(mobID: String) = this.toNMS().isOfType(mobID)
 /**
  * @return Whether the mob is of type of the given mob ID
  */
-fun net.minecraft.server.v1_15_R1.Entity.isOfType(mobID: String) = this.mobzyID == mobID
+fun EntityNMS.isOfType(mobID: String) = this.mobzyID == mobID
 
 /**
  * @return whether this is a custom mob registered with Mobzy
@@ -105,7 +113,7 @@ val Entity.isCustomMob
 /**
  * @return whether this is a custom mob registered with Mobzy
  */
-fun net.minecraft.server.v1_15_R1.Entity.isCustomMob() = this is CustomMob
+fun EntityNMS.isCustomMob() = this is CustomMob
 
 /**
  * A custom mob's [MobTemplate] that is registered with Mobzy
@@ -116,7 +124,7 @@ val Entity.template: MobTemplate
 /**
  * A custom mob's [MobTemplate] that is registered with Mobzy
  */
-val net.minecraft.server.v1_15_R1.Entity.template: MobTemplate
+val EntityNMS.template: MobTemplate
     get() = (this as CustomMob).template
 
 /**

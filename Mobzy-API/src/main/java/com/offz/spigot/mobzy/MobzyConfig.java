@@ -2,6 +2,8 @@ package com.offz.spigot.mobzy;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.offz.spigot.mobzy.mobs.types.FlyingMob;
+import com.offz.spigot.mobzy.mobs.types.HostileMob;
 import com.offz.spigot.mobzy.mobs.types.PassiveMob;
 import com.offz.spigot.mobzy.spawning.SpawnRegistry;
 import net.minecraft.server.v1_15_R1.Entity;
@@ -198,8 +200,8 @@ public class MobzyConfig {
         plugin.getLogger().info(ChatColor.YELLOW + "Registered addons: " + registeredAddons.toString());
 
         registerMobType("passive", PassiveMob.class);
-//        registerMobType("hostile", HostileMob.class); //FIXME
-//        registerMobType("flying", FlyingMob.class);
+        registerMobType("hostile", HostileMob.class);
+        registerMobType("flying", FlyingMob.class);
         registeredAddons.forEach(addon -> addon.registerWithMobzy(plugin));
         loadConfigValues();
         reloadConfigurationMap(mobCfgs);

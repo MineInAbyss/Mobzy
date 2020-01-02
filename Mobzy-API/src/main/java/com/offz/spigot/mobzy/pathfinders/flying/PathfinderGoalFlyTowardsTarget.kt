@@ -1,46 +1,22 @@
-/*
-package com.offz.spigot.mobzy.pathfinders.flying;
+package com.offz.spigot.mobzy.pathfinders.flying
 
-import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import net.minecraft.server.v1_15_R1.MathHelper;
-import net.minecraft.server.v1_15_R1.PathfinderGoal;
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.pathfinders.MobzyPathfinderGoal
 
-*/
-/**
- * Looking at target based off EntityGhast's pathfinders
- *//*
+class PathfinderGoalFlyTowardsTarget(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
+    override fun shouldExecute(): Boolean = (target != null)
 
-public class PathfinderGoalFlyTowardsTarget extends PathfinderGoal {
-    private FlyingMob mob;
+    override fun shouldKeepExecuting(): Boolean = target != null
 
-    public PathfinderGoalFlyTowardsTarget(FlyingMob flyingMob) {
-        mob = flyingMob;
+    override fun execute() {
+        val target = target ?: return
+        mob.lookAtPitchLock(target)
+
+        val targetLoc = target.location
+        moveController.a(targetLoc.x, targetLoc.y, targetLoc.z, 1.0) //TODO change to wrapper
+
+        //aim slightly higher when below target to fix getting stuck
+        if (targetLoc.y > mob.y)
+            moveController.a(targetLoc.x, mob.y + 1, targetLoc.z, 1.0)
     }
-
-    public boolean a() {
-        return true;
-    }
-
-    public void e() {
-        if (this.mob.getGoalTarget() == null) {
-            this.mob.yaw = -((float) MathHelper.c(this.mob.motX, this.mob.motZ)) * 57.295776F;
-            this.mob.aQ = this.mob.yaw;
-        } else {
-            //look at target
-            LivingEntity target = (LivingEntity) this.mob.getGoalTarget().getBukkitEntity();
-            mob.lookAt(target);
-            Location targetLoc = target.getLocation();
-            //move towards target
-            this.mob.getControllerMove().a(targetLoc.getX(), targetLoc.getY(), targetLoc.getZ(), 1);
-            if (targetLoc.getY() > mob.getY())
-                this.mob.getControllerMove().a(targetLoc.getX(), mob.getY() + 1, targetLoc.getZ(), 4);
-
-//            if (targetLoc.getY() > mob.locY)
-//                this.mob.getControllerMove().a(targetLoc.getX(), mob.locY + 1, targetLoc.getZ(), 4);
-//            else
-//                this.mob.getControllerMove().a(targetLoc.getX(), mob.locY - 1, targetLoc.getZ(), 4);
-        }
-    }
-}*/
+}

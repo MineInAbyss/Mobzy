@@ -1,6 +1,8 @@
 package com.offz.spigot.mobzy
 
 import com.offz.spigot.mobzy.gui.MobzyGUI
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.mobs.types.HostileMob
 //import com.offz.spigot.mobzy.mobs.types.FlyingMob
 //import com.offz.spigot.mobzy.mobs.types.HostileMob
 import com.offz.spigot.mobzy.mobs.types.PassiveMob
@@ -87,8 +89,8 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
                                 || args[1] == "named" && entity.isRenamed
                                 || args[1] == "npc" && entity.scoreboardTags.contains("npc")
                                 || args[1] == "passive" && !entity.scoreboardTags.contains("npc") && nmsEntity is PassiveMob
-//                                || args[1] == "hostile" && nmsEntity is HostileMob //FIXME
-//                                || args[1] == "flying" && nmsEntity is FlyingMob
+                                || args[1] == "hostile" && nmsEntity is HostileMob
+                                || args[1] == "flying" && nmsEntity is FlyingMob
                                 || entity.isOfType(args[1])))
                     try {
                         val playerLoc = sender.location

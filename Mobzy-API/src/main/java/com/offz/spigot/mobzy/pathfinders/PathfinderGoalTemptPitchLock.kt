@@ -31,7 +31,7 @@ class PathfinderGoalTemptPitchLock(private val mob: CustomMob, private val targe
         } else false
     }
 
-    override fun shouldTerminate(): Boolean = false
+    override fun shouldKeepExecuting(): Boolean = false
 
     override fun init() {
     }
@@ -48,7 +48,7 @@ class PathfinderGoalTemptPitchLock(private val mob: CustomMob, private val targe
             cooldown = 10
         else return
 
-        val dist = mob.distanceToEntity(target!!)
+        val dist = mob.distanceTo(target!!)
         if (dist in 1.0..6.25) navigation.moveToEntity(target!!, speed)
     }
 }

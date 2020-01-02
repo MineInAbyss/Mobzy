@@ -7,7 +7,6 @@ import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalMeleeAttackPitchLock
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
 import net.minecraft.server.v1_15_R1.*
-import org.bukkit.entity.LivingEntity
 
 /**
  * Lots of code taken from EntityZombie
@@ -24,7 +23,7 @@ abstract class HostileMob(world: World?, override var template: MobTemplate) : E
     override val entity: EntityLiving
         get() = this
 
-    override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime //TODO I want a consistent fix for the ambiguity errors, this might be it
+    override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime
     override val killScore: Int = aW
 
     //implementation of behaviours
@@ -36,7 +35,6 @@ abstract class HostileMob(world: World?, override var template: MobTemplate) : E
         addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
         addPathfinderGoal(8, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 8.0))
         addPathfinderGoal(8, PathfinderGoalRandomLookaround(this))
-        //TODO make addTargetSelector
         addTargetSelector(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
     }
 
@@ -55,8 +53,8 @@ abstract class HostileMob(world: World?, override var template: MobTemplate) : E
 
     override fun die() = super.die().also { undisguise() }
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
-    override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name) //TODO I forget why I did this, maybe to change the death message
-//    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop().also { debug(expToDrop().toString()) } //TODO exp isnt dropping
+    override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name)
+    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
@@ -73,8 +71,7 @@ abstract class HostileMob(world: World?, override var template: MobTemplate) : E
 
     init {
         createFromBase()
-        addScoreboardTag("passiveMob")
-        //TODO this is a temporary fix to see if it affects performance
-        (bukkitEntity as LivingEntity).removeWhenFarAway = true
+        addScoreboardTag("hostileMob")
+        living.removeWhenFarAway = true
     }
 }

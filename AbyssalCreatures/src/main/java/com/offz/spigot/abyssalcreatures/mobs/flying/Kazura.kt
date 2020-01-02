@@ -1,27 +1,21 @@
-/*
-package com.offz.spigot.abyssalcreatures.mobs.flying;
+package com.offz.spigot.abyssalcreatures.mobs.flying
 
-import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyTowardsTarget;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFlyAboveGround;
-import net.minecraft.server.v1_15_R1.PathfinderGoalFloat;
-import net.minecraft.server.v1_15_R1.PathfinderGoalTargetNearestPlayer;
-import net.minecraft.server.v1_15_R1.World;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyTowardsTarget
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFlyAboveGround
+import net.minecraft.server.v1_15_R1.EntityHuman
+import net.minecraft.server.v1_15_R1.PathfinderGoalFloat
+import net.minecraft.server.v1_15_R1.PathfinderGoalNearestAttackableTarget
+import net.minecraft.server.v1_15_R1.World
 
-public class Kazura extends FlyingMob implements HitBehaviour {
-    public Kazura(World world) {
-        super(world, "Kazura");
-        setSize(1f, 1f);
+class Kazura(world: World?) : FlyingMob(world, "Kazura"), HitBehaviour {
+    override fun createPathfinders() {
+        addPathfinderGoal(0, PathfinderGoalFloat(this))
+        addPathfinderGoal(1, PathfinderGoalFlyDamageTarget(this))
+        addPathfinderGoal(3, PathfinderGoalFlyTowardsTarget(this))
+        addPathfinderGoal(7, PathfinderGoalIdleFlyAboveGround(this, 2.0, 16.0))
+        addTargetSelector(1, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
     }
-
-    @Override
-    public void createPathfinders() {
-        goalSelector.a(1, new PathfinderGoalFlyDamageTarget(this));
-        goalSelector.a(3, new PathfinderGoalFlyTowardsTarget(this));
-        goalSelector.a(7, new PathfinderGoalIdleFlyAboveGround(this, 2, 16));
-        goalSelector.a(0, new PathfinderGoalFloat(this));
-        targetSelector.a(1, new PathfinderGoalTargetNearestPlayer(this));
-    }
-}*/
+}

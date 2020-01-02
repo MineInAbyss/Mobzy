@@ -20,7 +20,7 @@ open class CustomType {
 
         @JvmStatic
         fun toEntityTypeID(name: String): String {
-            return name.toLowerCase().replace(" ", "")
+            return name.toLowerCase().replace(" ", "_")
         }
 
         @JvmStatic
@@ -34,7 +34,7 @@ open class CustomType {
 
         @JvmStatic
         fun getTemplate(name: String): MobTemplate {
-            return templates[toEntityTypeID(name)] ?: error("Template for $$name not found")
+            return templates[toEntityTypeID(name)] ?: error("Template for $name not found")
         }
 
         @JvmStatic

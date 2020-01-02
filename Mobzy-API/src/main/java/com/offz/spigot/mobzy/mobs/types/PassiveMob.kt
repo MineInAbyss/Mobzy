@@ -7,7 +7,6 @@ import com.offz.spigot.mobzy.mobs.MobTemplate
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
 import net.minecraft.server.v1_15_R1.*
-import org.bukkit.entity.LivingEntity
 
 /**
  * Originally based off EntityPig
@@ -35,8 +34,8 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
         addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
-        addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
-        addPathfinderGoal(7, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
+        addPathfinderGoal(6, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
+        addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
     }
 
     /**
@@ -76,6 +75,6 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
         createFromBase()
         addScoreboardTag("passiveMob")
         //TODO this is a temporary fix to see if it affects performance
-        (bukkitEntity as LivingEntity).removeWhenFarAway = true
+        living.removeWhenFarAway = true
     }
 }

@@ -1,20 +1,19 @@
-/*
-package com.offz.spigot.abyssalcreatures.mobs.flying;
+package com.offz.spigot.abyssalcreatures.mobs.flying
 
-import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalDiveOnTargetAttack;
-import net.minecraft.server.v1_15_R1.World;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalDiveOnTargetAttack
+import net.minecraft.server.v1_15_R1.World
 
-public class Madokajack extends FlyingMob implements HitBehaviour {
-    public Madokajack(World world) {
-        super(world, "Madokajack");
-        setSize(4.5f, 3f);
+class Madokajack(world: World?) : FlyingMob(world, "Madokajack"), HitBehaviour {
+    override fun createPathfinders() {
+        super.createPathfinders()
+        addPathfinderGoal(2, PathfinderGoalDiveOnTargetAttack(
+                this,
+                minHeight = 6.0,
+                maxHeight = 10.0,
+                startDiveDistance = 14.0,
+                bashVelMultiplier = 1.0
+        ))
     }
-
-    @Override
-    public void createPathfinders() {
-        super.createPathfinders();
-        goalSelector.a(2, new PathfinderGoalDiveOnTargetAttack(this, -0.3, 6, 10, 8, 2, 0.6, 30));
-    }
-}*/
+}

@@ -2,6 +2,7 @@ package com.offz.spigot.mobzy.mobs
 
 import com.offz.spigot.mobzy.CustomType
 import com.offz.spigot.mobzy.debug
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
 import com.offz.spigot.mobzy.pathfinders.Navigation
 import me.libraryaddict.disguise.DisguiseAPI
 import me.libraryaddict.disguise.disguisetypes.Disguise
@@ -16,6 +17,7 @@ import org.bukkit.craftbukkit.v1_15_R1.event.CraftEventFactory
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import kotlin.random.Random
+
 
 /**
  * @property killScore The score with which a player should be rewarded with when the current entity is killed.
@@ -37,7 +39,7 @@ interface CustomMob {
     val killer: EntityLiving? get() = entity.killer
     fun expToDrop(): Int {
         return if (template.minExp == null || template.maxExp == null) entity.expToDrop
-        else if(template.maxExp!! <= template.minExp!!) template.minExp!!
+        else if (template.maxExp!! <= template.minExp!!) template.minExp!!
         else Random.nextInt(template.minExp!!, template.maxExp!!)
     }
 
@@ -82,13 +84,14 @@ interface CustomMob {
 
     fun setConfiguredAttributes() {
         if (staticTemplate.maxHealth != null)
-            entity.getAttributeInstance(GenericAttributes.MAX_HEALTH).value = staticTemplate.maxHealth!!
+            entity.getAttributeInstance(GenericAttributes.MAX_HEALTH).value = staticTemplate.maxHealth
+                    ?: return //TODO not sure if we need this null check
         if (staticTemplate.movementSpeed != null)
-            entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).value = staticTemplate.movementSpeed!!
-        if (staticTemplate.attackDamage != null /*&& this !is FlyingMob TODO add this back*/) //flying mobs can't have an attack damage attribute, we use the builder's value instead
-            entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).value = staticTemplate.attackDamage!!
+            entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).value = staticTemplate.movementSpeed ?: return
+        if (staticTemplate.attackDamage != null && this !is FlyingMob) //flying mobs can't have an attack damage attribute, we use the builder's value instead
+            entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).value = staticTemplate.attackDamage ?: return
         if (staticTemplate.followRange != null)
-            entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).value = staticTemplate.followRange!!
+            entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).value = staticTemplate.followRange ?: return
     }
 
     fun dieCM(damageSource: DamageSource?) {
@@ -118,7 +121,7 @@ interface CustomMob {
 
     fun makeSound(sound: String?) {
         if (sound != null)
-            living.world.playSound(location, sound, SoundCategory.NEUTRAL, 1f, (kotlin.random.Random.nextDouble(1.0, 1.02).toFloat()))
+            living.world.playSound(location, sound, SoundCategory.NEUTRAL, 1f, (Random.nextDouble(1.0, 1.02).toFloat()))
     }
 
     fun disguise() {
@@ -137,6 +140,7 @@ interface CustomMob {
     fun addPathfinderGoal(priority: Int, goal: PathfinderGoal) {
         (entity as EntityInsentient).goalSelector.a(priority, goal)
     }
+
     fun addTargetSelector(priority: Int, goal: PathfinderGoalTarget) {
         (entity as EntityInsentient).targetSelector.a(priority, goal)
     }
@@ -147,9 +151,13 @@ interface CustomMob {
      * @param other Another entity.
      * @return The distance between the current entity and other entity's locations.
      */
-    fun distanceToEntity(other: Entity): Double {
-        return location.distance(other.location)
-    }
+    fun distanceTo(other: Entity): Double = distanceTo(other.location)
+
+    /**
+     * @param other Some location
+     * @return The distance between the current entity and the other location
+     */
+    fun distanceTo(other: Location): Double = location.distance(other)
 
     /**
      * @param range the range to search within
@@ -157,8 +165,15 @@ interface CustomMob {
      */
     fun findNearbyPlayer(range: Double) = world.findNearbyPlayer(this.entity, range)
 
-    fun lookAt(x: Double, y: Double, z: Double) =
-            (entity as EntityInsentient).controllerLook.a(x, y, z)
+    fun lookAt(x: Double, z: Double) = lookAt(x, y, z)
+
+    fun lookAt(x: Double, y: Double, z: Double) {
+        val dirBetweenLocations = org.bukkit.util.Vector(x, y, z).subtract(location.toVector())
+        val location = living.location
+        location.direction = dirBetweenLocations
+        living.setRotation(location.yaw, location.pitch)
+    }
+//            (entity as EntityInsentient).controllerLook.a(x, y, z)
 
     /**
      * @param location the location to look at
@@ -174,9 +189,11 @@ interface CustomMob {
      */
     fun lookAt(entity: Entity) = lookAt(entity.location)
 
-    fun lookAtPitchLock(location: Location) = lookAt(location.x, y + entity.headHeight, location.z)
+    fun lookAtPitchLock(location: Location) = lookAt(location.x, location.z)
 
     fun lookAtPitchLock(entity: Entity) = lookAtPitchLock(entity.location)
+
+    fun canReach(target: Entity) = distanceTo(target) < entity.width / 2 + 1
 
 //    fun jump() = (entity as EntityInsentient).controllerJump.jump()
 }
