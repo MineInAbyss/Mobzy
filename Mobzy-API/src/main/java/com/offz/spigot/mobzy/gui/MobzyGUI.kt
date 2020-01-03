@@ -84,9 +84,9 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
 
     fun saveConfigValues(spawn: MutableMap<String, Any?>, mobProperties: List<MobzyPropertyElement>) {
         spawn.clear()
-        mobProperties.forEach { property -> spawn[property.key] = property.value }
-        mobzy.mobzyConfig.saveSpawnCfg(config)
-        player.sendMessage(ChatColor.GREEN.toString() + "Successfully saved mob's configuartion")
+        mobProperties.forEach { spawn[it.key] = it.value }
+        mobzy.mobzyConfig.saveSpawnCfg(config ?: error("Could not save config values, config was null"))
+        player.sendMessage("${ChatColor.GREEN}Successfully saved mob's configuartion")
     }
 
     init {

@@ -1,38 +1,23 @@
-/*
-package com.offz.spigot.abyssalcreatures.mobs.flying;
+package com.offz.spigot.abyssalcreatures.mobs.flying
 
-import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour;
-import com.offz.spigot.mobzy.mobs.types.FlyingMob;
-import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalDiveOnTargetAttack;
-import net.minecraft.server.v1_15_R1.World;
+import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
+import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalDiveOnTargetAttack
+import net.minecraft.server.v1_15_R1.World
 
-public class Benikuchinawa extends FlyingMob implements HitBehaviour {
-    public Benikuchinawa(World world) {
-        super(world, "Benikuchinawa");
-        setSize(4.5f, 2f);
-        //An alternative method for setting boundaries which doesn't seem to work anymore
-//        AxisAlignedBB boundingBox = new AxisAlignedBB(locX - 5, locY, locZ - 1, locX + 5, locY + 1, locZ + 1);
-//        a(boundingBox);
+class Benikuchinawa(world: World?) : FlyingMob(world, "Benikuchinawa"), HitBehaviour {
+    override fun createPathfinders() {
+        super.createPathfinders()
+        addPathfinderGoal(2, PathfinderGoalDiveOnTargetAttack(
+                this,
+                diveVelocity = -0.03,
+                minHeight = 3.0,
+                maxHeight = 5.0
+        ))
     }
 
-    @Override
-    public void createPathfinders() {
-        super.createPathfinders();
-        goalSelector.a(2, new PathfinderGoalDiveOnTargetAttack(this, -0.03, 3, 5, 8, 2, 0.6, 30));
-    }
+    override val soundAmbient = "entity.llama.ambient"
+    override val soundDeath = "entity.llama.death"
+    override val soundHurt = "entity.llama.hurt"
 
-    @Override
-    public String soundAmbient() {
-        return "entity.llama.ambient";
-    }
-
-    @Override
-    public String soundDeath() {
-        return "entity.llama.death";
-    }
-
-    @Override
-    public String soundHurt() {
-        return "entity.llama.hurt";
-    }
-}*/
+}

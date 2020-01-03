@@ -1,47 +1,28 @@
-package com.offz.spigot.mobzy.spawning.vertical;
+package com.offz.spigot.mobzy.spawning.vertical
 
-import com.offz.spigot.mobzy.spawning.MobSpawn;
-import org.bukkit.Location;
+import com.offz.spigot.mobzy.spawning.MobSpawn.SpawnPosition
+import org.bukkit.Location
+import kotlin.random.Random
 
 //TODO name could be confused with SpawnRegion
-
 /**
  * Defines a vertical area from a top and bottom location, with information about its gap
+ *
+ * @property top The topmost location of the spawn.
+ * @property bottom The bottommost location of the spawn.
+ * @property gap The gap in the y axis between the two of them.
  */
-public class SpawnArea {
-    private Location top;
-    private Location bottom;
-    private int gap;
+class SpawnArea(val top: Location, val bottom: Location) {
+    //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
+    val gap: Int = top.blockY - bottom.blockY + 1
 
-    public SpawnArea(Location top, Location bottom) {
-        this.top = top;
-        this.bottom = bottom;
-        gap = top.getBlockY() - bottom.getBlockY() + 1; //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
-    }
+    fun getSpawnLocation(spawnPosition: SpawnPosition): Location =
+            when (spawnPosition) {
+                //pick some position between the bottom and top when spawn position is in air
+                SpawnPosition.AIR -> bottom.clone().add(0.0, Random.nextDouble(top.y - bottom.y), 0.0)
+                SpawnPosition.GROUND -> bottom
+                else -> top
+            }
 
-    public Location getTop() {
-        return top;
-    }
-
-    public Location getBottom() {
-        return bottom;
-    }
-
-    public Location getSpawnLocation(MobSpawn.SpawnPosition spawnPosition) {
-        if (spawnPosition.equals(MobSpawn.SpawnPosition.AIR))
-            return getBottom().clone().add(0, Math.random() * (getTop().getY() - getBottom().getY()), 0);
-        else if (spawnPosition.equals(MobSpawn.SpawnPosition.GROUND))
-            return getBottom();
-        else
-            return getTop();
-    }
-
-    public int getGap() {
-        return gap;
-    }
-
-    @Override
-    public String toString() {
-        return "SpawnArea: " + bottom.getBlockY() + ", " + top.getBlockY();
-    }
+    override fun toString(): String = "SpawnArea: " + bottom.blockY + ", " + top.blockY
 }

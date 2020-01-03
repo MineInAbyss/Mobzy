@@ -4,13 +4,16 @@ import com.offz.spigot.mobzy.CustomType.Companion.getType
 import com.offz.spigot.mobzy.logError
 import com.offz.spigot.mobzy.logGood
 import com.offz.spigot.mobzy.spawning.MobSpawn.Companion.deserialize
+import com.offz.spigot.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.offz.spigot.mobzy.spawning.regions.SpawnRegion
-import net.minecraft.server.v1_15_R1.Entity
 import org.bukkit.configuration.file.FileConfiguration
 import java.util.*
 
+/**
+ * @property regionSpawns A map of region names to their [SpawnRegion].
+ */
 object SpawnRegistry {
-    private val regionSpawns: MutableMap<String?, SpawnRegion?> = HashMap()
+    private val regionSpawns: MutableMap<String, SpawnRegion> = HashMap()
 
     fun unregisterAll() = regionSpawns.clear()
 
@@ -22,13 +25,6 @@ object SpawnRegistry {
             try {
                 val spawnList = region["spawns"] as List<Map<*, *>>
                 for (spawn in spawnList) {
-
-                    //create a new builder from the MobSpawn found inside of an already created layer
-                    /*if (spawn.containsKey("reuse")) {
-                        val reusedMob = spawn["reuse"] as String?
-                        mobSpawn = MobSpawn.newBuilder(getReusedBuilder(reusedMob))
-                    } else if (!spawn.containsKey("mob")) break
-                    */ //FIXME add back reuse functionality
                     spawnRegion.addSpawn(deserialize(spawn as Map<String?, Any?>))
                 }
             } catch (e: NullPointerException) {
@@ -40,12 +36,13 @@ object SpawnRegistry {
         logGood("Reloaded spawns.yml")
     }
 
-    fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this out because I have no idea what it's doing
-            regionSpawns[reusedMob.substring(0, reusedMob.indexOf(':'))]!!
+    fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this because I have no idea what it's doing
+            (regionSpawns[reusedMob.substring(0, reusedMob.indexOf(':'))]
+                    ?: error("Could not find registered region for $reusedMob"))
                     .getSpawnOfType(getType(reusedMob.substring(reusedMob.indexOf(':') + 1)))
 
-    fun getMobSpawnsForRegions(regionIDs: List<String?>, mobType: Class<out Entity?>?) = regionIDs
+    fun List<String>.getMobSpawnsForRegions(creatureType: String): List<MobSpawn> = this
             .filter { regionSpawns.containsKey(it) }
-            .map { regionSpawns[it]!!.getSpawnsFor(mobType) }
-            .flatten() //TODO make sure this is working
+            .map { regionSpawns[it]!!.getSpawnsFor(creatureType) }
+            .flatten()
 }

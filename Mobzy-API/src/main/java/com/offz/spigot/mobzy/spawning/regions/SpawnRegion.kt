@@ -1,60 +1,35 @@
-package com.offz.spigot.mobzy.spawning.regions;
+package com.offz.spigot.mobzy.spawning.regions
 
-import com.offz.spigot.mobzy.MobzyConfig;
-import com.offz.spigot.mobzy.MobzyKt;
-import com.offz.spigot.mobzy.spawning.MobSpawn;
-import net.minecraft.server.v1_15_R1.Entity;
-import net.minecraft.server.v1_15_R1.EntityTypes;
-
-import java.util.*;
+import com.offz.spigot.mobzy.creatureType
+import com.offz.spigot.mobzy.name
+import com.offz.spigot.mobzy.spawning.MobSpawn
+import net.minecraft.server.v1_15_R1.EntityTypes
+import java.util.*
 
 /**
  * A region with determined hostile, passive, flying, etc... spawns. Currently only layers are treated as regions.
  * In the future, this will integrate with WorldGuard regions to allow for more specific region setting
  */
-public class SpawnRegion {
+class SpawnRegion(val name: String, vararg spawns: MobSpawn) {
     //TODO maybe mob caps should be determined per region?
-    private Map<Class<? extends Entity>, List<MobSpawn>> spawns = new HashMap<>();
-    private MobzyConfig config = (MobzyKt.getMobzy()).getMobzyConfig();
-    private String name;
+    private val spawns: MutableMap<String, MutableList<MobSpawn>> = HashMap()
 
-    public SpawnRegion(String name, MobSpawn... spawns) {
-        this.name = name;
-
-        for (MobSpawn spawn : spawns) {
-            addSpawn(spawn);
-        }
+    fun getSpawnsFor(creatureType: String): List<MobSpawn> {
+        return (spawns[creatureType] ?: return emptyList()).toList()
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public List<MobSpawn> getSpawnsFor(Class<? extends Entity> mobType) {
-        if(!spawns.containsKey(mobType))
-            return Collections.emptyList();
-        return spawns.get(mobType);
-    }
-
-    public void addSpawn(MobSpawn spawn) {
-        Class entityClass = spawn.getEntityType().getClass(); //FIXME
+    fun addSpawn(spawn: MobSpawn) {
         //add to a different spawn list depending on what kind of entity type it is (since we have separate mob caps per list)
-        for (Class<? extends Entity> type : config.getRegisteredMobTypes().values()) {
-            if (type.isAssignableFrom(entityClass)) {
-                if (spawns.get(type) == null)
-                    spawns.put(type, new ArrayList<>(Collections.singletonList(spawn)));
-                else
-                    spawns.get(type).add(spawn);
-                return;
-            }
-        }
+        val creatureType = spawn.entityType.creatureType.name
+        if (spawns[creatureType] == null) spawns[creatureType] = mutableListOf(spawn)
+        else spawns[creatureType]!!.add(spawn)
     }
 
-    public MobSpawn getSpawnOfType(EntityTypes type) {
-        return spawns.values().stream()
-                .flatMap(List::stream)
-                .filter(spawn -> spawn.getEntityType().equals(type))
-                .findFirst()
-                .orElse(null);
+    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn =
+            spawns.values.flatten().firstOrNull { (entityType) -> entityType == type }
+                    ?: error("Could not find ${type.name} in ${spawns.values.flatten().map { it.entityType.name }}")
+
+    init {
+        for (spawn in spawns) addSpawn(spawn)
     }
 }

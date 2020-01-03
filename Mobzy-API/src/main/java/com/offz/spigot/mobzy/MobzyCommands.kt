@@ -131,7 +131,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
                 return true
             }
 
-            if (numOfSpawns > MobzyConfig.getMaxSpawnAmount()) numOfSpawns = MobzyConfig.getMaxSpawnAmount()
+            if (numOfSpawns > MobzyConfig.maxSpawnAmount) numOfSpawns = MobzyConfig.maxSpawnAmount
             for (i in 0 until numOfSpawns) CustomType.spawnEntity(args[1], sender.location)
             return true
         }
@@ -157,19 +157,19 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): List<String> {
         if (command.name != "mobzy") return emptyList()
         if (args.size <= 1) return listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config")
-                .filter { a: String -> a.startsWith(args[0]) }
+                .filter { it.startsWith(args[0]) }
         val subCommand = args[0]
         if (subCommand == "spawn" || subCommand == "s")
             if (args.size == 2) {
                 return CustomType.types.keys
-                        .filter { a: String -> a.startsWith(args[1].toLowerCase()) }
+                        .filter { it.startsWith(args[1].toLowerCase()) }
             } else if (args.size == 3) {
                 var min = 1
                 try {
                     min = args[2].toInt()
                 } catch (e: NumberFormatException) {
                 }
-                return (min until MobzyConfig.getMaxSpawnAmount()).asIterable()
+                return (min until MobzyConfig.maxSpawnAmount).asIterable()
                         .map { it.toString() }.filter { it.startsWith(min.toString()) }
             }
         if (subCommand in listOf("remove", "rm", "info", "i"))

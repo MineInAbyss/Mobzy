@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 public class SpawnChunkGrid {
     private List<ChunkSpawn> chunkSpawns;
 
-
     SpawnChunkGrid(List<Location> locs, int minRad, int maxRad) {
         List<Chunk> tooCloseChunks = new ArrayList<>();
         List<Chunk> spawnableChunks = new ArrayList<>();
@@ -73,6 +72,9 @@ public class SpawnChunkGrid {
         return chunkSpawns;
     }
 
+    /**
+     * @return The now-slightly-shuffled list of ChunkSpawns, with some consideration for their original preferences
+     */
     public List<ChunkSpawn> getShuffledSpawns() {
         for (ChunkSpawn spawn : chunkSpawns)
             spawn.setPreferenceOffset(Math.random());

@@ -12,9 +12,12 @@ import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.util.Vector
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.sign
+import kotlin.random.Random
 
-data class MobSpawn(val entityType: EntityTypes<*>,
+//todo make
+data class MobSpawn(var entityType: EntityTypes<*>,
                     var minAmount: Int = 1,
                     var maxAmount: Int = 1,
                     var radius: Double = 0.0,
@@ -109,7 +112,7 @@ data class MobSpawn(val entityType: EntityTypes<*>,
         fun enoughSpace(loc: Location, width: Double, height: Double): Boolean {
             val checkRad = width / 2
             var y = 0
-            while (y < Math.ceil(height)) {
+            while (y < ceil(height)) {
                 var x = -checkRad
                 while (x < checkRad) {
                     var z = -checkRad
@@ -141,8 +144,9 @@ data class MobSpawn(val entityType: EntityTypes<*>,
                 val y = (Math.random() - 0.5) * maxRad
                 if (abs(y) > minRad) //if y is minRad blocks away from player, mobs can spawn directly under or above
                     minRad = 0.0
-                val x = sign(Math.random() - 0.5) * (Math.random() * (maxRad - minRad) + minRad)
-                val z = sign(Math.random() - 0.5) * (Math.random() * (maxRad - minRad) + minRad)
+
+                val x = sign(Math.random() - 0.5) * Random.nextDouble(minRad, maxRad)
+                val z = sign(Math.random() - 0.5) * Random.nextDouble(minRad, maxRad)
                 if (!loc.chunk.isLoaded) return null
                 var searchLoc: Location? = loc.clone()
                 searchLoc = searchLoc!!.add(Vector(x, y, z))
@@ -159,13 +163,20 @@ data class MobSpawn(val entityType: EntityTypes<*>,
 
         //TODO make these use @SerializableAs https://www.spigotmc.org/threads/tutorial-bukkit-custom-serialization.148781/
         @JvmStatic
-        fun deserialize(args: Map<String?, Any?>): MobSpawn? {
+        fun deserialize(args: Map<String?, Any?>): MobSpawn {
             fun setArg(name: String, setValue: (Any) -> Unit) {
                 if (args.containsKey(name))
-                    setValue(args[name] ?: error("Failed to parse argument while serializing MobSpawn"))
+                    setValue(args[name]
+                            ?: error("Failed to parse argument while serializing MobSpawn for property $name"))
+            }
+            //create a new builder from the MobSpawn found inside of an already created layer
+            val spawn = when {
+                args.containsKey("reuse") -> SpawnRegistry.reuseMobSpawn(args["reuse"] as String).copy()
+                        .also { setArg("mob") { mob -> it.entityType = getType(mob as String) } }
+                args.containsKey("mob") -> MobSpawn(getType((args["mob"]) as String))
+                else -> error("Serialization failed. No `mob` or `reuse` tag is defined in the spawn.")
             }
 
-            val spawn = MobSpawn(entityType = getType((args["mob"] as String)))
             setArg("min-amount") { spawn.minAmount = (it as Number).toInt() }
             setArg("max-amount") { spawn.maxAmount = (it as Number).toInt() }
 

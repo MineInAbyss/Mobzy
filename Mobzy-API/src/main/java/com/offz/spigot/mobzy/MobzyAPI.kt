@@ -4,6 +4,8 @@ import com.offz.spigot.mobzy.CustomType.Companion.toEntityTypeID
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
 import net.minecraft.server.v1_15_R1.EntityLiving
+import net.minecraft.server.v1_15_R1.EntityTypes
+import net.minecraft.server.v1_15_R1.EnumCreatureType
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity
@@ -17,13 +19,18 @@ fun <T> T.debugVal(message: String = ""): T {
     return this
 }
 
+fun <T> T.logVal(message: String = ""): T {
+    logInfo("$message $this")
+    return this
+}
+
 /**
  * Broadcast a message if the debug option is enabled in config
  *
  * @param message the message to be sent
  */
 fun debug(message: String) {
-    if (mobzy.mobzyConfig.isDebug) Bukkit.broadcastMessage(message)
+    if (MobzyConfig.isDebug) Bukkit.broadcastMessage(message)
 }
 
 fun logInfo(message: String, color: ChatColor = ChatColor.WHITE) {
@@ -104,6 +111,10 @@ fun Entity.isOfType(mobID: String) = this.toNMS().isOfType(mobID)
  */
 fun EntityNMS.isOfType(mobID: String) = this.mobzyID == mobID
 
+
+fun Entity.isOfCreatureType(creatureType: String) = this.toNMS().isOfCreatureType(creatureType)
+fun EntityNMS.isOfCreatureType(creatureType: String) = this.entityType.creatureType.name == creatureType
+
 /**
  * @return whether this is a custom mob registered with Mobzy
  */
@@ -134,3 +145,9 @@ val EntityNMS.template: MobTemplate
 fun getTemplate(name: String): MobTemplate {
     return CustomType.getTemplate(name)
 }
+
+val EntityTypes<*>.name: String
+    get() = this.f()
+
+val EntityTypes<*>.creatureType: EnumCreatureType
+    get() = this.e()

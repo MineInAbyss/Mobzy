@@ -46,15 +46,15 @@ open class CustomType {
         }
 
         @JvmStatic
-        fun registerEntity(name: String, templateName: String = name, width: Float = 1f, height: Float = 2f, func: (World) -> Entity): EntityTypes<*> {
-            val injected: EntityTypes<*> = injectNewEntity(name, "zombie", bToa(EntityTypes.b { _, world -> func(world)}).c().a(width, height))
+        fun registerEntity(name: String, type: EnumCreatureType, templateName: String = name , width: Float = 1f, height: Float = 2f, func: (World) -> Entity): EntityTypes<*> {
+            val injected: EntityTypes<*> = injectNewEntity(name, "zombie", bToa(EntityTypes.b { _, world -> func(world)}, type).c().a(width, height))
             types[name] = injected
             templateNames[name] = templateName
             return injected
         }
 
         @JvmStatic
-        fun getMobNameForEntityTypes(type: EntityTypes<*>) = type.f().removePrefix("entity.minecraft.")
+        fun getMobNameForEntityTypes(type: EntityTypes<*>) = type.name.removePrefix("entity.minecraft.")
 
         @JvmStatic
         fun registerTypes() {
@@ -73,7 +73,7 @@ open class CustomType {
             return deserialize((mobCfg[name] as MemorySection).getValues(true), name)
         }
 
-        private fun bToa(b: EntityTypes.b<Entity>): EntityTypes.a<Entity> = EntityTypes.a.a(b, EnumCreatureType.MISC)
+        private fun bToa(b: EntityTypes.b<Entity>, creatureType: EnumCreatureType ): EntityTypes.a<Entity> = EntityTypes.a.a(b, creatureType)
 
         //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
         private fun injectNewEntity(name: String, extend_from: String, a: EntityTypes.a<Entity>): EntityTypes<Entity> { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293

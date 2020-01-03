@@ -57,7 +57,7 @@ class Mobzy : JavaPlugin() {
         mobzy = this
         logger.info("On enable has been called")
         saveDefaultConfig()
-        mobzyConfig = MobzyConfig(this)
+        mobzyConfig = MobzyConfig()
         reloadConfig()
         registerTypes() //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
@@ -71,9 +71,9 @@ class Mobzy : JavaPlugin() {
         server.pluginManager.registerEvents(GuiListener(this), this)
 
         //Register repeating tasks
-        if (MobzyConfig.doMobSpawns()) {
-            val spawnTask: Runnable = SpawnTask(this)
-            server.scheduler.scheduleSyncRepeatingTask(this, spawnTask, 0, MobzyConfig.getSpawnTaskDelay().toLong())
+        if (MobzyConfig.doMobSpawns) {
+            val spawnTask: Runnable = SpawnTask()
+            server.scheduler.scheduleSyncRepeatingTask(this, spawnTask, 0, MobzyConfig.spawnTaskDelay)
         }
 
         //Reload existing addons
