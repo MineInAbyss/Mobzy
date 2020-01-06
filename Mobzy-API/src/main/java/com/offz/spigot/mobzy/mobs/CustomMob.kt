@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.mobs
 
-import com.offz.spigot.mobzy.CustomType
 import com.offz.spigot.mobzy.debug
+import com.offz.spigot.mobzy.mobTemplate
 import com.offz.spigot.mobzy.mobs.types.FlyingMob
 import com.offz.spigot.mobzy.pathfinders.Navigation
 import me.libraryaddict.disguise.DisguiseAPI
@@ -22,13 +22,14 @@ import kotlin.random.Random
 /**
  * @property killScore The score with which a player should be rewarded with when the current entity is killed.
  * @property killer The killer of the current entity if it has one.
+ * @property scoreboardDisplayNameMZ Used to change the name displayed in the death message
  */
 interface CustomMob {
     // ========== Useful properties ===============
     val entity: EntityLiving
     val living: LivingEntity get() = entity.bukkitEntity as LivingEntity
     val template: MobTemplate
-    val staticTemplate: MobTemplate get() = CustomType.getTemplate(entity.entityType)
+    val staticTemplate: MobTemplate get() = entity.entityType.mobTemplate
     val x: Double get() = living.location.x
     val y: Double get() = living.location.y
     val z: Double get() = living.location.z
@@ -42,6 +43,9 @@ interface CustomMob {
         else if (template.maxExp!! <= template.minExp!!) template.minExp!!
         else Random.nextInt(template.minExp!!, template.maxExp!!)
     }
+
+    val scoreboardDisplayNameMZ: ChatMessage
+        get() = ChatMessage(template.name.capitalize())
 
     // ========== Things to be overloaded ==========
     val soundAmbient: String?
@@ -65,7 +69,6 @@ interface CustomMob {
     fun dropExp()
 
     // ========== Pre-written behaviour ============
-
     /**
      * Applies some default attributes that every custom mob should have, such as a model, invisibility, and an
      * identifier scoreboard tag

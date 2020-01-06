@@ -19,7 +19,7 @@ class SpawnArea(val top: Location, val bottom: Location) {
     fun getSpawnLocation(spawnPosition: SpawnPosition): Location =
             when (spawnPosition) {
                 //pick some position between the bottom and top when spawn position is in air
-                SpawnPosition.AIR -> bottom.clone().add(0.0, Random.nextDouble(top.y - bottom.y), 0.0)
+                SpawnPosition.AIR -> bottom.clone().add(0.0, Random.nextDouble(gap.toDouble()), 0.0)
                 SpawnPosition.GROUND -> bottom
                 else -> top
             }

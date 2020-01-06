@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.listener;
 
 import com.offz.spigot.mobzy.Mobzy;
-import com.offz.spigot.mobzy.MobzyAPIKt;
+import com.offz.spigot.mobzy.MobzyAPI;
 import com.offz.spigot.mobzy.MobzyContext;
 import com.offz.spigot.mobzy.MobzyKt;
 import com.offz.spigot.mobzy.mobs.CustomMob;
@@ -112,13 +112,13 @@ public class MobListener implements Listener {
      */
     @EventHandler
     public void onLeftClick(PlayerInteractEvent e) {
-        //TODO I'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
-        // armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:
+        // TODO I'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
+        //  armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:
         Player p = e.getPlayer();
         if (leftClicked(e) || rightClicked(e)) {
             RayTraceResult trace = p.getWorld().rayTrace(p.getEyeLocation(), p.getLocation().getDirection(), 3, FluidCollisionMode.ALWAYS, true, 0, entity -> !entity.equals(p));
             if (trace != null && trace.getHitEntity() != null) {
-                Entity hit = MobzyAPIKt.toNMS(trace.getHitEntity());
+                Entity hit = MobzyAPI.toNMS(trace.getHitEntity());
                 if (!(hit instanceof CustomMob))
                     return;
 
@@ -137,7 +137,7 @@ public class MobListener implements Listener {
         return e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK;
     }
 
-    //TODO this event doesn't send out a packet when right clicking air with an empty hand
+    // TODO this event doesn't send out a packet when right clicking air with an empty hand
     public boolean rightClicked(PlayerInteractEvent e) {
         return e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK;
     }

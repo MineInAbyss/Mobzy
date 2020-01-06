@@ -14,11 +14,10 @@ import org.bukkit.entity.EntityType
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
-//TODO convert to kotlin
 class SpawnTask : BukkitRunnable() {
     private val config: MobzyConfig = mobzy.mobzyConfig
 
-    override fun run() { //FIXME getNearbyEntities is no longer async
+    override fun run() {
         try { //run checks asynchronously
             if (!MobzyConfig.doMobSpawns) {
                 cancel()

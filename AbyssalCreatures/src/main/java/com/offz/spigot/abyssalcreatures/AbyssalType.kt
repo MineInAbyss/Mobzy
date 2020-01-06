@@ -3,12 +3,17 @@ package com.offz.spigot.abyssalcreatures
 import com.offz.spigot.abyssalcreatures.mobs.flying.*
 import com.offz.spigot.abyssalcreatures.mobs.hostile.*
 import com.offz.spigot.abyssalcreatures.mobs.passive.*
-import com.offz.spigot.mobzy.CustomType
+import com.offz.spigot.mobzy.registerEntity
+import com.offz.spigot.mobzy.registerTypes
+import com.offz.spigot.mobzy.toEntityTypeID
 import net.minecraft.server.v1_15_R1.EnumCreatureType
 
-class AbyssalType : CustomType() {
-    //(..., func = ::Neritantan)   is the same as   (...){ world -> Neritantan(world) }   or   (...){ Neritantan(it) }
-
+/**
+ * (..., func = ::Neritantan)   is the same as   (...){ world -> Neritantan(world) }   or   (...){ Neritantan(it) }
+ */
+@Suppress("SpellCheckingInspection", "PropertyName", "unused")
+class AbyssalType {
+    //TODO get these to be static somehow, maybe an enum?
     //Passive
     val ASHIMITE = registerEntity("ashimite", EnumCreatureType.CREATURE, width = 2f, height = 2f, func = ::Ashimite)
     val FUWAGI = registerEntity("fuwagi", EnumCreatureType.CREATURE, width = 0.6f, height = 0.6f, func = ::Fuwagi)
@@ -36,7 +41,8 @@ class AbyssalType : CustomType() {
     val ROHANA = registerEntity("rohana", EnumCreatureType.CREATURE, width = 0.6f, height = 0.6f, func = ::Rohana)
 
     //NPCs
-    fun registerNPC(name: String, modelID: Int) = registerEntity(toEntityTypeID(name), EnumCreatureType.MISC, templateName = "npc", width = 0.6f, height = 2f) { NPC(it, name, modelID) }
+    fun registerNPC(name: String, modelID: Int) = registerEntity(name.toEntityTypeID(), EnumCreatureType.MISC, templateName = "npc", width = 0.6f, height = 2f) { NPC(it, name, modelID) }
+
     val MITTY = registerNPC("Mitty", 2)
     val NANACHI = registerNPC("Nanachi", 3)
     val BONDREWD = registerNPC("Bondrewd", 4)
@@ -52,4 +58,8 @@ class AbyssalType : CustomType() {
     val TORKA = registerNPC("Torka", 14)
     val LYZA = registerNPC("Lyza", 15)
     val PRUSHKA = registerNPC("Prushka", 16)
+
+    init {
+        registerTypes()
+    }
 }

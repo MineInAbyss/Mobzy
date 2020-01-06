@@ -1,6 +1,5 @@
 package com.offz.spigot.mobzy
 
-import com.offz.spigot.mobzy.CustomType.Companion.types
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.readCfg
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.unregisterAll
 import org.bukkit.ChatColor
@@ -16,11 +15,10 @@ class MobzyConfig {
     val spawnCfgs: MutableMap<File, FileConfiguration> = HashMap()
     val mobCfgs: MutableMap<File, FileConfiguration> = HashMap()
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
-//TODO remove commented
 
-//    fun registerMobType(name: String?, type: Class<out Entity?>) {
-//        registeredMobTypes[name] = type
-//    }
+    init {
+        reload()
+    }
 
     /**
      * Reads the configuration values from the plugin's config.yml file
@@ -55,7 +53,7 @@ class MobzyConfig {
      * @param plugin the plugin this file corresponds to
      */
     fun registerMobCfg(file: File, plugin: JavaPlugin) {
-        if(plugin !is MobzyAddon) error("Cannot register $plugin, it is not a MobzyAddon")
+        if (plugin !is MobzyAddon) error("Cannot register $plugin, it is not a MobzyAddon")
         registerCfg(mobCfgs, file, plugin)
         if (!registeredAddons.contains(plugin)) registeredAddons.add(plugin as MobzyAddon)
         logInfo("Registered addons: $registeredAddons")
@@ -89,7 +87,7 @@ class MobzyConfig {
      * Reload the configurations stored in the plugin. Most stuff requires a full reload of the plugin now
      */
     fun reload() {
-        types.clear()
+        mobzy.customTypes.reload()
         logInfo("Registered addons: $registeredAddons")
         registeredAddons.forEach { it.registerWithMobzy(mobzy) }
         loadConfigValues()
@@ -119,20 +117,13 @@ class MobzyConfig {
      * @property doMobSpawns whether custom mob spawning enabled
      */
     companion object {
-        var isDebug = false
-            private set
-        var doMobSpawns = false
-            private set
-        var spawnSearchRadius = 0.0
-            private set
-        var minChunkSpawnRad = 0
-            private set
-        var maxChunkSpawnRad = 0
-            private set
-        var maxSpawnAmount = 0
-            private set
-        var spawnTaskDelay = 0L
-            private set
+        var isDebug = false; private set
+        var doMobSpawns = false; private set
+        var spawnSearchRadius = 0.0; private set
+        var minChunkSpawnRad = 0; private set
+        var maxChunkSpawnRad = 0; private set
+        var maxSpawnAmount = 0; private set
+        var spawnTaskDelay = 0L; private set
         private val mobCaps: MutableMap<String, Int> = HashMap()
 
         /**
@@ -143,9 +134,5 @@ class MobzyConfig {
             return mobCaps[creatureType] ?: error("could not find mob cap for $creatureType")
         }
 
-    }
-
-    init {
-        reload()
     }
 }

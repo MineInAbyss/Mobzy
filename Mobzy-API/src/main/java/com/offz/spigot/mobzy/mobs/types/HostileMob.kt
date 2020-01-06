@@ -1,18 +1,19 @@
 package com.offz.spigot.mobzy.mobs.types
 
-import com.offz.spigot.mobzy.CustomType
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalMeleeAttackPitchLock
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
+import com.offz.spigot.mobzy.toTemplate
+import com.offz.spigot.mobzy.type
 import net.minecraft.server.v1_15_R1.*
 
 /**
  * Lots of code taken from EntityZombie
  */
-abstract class HostileMob(world: World?, override var template: MobTemplate) : EntityMonster(CustomType.getType(template) as EntityTypes<out EntityMonster>, world), CustomMob {
-    constructor(world: World?, name: String?) : this(world, CustomType.getTemplate(name!!))
+abstract class HostileMob(world: World?, override var template: MobTemplate) : EntityMonster(template.type as EntityTypes<out EntityMonster>, world), CustomMob {
+    constructor(world: World?, name: String) : this(world, name.toTemplate())
 
     //implementation of properties from CustomMob
     override var killedMZ: Boolean
@@ -53,7 +54,7 @@ abstract class HostileMob(world: World?, override var template: MobTemplate) : E
 
     override fun die() = super.die().also { undisguise() }
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
-    override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name)
+    override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
     override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }

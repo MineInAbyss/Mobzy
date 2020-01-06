@@ -1,18 +1,19 @@
 package com.offz.spigot.mobzy.mobs.types
 
-import com.offz.spigot.mobzy.CustomType
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
 import com.offz.spigot.mobzy.pathfinders.controllers.MZControllerMoveFlying
 import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget
 import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFly
+import com.offz.spigot.mobzy.toTemplate
+import com.offz.spigot.mobzy.type
 import net.minecraft.server.v1_15_R1.*
 
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
  */
-abstract class FlyingMob(world: World?, override var template: MobTemplate) : EntityFlying(CustomType.getType(template) as EntityTypes<out EntityFlying>, world), CustomMob {
-    constructor(world: World?, name: String?) : this(world, CustomType.getTemplate(name!!))
+abstract class FlyingMob(world: World?, override var template: MobTemplate) : EntityFlying(template.type as EntityTypes<out EntityFlying>, world), CustomMob {
+    constructor(world: World?, name: String) : this(world, name.toTemplate())
 
     //implementation of properties from CustomMob
     override var killedMZ: Boolean
@@ -50,14 +51,13 @@ abstract class FlyingMob(world: World?, override var template: MobTemplate) : En
 
     override fun die() = super.die().also { undisguise() }
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
-    override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name)
+    override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
     override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
     override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
     override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
-//
 
     //EntityFlying specific overriding
 

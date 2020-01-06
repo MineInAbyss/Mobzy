@@ -39,7 +39,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
             sendInfo("Mob configs: ${config.mobCfgs}\n" +
                     "Spawn configs: ${config.spawnCfgs}\n" +
                     "Registered addons: ${config.registeredAddons}\n" +
-                    "Registered EntityTypes: ${CustomType.types}")
+                    "Registered EntityTypes: ${mobzy.customTypes.types}")
         }
 
         //reload
@@ -119,7 +119,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
                 sendError("Command can only be used by a player"); return true
             } else if (args.size == 1) {
                 sendError("Enter a mob name"); return true
-            } else if (!CustomType.types.containsKey(args[1])) {
+            } else if (!mobzy.customTypes.types.containsKey(args[1])) {
                 sendError("No such entity ${args[1]}"); return true
             }
 
@@ -132,15 +132,13 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
             }
 
             if (numOfSpawns > MobzyConfig.maxSpawnAmount) numOfSpawns = MobzyConfig.maxSpawnAmount
-            for (i in 0 until numOfSpawns) CustomType.spawnEntity(args[1], sender.location)
+            for (i in 0 until numOfSpawns) sender.location.spawnEntity(args[1])
             return true
         }
 
         //list
-        else if ("mobzy.spawn.list".permitted("list", "l")) {
-            sendSuccess(CustomType.types.keys.toString())
-            return true
-        }
+        else if ("mobzy.spawn.list".permitted("list", "l"))
+            sendSuccess(mobzy.customTypes.types.keys.toString()).let { return true }
 
         //config
         else if ("mobzy.config".permitted("config")) {
@@ -161,7 +159,8 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
         val subCommand = args[0]
         if (subCommand == "spawn" || subCommand == "s")
             if (args.size == 2) {
-                return CustomType.types.keys
+                //TODO I don't like creating the new list like this every time
+                return mobzy.customTypes.types.keys
                         .filter { it.startsWith(args[1].toLowerCase()) }
             } else if (args.size == 3) {
                 var min = 1
@@ -175,7 +174,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Co
         if (subCommand in listOf("remove", "rm", "info", "i"))
             if (args.size == 2) {
                 val mobs: MutableList<String> = ArrayList()
-                mobs.addAll(CustomType.types.keys)
+                mobs.addAll(mobzy.customTypes.types.keys)
                 mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
                 return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
             }

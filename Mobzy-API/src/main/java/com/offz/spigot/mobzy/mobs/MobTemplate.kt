@@ -26,7 +26,6 @@ data class MobTemplate(var name: String,
                        var isAdult: Boolean = true,
                        var deathCommands: List<String> = ArrayList(),
                        var drops: List<MobDrop> = ArrayList()) : ConfigurationSerializable {
-    constructor(aName: String, aModelID: Int) : this(name = aName, modelID = aModelID)
 
     fun chooseDrops(): List<ItemStack?> = drops.toList().map { it.chooseDrop() }
 
@@ -47,6 +46,7 @@ data class MobTemplate(var name: String,
     }
 
     companion object {
+        @Suppress("UNCHECKED_CAST")
         fun deserialize(args: Map<String?, Any?>, name: String): MobTemplate {
             fun setArg(name: String, setValue: (Any) -> Unit) {
                 if (args.containsKey(name))

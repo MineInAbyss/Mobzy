@@ -1,18 +1,18 @@
 package com.offz.spigot.mobzy.mobs.types
 
-import com.offz.spigot.mobzy.CustomType.Companion.getTemplate
-import com.offz.spigot.mobzy.CustomType.Companion.getType
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import com.offz.spigot.mobzy.pathfinders.PathfinderGoalWalkingAnimation
+import com.offz.spigot.mobzy.toTemplate
+import com.offz.spigot.mobzy.type
 import net.minecraft.server.v1_15_R1.*
 
 /**
  * Originally based off EntityPig
  */
-abstract class PassiveMob(world: World?, override var template: MobTemplate) : EntityAnimal(getType(template) as EntityTypes<out EntityAnimal>, world), CustomMob {
-    constructor(world: World?, name: String?) : this(world, getTemplate(name!!))
+abstract class PassiveMob(world: World?, override var template: MobTemplate) : EntityAnimal(template.type as EntityTypes<out EntityAnimal>, world), CustomMob {
+    constructor(world: World?, name: String) : this(world, name.toTemplate())
 
     //implementation of properties from CustomMob
     override var killedMZ: Boolean
@@ -58,7 +58,7 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
 
     override fun die() = super.die().also { undisguise() }
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
-    override fun getScoreboardDisplayName(): ChatMessage = ChatMessage(template.name) //TODO I forget why I did this, maybe to change the death message
+    override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
     override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }

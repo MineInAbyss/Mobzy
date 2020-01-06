@@ -1,10 +1,10 @@
 package com.offz.spigot.mobzy.spawning
 
-import com.offz.spigot.mobzy.CustomType.Companion.getType
-import com.offz.spigot.mobzy.CustomType.Companion.spawnEntity
 import com.offz.spigot.mobzy.isCustomMob
+import com.offz.spigot.mobzy.spawnEntity
 import com.offz.spigot.mobzy.spawning.vertical.SpawnArea
 import com.offz.spigot.mobzy.spawning.vertical.VerticalSpawn
+import com.offz.spigot.mobzy.toEntityType
 import com.offz.spigot.mobzy.toNMS
 import net.minecraft.server.v1_15_R1.EntityTypes
 import org.bukkit.Location
@@ -16,36 +16,32 @@ import kotlin.math.ceil
 import kotlin.math.sign
 import kotlin.random.Random
 
-//todo make
-data class MobSpawn(var entityType: EntityTypes<*>,
-                    var minAmount: Int = 1,
-                    var maxAmount: Int = 1,
-                    var radius: Double = 0.0,
-                    var basePriority: Double = 1.0,
-                    var minTime: Long = -1,
-                    var maxTime: Long = 10000000,
-                    var minLight: Long = 0,
-                    var maxLight: Long = 100,
-                    var minY: Int = 0,
-                    var maxY: Int = 256,
-                    var minGap: Int = 0,
-                    var maxGap: Int = 256,
-                    var maxLocalGroup: Int = -1,
-                    var localGroupRadius: Double = 10.0,
-                    var spawnPos: SpawnPosition = SpawnPosition.GROUND,
-                    var whitelist: List<Material> = listOf()) : ConfigurationSerializable {
+data class MobSpawn(
+        var entityType: EntityTypes<*>,
+        var minAmount: Int = 1,
+        var maxAmount: Int = 1,
+        var radius: Double = 0.0,
+        var basePriority: Double = 1.0,
+        var minTime: Long = -1,
+        var maxTime: Long = 10000000,
+        var minLight: Long = 0,
+        var maxLight: Long = 100,
+        var minY: Int = 0,
+        var maxY: Int = 256,
+        var minGap: Int = 0,
+        var maxGap: Int = 256,
+        var maxLocalGroup: Int = -1,
+        var localGroupRadius: Double = 10.0,
+        var spawnPos: SpawnPosition = SpawnPosition.GROUND,
+        var whitelist: List<Material> = listOf()) : ConfigurationSerializable {
 
     @JvmOverloads
     fun spawn(area: SpawnArea, spawns: Int = chooseSpawnAmount()): Int {
         val loc = area.getSpawnLocation(spawnPos)
         for (i in 0 until spawns) {
-            if (radius == 0.0) {
-                spawnEntity(entityType, loc)
-            } else {
-                if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
-                    spawnEntity(entityType, getSpawnInRadius(loc, 0.0, radius) ?: loc)
-                else spawnEntity(entityType, loc)
-            }
+            if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
+                (getSpawnInRadius(loc, 0.0, radius) ?: loc).spawnEntity(entityType)
+            else loc.spawnEntity(entityType)
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
             //FIXME
             /*if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) { //length is actually the height, don't know why, it's just how it be
@@ -172,8 +168,8 @@ data class MobSpawn(var entityType: EntityTypes<*>,
             //create a new builder from the MobSpawn found inside of an already created layer
             val spawn = when {
                 args.containsKey("reuse") -> SpawnRegistry.reuseMobSpawn(args["reuse"] as String).copy()
-                        .also { setArg("mob") { mob -> it.entityType = getType(mob as String) } }
-                args.containsKey("mob") -> MobSpawn(getType((args["mob"]) as String))
+                        .also { setArg("mob") { mob -> it.entityType = (mob as String).toEntityType() } }
+                args.containsKey("mob") -> MobSpawn((args["mob"] as String).toEntityType())
                 else -> error("Serialization failed. No `mob` or `reuse` tag is defined in the spawn.")
             }
 

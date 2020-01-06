@@ -1,9 +1,6 @@
 package com.offz.spigot.mobzy
 
 import com.derongan.minecraft.guiy.GuiListener
-import com.offz.spigot.mobzy.CustomType.Companion.getType
-import com.offz.spigot.mobzy.CustomType.Companion.registerTypes
-import com.offz.spigot.mobzy.CustomType.Companion.spawnEntity
 import com.offz.spigot.mobzy.listener.MobListener
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.spawning.SpawnTask
@@ -21,6 +18,8 @@ lateinit var mobzy: Mobzy
 
 class Mobzy : JavaPlugin() {
     lateinit var mobzyConfig: MobzyConfig
+        private set
+    lateinit var customTypes: CustomType
         private set
     private lateinit var context: MobzyContext
 
@@ -57,9 +56,9 @@ class Mobzy : JavaPlugin() {
         mobzy = this
         logger.info("On enable has been called")
         saveDefaultConfig()
+        customTypes = CustomType() //TODO better name for class
         mobzyConfig = MobzyConfig()
         reloadConfig()
-        registerTypes() //not clean but mob ids need to be registered with the server on startup or the mobs get removed
 
         //Plugin startup logic
         context = MobzyContext(config, mobzyConfig) //Create new context and add plugin and logger to it
@@ -101,7 +100,7 @@ class Mobzy : JavaPlugin() {
                 if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
                 it.scoreboardTags.contains("customMob2") && it.toNMS() !is CustomMob
             }.forEach {
-                val replacement = spawnEntity(getType(it.scoreboardTags), it.location)!!.toNMS<EntityLiving>()
+                val replacement = it.location.spawnEntity((it.scoreboardTags).toEntityType())!!.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()
                 it.toNMS<EntityLiving>().b(nbt) //.b copies over the entity's nbt data to the compound
                 it.remove()

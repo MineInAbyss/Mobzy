@@ -1,11 +1,11 @@
 package com.offz.spigot.mobzy.spawning
 
-import com.offz.spigot.mobzy.CustomType.Companion.getType
 import com.offz.spigot.mobzy.logError
 import com.offz.spigot.mobzy.logGood
 import com.offz.spigot.mobzy.spawning.MobSpawn.Companion.deserialize
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.offz.spigot.mobzy.spawning.regions.SpawnRegion
+import com.offz.spigot.mobzy.toEntityType
 import org.bukkit.configuration.file.FileConfiguration
 import java.util.*
 
@@ -39,7 +39,7 @@ object SpawnRegistry {
     fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this because I have no idea what it's doing
             (regionSpawns[reusedMob.substring(0, reusedMob.indexOf(':'))]
                     ?: error("Could not find registered region for $reusedMob"))
-                    .getSpawnOfType(getType(reusedMob.substring(reusedMob.indexOf(':') + 1)))
+                    .getSpawnOfType(reusedMob.substring(reusedMob.indexOf(':') + 1).toEntityType())
 
     fun List<String>.getMobSpawnsForRegions(creatureType: String): List<MobSpawn> = this
             .filter { regionSpawns.containsKey(it) }

@@ -5,11 +5,11 @@ import com.derongan.minecraft.guiy.gui.ClickableElement
 import com.derongan.minecraft.guiy.gui.FillableElement
 import com.derongan.minecraft.guiy.gui.Layout
 import com.derongan.minecraft.guiy.gui.layouts.HistoryGuiHolder
-import com.offz.spigot.mobzy.CustomType.Companion.getMobNameForEntityTypes
-import com.offz.spigot.mobzy.getTemplate
 import com.offz.spigot.mobzy.gui.layouts.MobConfigLayout
+import com.offz.spigot.mobzy.mobTemplate
 import com.offz.spigot.mobzy.mobzy
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.reuseMobSpawn
+import com.offz.spigot.mobzy.toTemplate
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.configuration.file.FileConfiguration
@@ -54,6 +54,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
             }
             val cell = Cell.forMaterial(material, regionName)
             val mobConfig = ClickableElement(cell) {
+                @Suppress("UNCHECKED_CAST")
                 setElement(buildSpawns(region["spawns"] as List<MutableMap<String, Any?>>, region["name"] as String))
             }
             grid.addElement(mobConfig)
@@ -69,10 +70,9 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         spawns.forEach { spawn ->
             val spawnBuilder =
                     if (spawn.containsKey("reuse"))
-                        getTemplate(getMobNameForEntityTypes(reuseMobSpawn((spawn["reuse"] as String)).entityType)) //TODO not sure if this is right because I changed it from before
-                    else {
-                        getTemplate(spawn["mob"] as String)
-                    }
+                        reuseMobSpawn(spawn["reuse"] as String).entityType.mobTemplate //TODO not sure if this is right because I changed it from before
+                    else
+                        (spawn["mob"] as String).toTemplate()
             val cell = Cell.forItemStack(spawnBuilder.modelItemStack)
             //open up the config layout with its menu options
             val mobConfig = ClickableElement(cell) { setElement(MobConfigLayout(this, spawn, regionName)) }
