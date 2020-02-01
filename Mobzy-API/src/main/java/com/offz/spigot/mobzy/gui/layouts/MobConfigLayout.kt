@@ -60,7 +60,7 @@ class MobConfigLayout(private val main: MobzyGUI, val spawn: MutableMap<String, 
         makeProperty(HeadLib.WOODEN_Y, PropertyType.DOUBLE_INPUT, "max-y", s.maxY)
         makeProperty(HeadLib.QUARTZ_R, PropertyType.DOUBLE_INPUT, "radius", s.radius)
         makeProperty(HeadLib.PLAIN_GRASS_GREEN, PropertyType.DOUBLE_INPUT, "spawn-pos", s.spawnPos)
-        makeProperty(HeadLib.PLAIN_WHITE, PropertyType.DOUBLE_INPUT, "block-whitelist", s.whitelist)
+        makeProperty(HeadLib.PLAIN_WHITE, PropertyType.DOUBLE_INPUT, "block-whitelist", s.blockWhitelist)
     }
 
     private fun makeProperty(head: HeadLib, type: PropertyType, key: String, default: Any): MobzyPropertyElement =

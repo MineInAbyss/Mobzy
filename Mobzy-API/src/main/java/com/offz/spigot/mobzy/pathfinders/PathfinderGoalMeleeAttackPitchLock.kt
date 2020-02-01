@@ -10,20 +10,21 @@ class PathfinderGoalMeleeAttackPitchLock(mob: CustomMob, private val speed: Doub
     }
 
     override fun shouldKeepExecuting(): Boolean {
-        if (target == null || target!!.isDead) return true
-        return false
+        val target = target ?: return false
+        return !target.isDead
     }
 
     private var cooldown: Int = 0
     override fun execute() {
-        mob.lookAtPitchLock(target!!)
+        val target = target ?: return
+        mob.lookAtPitchLock(target)
         if (--cooldown < 0)
             cooldown = 10
         else return
-        if (mob.canReach(target!!)) {
-            target!!.damage(mob.staticTemplate.attackDamage ?: 0.0, entity)
+        if (mob.canReach(target)) {
+            target.damage(mob.staticTemplate.attackDamage ?: 0.0, entity)
             //TODO knockback
         }
-        navigation.moveToEntity(target!!, speed)
+        navigation.moveToEntity(target, speed)
     }
 }

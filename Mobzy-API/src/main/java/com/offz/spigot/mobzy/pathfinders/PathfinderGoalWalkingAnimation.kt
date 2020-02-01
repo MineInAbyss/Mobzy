@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.pathfinders
 
-import com.offz.spigot.mobzy.damage
-import com.offz.spigot.mobzy.editItemMeta
+import com.mineinabyss.idofront.damage
+import com.mineinabyss.idofront.editItemMeta
 import org.bukkit.entity.LivingEntity
 
 class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID: Int) : PathfinderGoal() {

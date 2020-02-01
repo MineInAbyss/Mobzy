@@ -2,7 +2,7 @@ name: Mobzy
 version: @plugin_version@
 author: Offz
 main: com.offz.spigot.mobzy.Mobzy
-api-version: 1.13
+api-version: 1.15
 depend: [WorldGuard, LibsDisguises]
 
 prefix: Mobzy

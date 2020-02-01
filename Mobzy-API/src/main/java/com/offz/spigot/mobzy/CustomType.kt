@@ -1,5 +1,8 @@
 package com.offz.spigot.mobzy
 
+import com.mineinabyss.idofront.logInfo
+import com.mineinabyss.idofront.logSuccess
+import com.mineinabyss.idofront.logWarn
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
 import com.offz.spigot.mobzy.mobs.MobTemplate
@@ -40,7 +43,7 @@ class CustomType {
             val name = type.mobName
             _templates[name] = readTemplateConfig(_templateNames[name]!!)
         }
-        logGood("Registered: ${types.keys}")
+        logSuccess("Registered: ${types.keys}")
     }
 
     internal fun reload() { //TODO move all the CustomType related reload stuff here

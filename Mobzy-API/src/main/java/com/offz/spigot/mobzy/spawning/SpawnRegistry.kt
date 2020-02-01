@@ -1,11 +1,13 @@
 package com.offz.spigot.mobzy.spawning
 
-import com.offz.spigot.mobzy.logError
-import com.offz.spigot.mobzy.logGood
+import com.mineinabyss.idofront.logError
+import com.mineinabyss.idofront.logSuccess
+import com.offz.spigot.mobzy.Mobzy
 import com.offz.spigot.mobzy.spawning.MobSpawn.Companion.deserialize
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.offz.spigot.mobzy.spawning.regions.SpawnRegion
 import com.offz.spigot.mobzy.toEntityType
+import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import org.bukkit.configuration.file.FileConfiguration
 import java.util.*
 
@@ -17,6 +19,7 @@ object SpawnRegistry {
 
     fun unregisterAll() = regionSpawns.clear()
 
+    @Suppress("UNCHECKED_CAST")
     fun readCfg(config: FileConfiguration) {
         val regionList = config.getMapList("regions")
         for (region in regionList) {
@@ -33,7 +36,7 @@ object SpawnRegistry {
             }
             regionSpawns[name] = spawnRegion
         }
-        logGood("Reloaded spawns.yml")
+        logSuccess("Reloaded spawns.yml")
     }
 
     fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this because I have no idea what it's doing
@@ -41,7 +44,13 @@ object SpawnRegistry {
                     ?: error("Could not find registered region for $reusedMob"))
                     .getSpawnOfType(reusedMob.substring(reusedMob.indexOf(':') + 1).toEntityType())
 
-    fun List<String>.getMobSpawnsForRegions(creatureType: String): List<MobSpawn> = this
+    /**
+     * Takes a list of spawn region names and converts to a list of [MobSpawn]s from those regions
+     */
+    fun List<ProtectedRegion>.getMobSpawnsForRegions(creatureType: String): List<MobSpawn> = this
+            .filter { it.flags.containsKey(Mobzy.MZ_SPAWN_REGIONS) }
+            .flatMap { it.getFlag(Mobzy.MZ_SPAWN_REGIONS)!!.split(",") }
+            //up to this point, gets a list of the names of spawn areas in this region
             .filter { regionSpawns.containsKey(it) }
             .map { regionSpawns[it]!!.getSpawnsFor(creatureType) }
             .flatten()

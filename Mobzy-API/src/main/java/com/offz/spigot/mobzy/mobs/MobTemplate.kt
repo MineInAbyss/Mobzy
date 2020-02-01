@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.mobs
 
-import com.offz.spigot.mobzy.damage
-import com.offz.spigot.mobzy.editItemMeta
+import com.mineinabyss.idofront.damage
+import com.mineinabyss.idofront.editItemMeta
 import me.libraryaddict.disguise.disguisetypes.DisguiseType
 import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable
@@ -53,10 +53,9 @@ data class MobTemplate(var name: String,
                     setValue(args[name] ?: error("Failed to parse argument while serializing MobTemplate"))
             }
 
+            val configName = if (args.containsKey("name")) args["name"] as String else name
 
-            val name = if (args.containsKey("name")) args["name"] as String else name
-
-            val template = MobTemplate(name, args["model"] as Int)
+            val template = MobTemplate(configName, args["model"] as Int)
             setArg("adult") { template.isAdult = it as Boolean }
             setArg("disguise-as") { template.disguiseAs = DisguiseType.valueOf(it as String) }
             setArg("drops") { drops ->

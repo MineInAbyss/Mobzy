@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.listener;
 
+import com.mineinabyss.idofront.Entities;
 import com.offz.spigot.mobzy.Mobzy;
-import com.offz.spigot.mobzy.MobzyAPI;
 import com.offz.spigot.mobzy.MobzyContext;
 import com.offz.spigot.mobzy.MobzyKt;
 import com.offz.spigot.mobzy.mobs.CustomMob;
@@ -118,7 +118,7 @@ public class MobListener implements Listener {
         if (leftClicked(e) || rightClicked(e)) {
             RayTraceResult trace = p.getWorld().rayTrace(p.getEyeLocation(), p.getLocation().getDirection(), 3, FluidCollisionMode.ALWAYS, true, 0, entity -> !entity.equals(p));
             if (trace != null && trace.getHitEntity() != null) {
-                Entity hit = MobzyAPI.toNMS(trace.getHitEntity());
+                Entity hit = Entities.toNMS(trace.getHitEntity());
                 if (!(hit instanceof CustomMob))
                     return;
 

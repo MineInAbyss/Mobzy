@@ -43,19 +43,15 @@ interface CustomMob {
         else if (template.maxExp!! <= template.minExp!!) template.minExp!!
         else Random.nextInt(template.minExp!!, template.maxExp!!)
     }
-
     val scoreboardDisplayNameMZ: ChatMessage
-        get() = ChatMessage(template.name.capitalize())
+        get() = ChatMessage(template.name.split('_').joinToString(" ") { it.capitalize() })
 
     // ========== Things to be overloaded ==========
     val soundAmbient: String?
         get() = null
-    val soundHurt: String?
-        get() = null
-    val soundDeath: String?
-        get() = null
-    val soundStep: String?
-        get() = null
+    val soundHurt: String? get() = null
+    val soundDeath: String? get() = null
+    val soundStep: String? get() = null
     var killedMZ: Boolean
     val killScore: Int
 

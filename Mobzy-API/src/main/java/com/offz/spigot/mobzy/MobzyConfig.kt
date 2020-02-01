@@ -1,7 +1,10 @@
 package com.offz.spigot.mobzy
 
+import com.mineinabyss.idofront.logError
+import com.mineinabyss.idofront.logInfo
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.readCfg
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.unregisterAll
+import net.minecraft.server.v1_15_R1.EnumCreatureType
 import org.bukkit.ChatColor
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -15,10 +18,6 @@ class MobzyConfig {
     val spawnCfgs: MutableMap<File, FileConfiguration> = HashMap()
     val mobCfgs: MutableMap<File, FileConfiguration> = HashMap()
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
-
-    init {
-        reload()
-    }
 
     /**
      * Reads the configuration values from the plugin's config.yml file
@@ -94,6 +93,7 @@ class MobzyConfig {
         reloadConfigurationMap(mobCfgs)
         unregisterAll()
         reloadConfigurationMap(spawnCfgs)
+        mobzy.registerSpawnTask()
     }
 
     /**
@@ -118,7 +118,20 @@ class MobzyConfig {
      */
     companion object {
         var isDebug = false; private set
-        var doMobSpawns = false; private set
+        var doMobSpawns = false
+            set(enabled) {
+                if (enabled && !doMobSpawns) {
+                    field = true
+                    mobzy.config.set("doMobSpawns", true)
+                    mobzy.saveConfig()
+                    mobzy.registerSpawnTask()
+                } else if (!enabled && doMobSpawns) {
+                    field = false
+                    mobzy.config.set("doMobSpawns", false)
+                    mobzy.saveConfig()
+                    mobzy.registerSpawnTask()
+                }
+            }
         var spawnSearchRadius = 0.0; private set
         var minChunkSpawnRad = 0; private set
         var maxChunkSpawnRad = 0; private set
@@ -127,12 +140,11 @@ class MobzyConfig {
         private val mobCaps: MutableMap<String, Int> = HashMap()
 
         /**
-         * @param type a specific mob type
-         * @return the registered mob cap for that mob
+         * @param creatureType The name of the [EnumCreatureType].
+         * @return The mob cap for that mob in config.
          */
-        fun getMobCap(creatureType: String): Int {
-            return mobCaps[creatureType] ?: error("could not find mob cap for $creatureType")
-        }
+        fun getMobCap(creatureType: String): Int =
+                mobCaps[creatureType] ?: error("could not find mob cap for $creatureType")
 
     }
 }

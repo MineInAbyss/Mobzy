@@ -17,7 +17,7 @@ class AbyssalType {
     //Passive
     val ASHIMITE = registerEntity("ashimite", EnumCreatureType.CREATURE, width = 2f, height = 2f, func = ::Ashimite)
     val FUWAGI = registerEntity("fuwagi", EnumCreatureType.CREATURE, width = 0.6f, height = 0.6f, func = ::Fuwagi)
-    val MAKIHIGE = registerEntity("makihige", EnumCreatureType.CREATURE, width = 2f, height = 2f, func = ::Makihige)
+    val MAKIHIGE = registerEntity("makihige", EnumCreatureType.WATER_CREATURE, width = 2f, height = 2f, func = ::Makihige)
     val NERITANTAN = registerEntity("neritantan", EnumCreatureType.CREATURE, width = 0.6f, height = 0.6f, func = ::Neritantan)
     val OKIBO = registerEntity("okibo", EnumCreatureType.CREATURE, width = 3f, height = 3f, func = ::Okibo)
 
@@ -31,14 +31,15 @@ class AbyssalType {
     val TESUCHI = registerEntity("tesuchi", EnumCreatureType.MONSTER, width = 0.6f, height = 0.6f, func = ::Tesuchi)
 
     //Flying
-    val BENIKUCHINAWA = registerEntity("benikuchinawa", EnumCreatureType.MONSTER, width = 4.5f, height = 2f, func = ::Benikuchinawa)
-    val CORPSE_WEEPER = registerEntity("corpse_weeper", EnumCreatureType.MONSTER, width = 3f, height = 3f, func = ::CorpseWeeper)
-    val CYATORIA = registerEntity("cyatoria", EnumCreatureType.MONSTER, width = 3f, height = 2f, func = ::Cyatoria)
-    val DOSETORI = registerEntity("dosetori", EnumCreatureType.MONSTER, width = 3f, height = 2f, func = ::Dosetori)
-    val HAMMERBEAK = registerEntity("hammerbeak", EnumCreatureType.MONSTER, width = 3f, height = 2f, func = ::Hammerbeak)
-    val KAZURA = registerEntity("kazura", EnumCreatureType.CREATURE, width = 1f, height = 1f, func = ::Kazura)
-    val MADOKAJACK = registerEntity("madokajack", EnumCreatureType.MONSTER, width = 4.5f, height = 3f, func = ::Madokajack)
-    val ROHANA = registerEntity("rohana", EnumCreatureType.CREATURE, width = 0.6f, height = 0.6f, func = ::Rohana)
+    //TODO I don't like using MISC for flying creatures, but this is how we're setting them to a separate mob cap for now
+    val BENIKUCHINAWA = registerEntity("benikuchinawa", EnumCreatureType.MISC, width = 4.5f, height = 2f, func = ::Benikuchinawa)
+    val CORPSE_WEEPER = registerEntity("corpse_weeper", EnumCreatureType.MISC, width = 3f, height = 3f, func = ::CorpseWeeper)
+    val CYATORIA = registerEntity("cyatoria", EnumCreatureType.MISC, width = 3f, height = 2f, func = ::Cyatoria)
+    val DOSETORI = registerEntity("dosetori", EnumCreatureType.MISC, width = 3f, height = 2f, func = ::Dosetori)
+    val HAMMERBEAK = registerEntity("hammerbeak", EnumCreatureType.MISC, width = 3f, height = 2f, func = ::Hammerbeak)
+    val KAZURA = registerEntity("kazura", EnumCreatureType.WATER_CREATURE, width = 1f, height = 1f, func = ::Kazura)
+    val MADOKAJACK = registerEntity("madokajack", EnumCreatureType.MISC, width = 4.5f, height = 3f, func = ::Madokajack)
+    val ROHANA = registerEntity("rohana", EnumCreatureType.WATER_CREATURE, width = 0.6f, height = 0.6f, func = ::Rohana)
 
     //NPCs
     fun registerNPC(name: String, modelID: Int) = registerEntity(name.toEntityTypeID(), EnumCreatureType.MISC, templateName = "npc", width = 0.6f, height = 2f) { NPC(it, name, modelID) }
