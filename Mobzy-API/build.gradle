@@ -2,33 +2,27 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.0.0'
 }
 
-repositories {
-    maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
-    maven { url 'http://repo.md-5.net/content/groups/public/' } //LibsDisguises
-//    maven { url 'http://repo.extendedclip.com/content/repositories/placeholderapi/' } //PlaceHolderAPI
-}
-
 dependencies {
-    compileOnly 'LibsDisguises:LibsDisguises:9.8.1-SNAPSHOT' //LibsDisguises
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
-//    compileOnly 'me.clip:placeholderapi:+'
-    implementation 'com.github.Mineinabyss:guiy:master-SNAPSHOT'
-//    implementation 'com.github.WesJD:AnvilGUI:master-SNAPSHOT'
     implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
+    implementation 'org.nield:kotlin-statistics:1.2.1'
+    api project(':idofront')
+    if (useLocalGuiy.toBoolean()) implementation project(':guiy')
+    else implementation 'com.github.Mineinabyss:guiy:master-SNAPSHOT'
 }
 
 shadowJar {
     getArchiveBaseName().set("Mobzy")
     getArchiveClassifier().set(null)
-    dependencies {
-        include(dependency('com.github.Mineinabyss:guiy:master-SNAPSHOT'))
-        include(dependency('de.erethon:headlib:3.0.1'))
-        include(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
+
+    minimize {
+        exclude(dependency("org.jetbrains.kotlin:.*"))
+        exclude(dependency('de.erethon:headlib:3.0.2'))
     }
 }
 
 //Move into plugins folder
-if(plugin_path != '') {
+if (plugin_path != '') {
     task copyJar(type: Copy) {
         from shadowJar // here it automatically reads jar file produced from jar task
         into plugin_path

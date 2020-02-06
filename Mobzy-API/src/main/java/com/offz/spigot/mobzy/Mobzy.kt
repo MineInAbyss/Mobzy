@@ -1,0 +1,139 @@
+package com.offz.spigot.mobzy
+
+import com.derongan.minecraft.guiy.GuiListener
+import com.mineinabyss.idofront.entities.toNMS
+import com.offz.spigot.mobzy.listener.MobListener
+import com.offz.spigot.mobzy.mobs.CustomMob
+import com.offz.spigot.mobzy.spawning.SpawnTask
+import com.sk89q.worldguard.WorldGuard
+import com.sk89q.worldguard.protection.flags.StringFlag
+import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
+import net.minecraft.server.v1_15_R1.EntityLiving
+import net.minecraft.server.v1_15_R1.NBTTagCompound
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.plugin.java.JavaPlugin
+
+val mobzy: Mobzy
+    get() = JavaPlugin.getPlugin(Mobzy::class.java)
+
+class Mobzy : JavaPlugin() {
+    lateinit var mobzyConfig: MobzyConfig
+        private set
+    lateinit var customTypes: CustomType
+        private set
+    private lateinit var context: MobzyContext
+
+    override fun onLoad() {
+        logger.info("On load has been called")
+
+        //TODO try to allow plugin spawning in WorldGuard's config automatically
+        //Registering custom WorldGuard flag
+        val registry = WorldGuard.getInstance().flagRegistry
+        val mzSpawnRegions = registry["cm-spawns"]
+        val mzSpawnOverlap = registry["mz-spawn-overlap"]
+        //register MZ_SPAWN_REGIONS
+        if (mzSpawnRegions is StringFlag) //avoid problems if registering flag that already exists
+            MZ_SPAWN_REGIONS = mzSpawnRegions
+        else try {
+            val flag = StringFlag("cm-spawns", "")
+            registry.register(flag)
+            MZ_SPAWN_REGIONS = flag
+        } catch (e: FlagConflictException) {
+            e.printStackTrace()
+        }
+        //register MZ_SPAWN_OVERLAP
+        if (mzSpawnOverlap is StringFlag) MZ_SPAWN_OVERLAP = mzSpawnOverlap
+        else try {
+            val flag = StringFlag("mz-spawn-overlap", "stack")
+            registry.register(flag)
+            MZ_SPAWN_OVERLAP = flag
+        } catch (e: FlagConflictException) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onEnable() {
+        logger.info("On enable has been called")
+        saveDefaultConfig()
+        reloadConfig()
+        customTypes = CustomType() //TODO better name for class
+        mobzyConfig = MobzyConfig()
+        mobzyConfig.reload() //lots of startup logic in here
+
+        //Plugin startup logic
+        context = MobzyContext(config, mobzyConfig) //Create new context and add plugin and logger to it
+        context.plugin = this
+        context.logger = logger
+
+        //Register events
+        server.pluginManager.registerEvents(MobListener(context), this)
+        server.pluginManager.registerEvents(GuiListener(this), this)
+
+        //Reload existing addons
+        /*getLogger().info("Reloading addons: " + getConfig().getStringList(REGISTERED_ADDONS_KEY));
+        for (String name : getConfig().getStringList(REGISTERED_ADDONS_KEY)) {
+            PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+            Plugin addon = pluginManager.getPlugin(name);
+            if (addon instanceof MobzyAddon && pluginManager.isPluginEnabled(name) && !mobzyConfig.getRegisteredAddons().contains(addon))
+                ((MobzyAddon) addon).registerWithMobzy(this);
+        }*/
+
+        //Register commands
+        MobzyCommands(context)
+    }
+
+    private var spawnTaskID = -1
+
+    fun registerSpawnTask() {
+        server.scheduler.cancelTask(spawnTaskID)
+        spawnTaskID = -1
+
+        if (MobzyConfig.doMobSpawns) {
+            val spawnTask: Runnable = SpawnTask()
+            spawnTaskID = server.scheduler.scheduleSyncRepeatingTask(this, spawnTask, 0, MobzyConfig.spawnTaskDelay)
+        }
+    }
+
+    /**
+     * Every loaded custom entity in the world stops relating to the CustomMob class heirarchy after reload, so we
+     * can't do something like customEntity instanceof CustomMob. Therefore, we "reload" those entities by deleting
+     * them and copying their NBT data to new entities
+     */
+    fun reloadExistingEntities() {
+        var num = 0
+        Bukkit.getServer().worlds.forEach { world ->
+            world.entities.filter {
+                if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
+                it.scoreboardTags.contains("customMob2") && it.toNMS() !is CustomMob
+            }.forEach {
+                val replacement = it.location.spawnEntity((it.scoreboardTags).toEntityType())!!.toNMS<EntityLiving>()
+                val nbt = NBTTagCompound()
+                it.toNMS<EntityLiving>().b(nbt) //.b copies over the entity's nbt data to the compound
+                it.remove()
+                replacement.a(nbt) //.a copies the nbt data to the new entity
+                num++
+            }
+        }
+        logger.info(ChatColor.GREEN.toString() + "Reloaded " + num + " custom entities")
+    }
+
+    override fun onDisable() { // Plugin shutdown logic
+        super.onDisable()
+        logger.info("onDisable has been invoked!")
+        server.scheduler.cancelTasks(this)
+        //        Bukkit.broadcastMessage("Saving addons " + mobzyConfig.getRegisteredAddons().toString());
+//        getConfig().set(REGISTERED_ADDONS_KEY, mobzyConfig.getRegisteredAddons().stream().map(addon -> ((Plugin) addon).getName()).collect(Collectors.toList()));
+//        saveConfig();
+    }
+
+    companion object {
+        private const val REGISTERED_ADDONS_KEY = "addons"
+        //TODO Make these into their own custom flags instead of StringFlag
+        //TODO rename this to MZ_... in the WorldGuard config files :mittysweat:
+        @JvmStatic
+        var MZ_SPAWN_REGIONS: StringFlag? = null
+        @JvmStatic
+        var MZ_SPAWN_OVERLAP: StringFlag? = null
+    }
+}

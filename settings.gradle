@@ -1,3 +1,9 @@
-rootProject.name = 'Mobzy'
+include 'Mobzy-API', 'AbyssalCreatures'
 
-include 'Mobzy-API', 'AbyssialCreatures'
+//FIXME this screws up the project hierarchy but only sometimes
+//if(useLocalGuiy.toBoolean()) {
+include 'guiy'
+project(':guiy').projectDir = new File('../guiy')
+//}
+include 'idofront'
+project(':idofront').projectDir = new File('../idofront')

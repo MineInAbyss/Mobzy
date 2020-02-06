@@ -1,47 +1,63 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-allprojects {
-    group = 'com.github.MineInAbyss'
-    version = plugin_version + '-SNAPSHOT'
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
+}
 
-    ext{
-        //Put your plugins folder directory here! If it is left as '', jars won't be copied
-        plugin_path = ''
-    }
+repositories{
+    mavenCentral()
 }
 
 subprojects {
+    group = 'com.github.MineInAbyss'
+    version = plugin_version + '-SNAPSHOT'
     apply plugin: 'java'
-    apply plugin: 'maven'
+    apply plugin: 'kotlin'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    ext.kotlin_version = '1.3.61'
+    ext.plugin_path = '' //Put your plugins folder directory here! If it is left as '', jars won't be copied
 
     repositories {
         mavenCentral()
         jcenter()
         repositories {
-            maven { url 'https://papermc.io/repo/repository/maven-public/' } //PaperMC
             maven {
-                url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+                url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
                 content {
                     includeGroup 'org.bukkit'
                     includeGroup 'org.spigotmc'
                 }
-            } //Spigot
+            }
             maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
             maven { url 'https://erethon.de/repo/' } //HeadLib
             maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
             maven { url 'https://jitpack.io' } //JitPack
+            maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+            maven { url 'http://repo.md-5.net/content/groups/public/' }
         }
         mavenLocal()
     }
 
     dependencies {
-        compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT' //Spigot
-        compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT' // NMS
-        compileOnly 'de.erethon:headlib:3.0.1'
-//        implementation 'com.github.yannicklamprecht.PathfindergoalAPI:PathfindergoalAPI:1.3.3.6'
+        compileOnly 'org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT' //Spigot
+        compileOnly 'org.spigotmc:spigot:1.15-R0.1-SNAPSHOT' // NMS
+        compileOnly 'LibsDisguises:LibsDisguises:9.8.5-SNAPSHOT' //LibsDisguises
+        compileOnly 'de.erethon:headlib:3.0.2'
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    }
+
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 
     processResources {

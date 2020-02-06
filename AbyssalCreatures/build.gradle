@@ -1,0 +1,17 @@
+dependencies {
+    compile project(':Mobzy-API')
+}
+
+jar {
+    getArchiveBaseName().set("AbyssalCreatures")
+    getArchiveClassifier().set(null)
+}
+
+//Move into plugins folder
+if (plugin_path != '') {
+    task copyJar(type: Copy) {
+        from jar // here it automatically reads jar file produced from jar task
+        into plugin_path
+    }
+    build.dependsOn copyJar
+}
