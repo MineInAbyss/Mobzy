@@ -1,8 +1,8 @@
 package com.offz.spigot.mobzy
 
-import com.mineinabyss.idofront.logInfo
-import com.mineinabyss.idofront.logSuccess
-import com.mineinabyss.idofront.logWarn
+import com.mineinabyss.idofront.messaging.logInfo
+import com.mineinabyss.idofront.messaging.logSuccess
+import com.mineinabyss.idofront.messaging.logWarn
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
 import com.offz.spigot.mobzy.mobs.MobTemplate

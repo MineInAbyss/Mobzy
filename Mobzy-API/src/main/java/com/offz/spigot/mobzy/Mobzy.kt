@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy
 
 import com.derongan.minecraft.guiy.GuiListener
-import com.mineinabyss.idofront.toNMS
+import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.listener.MobListener
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.spawning.SpawnTask

@@ -91,17 +91,11 @@ data class MobSpawn(
 
         //if too many entities of the same type nearby
         if (maxLocalGroup > 0) {
-            var nearbyEntities = 0
 
             /*runInRadius(localGroupRadius) {
                 //TODO count number of entities in this radius
             }*/
             if((entityTypeCounts[entityType.name] ?: 0) > maxLocalGroup) return -1.0
-
-            for (spawn in toSpawn) {
-                if (spawn.location.world == loc.world && spawn.location.distance(loc) < localGroupRadius) nearbyEntities++
-                if (nearbyEntities >= maxLocalGroup) return -1.0
-            }
         }
         return priority
     }

@@ -1,6 +1,6 @@
 package com.offz.spigot.mobzy.pathfinders
 
-import com.mineinabyss.idofront.toNMS
+import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.mobs.CustomMob
 import net.minecraft.server.v1_15_R1.EntityLiving
 import org.bukkit.Material

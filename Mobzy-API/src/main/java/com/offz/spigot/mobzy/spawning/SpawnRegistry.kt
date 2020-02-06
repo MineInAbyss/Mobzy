@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.spawning
 
-import com.mineinabyss.idofront.logError
-import com.mineinabyss.idofront.logSuccess
+import com.mineinabyss.idofront.messaging.logError
+import com.mineinabyss.idofront.messaging.logSuccess
 import com.offz.spigot.mobzy.Mobzy
 import com.offz.spigot.mobzy.spawning.MobSpawn.Companion.deserialize
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.regionSpawns

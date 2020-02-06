@@ -43,6 +43,7 @@ interface CustomMob {
         else if (template.maxExp!! <= template.minExp!!) template.minExp!!
         else Random.nextInt(template.minExp!!, template.maxExp!!)
     }
+
     val scoreboardDisplayNameMZ: ChatMessage
         get() = ChatMessage(template.name.split('_').joinToString(" ") { it.capitalize() })
 
@@ -132,7 +133,7 @@ interface CustomMob {
     }
 
     fun undisguise() {
-        if (DisguiseAPI.isDisguised(living)) DisguiseAPI.getDisguise(living).removeDisguise()
+        DisguiseAPI.getDisguises(living).forEach { it.removeDisguise() }
     }
 
     // ========== Helper methods ===================

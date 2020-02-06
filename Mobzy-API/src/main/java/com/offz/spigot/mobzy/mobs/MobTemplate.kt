@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy.mobs
 
-import com.mineinabyss.idofront.damage
-import com.mineinabyss.idofront.editItemMeta
+import com.mineinabyss.idofront.items.damage
+import com.mineinabyss.idofront.items.editItemMeta
 import me.libraryaddict.disguise.disguisetypes.DisguiseType
 import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable

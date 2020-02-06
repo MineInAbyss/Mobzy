@@ -2,14 +2,15 @@ package com.offz.spigot.mobzy
 
 import com.mineinabyss.idofront.commands.Command.Execution
 import com.mineinabyss.idofront.commands.IdofrontCommandExecutor
-import com.mineinabyss.idofront.error
-import com.mineinabyss.idofront.info
-import com.mineinabyss.idofront.success
-import com.mineinabyss.idofront.toNMS
+import com.mineinabyss.idofront.entities.toNMS
+import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.messaging.info
+import com.mineinabyss.idofront.messaging.success
 import com.offz.spigot.mobzy.gui.MobzyGUI
 import com.offz.spigot.mobzy.mobs.types.FlyingMob
 import com.offz.spigot.mobzy.mobs.types.HostileMob
 import com.offz.spigot.mobzy.mobs.types.PassiveMob
+import me.libraryaddict.disguise.utilities.DisguiseUtilities
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -34,13 +35,15 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Id
                     sender.info("Reloaded config files (not necessarily successfully) :p")
                 }
             }
+            command("libsdisguisesstats") {
+                onExecute {
+                    sender.info("${DisguiseUtilities.getDisguises().count()} disguises in use")
+                }
+            }
 
             commandGroup {
                 val entityType = StringArgument(1, "entity type")
-                val radius = IntArgument(2, "radius", default = 0)
-                shared {
-                    onlyIfSenderIsPlayer()
-                }
+                val radius = IntArgument(2, "radius", default = 0).apply { ensureChangedByPlayer() } //TODO cleaner way of doing this
 
                 fun Execution.removeOrInfo(isInfo: Boolean) {
                     val worlds = mobzy.server.worlds
@@ -70,7 +73,8 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Id
                     sender.success((if (isInfo) "There are " else "Removed ") +
                             "&l$mobCount&r&a " + (if (entityType() == "all") "custom mobs " else "${entityType()} ") +
                             (if (entityCount != mobCount) "($entityCount entities) " else "") + //account for multi-entity mobs
-                            (if (radius() <= 0) "in all loaded chunks." else "in a radius of ${radius()} blocks."), '&')
+                            (if (radius() <= 0) "in all loaded chunks." else "in a radius of ${radius()} blocks."), '&'
+                    )
                 }
 
                 command("remove", "rm") {
@@ -112,7 +116,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Id
                         MobzyGUI(sender as Player).show(sender as Player)
                     }
                 }
-                command("domobspawns"){
+                command("domobspawns") {
                     val enabled = BooleanArgument(1, "enabled")
                     onExecute {
                         MobzyConfig.doMobSpawns = enabled()
@@ -126,7 +130,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Id
     //TODO make the API do tab completion
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): List<String> {
         if (command.name != "mobzy") return emptyList()
-        if (args.size <= 1) return listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config")
+        if (args.size <= 1) return listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config", "libsdisguisesstats")
                 .filter { it.startsWith(args[0]) }
         val subCommand = args[0]
         if (subCommand == "spawn" || subCommand == "s")

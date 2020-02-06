@@ -2,13 +2,14 @@
 
 package com.offz.spigot.mobzy
 
-import com.mineinabyss.idofront.logInfo
-import com.mineinabyss.idofront.toNMS
+import com.mineinabyss.idofront.entities.toNMS
+import com.mineinabyss.idofront.messaging.logInfo
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
 import net.minecraft.server.v1_15_R1.EntityTypes
 import net.minecraft.server.v1_15_R1.EnumCreatureType
 import net.minecraft.server.v1_15_R1.World
+import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.plugin.java.JavaPlugin
@@ -90,6 +91,16 @@ val Entity.template: MobTemplate get() = toNMS().template
  * A custom mob's [MobTemplate] that is registered with Mobzy
  */
 val EntityNMS.template: MobTemplate get() = (this as CustomMob).template
+
+/**
+ * A list of all the [CustomMob]s in these chunks.
+ */
+val List<Chunk>.customMobs get() = flatMap { it.customMobs }
+
+/**
+ * A list of all the [CustomMob]s in this chunk.
+ */
+val Chunk.customMobs get() = entities.filter { it.isCustomMob }
 
 //====================================================================
 // CUSTOM TYPE RELATED FUNCTIONS

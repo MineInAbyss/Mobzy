@@ -1,7 +1,7 @@
 package com.offz.spigot.mobzy
 
-import com.mineinabyss.idofront.logError
-import com.mineinabyss.idofront.logInfo
+import com.mineinabyss.idofront.messaging.logError
+import com.mineinabyss.idofront.messaging.logInfo
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.readCfg
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.unregisterAll
 import net.minecraft.server.v1_15_R1.EnumCreatureType
