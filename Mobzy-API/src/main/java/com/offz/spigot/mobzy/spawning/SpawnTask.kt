@@ -56,7 +56,7 @@ class SpawnTask : BukkitRunnable() {
                             regionManager.getWorldGuardRegions(spawnArea)
                                     .filterWhenOverlapFlag()
                                     .getMobSpawnsForRegions(type) //convert to a list of MobSpawns
-                                    .forEach { validSpawns.add(it.getPriority(spawnArea, toSpawn, entityTypeCounts), it) }
+                                    .forEach { validSpawns.add(it.getPriority(spawnArea, entityTypeCounts), it) }
 
                             if (validSpawns.isEmpty) return@spawnLoop
                             //weighted random decision of valid spawn

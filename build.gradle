@@ -37,6 +37,7 @@ subprojects {
             maven { url 'https://jitpack.io' } //JitPack
             maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
             maven { url 'http://repo.md-5.net/content/groups/public/' }
+            maven { url 'https://ci.mg-dev.eu/plugin/repository/everything' } //BKCommonLib
         }
         mavenLocal()
     }

@@ -1,14 +1,15 @@
 package com.offz.spigot.mobzy.listener
 
+import com.bergerkiller.bukkit.common.events.EntityRemoveEvent
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.MobzyContext
-import com.offz.spigot.mobzy.customMobs
+import com.offz.spigot.mobzy.isCustomMob
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
 import com.offz.spigot.mobzy.mobzy
-import me.libraryaddict.disguise.DisguiseAPI
+import com.offz.spigot.mobzy.toMobzy
 import net.minecraft.server.v1_15_R1.EntityHuman
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
@@ -23,7 +24,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.world.ChunkLoadEvent
-import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.meta.Damageable
 
 //TODO convert to kotlin
@@ -81,12 +81,10 @@ class MobListener(private val context: MobzyContext) : Listener {
         e.chunk.entities.filter { it.scoreboardTags.contains("customMob") }.forEach { it.remove() }
     }
 
-    /**
-     * Undisguises entities in a chunk when unloaded
-     */
     @EventHandler
-    fun undisguiseOnUnload(e: ChunkUnloadEvent) {
-        e.chunk.customMobs.forEach { DisguiseAPI.undisguiseToAll(it) }
+    fun undisguiseOnEntityRemove(e: EntityRemoveEvent) {
+        val entity = e.entity
+        if (entity.isCustomMob) (entity.toMobzy()).undisguise()
     }
 
     /**

@@ -1,11 +1,14 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '5.0.0'
+//    id 'org.jetbrains.kotlin.plugin.serialization' version '1.3.61'
 }
 
 dependencies {
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
     implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
     implementation 'org.nield:kotlin-statistics:1.2.1'
+    implementation 'com.bergerkiller.bukkit:BKCommonLib:1.15.2-v1-SNAPSHOT'
+//        implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0" // JVM dependency
     api project(':idofront')
     if (useLocalGuiy.toBoolean()) implementation project(':guiy')
     else implementation 'com.github.Mineinabyss:guiy:master-SNAPSHOT'

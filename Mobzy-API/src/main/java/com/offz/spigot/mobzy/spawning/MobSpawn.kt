@@ -76,7 +76,7 @@ data class MobSpawn(
         return spawns
     }
 
-    fun getPriority(spawnArea: SpawnArea, toSpawn: List<MobSpawnEvent>, entityTypeCounts: Map<String, Int>): Double {
+    fun getPriority(spawnArea: SpawnArea, entityTypeCounts: Map<String, Int>): Double {
         if (spawnArea.gap !in gapRange) return -1.0
 
         val loc = spawnArea.getSpawnLocation(spawnPos)

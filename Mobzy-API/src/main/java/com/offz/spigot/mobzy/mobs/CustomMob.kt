@@ -3,6 +3,7 @@ package com.offz.spigot.mobzy.mobs
 import com.offz.spigot.mobzy.debug
 import com.offz.spigot.mobzy.mobTemplate
 import com.offz.spigot.mobzy.mobs.types.FlyingMob
+import com.offz.spigot.mobzy.mobzy
 import com.offz.spigot.mobzy.pathfinders.Navigation
 import me.libraryaddict.disguise.DisguiseAPI
 import me.libraryaddict.disguise.disguisetypes.Disguise
@@ -116,6 +117,9 @@ interface CustomMob {
 //            entity.setPose(EntityPose.DYING)
             //TODO add PlaceHolderAPI support
             template.deathCommands.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it) }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(mobzy, {
+                undisguise()
+            }, 40)
         }
     }
 
@@ -133,7 +137,7 @@ interface CustomMob {
     }
 
     fun undisguise() {
-        DisguiseAPI.getDisguises(living).forEach { it.removeDisguise() }
+        DisguiseAPI.undisguiseToAll(living)
     }
 
     // ========== Helper methods ===================
