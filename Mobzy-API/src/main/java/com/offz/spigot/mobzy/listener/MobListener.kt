@@ -1,15 +1,12 @@
 package com.offz.spigot.mobzy.listener
 
-import com.bergerkiller.bukkit.common.events.EntityRemoveEvent
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.MobzyContext
-import com.offz.spigot.mobzy.isCustomMob
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
 import com.offz.spigot.mobzy.mobzy
-import com.offz.spigot.mobzy.toMobzy
 import net.minecraft.server.v1_15_R1.EntityHuman
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
@@ -26,7 +23,6 @@ import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.inventory.meta.Damageable
 
-//TODO convert to kotlin
 class MobListener(private val context: MobzyContext) : Listener {
     /**
      * We use this method to prevent any entity related statistics if they are from our custom mobs, since it causes
@@ -81,12 +77,6 @@ class MobListener(private val context: MobzyContext) : Listener {
         e.chunk.entities.filter { it.scoreboardTags.contains("customMob") }.forEach { it.remove() }
     }
 
-    @EventHandler
-    fun undisguiseOnEntityRemove(e: EntityRemoveEvent) {
-        val entity = e.entity
-        if (entity.isCustomMob) (entity.toMobzy()).undisguise()
-    }
-
     /**
      * The magic method that lets you hit entities in their server side hitboxes
      * TODO this doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do.
@@ -94,8 +84,7 @@ class MobListener(private val context: MobzyContext) : Listener {
      * @param e the event
      */
     @EventHandler
-    fun onLeftClick(e: PlayerInteractEvent) { // TODO I'd like some way to ignore hits onto the disguised entity. This could be done by using a marker
-//  armorstand as a disguise, but the disguise plugin seems to crash clients whenever we do that :yeeko:
+    fun onLeftClick(e: PlayerInteractEvent) { // TODO I'd like some way to ignore hits onto the disguised entity. Perhaps use a marker armorstand?
         val p = e.player
         if (e.leftClicked || e.rightClicked) {
             val trace = p.world.rayTrace(p.eyeLocation, p.location.direction, 3.0, FluidCollisionMode.ALWAYS, true, 0.0) { entity: Entity -> entity != p }

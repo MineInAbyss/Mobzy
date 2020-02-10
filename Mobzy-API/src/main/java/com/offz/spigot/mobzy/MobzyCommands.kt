@@ -10,8 +10,6 @@ import com.offz.spigot.mobzy.gui.MobzyGUI
 import com.offz.spigot.mobzy.mobs.types.FlyingMob
 import com.offz.spigot.mobzy.mobs.types.HostileMob
 import com.offz.spigot.mobzy.mobs.types.PassiveMob
-import me.libraryaddict.disguise.utilities.DisguiseUtilities
-import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -34,27 +32,6 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Id
                 onExecute {
                     context.mobzyConfig.reload()
                     sender.info("Reloaded config files (not necessarily successfully) :p")
-                }
-            }
-            command("libsdisguisesstats") {
-                onExecute {
-                    val entityList = DisguiseUtilities.getDisguises().mapKeys { Bukkit.getEntity(it.key) }
-                    sender.success("""
-                        ${entityList.count()} total disguises in use
-                        ${entityList.count { it.key == null }} are null
-                        ${entityList.count { it.key?.isDead ?: false }} are dead
-                        ${entityList.count { !(it.key?.isValid ?: false) }} are invalid
-                        ${entityList.count { it.value.size > 1 }} have multiple disguises
-                    """.trimIndent())
-                }
-            }
-            command("clearunuseddisguises") {
-                onExecute {
-                    DisguiseUtilities.getDisguises()
-                            .mapKeys { Bukkit.getEntity(it.key) }
-                            .filter { !(it.key?.isValid ?: false) } //get all dead or null entities
-                            .also { sender.success("${it.count()} entities' disguises cleared") }
-                            .forEach { it.value.forEach { disguise -> disguise.removeDisguise() } }
                 }
             }
 
@@ -146,7 +123,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Id
     //TODO make the API do tab completion
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): List<String> {
         if (command.name != "mobzy") return emptyList()
-        if (args.size <= 1) return listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config", "libsdisguisesstats", "clearunuseddisguises")
+        if (args.size <= 1) return listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config")
                 .filter { it.startsWith(args[0]) }
         val subCommand = args[0]
         if (subCommand == "spawn" || subCommand == "s")

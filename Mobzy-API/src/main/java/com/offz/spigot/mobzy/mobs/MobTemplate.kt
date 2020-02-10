@@ -2,7 +2,6 @@ package com.offz.spigot.mobzy.mobs
 
 import com.mineinabyss.idofront.items.damage
 import com.mineinabyss.idofront.items.editItemMeta
-import me.libraryaddict.disguise.disguisetypes.DisguiseType
 import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.inventory.ItemStack
@@ -15,7 +14,6 @@ import java.util.*
 data class MobTemplate(var name: String,
                        var modelID: Int,
                        var modelMaterial: Material = Material.DIAMOND_SWORD,
-                       var disguiseAs: DisguiseType = DisguiseType.ZOMBIE,
                        var temptItems: List<Material>? = null,
                        var maxHealth: Double? = null,
                        var movementSpeed: Double? = null,
@@ -57,7 +55,6 @@ data class MobTemplate(var name: String,
 
             val template = MobTemplate(configName, args["model"] as Int)
             setArg("adult") { template.isAdult = it as Boolean }
-            setArg("disguise-as") { template.disguiseAs = DisguiseType.valueOf(it as String) }
             setArg("drops") { drops ->
                 template.drops = (drops as List<Map<String, Any>>)
                         .map { MobDrop.deserialize(it) }

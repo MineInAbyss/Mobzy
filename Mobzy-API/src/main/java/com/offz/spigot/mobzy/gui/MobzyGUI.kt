@@ -5,19 +5,18 @@ import com.derongan.minecraft.guiy.gui.ClickableElement
 import com.derongan.minecraft.guiy.gui.FillableElement
 import com.derongan.minecraft.guiy.gui.Layout
 import com.derongan.minecraft.guiy.gui.layouts.HistoryGuiHolder
+import com.mineinabyss.idofront.messaging.success
 import com.offz.spigot.mobzy.gui.layouts.MobConfigLayout
 import com.offz.spigot.mobzy.mobTemplate
 import com.offz.spigot.mobzy.mobzy
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.reuseMobSpawn
 import com.offz.spigot.mobzy.toTemplate
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
 import java.util.*
 import java.util.function.Consumer
 
-//TODO cleanup code after conversion to kotlin
 class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     private val mobConfigs: List<ClickableElement> = ArrayList()
     private val spawnList: List<ClickableElement> = ArrayList()
@@ -86,7 +85,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         spawn.clear()
         mobProperties.forEach { spawn[it.key] = it.value }
         mobzy.mobzyConfig.saveSpawnCfg(config ?: error("Could not save config values, config was null"))
-        player.sendMessage("${ChatColor.GREEN}Successfully saved mob's configuartion")
+        player.success("Successfully saved mob's configuartion")
     }
 
     init {

@@ -37,7 +37,7 @@ abstract class FlyingMob(world: World?, override var template: MobTemplate) : En
     }
 
     override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
-    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = disguise()
+    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = Unit
 
     override fun dropExp() = dropExperience()
 
@@ -49,7 +49,6 @@ abstract class FlyingMob(world: World?, override var template: MobTemplate) : En
     override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
     override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
 
-    override fun die() = super.die().also { undisguise() }
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
     override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()

@@ -1,5 +1,10 @@
 package com.offz.spigot.mobzy
 
+import com.comphenix.protocol.PacketType
+import com.comphenix.protocol.ProtocolLibrary
+import com.comphenix.protocol.events.ListenerPriority
+import com.comphenix.protocol.events.PacketAdapter
+import com.comphenix.protocol.events.PacketEvent
 import com.derongan.minecraft.guiy.GuiListener
 import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.listener.MobListener
@@ -13,6 +18,7 @@ import net.minecraft.server.v1_15_R1.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.plugin.java.JavaPlugin
+
 
 val mobzy: Mobzy
     get() = JavaPlugin.getPlugin(Mobzy::class.java)
@@ -51,6 +57,22 @@ class Mobzy : JavaPlugin() {
         } catch (e: FlagConflictException) {
             e.printStackTrace()
         }
+
+        //register protocol manager
+
+        val protocolManager = ProtocolLibrary.getProtocolManager()!!
+
+
+        protocolManager.addPacketListener(object : PacketAdapter(this, ListenerPriority.NORMAL,
+                PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
+            override fun onPacketSending(event: PacketEvent) { // Item packets (id: 0x29)
+                if (event.packetType == PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
+                    if(Bukkit.getEntity(event.packet.uuiDs.read(0))?.isCustomMob == true)
+                        event.packet.integers.write(1, 95)
+                }
+            }
+        })
+
     }
 
     override fun onEnable() {

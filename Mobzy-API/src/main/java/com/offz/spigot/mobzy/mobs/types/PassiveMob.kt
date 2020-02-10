@@ -44,7 +44,7 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
      */
     override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
 
-    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = disguise()
+    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) {} /*= disguise()*/
 
     override fun dropExp() = dropExperience()
 
@@ -56,7 +56,6 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
     override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
     override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
 
-    override fun die() = super.die().also { undisguise() }
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
     override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
@@ -75,6 +74,6 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
         createFromBase()
         addScoreboardTag("passiveMob")
         //TODO this is a temporary fix to see if it affects performance
-        living.removeWhenFarAway = true
+        living.removeWhenFarAway = false
     }
 }

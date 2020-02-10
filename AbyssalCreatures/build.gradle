@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':Mobzy-API')
+    compileOnly project(':Mobzy-API')
 }
 
 jar {

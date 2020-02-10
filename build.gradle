@@ -35,9 +35,6 @@ subprojects {
             maven { url 'https://erethon.de/repo/' } //HeadLib
             maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
             maven { url 'https://jitpack.io' } //JitPack
-            maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
-            maven { url 'http://repo.md-5.net/content/groups/public/' }
-            maven { url 'https://ci.mg-dev.eu/plugin/repository/everything' } //BKCommonLib
         }
         mavenLocal()
     }
@@ -45,7 +42,6 @@ subprojects {
     dependencies {
         compileOnly 'org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT' //Spigot
         compileOnly 'org.spigotmc:spigot:1.15-R0.1-SNAPSHOT' // NMS
-        compileOnly 'LibsDisguises:LibsDisguises:9.8.5-SNAPSHOT' //LibsDisguises
         compileOnly 'de.erethon:headlib:3.0.2'
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     }

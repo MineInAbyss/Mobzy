@@ -3,7 +3,7 @@ version: @plugin_version@
 author: Offz
 main: com.offz.spigot.mobzy.Mobzy
 api-version: 1.15
-depend: [WorldGuard, LibsDisguises]
+depend: [WorldGuard, ProtocolLib]
 
 prefix: Mobzy
 description: A custom entities API
