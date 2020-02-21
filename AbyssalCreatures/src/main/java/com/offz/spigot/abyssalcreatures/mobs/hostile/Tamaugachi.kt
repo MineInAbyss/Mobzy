@@ -13,8 +13,8 @@ class Tamaugachi(world: World?) : HostileMob(world, "Tamaugachi"), HitBehaviour 
         //make them walk fast in water thanks to depth strider. The material can't be boots since they'll display even
         // if the entity is invisible
         living.equipment!!.boots = ItemStack(Material.STONE).editItemMeta {
-            it.isUnbreakable = true
-            it.addEnchant(Enchantment.DEPTH_STRIDER, 40, true)
+            isUnbreakable = true
+            addEnchant(Enchantment.DEPTH_STRIDER, 40, true)
         }
     }
 }

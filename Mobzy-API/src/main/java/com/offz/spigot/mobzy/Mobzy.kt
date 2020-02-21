@@ -19,16 +19,15 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.plugin.java.JavaPlugin
 
-
-val mobzy: Mobzy
-    get() = JavaPlugin.getPlugin(Mobzy::class.java)
+//TODO ensure lazy works here
+//get mobzy via bukkit once, then send that reference back afterwards
+val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 
 class Mobzy : JavaPlugin() {
     lateinit var mobzyConfig: MobzyConfig
         private set
     lateinit var customTypes: CustomType
         private set
-    private lateinit var context: MobzyContext
 
     override fun onLoad() {
         logger.info("On load has been called")
@@ -67,7 +66,7 @@ class Mobzy : JavaPlugin() {
                 PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
             override fun onPacketSending(event: PacketEvent) { // Item packets (id: 0x29)
                 if (event.packetType == PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
-                    if(Bukkit.getEntity(event.packet.uuiDs.read(0))?.isCustomMob == true)
+                    if (Bukkit.getEntity(event.packet.uuiDs.read(0))?.isCustomMob == true)
                         event.packet.integers.write(1, 95)
                 }
             }
@@ -76,6 +75,7 @@ class Mobzy : JavaPlugin() {
     }
 
     override fun onEnable() {
+        //Plugin startup logic
         logger.info("On enable has been called")
         saveDefaultConfig()
         reloadConfig()
@@ -83,13 +83,8 @@ class Mobzy : JavaPlugin() {
         mobzyConfig = MobzyConfig()
         mobzyConfig.reload() //lots of startup logic in here
 
-        //Plugin startup logic
-        context = MobzyContext(config, mobzyConfig) //Create new context and add plugin and logger to it
-        context.plugin = this
-        context.logger = logger
-
         //Register events
-        server.pluginManager.registerEvents(MobListener(context), this)
+        server.pluginManager.registerEvents(MobListener(), this)
         server.pluginManager.registerEvents(GuiListener(this), this)
 
         //Reload existing addons
@@ -102,7 +97,7 @@ class Mobzy : JavaPlugin() {
         }*/
 
         //Register commands
-        MobzyCommands(context)
+        MobzyCommands()
     }
 
     private var spawnTaskID = -1

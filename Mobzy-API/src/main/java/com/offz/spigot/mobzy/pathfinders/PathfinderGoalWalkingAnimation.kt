@@ -10,7 +10,7 @@ class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID:
 
     override fun execute() {
         mob.equipment!!.helmet = model.editItemMeta {
-            it.damage = modelID + 1
+            damage = modelID + 1
         }
     }
 
@@ -29,7 +29,7 @@ class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID:
     override fun shouldKeepExecuting(): Boolean {
         if (!shouldExecute() && model.damage != modelID + 2)
             mob.equipment!!.helmet = model.editItemMeta {
-                it.damage = modelID
+                damage = modelID
             }
         return false
     }

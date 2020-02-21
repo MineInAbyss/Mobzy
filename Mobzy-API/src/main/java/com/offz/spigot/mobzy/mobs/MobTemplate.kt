@@ -29,9 +29,9 @@ data class MobTemplate(var name: String,
 
     val modelItemStack
         get() = ItemStack(modelMaterial, 1).editItemMeta {
-            it.damage = modelID
-            it.isUnbreakable = true
-            it.setDisplayName(name)
+            damage = modelID
+            isUnbreakable = true
+            setDisplayName(name)
         }
 
     /**

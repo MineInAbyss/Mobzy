@@ -14,7 +14,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-class MobzyCommands internal constructor(private val context: MobzyContext) : IdofrontCommandExecutor() {
+class MobzyCommands internal constructor() : IdofrontCommandExecutor() {
     override val commands = commands(mobzy) {
         command("mobzy", "mz") {
             //the variables are stored for the commands below only
@@ -30,7 +30,7 @@ class MobzyCommands internal constructor(private val context: MobzyContext) : Id
             }
             command("reload", "rl") {
                 onExecute {
-                    context.mobzyConfig.reload()
+                    mobzy.mobzyConfig.reload()
                     sender.info("Reloaded config files (not necessarily successfully) :p")
                 }
             }

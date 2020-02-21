@@ -24,6 +24,7 @@ shadowJar {
     minimize {
         exclude(dependency("org.jetbrains.kotlin:.*"))
         exclude(dependency('de.erethon:headlib:3.0.2'))
+        exclude(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
     }
 }
 

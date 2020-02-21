@@ -24,14 +24,16 @@ class MobzyConfig {
      */
     private fun loadConfigValues() {
         val config = mobzy.config
-        isDebug = config.getBoolean("debug")
-        doMobSpawns = config.getBoolean("doMobSpawns")
-        spawnSearchRadius = (config.get("spawnSearchRadius") as Number).toDouble()
-        minChunkSpawnRad = config.getInt("minChunkSpawnRad")
-        maxChunkSpawnRad = config.getInt("maxChunkSpawnRad")
-        maxSpawnAmount = config.getInt("maxSpawnAmount")
-        spawnTaskDelay = (config.get("spawnTaskDelay") as Number).toLong()
-        creatureTypes.forEach { type -> mobCaps[type] = config["mobCaps.$type"] as Int } //register mob caps
+        with(config){
+            isDebug = getBoolean("debug")
+            doMobSpawns = getBoolean("doMobSpawns")
+            spawnSearchRadius = (get("spawnSearchRadius") as Number).toDouble()
+            minChunkSpawnRad = getInt("minChunkSpawnRad")
+            maxChunkSpawnRad = getInt("maxChunkSpawnRad")
+            maxSpawnAmount = getInt("maxSpawnAmount")
+            spawnTaskDelay = (get("spawnTaskDelay") as Number).toLong()
+            creatureTypes.forEach { type -> mobCaps[type] = this["mobCaps.$type"] as Int } //register mob caps
+        }
     }
 
     /**

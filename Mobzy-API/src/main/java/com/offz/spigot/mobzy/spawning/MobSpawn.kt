@@ -185,44 +185,46 @@ data class MobSpawn(
             //create a new builder from the MobSpawn found inside of an already created layer
             val spawn = when {
                 args.containsKey("reuse") -> SpawnRegistry.reuseMobSpawn(args["reuse"] as String).copy()
-                        .also { setArg("mob") { mob -> it.entityType = (mob as String).toEntityType() } }
+                        .apply { setArg("mob") { mob -> entityType = (mob as String).toEntityType() } }
                 args.containsKey("mob") -> MobSpawn((args["mob"] as String).toEntityType())
                 else -> error("Serialization failed. No `mob` or `reuse` tag is defined in the spawn.")
             }
 
-            setArg("min-amount") { spawn.minAmount = (it as Number).toInt() }
-            setArg("max-amount") { spawn.maxAmount = (it as Number).toInt() }
+            with(spawn){
+                setArg("min-amount") { minAmount = (it as Number).toInt() }
+                setArg("max-amount") { maxAmount = (it as Number).toInt() }
 
-            setArg("priority") { spawn.basePriority = (it as Number).toDouble() }
+                setArg("priority") { basePriority = (it as Number).toDouble() }
 
-            setArg("min-gap") { spawn.minGap = (it as Number).toInt() }
-            setArg("max-gap") { spawn.maxGap = (it as Number).toInt() }
+                setArg("min-gap") { minGap = (it as Number).toInt() }
+                setArg("max-gap") { maxGap = (it as Number).toInt() }
 
-            setArg("min-light") { spawn.minLight = (it as Number).toLong() }
-            setArg("max-light") { spawn.maxLight = (it as Number).toLong() }
+                setArg("min-light") { minLight = (it as Number).toLong() }
+                setArg("max-light") { maxLight = (it as Number).toLong() }
 
-            setArg("min-time") { spawn.minTime = (it as Number).toLong() }
-            setArg("max-max") { spawn.maxTime = (it as Number).toLong() }
+                setArg("min-time") { minTime = (it as Number).toLong() }
+                setArg("max-max") { maxTime = (it as Number).toLong() }
 
-            setArg("min-time") { spawn.minTime = (it as Number).toLong() }
-            setArg("max-time") { spawn.maxTime = (it as Number).toLong() }
+                setArg("min-time") { minTime = (it as Number).toLong() }
+                setArg("max-time") { maxTime = (it as Number).toLong() }
 
-            setArg("min-y") { spawn.minY = (it as Number).toInt() }
-            setArg("max-y") { spawn.maxY = (it as Number).toInt() }
+                setArg("min-y") { minY = (it as Number).toInt() }
+                setArg("max-y") { maxY = (it as Number).toInt() }
 
-            setArg("max-local-group") { spawn.maxLocalGroup = (it as Number).toInt() }
-            setArg("local-group-radius") { spawn.localGroupRadius = (it as Number).toDouble() }
-            setArg("radius") { spawn.radius = (it as Number).toDouble() }
-            setArg("spawn-pos") {
-                spawn.spawnPos = when (it as String?) {
-                    "AIR" -> SpawnPosition.AIR
-                    "GROUND" -> SpawnPosition.GROUND
-                    "OVERHANG" -> SpawnPosition.OVERHANG
-                    else -> SpawnPosition.GROUND
+                setArg("max-local-group") { maxLocalGroup = (it as Number).toInt() }
+                setArg("local-group-radius") { localGroupRadius = (it as Number).toDouble() }
+                setArg("radius") { radius = (it as Number).toDouble() }
+                setArg("spawn-pos") {
+                    spawnPos = when (it as String?) {
+                        "AIR" -> SpawnPosition.AIR
+                        "GROUND" -> SpawnPosition.GROUND
+                        "OVERHANG" -> SpawnPosition.OVERHANG
+                        else -> SpawnPosition.GROUND
+                    }
                 }
-            }
-            setArg("block-whitelist") { value ->
-                spawn.blockWhitelist = (value as List<String>).map { Material.valueOf(it) }
+                setArg("block-whitelist") { value ->
+                    spawn.blockWhitelist = (value as List<String>).map { Material.valueOf(it) }
+                }
             }
 
             return spawn

@@ -3,7 +3,6 @@ package com.offz.spigot.mobzy.listener
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.entities.toNMS
-import com.offz.spigot.mobzy.MobzyContext
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
 import com.offz.spigot.mobzy.mobzy
@@ -23,7 +22,7 @@ import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.inventory.meta.Damageable
 
-class MobListener(private val context: MobzyContext) : Listener {
+class MobListener : Listener {
     /**
      * We use this method to prevent any entity related statistics if they are from our custom mobs, since it causes
      * server crashes. This is mainly used to prevent entity killing players statistic changes, since player killing

@@ -2,6 +2,7 @@ package com.offz.spigot.mobzy.spawning
 
 import com.offz.spigot.mobzy.spawning.vertical.SpawnArea
 import com.offz.spigot.mobzy.spawning.vertical.VerticalSpawn
+import com.offz.spigot.mobzy.spawning.vertical.getHighestBlock
 import org.bukkit.Chunk
 
 /**
@@ -32,7 +33,7 @@ class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val ma
      * TODO this could have more complex checks in the future
      */
     private fun calculatePreference() { //pick random block in chunk
-        if (VerticalSpawn.getHighestBlock(randomLocInChunk, minY, maxY).blockY == minY) //if we found void
+        if (randomLocInChunk.getHighestBlock(minY, maxY).blockY == minY) //if we found void
             truePreference = 0.0
     }
 

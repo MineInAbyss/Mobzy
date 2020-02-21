@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-//TODO calculate looting
 data class MobDrop(val item: ItemStack,
                    val minAmount: Int = 1,
                    val maxAmount: Int = 1,
