@@ -69,7 +69,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         spawns.forEach { spawn ->
             val spawnBuilder =
                     if (spawn.containsKey("reuse"))
-                        reuseMobSpawn(spawn["reuse"] as String).entityType.mobTemplate //TODO not sure if this is right because I changed it from before
+                        reuseMobSpawn(spawn["reuse"] as String).entityType.mobTemplate
                     else
                         (spawn["mob"] as String).toTemplate()
             val cell = Cell.forItemStack(spawnBuilder.modelItemStack)

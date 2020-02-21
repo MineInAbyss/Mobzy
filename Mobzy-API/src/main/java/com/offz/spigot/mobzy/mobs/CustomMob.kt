@@ -11,6 +11,7 @@ import org.bukkit.Location
 import org.bukkit.SoundCategory
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_15_R1.event.CraftEventFactory
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.potion.PotionEffect
@@ -36,7 +37,7 @@ interface CustomMob {
     private val location: Location get() = living.location
     val navigation: Navigation
         get() = Navigation((entity as EntityInsentient).navigation, entity as EntityInsentient)
-    val killer: EntityLiving? get() = entity.killer
+    val killer: EntityHuman? get() = entity.killer
     fun expToDrop(): Int {
         return if (template.minExp == null || template.maxExp == null) entity.expToDrop
         else if (template.maxExp!! <= template.minExp!!) template.minExp!!
@@ -83,15 +84,11 @@ interface CustomMob {
     }
 
     fun setConfiguredAttributes() {
-        if (staticTemplate.maxHealth != null)
-            entity.getAttributeInstance(GenericAttributes.MAX_HEALTH).value = staticTemplate.maxHealth
-                    ?: return //TODO not sure if we need this null check
-        if (staticTemplate.movementSpeed != null)
-            entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).value = staticTemplate.movementSpeed ?: return
-        if (staticTemplate.attackDamage != null && this !is FlyingMob) //flying mobs can't have an attack damage attribute, we use the builder's value instead
-            entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).value = staticTemplate.attackDamage ?: return
-        if (staticTemplate.followRange != null)
-            entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).value = staticTemplate.followRange ?: return
+        staticTemplate.maxHealth?.let { entity.getAttributeInstance(GenericAttributes.MAX_HEALTH).value = it }
+        staticTemplate.movementSpeed?.let { entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).value = it }
+        if (this !is FlyingMob) //flying mobs can't have an attack damage attribute, we use the builder's value instead
+            staticTemplate.attackDamage?.let { entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).value = it }
+        staticTemplate.followRange?.let { entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).value = it }
     }
 
     fun dieCM(damageSource: DamageSource?) {
@@ -106,7 +103,9 @@ interface CustomMob {
 
             if (!entity.world.isClientSide) {
                 if (world.gameRules.getBoolean(GameRules.DO_MOB_LOOT)) {
-                    CraftEventFactory.callEntityDeathEvent(entity, template.chooseDrops())
+                    val killer = killer?.bukkitEntity
+                    val looting = killer?.inventory?.itemInMainHand?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
+                    CraftEventFactory.callEntityDeathEvent(entity, template.chooseDrops(looting))
                     entity.expToDrop = expToDrop()
                     dropExp()
                 } else CraftEventFactory.callEntityDeathEvent(entity)

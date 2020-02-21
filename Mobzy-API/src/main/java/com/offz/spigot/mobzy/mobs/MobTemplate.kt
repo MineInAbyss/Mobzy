@@ -25,7 +25,7 @@ data class MobTemplate(var name: String,
                        var deathCommands: List<String> = ArrayList(),
                        var drops: List<MobDrop> = ArrayList()) : ConfigurationSerializable {
 
-    fun chooseDrops(): List<ItemStack?> = drops.toList().map { it.chooseDrop() }
+    fun chooseDrops(looting: Int = 0): List<ItemStack?> = drops.toList().map { it.chooseDrop(looting) }
 
     val modelItemStack
         get() = ItemStack(modelMaterial, 1).editItemMeta {

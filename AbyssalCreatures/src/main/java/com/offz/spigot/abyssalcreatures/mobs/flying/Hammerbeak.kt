@@ -10,7 +10,7 @@ class Hammerbeak(world: World?) : FlyingMob(world, "Hammerbeak"), HitBehaviour {
         super.createPathfinders()
         addPathfinderGoal(2, PathfinderGoalDiveOnTargetAttack(
                 this,
-                diveVelocity = -0.6,
+                diveVelocity = -0.4,
                 minHeight = 8.0,
                 maxHeight = 12.0
         ))

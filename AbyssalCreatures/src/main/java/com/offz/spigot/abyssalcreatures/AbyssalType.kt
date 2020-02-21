@@ -25,7 +25,7 @@ class AbyssalType {
     val INBYO = registerEntity("inbyo", EnumCreatureType.MONSTER, width = 0.6f, height = 3f, func = ::Inbyo)
     val KUONGATARI = registerEntity("kuongatari", EnumCreatureType.MONSTER, width = 0.6f, height = 0.6f, func = ::Kuongatari)
     val OTTOBAS = registerEntity("ottobas", EnumCreatureType.MONSTER, width = 2f, height = 3f, func = ::Ottobas)
-    val SILKFANG = registerEntity("silkfang", EnumCreatureType.MONSTER, width = 2f, height = 2f, func = ::Silkfang)
+    val SILKFANG = registerEntity("silkfang", EnumCreatureType.MONSTER, width = 1.5f, height = 1.5f, func = ::Silkfang)
     val STEVE = registerEntity("steve", EnumCreatureType.MONSTER, width = 2f, height = 7f, func = ::Steve)
     val TAMAUGACHI = registerEntity("tamaugachi", EnumCreatureType.MONSTER, width = 2.5f, height = 2.5f, func = ::Tamaugachi)
     val TESUCHI = registerEntity("tesuchi", EnumCreatureType.MONSTER, width = 0.6f, height = 0.6f, func = ::Tesuchi)

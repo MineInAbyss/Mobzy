@@ -4,27 +4,30 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.inventory.ItemStack
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 //TODO calculate looting
 data class MobDrop(val item: ItemStack,
                    val minAmount: Int = 1,
                    val maxAmount: Int = 1,
                    val dropChance: Double = 1.0) : ConfigurationSerializable {
-    @JvmOverloads
-    constructor(material: Material, minAmount: Int = 1, maxAmount: Int = 1, dropChance: Double = 0.0) : this(ItemStack(material), minAmount, maxAmount, dropChance)
-
-    fun chooseDrop(): ItemStack? {
-        if (Math.random() < dropChance) {
+    /**
+     * @return The amount of items to be dropped, or null if the drop does not succeed
+     * TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.
+     */
+    fun chooseDrop(lootingLevel: Int = 0): ItemStack? {
+        val lootingPercent = lootingLevel/100.0
+        val lootingMaxAmount: Int = if (dropChance >= 0.5) (maxAmount + lootingLevel * Random.nextDouble()).roundToInt() else maxAmount
+        val lootingDropChance = if (dropChance >= 0.10) dropChance * (10.0 + lootingLevel) / 10.0 else dropChance + lootingPercent
+        return if (Random.nextDouble() < lootingDropChance) {
             val drop = item.clone()
-            drop.amount = (Math.random() * (maxAmount - minAmount) + minAmount).toInt()
-            return drop
-        }
-        return null
+            drop.amount = if (lootingMaxAmount <= minAmount) minAmount else Random.nextInt(minAmount, lootingMaxAmount)
+            drop
+        } else null
     }
 
-    override fun serialize(): Map<String, Any> {
-        return mapOf()
-    }
+    override fun serialize(): Map<String, Any> = TODO("No serialization implementation yet")
 
     companion object {
 

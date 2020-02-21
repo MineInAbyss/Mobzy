@@ -64,7 +64,6 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
     override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
     override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
-//
 
     //EntityAnimal specific overriding
 
@@ -74,6 +73,6 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
         createFromBase()
         addScoreboardTag("passiveMob")
         //TODO this is a temporary fix to see if it affects performance
-        living.removeWhenFarAway = false
+        living.removeWhenFarAway = true
     }
 }

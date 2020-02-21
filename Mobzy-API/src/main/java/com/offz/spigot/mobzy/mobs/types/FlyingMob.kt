@@ -4,6 +4,7 @@ import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
 import com.offz.spigot.mobzy.pathfinders.controllers.MZControllerMoveFlying
 import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget
+import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalHurtByTarget
 import com.offz.spigot.mobzy.pathfinders.flying.PathfinderGoalIdleFly
 import com.offz.spigot.mobzy.toTemplate
 import com.offz.spigot.mobzy.type
@@ -31,9 +32,10 @@ abstract class FlyingMob(world: World?, override var template: MobTemplate) : En
     
     override fun createPathfinders() {
         addPathfinderGoal(1, PathfinderGoalFloat(this))
-        addPathfinderGoal(1, PathfinderGoalFlyDamageTarget(this))
+        addPathfinderGoal(2, PathfinderGoalFlyDamageTarget(this))
         addPathfinderGoal(5, PathfinderGoalIdleFly(this))
-        addTargetSelector(1, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
+        addPathfinderGoal(1, PathfinderGoalHurtByTarget(this, 60.0))
+        addTargetSelector(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
     }
 
     override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
