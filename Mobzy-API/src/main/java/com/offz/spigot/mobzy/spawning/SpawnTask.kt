@@ -1,6 +1,5 @@
 package com.offz.spigot.mobzy.spawning
 
-import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.*
 import com.offz.spigot.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
 import com.offz.spigot.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions

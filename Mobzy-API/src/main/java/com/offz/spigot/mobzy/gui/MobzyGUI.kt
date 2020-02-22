@@ -5,9 +5,9 @@ import com.derongan.minecraft.guiy.gui.FillableElement
 import com.derongan.minecraft.guiy.gui.Layout
 import com.derongan.minecraft.guiy.gui.layouts.HistoryGuiHolder
 import com.derongan.minecraft.guiy.helpers.toCell
-import com.derongan.minecraft.guiy.kotlin_dls.button
-import com.derongan.minecraft.guiy.kotlin_dls.guiyLayout
-import com.derongan.minecraft.guiy.kotlin_dls.setElement
+import com.derongan.minecraft.guiy.kotlin_dsl.button
+import com.derongan.minecraft.guiy.kotlin_dsl.guiyLayout
+import com.derongan.minecraft.guiy.kotlin_dsl.setElement
 import com.mineinabyss.idofront.messaging.success
 import com.offz.spigot.mobzy.gui.layouts.MobConfigLayout
 import com.offz.spigot.mobzy.mobTemplate

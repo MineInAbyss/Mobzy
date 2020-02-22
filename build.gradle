@@ -4,7 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.61'
 }
 
-repositories{
+repositories {
     mavenCentral()
 }
 
@@ -18,7 +18,8 @@ subprojects {
     targetCompatibility = 1.8
 
     ext.kotlin_version = '1.3.61'
-    ext.plugin_path = '' //Put your plugins folder directory here! If it is left as '', jars won't be copied
+    //Put your plugins folder directory here! If it is left as '', jars won't be copied
+    ext.plugin_path = ''
 
     repositories {
         mavenCentral()
@@ -46,16 +47,8 @@ subprojects {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     }
 
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
-    }
-    compileTestKotlin {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
-    }
+    compileKotlin { kotlinOptions { jvmTarget = "1.8" } }
+    compileTestKotlin { kotlinOptions { jvmTarget = "1.8" } }
 
     processResources {
         from(sourceSets.main.resources.srcDirs) {

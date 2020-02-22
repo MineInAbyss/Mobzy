@@ -6,7 +6,6 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import com.derongan.minecraft.guiy.GuiListener
-import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.listener.MobListener
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.spawning.SpawnTask

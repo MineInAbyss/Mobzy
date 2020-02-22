@@ -2,10 +2,10 @@ package com.offz.spigot.mobzy.listener
 
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
-import com.mineinabyss.idofront.entities.toNMS
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.behaviours.HitBehaviour
 import com.offz.spigot.mobzy.mobzy
+import com.offz.spigot.mobzy.toNMS
 import net.minecraft.server.v1_15_R1.EntityHuman
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode

@@ -5,8 +5,8 @@ import com.derongan.minecraft.guiy.gui.FillableElement
 import com.derongan.minecraft.guiy.gui.Layout
 import com.derongan.minecraft.guiy.gui.ScrollingPallet
 import com.derongan.minecraft.guiy.helpers.toCell
-import com.derongan.minecraft.guiy.kotlin_dls.backButtonTo
-import com.derongan.minecraft.guiy.kotlin_dls.button
+import com.derongan.minecraft.guiy.kotlin_dsl.backButtonTo
+import com.derongan.minecraft.guiy.kotlin_dsl.button
 import com.mineinabyss.idofront.items.editItemMeta
 import com.offz.spigot.mobzy.gui.MobzyGUI
 import com.offz.spigot.mobzy.gui.Property

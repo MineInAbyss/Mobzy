@@ -5,9 +5,10 @@ import com.derongan.minecraft.guiy.gui.ClickableElement
 import com.derongan.minecraft.guiy.gui.Layout
 import com.derongan.minecraft.guiy.gui.inputs.NumberInput
 import com.derongan.minecraft.guiy.helpers.toCell
-import com.derongan.minecraft.guiy.kotlin_dls.backButtonTo
-import com.derongan.minecraft.guiy.kotlin_dls.button
-import com.derongan.minecraft.guiy.kotlin_dls.guiyLayout
+import com.derongan.minecraft.guiy.kotlin_dsl.backButtonTo
+import com.derongan.minecraft.guiy.kotlin_dsl.button
+import com.derongan.minecraft.guiy.kotlin_dsl.guiyLayout
+import com.derongan.minecraft.guiy.kotlin_dsl.setElement
 import com.mineinabyss.idofront.items.editItemMeta
 import com.offz.spigot.mobzy.gui.layouts.MobConfigLayout
 import com.offz.spigot.mobzy.mobzy
@@ -47,6 +48,22 @@ class Property(
     }
 
     private fun readNumber(): Layout = guiyLayout {
+        val numberInput = NumberInput() //TODO make setElement return the element created
+        setElement(0, 0, numberInput) {
+            submitAction = Consumer { value: Double ->
+                this@Property.main.backInHistory()
+                this@Property.wrapped.itemStack.editItemMeta {
+                    if (this@Property.type == PropertyType.INTEGER_INPUT) {
+                        this@Property.value = value.toInt()
+                        lore = listOf(value.toInt().toString() + "")
+                    } else if (this@Property.type == PropertyType.DOUBLE_INPUT) {
+                        this@Property.value = value
+                        lore = listOf(value.toString())
+                    }
+                }
+            }
+        }
+
         backButtonTo(this@Property.main)
 
         button(0, 5, (HeadLib.PLAIN_RED.toCell("${ChatColor.RED}Delete"))) {
@@ -54,25 +71,10 @@ class Property(
             this@Property.main.backInHistory()
         }
 
-        val numberInput = NumberInput()
-        numberInput.submitAction = Consumer { value: Double ->
-            this@Property.main.backInHistory()
-            this@Property.wrapped.itemStack.editItemMeta {
-                if (this@Property.type == PropertyType.INTEGER_INPUT) {
-                    this@Property.value = value.toInt()
-                    lore = listOf(value.toInt().toString() + "")
-                } else if (this@Property.type == PropertyType.DOUBLE_INPUT) {
-                    this@Property.value = value
-                    lore = listOf(value.toString())
-                }
-            }
-        }
-
-        setElement(0, 0, numberInput)
-
-        button(4, 5, Material.DIAMOND_BLOCK.toCell("Submit Number")) {
+        this@guiyLayout.button(4, 5, Material.DIAMOND_BLOCK.toCell("Submit Number")) {
             numberInput.onSubmit()
         }
+
     }
 
     enum class PropertyType {
@@ -84,7 +86,7 @@ class Property(
             when {
                 mobConfigLayout.unusedProperties.contains(this) -> mobConfigLayout.moveToUsed(this)
                 type == PropertyType.INTEGER_INPUT || type == PropertyType.DOUBLE_INPUT -> main.setElement(readNumber())
-                type == PropertyType.STRING_INPUT -> readString()
+                type == PropertyType.STRING_INPUT -> readString() //TODO Anvil GUI doesn't work
             }
         }
     }

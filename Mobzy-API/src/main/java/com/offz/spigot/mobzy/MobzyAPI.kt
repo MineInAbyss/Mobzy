@@ -2,7 +2,6 @@
 
 package com.offz.spigot.mobzy
 
-import com.mineinabyss.idofront.entities.toNMS
 import com.mineinabyss.idofront.messaging.logInfo
 import com.offz.spigot.mobzy.mobs.CustomMob
 import com.offz.spigot.mobzy.mobs.MobTemplate
