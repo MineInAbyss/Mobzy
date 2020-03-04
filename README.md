@@ -1,7 +1,9 @@
 
 # Mobzy
 
-[![Release](https://jitpack.io/v/MineInAbyss/Mobzy.svg)](https://jitpack.io/#MineInAbyss/Mobzy)
+![Release](https://jitpack.io/v/MineInAbyss/Mobzy.svg)](https://jitpack.io/#MineInAbyss/Mobzy)
+![CI](https://github.com/MineInAbyss/Mobzy/workflows/Java%20CI/badge.svg)
+
 
 ### Intro
 
