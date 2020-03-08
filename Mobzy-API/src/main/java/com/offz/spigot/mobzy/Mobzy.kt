@@ -18,14 +18,15 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.plugin.java.JavaPlugin
 
-//TODO ensure lazy works here
-//get mobzy via bukkit once, then send that reference back afterwards
+/**
+ * Gets [Mobzy] via bukkit once, then sends that reference back afterwards
+ */
 val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 
 class Mobzy : JavaPlugin() {
     lateinit var mobzyConfig: MobzyConfig
         private set
-    lateinit var customTypes: CustomType
+    lateinit var mobzyTypes: MobzyType
         private set
 
     override fun onLoad() {
@@ -57,9 +58,7 @@ class Mobzy : JavaPlugin() {
         }
 
         //register protocol manager
-
         val protocolManager = ProtocolLibrary.getProtocolManager()!!
-
 
         protocolManager.addPacketListener(object : PacketAdapter(this, ListenerPriority.NORMAL,
                 PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
@@ -78,7 +77,7 @@ class Mobzy : JavaPlugin() {
         logger.info("On enable has been called")
         saveDefaultConfig()
         reloadConfig()
-        customTypes = CustomType() //TODO better name for class
+        mobzyTypes = MobzyType()
         mobzyConfig = MobzyConfig()
         mobzyConfig.reload() //lots of startup logic in here
 

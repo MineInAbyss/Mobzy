@@ -261,7 +261,7 @@ ottobas:
           display-name: §rRaw Ottobas Meat
       max-amount: 1
 steve:
-  model: 62
+  model: 59
   max-health: 30
   movement-speed: 0.3
   attack-damage: 4

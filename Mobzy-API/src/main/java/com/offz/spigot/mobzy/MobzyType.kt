@@ -17,7 +17,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobTemplate]
  */
-class CustomType {
+class MobzyType {
     val types: Map<String, EntityTypes<*>>
         get() = _types.toMap()
     val templateNames: Map<String, String>
