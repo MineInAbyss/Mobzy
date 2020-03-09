@@ -1,9 +1,0 @@
-name: AbyssalCreatures
-version: @plugin_version@
-author: Offz
-main: com.offz.spigot.abyssalcreatures.AbyssalCreatures
-api-version: 1.15
-depend: [Mobzy]
-
-prefix: AbyssalCreatures
-description: An implementation of the Mobzy API for the MineInAbyss server

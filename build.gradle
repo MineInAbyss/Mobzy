@@ -1,59 +1,108 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.70'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
 }
 
-ext.kotlin_version = '1.3.70'
+plugins {
+    id 'java'
+    id 'idea'
+//    id 'maven-publish'
+//    id 'org.jetbrains.kotlin.plugin.serialization' version '1.3.70'
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: "kotlin"
+
+group = 'com.github.MineInAbyss'
+version = plugin_version + '-SNAPSHOT'
+println(version)
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 
 repositories {
     mavenCentral()
+    jcenter()
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+    maven {
+        name = "MineInAbyss"
+        url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+        }
+    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://erethon.de/repo/' } //HeadLib
+    maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+    maven { url 'https://jitpack.io' } //JitPack
+    maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
+    maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+    mavenLocal()
 }
 
-subprojects {
-    group = 'com.github.MineInAbyss'
-    version = plugin_version + '-SNAPSHOT'
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT' //Spigot
+    compileOnly 'org.spigotmc:spigot:1.15-R0.1-SNAPSHOT' // NMS
+    compileOnly 'de.erethon:headlib:3.0.2'
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
+    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
+    implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
+    implementation 'org.nield:kotlin-statistics:1.2.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+//        implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0" // JVM dependency
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    if (useLocalGuiy.toBoolean()) implementation project(':guiy')
+    else implementation 'com.github.mineinabyss:guiy:kotlin-dsl-SNAPSHOT'
 
-    //Put your plugins folder directory here! If it is left as '', jars won't be copied
-    ext.plugin_path = ''
+    if (useLocalIdofront.toBoolean()) implementation project(':idofront')
+    else implementation 'com.mineinabyss:idofront:0.1.1-alpha-5'
+}
 
-    repositories {
-        mavenCentral()
-        jcenter()
-        repositories {
-            maven {
-                url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-                content {
-                    includeGroup 'org.bukkit'
-                    includeGroup 'org.spigotmc'
-                }
-            }
-            maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-            maven { url 'https://erethon.de/repo/' } //HeadLib
-            maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
-            maven { url 'https://jitpack.io' } //JitPack
-        }
-        mavenLocal()
+shadowJar {
+    getArchiveBaseName().set("Mobzy")
+    getArchiveClassifier().set(null)
+
+    relocate 'com.derongan.minecraft.guiy', "com.derongan.minecraft.guiy.${project.group}.${project.name}"
+    relocate 'com.mineinabyss.idofront', "com.mineinabyss.idofront.${project.group}.${project.name}"
+
+    minimize {
+        exclude(dependency("org.jetbrains.kotlin:.*"))
+        exclude(dependency('de.erethon:headlib:3.0.2'))
+        exclude(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
     }
+}
+build.dependsOn shadowJar
 
-    dependencies {
-        compileOnly 'org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT' //Spigot
-        compileOnly 'org.spigotmc:spigot:1.15-R0.1-SNAPSHOT' // NMS
-        compileOnly 'de.erethon:headlib:3.0.2'
-        compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [plugin_version: plugin_version]
     }
+}
 
-    compileKotlin { kotlinOptions { jvmTarget = "1.8" } }
-    compileTestKotlin { kotlinOptions { jvmTarget = "1.8" } }
+compileKotlin { kotlinOptions { jvmTarget = "1.8" } }
+compileTestKotlin { kotlinOptions { jvmTarget = "1.8" } }
 
-    processResources {
-        from(sourceSets.main.resources.srcDirs) {
-            filter ReplaceTokens, tokens: [plugin_version: plugin_version]
-        }
+//Move into plugins folder
+if (project.hasProperty("plugin_path") && plugin_path) {
+    println("Copying to plugin directory $plugin_path")
+    task copyJar(type: Copy) {
+        from shadowJar // here it automatically reads jar file produced from jar task
+        into plugin_path
     }
+    build.dependsOn copyJar
 }
