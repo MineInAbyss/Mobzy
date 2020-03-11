@@ -1,7 +1,7 @@
 name: Mobzy
 version: @plugin_version@
 author: Offz
-main: com.offz.spigot.mobzy.Mobzy
+main: com.mineinabyss.mobzy.Mobzy
 api-version: 1.15
 depend: [WorldGuard, ProtocolLib]
 

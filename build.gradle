@@ -20,13 +20,13 @@ plugins {
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "kotlin"
 
-group = 'com.github.MineInAbyss'
-version = plugin_version + '-SNAPSHOT'
-println(version)
+group = 'com.mineinabyss'
+version = plugin_version
+
+if (project.hasProperty("buildNo")) version += ".$buildNo"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
 
 repositories {
     mavenCentral()
@@ -77,8 +77,8 @@ shadowJar {
     getArchiveBaseName().set("Mobzy")
     getArchiveClassifier().set(null)
 
-    relocate 'com.derongan.minecraft.guiy', "com.derongan.minecraft.guiy.${project.group}.${project.name}"
-    relocate 'com.mineinabyss.idofront', "com.mineinabyss.idofront.${project.group}.${project.name}"
+    relocate 'com.derongan.minecraft.guiy', "${project.group}.${project.name}.guiy".toLowerCase()
+    relocate 'com.mineinabyss.idofront', "${project.group}.${project.name}.idofront".toLowerCase()
 
     minimize {
         exclude(dependency("org.jetbrains.kotlin:.*"))
