@@ -88,7 +88,7 @@ class MobzyConfig {
      * Reload the configurations stored in the plugin. Most stuff requires a full reload of the plugin now
      */
     fun reload() {
-        mobzy.customTypes.reload()
+        mobzy.mobzyTypes.reload()
         logInfo("Registered addons: $registeredAddons")
         registeredAddons.forEach { it.registerWithMobzy(mobzy) }
         loadConfigValues()

@@ -105,9 +105,9 @@ val Chunk.customMobs get() = entities.filter { it.isCustomMob }
 // CUSTOM TYPE RELATED FUNCTIONS
 //====================================================================
 
-private val types: Map<String, EntityTypes<*>> get() = mobzy.customTypes.types
-private val templateNames: Map<String, String> get() = mobzy.customTypes.templateNames
-private val templates: Map<String, MobTemplate> get() = mobzy.customTypes.templates
+private val types: Map<String, EntityTypes<*>> get() = mobzy.mobzyTypes.types
+private val templateNames: Map<String, String> get() = mobzy.mobzyTypes.templateNames
+private val templates: Map<String, MobTemplate> get() = mobzy.mobzyTypes.templates
 
 fun String.toEntityTypeID() = toLowerCase().replace(" ", "_")
 fun String.toEntityType(): EntityTypes<*> = types[toEntityTypeID()] ?: error("Mob type $this not found")
@@ -128,7 +128,7 @@ val EntityTypes<*>.mobTemplate get() = mobName.toTemplate()
 val MobTemplate.type get() = types[name.toEntityTypeID()] ?: error("No entity type found for template $this")
 
 fun Location.spawnEntity(name: String) = spawnEntity(name.toEntityType())
-fun Location.spawnEntity(type: EntityTypes<*>) = mobzy.customTypes.spawnEntity(type, this)
+fun Location.spawnEntity(type: EntityTypes<*>) = mobzy.mobzyTypes.spawnEntity(type, this)
 
 fun registerEntity(name: String,
                    type: EnumCreatureType,
@@ -136,9 +136,9 @@ fun registerEntity(name: String,
                    width: Float = 1f,
                    height: Float = 2f,
                    func: (World) -> EntityNMS) =
-        mobzy.customTypes.registerEntity(name, type, templateName, width, height, func)
+        mobzy.mobzyTypes.registerEntity(name, type, templateName, width, height, func)
 
-fun registerTypes() = mobzy.customTypes.registerTypes()
+fun registerTypes() = mobzy.mobzyTypes.registerTypes()
 
 //====================================================================
 // CONFIG REGISTRY FUNCTIONS

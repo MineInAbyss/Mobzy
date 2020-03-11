@@ -1,7 +1,5 @@
 rootProject.name = 'Mobzy'
 
-include 'Mobzy-API', 'AbyssalCreatures'
-
 //FIXME this screws up the project hierarchy but only sometimes
 if (useLocalGuiy.toBoolean()) {
     include 'guiy'
