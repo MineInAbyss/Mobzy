@@ -41,29 +41,43 @@ val Entity.isRenamed
     get() = if (toNMS().isCustomMob || customName == null) false else customName != this.mobzyID
 
 /**
- * The mobzy ID for a registered custom mob
+ * The mobzy ID for a registered custom mob.
  */
 val Entity.mobzyID get() = toNMS().mobzyID
 
 /**
- * The mobzy ID for a registered custom mob
+ * The mobzy ID for a registered custom mob.
  */
 val EntityNMS.mobzyID get() = (this.template.name).toEntityTypeID()
 
+/**
+ * Converts [Entity] to [CustomMob].
+ */
 fun Entity.toMobzy() = toNMS().toMobzy()
 
+/**
+ * Converts [EntityNMS] to [CustomMob].
+ */
 fun EntityNMS.toMobzy() = this as CustomMob
 
 /**
- * @return Whether the mob is of type of the given mob ID
+ * @return Whether the mob is of type of the given mob ID.
  */
 fun Entity.isOfType(mobID: String) = toNMS().isOfType(mobID)
 
 /**
- * @return Whether the mob is of type of the given mob ID
+ * @return Whether the mob is of type of the given mob ID.
  */
 fun EntityNMS.isOfType(mobID: String) = this.mobzyID == mobID
 
+/**
+ * The [EnumCreatureType] for this [EntityTypes] object.
+ */
+val EntityTypes<*>.creatureType: EnumCreatureType get() = this.e()
+
+/**
+ * The name of the [EnumCreatureType] of this entity.
+ */
 val EntityNMS.creatureType
     get() = this.entityType.creatureType.name
 
@@ -72,22 +86,22 @@ fun Entity.isOfCreatureType(creatureType: String) = toNMS().isOfCreatureType(cre
 fun EntityNMS.isOfCreatureType(creatureType: String) = this.entityType.creatureType.name == creatureType
 
 /**
- * @return whether this is a custom mob registered with Mobzy
+ * @return whether this is a custom mob registered with Mobzy.
  */
 val Entity.isCustomMob get() = toNMS().isCustomMob
 
 /**
- * @return whether this is a custom mob registered with Mobzy
+ * @return whether this is a custom mob registered with Mobzy.
  */
 val EntityNMS.isCustomMob get() = this is CustomMob
 
 /**
- * A custom mob's [MobTemplate] that is registered with Mobzy
+ * A custom mob's [MobTemplate] that is registered with Mobzy.
  */
 val Entity.template: MobTemplate get() = toNMS().template
 
 /**
- * A custom mob's [MobTemplate] that is registered with Mobzy
+ * A custom mob's [MobTemplate] that is registered with Mobzy.
  */
 val EntityNMS.template: MobTemplate get() = (this as CustomMob).template
 
@@ -114,10 +128,8 @@ fun String.toEntityType(): EntityTypes<*> = types[toEntityTypeID()] ?: error("Mo
 fun Set<String>.toEntityType() = types[first { types.containsKey(it.toEntityTypeID()) }.toEntityTypeID()]
         ?: error("No type found for $this. Registered types: $types")
 
-
-val EntityTypes<*>.creatureType: EnumCreatureType get() = this.e()
 /**
- * The name of the mob type
+ * The name of the mob type.
  */
 val EntityTypes<*>.name: String get() = this.f()
 val EntityTypes<*>.mobName: String get() = this.name.removePrefix("entity.minecraft.")
