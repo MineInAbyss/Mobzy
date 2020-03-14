@@ -20,7 +20,7 @@ plugins {
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "kotlin"
 
-group = 'com.github.MineInAbyss'
+group = 'com.mineinabyss'
 if (project.hasProperty("buildNo")) version += ".$buildNo"
 
 sourceCompatibility = 1.8
