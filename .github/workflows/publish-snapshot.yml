@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Load gradle cache
-      - uses: actions/cache@v1
+        uses: actions/cache@v1
         id: cache
         with:
           path: ~/.gradle/caches
