@@ -13,7 +13,7 @@ buildscript {
 plugins {
     id 'java'
     id 'idea'
-//    id 'maven-publish'
+    id 'maven-publish'
 //    id 'org.jetbrains.kotlin.plugin.serialization' version '1.3.70'
 }
 
@@ -41,14 +41,6 @@ repositories {
     maven {
         name = "MineInAbyss"
         url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-    maven {
-        name = "MineInAbyss"
-        url = uri("https://maven.pkg.github.com/MineInAbyss/Mobzy")
         credentials {
             username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
