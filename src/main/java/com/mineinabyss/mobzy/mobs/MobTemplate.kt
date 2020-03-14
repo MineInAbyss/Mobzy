@@ -1,5 +1,7 @@
 package com.mineinabyss.mobzy.mobs
 
+import com.charleskorn.kaml.Yaml
+import com.mineinabyss.idofront.items.damage
 import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable
@@ -46,7 +48,7 @@ data class MobTemplate(var name: String,
         fun deserialize(args: Map<String?, Any?>, name: String): MobTemplate {
             fun setArg(name: String, setValue: (Any) -> Unit) {
                 if (args.containsKey(name))
-                    setValue(args[name] ?: error("Failed to parse argument while serializing MobTemplate"))
+                    setValue(args[name] ?: error("Failed to parse $name while serializing MobTemplate"))
             }
 
             val configName = if (args.containsKey("name")) args["name"] as String else name
@@ -55,7 +57,7 @@ data class MobTemplate(var name: String,
             setArg("adult") { template.isAdult = it as Boolean }
             setArg("drops") { drops ->
                 template.drops = (drops as List<Map<String, Any>>)
-                        .map { MobDrop.deserialize(it) }
+                        .map { Yaml.default.parse(MobDrop.serializer(), it.toString()) }
                         .toList().requireNoNulls()
             }
             setArg("model-material") { template.modelMaterial = Material.getMaterial((it as String))!! }
