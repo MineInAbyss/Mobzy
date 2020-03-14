@@ -21,6 +21,8 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "kotlin"
 
 group = 'com.mineinabyss'
+version = plugin_version
+
 if (project.hasProperty("buildNo")) version += ".$buildNo"
 
 sourceCompatibility = 1.8
