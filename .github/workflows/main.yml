@@ -12,7 +12,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - run: cat $HOME/.m2/settings.xml
     - uses: derongan/nmsaction@v1
       with:
         rev: 1.15
