@@ -114,9 +114,6 @@ class MobzyType {
         //Call a method after the entity has been spawned and things like location have been determined
         if (nmsEntity is AfterSpawnBehaviour) (nmsEntity as AfterSpawnBehaviour).afterSpawn()
 
-        //testing the enoughSpace method
-//        if (!MobSpawn.enoughSpace(loc, nmsEntity.width, nmsEntity.length))
-//            nmsEntity.die();
         return nmsEntity?.bukkitEntity // convert to a Bukkit entity
     }
 }
