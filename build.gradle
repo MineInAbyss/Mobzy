@@ -56,12 +56,12 @@ repositories {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    getArchiveBaseName().set('sources')
+    getArchiveClassifier().set('sources')
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    getArchiveBaseName().set('javadoc')
+    getArchiveClassifier().set('javadoc')
     from javadoc.destinationDir
 }
 
