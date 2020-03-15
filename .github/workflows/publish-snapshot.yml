@@ -15,8 +15,8 @@ jobs:
         uses: actions/cache@v1
         id: cache
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: nms-build/.m2/repository
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Set up JDK 1.8
@@ -29,7 +29,6 @@ jobs:
         with:
           rev: 1.15
       - name: Install nms into m2
-        if: steps.cache.outputs.cache-hit != 'true'
         run: mkdir -p $HOME/.m2/repository && cp -a nms-build/.m2/repository/. $HOME/.m2/repository
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
