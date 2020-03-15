@@ -132,6 +132,10 @@ fun Set<String>.toEntityType() = types[first { types.containsKey(it.toEntityType
  * The name of the mob type.
  */
 val EntityTypes<*>.name: String get() = this.f()
+
+/**
+ * The mob's [EntityTypes.name] without the `entity.minecraft.` prefix
+ */
 val EntityTypes<*>.mobName: String get() = this.name.removePrefix("entity.minecraft.")
 
 fun String.toTemplate() = templates[toEntityTypeID()] ?: error("Template for $this not found")
