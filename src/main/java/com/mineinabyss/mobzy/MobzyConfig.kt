@@ -13,6 +13,12 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 
+/**
+ * @property registeredAddons A list of [MobzyAddon]s that have been registered with the plugin.
+ * @property spawnCfgs A list of [FileConfiguration]s used for defining mob spawning behaviour.
+ * @property mobCfgs A list of [FileConfiguration]s used for defining mob attributes, such as drops.
+ * @property creatureTypes A list of the types of creatures (currently everything from [EnumCreatureType].
+ */
 class MobzyConfig {
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
     val spawnCfgs: MutableMap<File, FileConfiguration> = HashMap()

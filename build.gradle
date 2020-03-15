@@ -55,6 +55,16 @@ repositories {
     mavenLocal()
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    getArchiveBaseName().set('sources')
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    getArchiveBaseName().set('javadoc')
+    from javadoc.destinationDir
+}
+
 publishing {
     repositories {
         maven {
@@ -68,14 +78,16 @@ publishing {
     }
     publications {
         gpr(MavenPublication) {
-            from(components.java)
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.15-R0.1-SNAPSHOT' //Spigot
-    compileOnly 'org.spigotmc:spigot:1.15-R0.1-SNAPSHOT' // NMS
+    compileOnly "org.spigotmc:spigot-api:$server_version" //Spigot
+    compileOnly "org.spigotmc:spigot:$server_version" // NMS
     compileOnly 'de.erethon:headlib:3.0.2'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
@@ -88,7 +100,7 @@ dependencies {
     else implementation 'com.github.mineinabyss:guiy:kotlin-dsl-SNAPSHOT'
 
     if (useLocalIdofront.toBoolean()) implementation project(':idofront')
-    else implementation 'com.mineinabyss:idofront:0.1.2-alpha.6'
+    else implementation 'com.mineinabyss:idofront:0.1.+'
 }
 
 shadowJar {

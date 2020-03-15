@@ -3,11 +3,11 @@ package com.mineinabyss.mobzy
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.logWarn
-import com.mojang.datafixers.DataFixUtils
-import com.mojang.datafixers.types.Type
 import com.mineinabyss.mobzy.mobs.MobTemplate
 import com.mineinabyss.mobzy.mobs.MobTemplate.Companion.deserialize
 import com.mineinabyss.mobzy.mobs.behaviours.AfterSpawnBehaviour
+import com.mojang.datafixers.DataFixUtils
+import com.mojang.datafixers.types.Type
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.Location
 import org.bukkit.configuration.MemorySection
@@ -16,6 +16,9 @@ import org.bukkit.event.entity.CreatureSpawnEvent
 
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobTemplate]
+ * @property templateNames Associates every mob id to a template name. We do this because some mobs may use the same
+ * template, such as NPCs.
+ * @property templates A map of mob [EntityTypes.mobName]s to [MobTemplate]s.
  */
 class MobzyType {
     val types: Map<String, EntityTypes<*>>
@@ -37,6 +40,12 @@ class MobzyType {
         return injected
     }
 
+    /**
+     * Registers the mob attributes for each item in [types] by getting their associated template from config.
+     * We end up with an updated [templates] list for reading from later.
+     *
+     * @see readTemplateConfig
+     */
     fun registerTypes() {
         logInfo("Registering types")
         for (type in _types.values) {
@@ -46,6 +55,9 @@ class MobzyType {
         logSuccess("Registered: ${types.keys}")
     }
 
+    /**
+     * Clears all stored [types], [templateNames], and [templates]
+     */
     internal fun reload() { //TODO move all the CustomType related reload stuff here
         _types.clear()
         _templateNames.clear()
@@ -54,6 +66,11 @@ class MobzyType {
 
     private fun bToa(b: EntityTypes.b<Entity>, creatureType: EnumCreatureType): EntityTypes.a<Entity> = EntityTypes.a.a(b, creatureType)
 
+    /**
+     * Deserializes the template for a given mob from any of the registered mob configurations.
+     *
+     * @param name The name of the mob type to read the template for.
+     */
     private fun readTemplateConfig(name: String): MobTemplate =
             deserialize(((mobzy.mobzyConfig.mobCfgs.values.firstOrNull { it.contains(name) }
                     ?: error("$name's builder not found"))
@@ -97,9 +114,6 @@ class MobzyType {
         //Call a method after the entity has been spawned and things like location have been determined
         if (nmsEntity is AfterSpawnBehaviour) (nmsEntity as AfterSpawnBehaviour).afterSpawn()
 
-        //testing the enoughSpace method
-//        if (!MobSpawn.enoughSpace(loc, nmsEntity.width, nmsEntity.length))
-//            nmsEntity.die();
         return nmsEntity?.bukkitEntity // convert to a Bukkit entity
     }
 }
