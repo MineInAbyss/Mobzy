@@ -1,6 +1,8 @@
 name: Java CI
 
 on: [push]
+  paths-ignore:
+    - '**.md'
 
 jobs:
   build:
