@@ -8,7 +8,7 @@ import net.minecraft.server.v1_15_R1.EnumCreatureType
 import org.bukkit.ChatColor
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.plugin.Plugin
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -30,7 +30,7 @@ class MobzyConfig {
      */
     private fun loadConfigValues() {
         val config = mobzy.config
-        with(config){
+        with(config) {
             isDebug = getBoolean("debug")
             doMobSpawns = getBoolean("doMobSpawns")
             spawnSearchRadius = (get("spawnSearchRadius") as Number).toDouble()
@@ -48,7 +48,7 @@ class MobzyConfig {
      * @param file   the file to be read from
      * @param plugin the plugin this file corresponds to
      */
-    fun registerSpawnCfg(file: File, plugin: JavaPlugin) {
+    fun registerSpawnCfg(file: File, plugin: Plugin) {
         registerCfg(spawnCfgs, file, plugin)
         readCfg(spawnCfgs[file]!!)
     }
@@ -59,14 +59,14 @@ class MobzyConfig {
      * @param file   the file to be read from
      * @param plugin the plugin this file corresponds to
      */
-    fun registerMobCfg(file: File, plugin: JavaPlugin) {
+    fun registerMobCfg(file: File, plugin: Plugin) {
         if (plugin !is MobzyAddon) error("Cannot register $plugin, it is not a MobzyAddon")
         registerCfg(mobCfgs, file, plugin)
-        if (!registeredAddons.contains(plugin)) registeredAddons.add(plugin as MobzyAddon)
+        if (!registeredAddons.contains(plugin)) registeredAddons.add(plugin)
         logInfo("Registered addons: $registeredAddons")
     }
 
-    private fun registerCfg(config: MutableMap<File, FileConfiguration>, file: File, plugin: JavaPlugin) {
+    private fun registerCfg(config: MutableMap<File, FileConfiguration>, file: File, plugin: Plugin) {
         logInfo("Registering configuration ${file.name}")
         if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdir()
         if (!file.exists()) {
@@ -96,7 +96,7 @@ class MobzyConfig {
     fun reload() {
         mobzy.mobzyTypes.reload()
         logInfo("Registered addons: $registeredAddons")
-        registeredAddons.forEach { it.registerWithMobzy(mobzy) }
+        registeredAddons.forEach { it.registerWithMobzy() }
         loadConfigValues()
         reloadConfigurationMap(mobCfgs)
         unregisterAll()

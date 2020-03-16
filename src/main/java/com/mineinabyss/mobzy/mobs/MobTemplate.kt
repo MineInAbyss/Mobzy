@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.idofront.items.damage
 import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.configuration.serialization.ConfigurationSerializable
@@ -28,9 +27,8 @@ data class MobTemplate(var name: String,
     fun chooseDrops(looting: Int = 0): List<ItemStack?> = drops.toList().map { it.chooseDrop(looting) }
 
     val modelItemStack
-        get() = ItemStack(modelMaterial, 1).editItemMeta {
-            damage = modelID
-            isUnbreakable = true
+        get() = ItemStack(modelMaterial).editItemMeta {
+            setCustomModelData(modelID)
             setDisplayName(name)
         }
 

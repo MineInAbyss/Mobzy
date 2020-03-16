@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy.listener
 
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
+import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
@@ -20,7 +21,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.world.ChunkLoadEvent
-import org.bukkit.inventory.meta.Damageable
 
 class MobListener : Listener {
     /**
@@ -50,20 +50,16 @@ class MobListener : Listener {
         if (entity is HitBehaviour) { //change the model to its hit version
             val modelID = (entity as CustomMob).template.modelID
             val ee = (entity.bukkitEntity as LivingEntity).equipment ?: return
-            val `is` = ee.helmet
-            val itemMeta = `is`!!.itemMeta
-            if (itemMeta !is Damageable) return
-            (itemMeta as Damageable).damage = modelID + 2
-            `is`.itemMeta = itemMeta
-            ee.helmet = `is`
+            ee.helmet = ee.helmet?.editItemMeta {
+                setCustomModelData(modelID + 2)
+            }
+
             //in 5 ticks change the model back to the non hit version
             Bukkit.getScheduler().runTaskLater(mobzy, Runnable {
-                if (!entity.bukkitEntity.isDead) { //get the meta again in case it has changed within the task's delay period
-                    val newMeta = `is`.itemMeta
-                    (newMeta as Damageable?)!!.damage = modelID
-                    `is`.itemMeta = newMeta
-                    ee.helmet = `is`
-                }
+                if (!entity.bukkitEntity.isDead)
+                    ee.helmet = ee.helmet?.editItemMeta {
+                        setCustomModelData(modelID)
+                    }
             }, 5)
         }
     }

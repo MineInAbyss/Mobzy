@@ -11,7 +11,7 @@ import net.minecraft.server.v1_15_R1.World
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.entity.Entity
-import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.plugin.Plugin
 import java.io.File
 import net.minecraft.server.v1_15_R1.Entity as EntityNMS
 
@@ -166,7 +166,7 @@ fun registerTypes() = mobzy.mobzyTypes.registerTypes()
  * @param configuration the file in which to look for a configuration
  * @param plugin        the plugin this configuration file corresponds to
  */
-fun registerSpawnConfig(configuration: File, plugin: JavaPlugin) =
+fun registerSpawnConfig(configuration: File, plugin: Plugin) =
         mobzy.mobzyConfig.registerSpawnCfg(configuration, plugin)
 
 /**
@@ -175,5 +175,5 @@ fun registerSpawnConfig(configuration: File, plugin: JavaPlugin) =
  * @param configuration the file in which to look for a configuration
  * @param plugin        the plugin this configuration file corresponds to
  */
-fun registerMobConfig(configuration: File, plugin: JavaPlugin) =
+fun registerMobConfig(configuration: File, plugin: Plugin) =
         mobzy.mobzyConfig.registerMobCfg(configuration, plugin)
