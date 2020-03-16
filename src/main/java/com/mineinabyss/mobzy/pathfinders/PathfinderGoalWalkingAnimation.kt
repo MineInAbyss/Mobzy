@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.idofront.messaging.logInfo
 import org.bukkit.entity.LivingEntity
 
 class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID: Int) : PathfinderGoal() {
@@ -16,14 +15,9 @@ class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID:
     override fun shouldKeepExecuting(): Boolean = shouldExecute()
 
     override fun init() {
-        logInfo("init!")
-        mob.equipment!!.helmet = model.editItemMeta {
-            setCustomModelData(modelID + 1)
-        }
     }
 
     override fun reset() {
-        logInfo("reset!")
         mob.equipment!!.helmet = model.editItemMeta {
             setCustomModelData(modelID)
         }
@@ -31,6 +25,8 @@ class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID:
     }
 
     override fun execute() {
+        mob.equipment!!.helmet = model.editItemMeta {
+            setCustomModelData(modelID + 1)
+        }
     }
-
 }

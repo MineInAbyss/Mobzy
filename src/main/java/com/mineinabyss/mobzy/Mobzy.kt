@@ -69,7 +69,6 @@ class Mobzy : JavaPlugin() {
                 }
             }
         })
-
     }
 
     override fun onEnable() {
@@ -144,10 +143,12 @@ class Mobzy : JavaPlugin() {
 
     companion object {
         private const val REGISTERED_ADDONS_KEY = "addons"
+
         //TODO Make these into their own custom flags instead of StringFlag
         //TODO rename this to MZ_... in the WorldGuard config files :mittysweat:
         @JvmStatic
         var MZ_SPAWN_REGIONS: StringFlag? = null
+
         @JvmStatic
         var MZ_SPAWN_OVERLAP: StringFlag? = null
     }
