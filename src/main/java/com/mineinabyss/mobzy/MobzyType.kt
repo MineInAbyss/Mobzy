@@ -1,18 +1,27 @@
 package com.mineinabyss.mobzy
 
+import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.mobzy.mobs.MobTemplate
-import com.mineinabyss.mobzy.mobs.MobTemplate.Companion.deserialize
 import com.mineinabyss.mobzy.mobs.behaviours.AfterSpawnBehaviour
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.internal.LinkedHashMapSerializer
+import kotlinx.serialization.internal.StringSerializer
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.Location
-import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
 import org.bukkit.event.entity.CreatureSpawnEvent
+import kotlin.collections.Map
+import kotlin.collections.MutableMap
+import kotlin.collections.first
+import kotlin.collections.mapOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
+import kotlin.collections.toMap
 
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobTemplate]
@@ -30,7 +39,7 @@ class MobzyType {
 
     private val _types: MutableMap<String, EntityTypes<*>> = mutableMapOf()
     private val _templateNames: MutableMap<String, String> = mutableMapOf()
-    private val _templates: MutableMap<String, MobTemplate> = mutableMapOf()
+    private var _templates: Map<String, MobTemplate> = mutableMapOf()
 
     fun registerEntity(name: String, type: EnumCreatureType, templateName: String, width: Float, height: Float, func: (World) -> Entity): EntityTypes<*> {
         val mobID = name.toEntityTypeID()
@@ -48,10 +57,7 @@ class MobzyType {
      */
     fun registerTypes() {
         logInfo("Registering types")
-        for (type in _types.values) {
-            val name = type.mobName
-            _templates[name] = readTemplateConfig(_templateNames[name]!!)
-        }
+        _templates = readTemplateConfig()
         logSuccess("Registered: ${types.keys}")
     }
 
@@ -61,7 +67,7 @@ class MobzyType {
     internal fun reload() { //TODO move all the CustomType related reload stuff here
         _types.clear()
         _templateNames.clear()
-        _templates.clear()
+        _templates = mapOf()
     }
 
     private fun bToa(b: EntityTypes.b<Entity>, creatureType: EnumCreatureType): EntityTypes.a<Entity> = EntityTypes.a.a(b, creatureType)
@@ -71,11 +77,13 @@ class MobzyType {
      *
      * @param name The name of the mob type to read the template for.
      */
-    private fun readTemplateConfig(name: String): MobTemplate =
-            deserialize(((mobzy.mobzyConfig.mobCfgs.values.firstOrNull { it.contains(name) }
-                    ?: error("$name's builder not found"))
-                    [name] as MemorySection)
-                    .getValues(true), name)
+    private fun readTemplateConfig(): Map<String, MobTemplate> =
+            Yaml.default.parse((StringSerializer to MobTemplate.serializer()).map,
+                    mobzy.mobzyConfig.mobCfgs.values.first { true }.saveToString()) //TODO run on all mobCfgs
+
+    //TODO temporarily copied over while there are some problems with Shorthands.kt
+    val <K, V> Pair<KSerializer<K>, KSerializer<V>>.map: KSerializer<Map<K, V>>
+        get() = LinkedHashMapSerializer(this.first, this.second)
 
     /**
      * Injects an entity into the server

@@ -30,7 +30,7 @@ abstract class HostileMob(world: World?, override var template: MobTemplate) : E
     //implementation of behaviours
 
     override fun createPathfinders() {
-        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.modelID))
+        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.model))
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalMeleeAttackPitchLock(this))
         addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))

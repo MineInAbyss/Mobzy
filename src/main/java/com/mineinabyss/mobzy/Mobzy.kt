@@ -1,13 +1,18 @@
 package com.mineinabyss.mobzy
 
+import com.charleskorn.kaml.Yaml
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import com.derongan.minecraft.guiy.GuiListener
+import com.mineinabyss.idofront.messaging.logInfo
+import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.mobs.DateSerializer
+import com.mineinabyss.mobzy.mobs.SpigotSerializer
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.flags.StringFlag
@@ -16,7 +21,10 @@ import net.minecraft.server.v1_15_R1.EntityLiving
 import net.minecraft.server.v1_15_R1.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 
 /**
  * Gets [Mobzy] via bukkit once, then sends that reference back afterwards
@@ -74,6 +82,9 @@ class Mobzy : JavaPlugin() {
     override fun onEnable() {
         //Plugin startup logic
         logger.info("On enable has been called")
+
+        logSuccess(Yaml.default.stringify(DateSerializer, Date()))
+
         saveDefaultConfig()
         reloadConfig()
         mobzyTypes = MobzyType()

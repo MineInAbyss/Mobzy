@@ -5,6 +5,7 @@ package com.mineinabyss.mobzy
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobTemplate
+import kotlinx.serialization.ImplicitReflectionSerializer
 import net.minecraft.server.v1_15_R1.EntityTypes
 import net.minecraft.server.v1_15_R1.EnumCreatureType
 import net.minecraft.server.v1_15_R1.World

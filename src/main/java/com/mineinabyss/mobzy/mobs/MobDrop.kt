@@ -1,38 +1,58 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.idofront.items.editItemMeta
-import org.bukkit.Bukkit
+import kotlinx.serialization.*
+import kotlinx.serialization.internal.PrimitiveDescriptor
+import kotlinx.serialization.internal.SerialClassDescImpl
+import kotlinx.serialization.internal.StringDescriptor
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.inventory.ItemStack
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.roundToInt
 import kotlin.random.Random
-import kotlin.reflect.KClass
 
-@Serializer(forClass = ConfigurationSerializable::class)
-class SpigotSerializer<T : ConfigurationSerializable>(private val serializableClass: KClass<T>) : KSerializer<T> {
-    override val descriptor: SerialDescriptor = SerialClassDescImpl(serializableClass.simpleName!!)
+@Serializer(forClass = ItemStack::class)
+object SpigotSerializer : KSerializer<ItemStack> {
+    override val descriptor: SerialDescriptor = SerialClassDescImpl("ItemStack")
 
-    override fun serialize(encoder: Encoder, obj: T) {
+    override fun serialize(encoder: Encoder, obj: ItemStack) {
+        obj.serialize()
         val yamlConfig = YamlConfiguration()
         yamlConfig.set("", obj) //TODO don't know if this will set it like I think it will
         encoder.encodeString(yamlConfig.saveToString())
     }
 
-    override fun deserialize(decoder: Decoder): T {
+    override fun deserialize(decoder: Decoder): ItemStack {
         val yamlConfig = YamlConfiguration()
         yamlConfig.loadFromString(decoder.decodeString())
-        return yamlConfig.get("") as T
+        return yamlConfig.get("") as ItemStack
+    }
+}
+
+@Serializer(forClass = Date::class)
+object DateSerializer: KSerializer<Date> {
+    private val df: DateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS")
+
+    override val descriptor: SerialDescriptor = StringDescriptor
+
+    override fun serialize(encoder: Encoder, obj: Date) {
+        encoder.encodeString(df.format(obj))
+    }
+
+    override fun deserialize(decoder: Decoder): Date {
+        return df.parse(decoder.decodeString())
     }
 }
 
 @Serializable
-data class MobDrop(//@Serializable(with = SpigotSerializer::class) val item: ItemStack,
-//                   val material: Material,
-        val minAmount: Int = 1,
-        val maxAmount: Int = 1,
-        val dropChance: Double = 1.0) {
+data class MobDrop(
+        @Serializable(with = SpigotSerializer::class) val item: ItemStack? = null,
+        val material: Material? = null,
+        @SerialName("min-amount") val minAmount: Int = 1,
+        @SerialName("max-amount") val maxAmount: Int = 1,
+        @SerialName("drop-chance") val dropChance: Double = 1.0) {
     /**
      * @return The amount of items to be dropped, or null if the drop does not succeed
      * TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.

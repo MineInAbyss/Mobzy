@@ -48,7 +48,7 @@ class MobListener : Listener {
     fun onHit(e: EntityDamageEvent) {
         val entity = (e.entity as CraftEntity).handle
         if (entity is HitBehaviour) { //change the model to its hit version
-            val modelID = (entity as CustomMob).template.modelID
+            val modelID = (entity as CustomMob).template.model
             val ee = (entity.bukkitEntity as LivingEntity).equipment ?: return
             ee.helmet = ee.helmet?.editItemMeta {
                 setCustomModelData(modelID + 2)
