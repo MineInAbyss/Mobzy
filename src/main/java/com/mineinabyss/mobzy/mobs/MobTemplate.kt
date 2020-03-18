@@ -33,7 +33,7 @@ data class MobTemplate(
                 ?: error("Template was accessed but not registered in any mob configuration")).key
     }
 
-    fun chooseDrops(looting: Int = 0): List<ItemStack?> = drops.toList().map { it.chooseDrop(looting) }
+    fun chooseDrops(looting: Int = 0, fire: Int = 0): List<ItemStack?> = drops.toList().map { it.chooseDrop(looting, fire) }
 
     val modelItemStack
         get() = ItemStack(modelMaterial).editItemMeta {

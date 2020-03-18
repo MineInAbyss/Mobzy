@@ -104,8 +104,10 @@ interface CustomMob {
             if (!entity.world.isClientSide) {
                 if (world.gameRules.getBoolean(GameRules.DO_MOB_LOOT)) {
                     val killer = killer?.bukkitEntity
-                    val looting = killer?.inventory?.itemInMainHand?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
-                    CraftEventFactory.callEntityDeathEvent(entity, template.chooseDrops(looting))
+                    val heldItem = killer?.inventory?.itemInMainHand
+                    val looting = heldItem?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
+                    val fireAspect = heldItem?.enchantments?.get(Enchantment.FIRE_ASPECT) ?: 0
+                    CraftEventFactory.callEntityDeathEvent(entity, template.chooseDrops(looting, fireAspect))
                     entity.expToDrop = expToDrop()
                     dropExp()
                 } else CraftEventFactory.callEntityDeathEvent(entity)
