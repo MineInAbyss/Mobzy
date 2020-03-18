@@ -35,7 +35,6 @@ class MobListener : Listener {
     fun onStatisticIncrement(e: PlayerStatisticIncrementEvent) { //if the statistic is entity related and the entity is null, it must be custom, therefore we cancel the event
         if (e.statistic.type == Statistic.Type.ENTITY && e.entityType == null) {
             e.isCancelled = true
-            //            CustomMobsAPI.debug(ChatColor.RED + "Overrode statistic");
         }
     }
 

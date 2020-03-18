@@ -89,13 +89,13 @@ dependencies {
     compileOnly "org.spigotmc:spigot-api:$server_version" //Spigot
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
     compileOnly 'de.erethon:headlib:3.0.2'
-    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.2' //WorldGuard
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
     implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
     implementation 'org.nield:kotlin-statistics:1.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "com.charleskorn.kaml:kaml:0.16.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0" // JVM dependency
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0") // JVM dependency
 
     if (useLocalGuiy.toBoolean()) implementation project(':guiy')
     else implementation 'com.github.mineinabyss:guiy:kotlin-dsl-SNAPSHOT'

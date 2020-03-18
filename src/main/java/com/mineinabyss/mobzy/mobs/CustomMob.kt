@@ -112,7 +112,6 @@ interface CustomMob {
             }
 
             world.broadcastEntityEffect(entity, 3.toByte())
-//            entity.setPose(EntityPose.DYING)
             //TODO add PlaceHolderAPI support
             template.deathCommands.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it) }
         }

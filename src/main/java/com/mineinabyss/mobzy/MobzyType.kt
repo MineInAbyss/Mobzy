@@ -8,44 +8,33 @@ import com.mineinabyss.mobzy.mobs.MobTemplate
 import com.mineinabyss.mobzy.mobs.behaviours.AfterSpawnBehaviour
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.internal.LinkedHashMapSerializer
-import kotlinx.serialization.internal.StringSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
 import org.bukkit.event.entity.CreatureSpawnEvent
-import kotlin.collections.Map
-import kotlin.collections.MutableMap
-import kotlin.collections.first
-import kotlin.collections.mapOf
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
-import kotlin.collections.toMap
 
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobTemplate]
- * @property templateNames Associates every mob id to a template name. We do this because some mobs may use the same
- * template, such as NPCs.
  * @property templates A map of mob [EntityTypes.mobName]s to [MobTemplate]s.
  */
 class MobzyType {
-    val types: Map<String, EntityTypes<*>>
-        get() = _types.toMap()
-    val templateNames: Map<String, String>
-        get() = _templateNames.toMap()
-    val templates: Map<String, MobTemplate>
-        get() = _templates.toMap()
+    val types: Map<String, EntityTypes<*>> get() = _types.toMap()
+    val templates: Map<String, MobTemplate> get() = _templates.toMap()
 
     private val _types: MutableMap<String, EntityTypes<*>> = mutableMapOf()
-    private val _templateNames: MutableMap<String, String> = mutableMapOf()
-    private var _templates: Map<String, MobTemplate> = mutableMapOf()
+    private var _templates: Map<String, MobTemplate> = mapOf()
+    private val hardCodedTemplates: MutableMap<String, MobTemplate> = mutableMapOf()
 
-    fun registerEntity(name: String, type: EnumCreatureType, templateName: String, width: Float, height: Float, func: (World) -> Entity): EntityTypes<*> {
+    fun registerHardCodedTemplate(mob: String, template: MobTemplate) = hardCodedTemplates.put(mob.toEntityTypeID(), template)
+
+    val MobTemplate.type get() = types[name.toEntityTypeID()] ?: error("No entity type found for template $this")
+    fun registerEntity(name: String, type: EnumCreatureType, width: Float, height: Float, func: (World) -> Entity): EntityTypes<*> {
         val mobID = name.toEntityTypeID()
         val injected: EntityTypes<*> = injectNewEntity(mobID, "zombie", bToa(EntityTypes.b { _, world -> func(world) }, type).c().a(width, height))
         _types[mobID] = injected
-        _templateNames[mobID] = templateName
         return injected
     }
 
@@ -57,38 +46,33 @@ class MobzyType {
      */
     fun registerTypes() {
         logInfo("Registering types")
-        _templates = readTemplateConfig()
+        _templates = hardCodedTemplates.plus(readTemplateConfig())
         logSuccess("Registered: ${types.keys}")
     }
 
     /**
-     * Clears all stored [types], [templateNames], and [templates]
+     * Deserializes the templates for all mobs in the configuration
      */
+    private fun readTemplateConfig(): Map<String, MobTemplate> {
+        val map = mutableMapOf<String, MobTemplate>()
+        mobzy.mobzyConfig.mobCfgs.values.forEach {
+            map.putAll(Yaml.default.parse(MapSerializer(String.serializer(), MobTemplate.serializer()), it.saveToString()))
+        }
+        return map.toMap()
+    }
+
+    /** Clears all stored [types], and [templates] */
     internal fun reload() { //TODO move all the CustomType related reload stuff here
         _types.clear()
-        _templateNames.clear()
         _templates = mapOf()
     }
 
     private fun bToa(b: EntityTypes.b<Entity>, creatureType: EnumCreatureType): EntityTypes.a<Entity> = EntityTypes.a.a(b, creatureType)
 
     /**
-     * Deserializes the template for a given mob from any of the registered mob configurations.
-     *
-     * @param name The name of the mob type to read the template for.
-     */
-    private fun readTemplateConfig(): Map<String, MobTemplate> =
-            Yaml.default.parse((StringSerializer to MobTemplate.serializer()).map,
-                    mobzy.mobzyConfig.mobCfgs.values.first { true }.saveToString()) //TODO run on all mobCfgs
-
-    //TODO temporarily copied over while there are some problems with Shorthands.kt
-    val <K, V> Pair<KSerializer<K>, KSerializer<V>>.map: KSerializer<Map<K, V>>
-        get() = LinkedHashMapSerializer(this.first, this.second)
-
-    /**
      * Injects an entity into the server
      *
-     * Originally from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
+     * Originally from [paper forms](https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293)
      */
     private fun injectNewEntity(name: String, extend_from: String, a: EntityTypes.a<Entity>): EntityTypes<Entity> { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
         @Suppress("UNCHECKED_CAST") val dataTypes = DataConverterRegistry.a()
