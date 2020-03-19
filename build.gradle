@@ -111,13 +111,13 @@ shadowJar {
     relocate 'com.derongan.minecraft.guiy', "${project.group}.${project.name}.guiy".toLowerCase()
     relocate 'com.mineinabyss.idofront', "${project.group}.${project.name}.idofront".toLowerCase()
 
-    /*minimize {
+    minimize {
         exclude(dependency("org.jetbrains.kotlin:.*"))
         exclude(dependency("org.jetbrains.kotlinx:kotlinx-serialization-runtime:.*"))
         exclude(dependency("com.charleskorn.kaml:kaml:.*"))
         exclude(dependency('de.erethon:headlib:3.0.2'))
         exclude(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
-    }*/
+    }
 }
 build.dependsOn shadowJar
 
