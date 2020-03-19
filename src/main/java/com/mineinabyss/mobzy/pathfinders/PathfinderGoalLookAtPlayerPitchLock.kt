@@ -16,7 +16,7 @@ class PathfinderGoalLookAtPlayerPitchLock(
     override fun shouldExecute(): Boolean {
         if (Random.nextFloat() >= startChance) return false
 
-        if (nmsEntity.goalTarget != null) {
+        if (target != null) {
             lookAt = nmsEntity.goalTarget!!.living
             return true
         }
@@ -25,7 +25,6 @@ class PathfinderGoalLookAtPlayerPitchLock(
                 .ifEmpty { return false }
                 .filter { other -> other!!.toNMS().entityType === targetType }
                 .minBy { mob.distanceTo(it) }
-//        nmsEntity.goalTarget = lookAt!!.toNMS() as EntityLiving
         return true
     }
 

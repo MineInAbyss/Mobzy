@@ -10,7 +10,7 @@ class PathfinderGoalFlyDamageTarget(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
     override fun shouldKeepExecuting(): Boolean = false
 
     override fun execute() {
-        lastHit = System.currentTimeMillis()
+        restartCooldown()
         val target = target ?: return
         val attackDamage: Double = mob.staticTemplate.attackDamage ?: return
         //if within range, harm

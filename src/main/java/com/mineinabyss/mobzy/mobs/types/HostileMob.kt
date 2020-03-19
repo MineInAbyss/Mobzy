@@ -3,8 +3,8 @@ package com.mineinabyss.mobzy.mobs.types
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobTemplate
 import com.mineinabyss.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalMeleeAttackPitchLock
 import com.mineinabyss.mobzy.pathfinders.PathfinderGoalWalkingAnimation
+import com.mineinabyss.mobzy.pathfinders.hostile.PathfinderGoalMeleeAttackPitchLock
 import com.mineinabyss.mobzy.toTemplate
 import com.mineinabyss.mobzy.type
 import net.minecraft.server.v1_15_R1.*

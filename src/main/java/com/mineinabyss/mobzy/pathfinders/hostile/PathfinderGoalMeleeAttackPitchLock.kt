@@ -1,6 +1,7 @@
-package com.mineinabyss.mobzy.pathfinders
+package com.mineinabyss.mobzy.pathfinders.hostile
 
 import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 
 class PathfinderGoalMeleeAttackPitchLock(mob: CustomMob, private val speed: Double = 1.0) : MobzyPathfinderGoal(mob) {
     override fun shouldExecute(): Boolean = target != null && cooledDown
@@ -8,7 +9,7 @@ class PathfinderGoalMeleeAttackPitchLock(mob: CustomMob, private val speed: Doub
     override fun shouldKeepExecuting(): Boolean = false
 
     override fun execute() {
-        lastHit = System.currentTimeMillis()
+        restartCooldown()
         val target = target ?: return
         mob.lookAtPitchLock(target)
 

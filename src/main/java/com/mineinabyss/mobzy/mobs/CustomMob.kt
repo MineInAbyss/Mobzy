@@ -30,9 +30,9 @@ interface CustomMob {
     val living: LivingEntity get() = entity.bukkitEntity as LivingEntity
     val template: MobTemplate
     val staticTemplate: MobTemplate get() = entity.entityType.mobTemplate
-    val x: Double get() = living.location.x
-    val y: Double get() = living.location.y
-    val z: Double get() = living.location.z
+    val locX: Double get() = living.location.x
+    val locY: Double get() = living.location.y
+    val locZ: Double get() = living.location.z
     private val world: World get() = (living.world as CraftWorld).handle
     private val location: Location get() = living.location
     val navigation: Navigation
@@ -94,7 +94,7 @@ interface CustomMob {
     fun dieCM(damageSource: DamageSource?) {
         if (!killedMZ) {
             killedMZ = true
-            debug("${ChatColor.RED}${template.name} died at coords ${x.toInt()} ${y.toInt()} ${z.toInt()}")
+            debug("${ChatColor.RED}${template.name} died at coords ${locX.toInt()} ${locY.toInt()} ${locZ.toInt()}")
             if (killScore >= 0 && killer != null) killer!!.a(entity, killScore, damageSource)
             // this line causes the entity to send a statistics update on death (we don't want this as it causes a NPE exception and crash)
 //            if (entity != null) entity.b(this);
@@ -153,7 +153,7 @@ interface CustomMob {
      */
     fun findNearbyPlayer(range: Double) = world.findNearbyPlayer(this.entity, range)
 
-    fun lookAt(x: Double, z: Double) = lookAt(x, y, z)
+    fun lookAt(x: Double, z: Double) = lookAt(x, locY, z)
 
     fun lookAt(x: Double, y: Double, z: Double) {
         val dirBetweenLocations = org.bukkit.util.Vector(x, y, z).subtract(location.toVector())
@@ -181,7 +181,7 @@ interface CustomMob {
 
     fun lookAtPitchLock(entity: Entity) = lookAtPitchLock(entity.location)
 
-    fun canReach(target: Entity) = distanceTo(target) < entity.width / 2 + 1
+    fun canReach(target: Entity) = distanceTo(target) < entity.width / 2.0 + 1.5
 
 //    fun jump() = (entity as EntityInsentient).controllerJump.jump()
 }
