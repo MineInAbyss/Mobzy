@@ -29,7 +29,7 @@ abstract class PassiveMob(world: World?, override var template: MobTemplate) : E
     //implementation of behaviours
 
     override fun createPathfinders() {
-        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.modelID))
+        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.model))
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))

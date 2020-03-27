@@ -3,14 +3,13 @@ package com.mineinabyss.mobzy.pathfinders.flying
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 
-class PathfinderGoalFlyDamageTarget(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
-
+class PathfinderGoalFlyDamageTarget(override val mob: FlyingMob) : MobzyPathfinderGoal() {
     override fun shouldExecute(): Boolean = target != null && cooledDown
 
     override fun shouldKeepExecuting(): Boolean = false
 
     override fun execute() {
-        lastHit = System.currentTimeMillis()
+        restartCooldown()
         val target = target ?: return
         val attackDamage: Double = mob.staticTemplate.attackDamage ?: return
         //if within range, harm

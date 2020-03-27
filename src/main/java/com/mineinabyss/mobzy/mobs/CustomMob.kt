@@ -1,12 +1,12 @@
 package com.mineinabyss.mobzy.mobs
 
+import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.mobTemplate
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.Navigation
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.SoundCategory
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
@@ -30,9 +30,9 @@ interface CustomMob {
     val living: LivingEntity get() = entity.bukkitEntity as LivingEntity
     val template: MobTemplate
     val staticTemplate: MobTemplate get() = entity.entityType.mobTemplate
-    val x: Double get() = living.location.x
-    val y: Double get() = living.location.y
-    val z: Double get() = living.location.z
+    val locX: Double get() = living.location.x
+    val locY: Double get() = living.location.y
+    val locZ: Double get() = living.location.z
     private val world: World get() = (living.world as CraftWorld).handle
     private val location: Location get() = living.location
     val navigation: Navigation
@@ -72,7 +72,7 @@ interface CustomMob {
      */
     fun createFromBase() {
 //        entity.expToDrop = 3
-        living.addScoreboardTag("customMob2")
+        living.addScoreboardTag("customMob3")
         living.addScoreboardTag(template.name)
 
         //create an item based on model ID in head slot if entity will be using itself for the model
@@ -94,7 +94,7 @@ interface CustomMob {
     fun dieCM(damageSource: DamageSource?) {
         if (!killedMZ) {
             killedMZ = true
-            debug("${ChatColor.RED}${template.name} died at coords ${x.toInt()} ${y.toInt()} ${z.toInt()}")
+            debug("&c${template.name} died at coords ${locX.toInt()} ${locY.toInt()} ${locZ.toInt()}".color())
             if (killScore >= 0 && killer != null) killer!!.a(entity, killScore, damageSource)
             // this line causes the entity to send a statistics update on death (we don't want this as it causes a NPE exception and crash)
 //            if (entity != null) entity.b(this);
@@ -104,15 +104,16 @@ interface CustomMob {
             if (!entity.world.isClientSide) {
                 if (world.gameRules.getBoolean(GameRules.DO_MOB_LOOT)) {
                     val killer = killer?.bukkitEntity
-                    val looting = killer?.inventory?.itemInMainHand?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
-                    CraftEventFactory.callEntityDeathEvent(entity, template.chooseDrops(looting))
+                    val heldItem = killer?.inventory?.itemInMainHand
+                    val looting = heldItem?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
+                    val fireAspect = heldItem?.enchantments?.get(Enchantment.FIRE_ASPECT) ?: 0
+                    CraftEventFactory.callEntityDeathEvent(entity, template.chooseDrops(looting, fireAspect))
                     entity.expToDrop = expToDrop()
                     dropExp()
                 } else CraftEventFactory.callEntityDeathEvent(entity)
             }
 
             world.broadcastEntityEffect(entity, 3.toByte())
-//            entity.setPose(EntityPose.DYING)
             //TODO add PlaceHolderAPI support
             template.deathCommands.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it) }
         }
@@ -152,7 +153,7 @@ interface CustomMob {
      */
     fun findNearbyPlayer(range: Double) = world.findNearbyPlayer(this.entity, range)
 
-    fun lookAt(x: Double, z: Double) = lookAt(x, y, z)
+    fun lookAt(x: Double, z: Double) = lookAt(x, locY, z)
 
     fun lookAt(x: Double, y: Double, z: Double) {
         val dirBetweenLocations = org.bukkit.util.Vector(x, y, z).subtract(location.toVector())
@@ -180,7 +181,7 @@ interface CustomMob {
 
     fun lookAtPitchLock(entity: Entity) = lookAtPitchLock(entity.location)
 
-    fun canReach(target: Entity) = distanceTo(target) < entity.width / 2 + 1
+    fun canReach(target: Entity) = distanceTo(target) < entity.width / 2.0 + 1.5
 
 //    fun jump() = (entity as EntityInsentient).controllerJump.jump()
 }

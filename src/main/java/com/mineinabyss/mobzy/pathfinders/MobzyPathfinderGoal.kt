@@ -9,20 +9,25 @@ import org.bukkit.GameMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
-abstract class MobzyPathfinderGoal(protected val mob: CustomMob, private val cooldown: Long = 500) : PathfinderGoal() {
-    protected val entity: LivingEntity = mob.entity.bukkitEntity as LivingEntity
-    protected val nmsEntity: EntityInsentient = mob.entity as EntityInsentient
-    protected val moveController: ControllerMove
-        get() = nmsEntity.controllerMove
-    protected val navigation = mob.navigation
+abstract class MobzyPathfinderGoal(private val cooldown: Long = 500) : PathfinderGoal() {
+    abstract val mob: CustomMob
+    protected val entity: LivingEntity by lazy { mob.entity.bukkitEntity as LivingEntity }
+    protected val nmsEntity: EntityInsentient by lazy { mob.entity as EntityInsentient }
+    protected val moveController: ControllerMove get() = nmsEntity.controllerMove
+    protected val navigation by lazy { mob.navigation }
     protected var target
         get() = nmsEntity.goalTarget?.living
         set(value) {
             nmsEntity.goalTarget = value?.toNMS<EntityLiving>()
         }
 
-    protected var lastHit: Long = 0
-    protected val cooledDown get() = lastHit < System.currentTimeMillis() - cooldown
+    private var cooldownStart: Long = 0
+
+    fun restartCooldown() {
+        cooldownStart = System.currentTimeMillis()
+    }
+
+    protected val cooledDown get() = cooldownStart < System.currentTimeMillis() - cooldown
 
     override fun init() = Unit
 

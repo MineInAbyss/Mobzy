@@ -6,7 +6,10 @@ import com.mineinabyss.mobzy.pathfinders.living
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
-class PathfinderGoalHurtByTarget(mob: CustomMob, val range: Double = mob.staticTemplate.followRange ?: 0.0) : MobzyPathfinderGoal(mob) {
+class PathfinderGoalHurtByTarget(
+        override val mob: CustomMob,
+        val range: Double = mob.staticTemplate.followRange ?: 0.0
+) : MobzyPathfinderGoal() {
     private lateinit var playerDamager: Player
     override fun shouldExecute(): Boolean {
         val damager = (nmsEntity.lastDamager ?: return false).living

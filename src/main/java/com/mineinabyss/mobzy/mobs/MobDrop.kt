@@ -1,77 +1,48 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.idofront.items.editItemMeta
-import org.bukkit.Bukkit
-import org.bukkit.Material
-import org.bukkit.configuration.serialization.ConfigurationSerializable
+import com.mineinabyss.idofront.messaging.color
+import com.mineinabyss.idofront.recpies.addFurnaceRecipe
+import com.mineinabyss.idofront.serialization.SerializableItemStack
+import com.mineinabyss.mobzy.mobzy
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.bukkit.ChatColor
 import org.bukkit.inventory.ItemStack
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-data class MobDrop(val item: ItemStack,
-                   val minAmount: Int = 1,
-                   val maxAmount: Int = 1,
-                   val dropChance: Double = 1.0) : ConfigurationSerializable {
+@Serializable
+data class MobDrop(
+        val item: SerializableItemStack,
+        @SerialName("cooked-item") val cooked: SerializableItemStack? = null,
+        @SerialName("cook-exp") val cookExp: Float = 0f,
+        @SerialName("cook-time") val cookTime: Int = 160,
+        @SerialName("min-amount") val minAmount: Int = 1,
+        @SerialName("max-amount") val maxAmount: Int = 1,
+        @SerialName("drop-chance") val dropChance: Double = 1.0) {
+    init {
+        if (cooked != null) {
+            val cookedItem = cooked.toItemStack()
+            //TODO pretty hacky way of adding recipes. Won't reload them from config if they've changed.
+            try {
+                addFurnaceRecipe(ChatColor.stripColor(cookedItem.itemMeta!!.displayName.color('§').replace(' ', '_'))!!, cookedItem, item.toItemStack(), cookExp, cookTime, mobzy)
+            } catch (e: IllegalStateException) {
+            }
+        }
+    }
+
     /**
      * @return The amount of items to be dropped, or null if the drop does not succeed
      * TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.
      */
-    fun chooseDrop(lootingLevel: Int = 0): ItemStack? {
+    fun chooseDrop(lootingLevel: Int = 0, fire: Int = 0): ItemStack? {
         val lootingPercent = lootingLevel / 100.0
         val lootingMaxAmount: Int = if (dropChance >= 0.5) (maxAmount + lootingLevel * Random.nextDouble()).roundToInt() else maxAmount
         val lootingDropChance = if (dropChance >= 0.10) dropChance * (10.0 + lootingLevel) / 10.0 else dropChance + lootingPercent
         return if (Random.nextDouble() < lootingDropChance) {
-            val drop = item.clone()
+            val drop = if (fire > 0 && cooked != null) cooked.toItemStack() else item.toItemStack()
             drop.amount = if (lootingMaxAmount <= minAmount) minAmount else Random.nextInt(minAmount, lootingMaxAmount)
             drop
         } else null
-    }
-
-    override fun serialize(): Map<String, Any> = TODO("No serialization implementation yet")
-
-    companion object {
-
-        //TODO convert to use kotlinx.serialization
-        /**
-         * Required method for configuration serialization
-         *
-         * @param args map to deserialize
-         * @return deserialized item stack
-         * @see ConfigurationSerializable
-         */
-        fun deserialize(args: Map<String, Any>): MobDrop? {
-            val item = when {
-                args.containsKey("item") -> args["item"] as ItemStack
-                args.containsKey("material") -> try {
-                    ItemStack(Material.getMaterial(args["material"] as String)!!)
-                } catch (e: Exception) {
-                    Bukkit.getConsoleSender().sendMessage("Deserializing $args")
-                    e.printStackTrace()
-                    return null
-                }
-                else -> null
-            } ?: return null
-
-            if (args.containsKey("custom-model-data")) item.editItemMeta {
-                setCustomModelData((args["custom-model-data"] as Int))
-            }
-
-            val dropChance = if (args.containsKey("drop-chance"))
-                args["drop-chance"] as Double
-            else 1.0
-
-            if (args.containsKey("amount")) {
-                val amount = args["amount"] as Int
-                return MobDrop(item, amount, amount, dropChance)
-            }
-
-            if (!(args.containsKey("min-amount") && args.containsKey("max-amount")))
-                return MobDrop(item, 1, 1, dropChance)
-
-            val minAmount = args["min-amount"] as Int
-            val maxAmount = args["max-amount"] as Int
-
-            return MobDrop(item, minAmount, maxAmount, dropChance)
-        }
     }
 }

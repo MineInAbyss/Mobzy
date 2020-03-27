@@ -6,14 +6,14 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 class PathfinderGoalDiveOnTargetAttack(
-        mob: FlyingMob,
+        override val mob: FlyingMob,
         private val diveVelocity: Double = -0.3,
         private val minHeight: Double = 6.0,
         private val maxHeight: Double = 10.0,
         private val startDiveDistance: Double = 16.0,
         private val startDiveHeightRange: Double = 2.0,
         private val bashVelMultiplier: Double = 0.6,
-        private val bashDuration: Double = 30.0) : MobzyPathfinderGoal(mob) {
+        private val bashDuration: Double = 30.0) : MobzyPathfinderGoal() {
     private var currentAction = Action.FLY
     private var diveHeight: Double = pickDiveHeight()
     private var bashLeft = bashDuration
@@ -42,7 +42,7 @@ class PathfinderGoalDiveOnTargetAttack(
 
         //if arrived to dive
         val diveTarget = target.location.clone().add(0.0, diveHeight, 0.0)
-        if (diveTarget.distance(target.location) < startDiveDistance && abs(mob.y - diveTarget.y) < startDiveHeightRange) {
+        if (diveTarget.distance(target.location) < startDiveDistance && abs(mob.locY - diveTarget.y) < startDiveHeightRange) {
             diveHeight = pickDiveHeight()
             currentAction = Action.DIVE
             return
@@ -56,7 +56,7 @@ class PathfinderGoalDiveOnTargetAttack(
         val target = target ?: return
         mob.lookAtPitchLock(target)
         val targetLoc = target.location
-        if (mob.distanceTo(target) < 2 || entity.velocity.y == 0.0 || mob.y <= target.location.y + 1.0) {
+        if (mob.distanceTo(target) < 2 || entity.velocity.y == 0.0 || mob.locY <= target.location.y + 1.0) {
             currentAction = Action.BASH
             bashVelX = entity.location.direction.x * bashVelMultiplier
             bashVelZ = entity.location.direction.z * bashVelMultiplier
@@ -67,7 +67,7 @@ class PathfinderGoalDiveOnTargetAttack(
     }
 
     private fun bash() {
-        mob.lookAt(mob.x + bashVelX, mob.z + bashVelZ)
+        mob.lookAt(mob.locX + bashVelX, mob.locZ + bashVelZ)
         entity.velocity = entity.velocity.setX(bashVelX).setZ(bashVelZ)
         if (bashLeft-- <= 0 || target == null || mob.distanceTo(target!!) < 2 || entity.velocity.x == 0.0 || entity.velocity.z == 0.0) {
             currentAction = Action.FLY

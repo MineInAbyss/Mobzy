@@ -38,17 +38,17 @@ fun debug(message: String, colorChar: Char? = null) {
  * Whether an entity is a renamed mob registered with Mobzy.
  */
 val Entity.isRenamed
-    get() = if (toNMS().isCustomMob || customName == null) false else customName != this.mobzyID
+    get() = if (toNMS().isCustomMob || customName == null) false else customName != this.mobName
 
 /**
  * The mobzy ID for a registered custom mob.
  */
-val Entity.mobzyID get() = toNMS().mobzyID
+val Entity.mobName get() = toNMS().mobName
 
 /**
  * The mobzy ID for a registered custom mob.
  */
-val EntityNMS.mobzyID get() = (this.template.name).toEntityTypeID()
+val EntityNMS.mobName get() = this.entityType.mobName
 
 /**
  * Converts [Entity] to [CustomMob].
@@ -68,7 +68,7 @@ fun Entity.isOfType(mobID: String) = toNMS().isOfType(mobID)
 /**
  * @return Whether the mob is of type of the given mob ID.
  */
-fun EntityNMS.isOfType(mobID: String) = this.mobzyID == mobID
+fun EntityNMS.isOfType(mobID: String) = this.mobName == mobID
 
 /**
  * The [EnumCreatureType] for this [EntityTypes] object.
@@ -120,7 +120,6 @@ val Chunk.customMobs get() = entities.filter { it.isCustomMob }
 //====================================================================
 
 private val types: Map<String, EntityTypes<*>> get() = mobzy.mobzyTypes.types
-private val templateNames: Map<String, String> get() = mobzy.mobzyTypes.templateNames
 private val templates: Map<String, MobTemplate> get() = mobzy.mobzyTypes.templates
 
 fun String.toEntityTypeID() = toLowerCase().replace(" ", "_")
@@ -138,21 +137,23 @@ val EntityTypes<*>.name: String get() = this.f()
  */
 val EntityTypes<*>.mobName: String get() = this.name.removePrefix("entity.minecraft.")
 
-fun String.toTemplate() = templates[toEntityTypeID()] ?: error("Template for $this not found")
 val EntityTypes<*>.mobTemplate get() = mobName.toTemplate()
-
+fun String.toTemplate() = templates[toEntityTypeID()] ?: error("Template for $this not found")
 val MobTemplate.type get() = types[name.toEntityTypeID()] ?: error("No entity type found for template $this")
 
 fun Location.spawnEntity(name: String) = spawnEntity(name.toEntityType())
 fun Location.spawnEntity(type: EntityTypes<*>) = mobzy.mobzyTypes.spawnEntity(type, this)
 
+
+fun registerHardCodedTemplate(mob: String, template: MobTemplate): MobTemplate =
+        mobzy.mobzyTypes.registerHardCodedTemplate(mob, template).let { template }
+
 fun registerEntity(name: String,
                    type: EnumCreatureType,
-                   templateName: String = name,
                    width: Float = 1f,
                    height: Float = 2f,
                    func: (World) -> EntityNMS) =
-        mobzy.mobzyTypes.registerEntity(name, type, templateName, width, height, func)
+        mobzy.mobzyTypes.registerEntity(name, type, width, height, func)
 
 fun registerTypes() = mobzy.mobzyTypes.registerTypes()
 

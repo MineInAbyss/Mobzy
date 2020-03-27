@@ -2,7 +2,10 @@ package com.mineinabyss.mobzy
 
 import com.mineinabyss.idofront.commands.Command.PlayerExecution
 import com.mineinabyss.idofront.commands.IdofrontCommandExecutor
-import com.mineinabyss.idofront.commands.arguments.*
+import com.mineinabyss.idofront.commands.arguments.BooleanArg
+import com.mineinabyss.idofront.commands.arguments.IntArg
+import com.mineinabyss.idofront.commands.arguments.StringArg
+import com.mineinabyss.idofront.commands.arguments.StringListArg
 import com.mineinabyss.idofront.commands.onExecuteByPlayer
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
@@ -15,7 +18,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 
-class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
+object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         command("mobzy", "mz") {
             command("configinfo", "cfginfo", desc = "Information about the current state of the plugin") {
@@ -39,7 +42,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
             commandGroup {
                 val entityType by +StringArg("entity type")
-                val radius by +CustomArg<Int>("radius", { arg.toInt() }) {
+                val radius by +IntArg("radius") {
                     default = 0
                     ensureChangedByPlayer()
                 }

@@ -6,7 +6,7 @@ import org.bukkit.Location
 import org.bukkit.util.Vector
 import kotlin.random.Random
 
-open class PathfinderGoalIdleFly(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
+open class PathfinderGoalIdleFly(override val mob: FlyingMob) : MobzyPathfinderGoal() {
     protected var targetLoc: Location? = null
 
     //if there isn't an operation to move somewhere, we can start looking for somewhere to fly
@@ -19,9 +19,9 @@ open class PathfinderGoalIdleFly(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
     }
 
     override fun init() {
-        val x = mob.x + Random.nextDouble(-16.0, 16.0)
-        val y = mob.y + Random.nextDouble(-16.0, 12.0) //make it more likely to fly down
-        val z = mob.z + Random.nextDouble(-16.0, 16.0)
+        val x = mob.locX + Random.nextDouble(-16.0, 16.0)
+        val y = mob.locY + Random.nextDouble(-16.0, 12.0) //make it more likely to fly down
+        val z = mob.locZ + Random.nextDouble(-16.0, 16.0)
         val loc = Location(entity.world, x, y, z)
         if (!loc.block.isPassable)
             return

@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.pathfinders.flying
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 
-class PathfinderGoalFlyTowardsTarget(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
+class PathfinderGoalFlyTowardsTarget(override val mob: FlyingMob) : MobzyPathfinderGoal() {
     override fun shouldExecute(): Boolean = (target != null)
 
     override fun shouldKeepExecuting(): Boolean = target != null
@@ -16,7 +16,7 @@ class PathfinderGoalFlyTowardsTarget(mob: FlyingMob) : MobzyPathfinderGoal(mob) 
         moveController.a(targetLoc.x, targetLoc.y, targetLoc.z, 1.0) //TODO change to wrapper
 
         //aim slightly higher when below target to fix getting stuck
-        if (targetLoc.y > mob.y)
-            moveController.a(targetLoc.x, mob.y + 1, targetLoc.z, 1.0)
+        if (targetLoc.y > mob.locY)
+            moveController.a(targetLoc.x, mob.locY + 1, targetLoc.z, 1.0)
     }
 }

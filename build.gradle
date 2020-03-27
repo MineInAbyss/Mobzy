@@ -14,7 +14,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-//    id 'org.jetbrains.kotlin.plugin.serialization' version '1.3.70'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.3.70'
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -27,6 +27,9 @@ if (project.hasProperty("buildNo")) version += ".$buildNo"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+def github_username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+def github_password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
 
 repositories {
     mavenCentral()
@@ -42,8 +45,24 @@ repositories {
         name = "MineInAbyss"
         url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
         credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            username = github_username
+            password = github_password
+        }
+    }
+    maven {
+        name = "MineInAbyss"
+        url = uri("https://maven.pkg.github.com/MineInAbyss/Guiy")
+        credentials {
+            username = github_username
+            password = github_password
+        }
+    }
+    maven {
+        name = "CultOfClang"
+        url = uri("https://maven.pkg.github.com/CultOfClang/Minecraft/")
+        credentials {
+            username = github_username
+            password = github_password
         }
     }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -68,11 +87,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
+            name = "Mobzy"
             url = uri("https://maven.pkg.github.com/MineInAbyss/Mobzy")
             credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+                username = github_username
+                password = github_password
             }
         }
     }
@@ -88,19 +107,18 @@ publishing {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:$server_version" //Spigot
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
-    compileOnly 'de.erethon:headlib:3.0.2'
-    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0' //WorldGuard
-    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
-    implementation 'com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'
-    implementation 'org.nield:kotlin-statistics:1.2.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-//        implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0" // JVM dependency
+    compileOnly "de.erethon:headlib:3.0.2"
+    compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2" //WorldGuard
+    compileOnly "com.comphenix.protocol:ProtocolLib:4.5.0"
+    compileOnly "com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721"
+    compileOnly "org.nield:kotlin-statistics:1.2.1"
+    compileOnly "org.cultofclang.minecraft:kotlinspice:0.1.12"
 
     if (useLocalGuiy.toBoolean()) implementation project(':guiy')
-    else implementation 'com.github.mineinabyss:guiy:kotlin-dsl-SNAPSHOT'
+    else implementation "com.derongan.minecraft:guiy:0.1.+"
 
     if (useLocalIdofront.toBoolean()) implementation project(':idofront')
-    else implementation 'com.mineinabyss:idofront:0.1.+'
+    else implementation "com.mineinabyss:idofront:0.1.+"
 }
 
 shadowJar {
@@ -111,7 +129,6 @@ shadowJar {
     relocate 'com.mineinabyss.idofront', "${project.group}.${project.name}.idofront".toLowerCase()
 
     minimize {
-        exclude(dependency("org.jetbrains.kotlin:.*"))
         exclude(dependency('de.erethon:headlib:3.0.2'))
         exclude(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
     }

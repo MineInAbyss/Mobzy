@@ -3,10 +3,12 @@ package com.mineinabyss.mobzy.listener
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.mobzy.mobName
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.toNMS
+import com.mineinabyss.mobzy.toTemplate
 import net.minecraft.server.v1_15_R1.EntityHuman
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
@@ -22,7 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.world.ChunkLoadEvent
 
-class MobListener : Listener {
+object MobListener : Listener {
     /**
      * We use this method to prevent any entity related statistics if they are from our custom mobs, since it causes
      * server crashes. This is mainly used to prevent entity killing players statistic changes, since player killing
@@ -35,7 +37,6 @@ class MobListener : Listener {
     fun onStatisticIncrement(e: PlayerStatisticIncrementEvent) { //if the statistic is entity related and the entity is null, it must be custom, therefore we cancel the event
         if (e.statistic.type == Statistic.Type.ENTITY && e.entityType == null) {
             e.isCancelled = true
-            //            CustomMobsAPI.debug(ChatColor.RED + "Overrode statistic");
         }
     }
 
@@ -48,7 +49,7 @@ class MobListener : Listener {
     fun onHit(e: EntityDamageEvent) {
         val entity = (e.entity as CraftEntity).handle
         if (entity is HitBehaviour) { //change the model to its hit version
-            val modelID = (entity as CustomMob).template.modelID
+            val modelID = (entity as CustomMob).template.model
             val ee = (entity.bukkitEntity as LivingEntity).equipment ?: return
             ee.helmet = ee.helmet?.editItemMeta {
                 setCustomModelData(modelID + 2)
@@ -65,11 +66,22 @@ class MobListener : Listener {
     }
 
     /**
-     * Remove all old entities, which still contain the "customMob" tag (now "customMob2")
+     * Remove all old entities, which still contain the original `customMob` tag
+     *
+     * Updates `customMob2` entities with old damage values for models to the new custom-model-data tag
      */
     @EventHandler
     fun onChunkLoad(e: ChunkLoadEvent) {
-        e.chunk.entities.filter { it.scoreboardTags.contains("customMob") }.forEach { it.remove() }
+        for (entity in e.chunk.entities) {
+            if (entity.scoreboardTags.contains("customMob")) {
+                entity.remove()
+            } else if (entity.scoreboardTags.contains("customMob2") && entity is LivingEntity) {
+                //TODO have ONLY ONE way of accessing the mob template so we don't have to do dumb stuff like this!!!
+                entity.equipment?.helmet = entity.toNMS().entityType.mobName.toTemplate().modelItemStack
+                entity.removeScoreboardTag("customMob2")
+                entity.addScoreboardTag("customMob3")
+            }
+        }
     }
 
     /**

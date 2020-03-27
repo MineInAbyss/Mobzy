@@ -26,14 +26,14 @@ class SpawnTask : BukkitRunnable() {
 
             val container = WorldGuard.getInstance().platform.regionContainer
 
-            Bukkit.getOnlinePlayers().toList().toPlayerGroups().forEach { playerGroup->
+            Bukkit.getOnlinePlayers().toList().toPlayerGroups().forEach { playerGroup ->
                 val regionManager = container[BukkitAdapter.adapt(playerGroup[0].world)] ?: return@forEach
                 val toSpawn: MutableList<MobSpawnEvent> = mutableListOf()
 
                 //STEP 1: Generate array of ChunkSpawns around player group
-               val spawnChunkGrid = SpawnChunkGrid(playerGroup.map { it.location }, MobzyConfig.minChunkSpawnRad, MobzyConfig.maxChunkSpawnRad)
+                val spawnChunkGrid = SpawnChunkGrid(playerGroup.map { it.location }, MobzyConfig.minChunkSpawnRad, MobzyConfig.maxChunkSpawnRad)
 
-                val customMobs = spawnChunkGrid.allChunks.customMobs
+                val customMobs = spawnChunkGrid.allChunks.filter { it.isLoaded }.customMobs
 
                 Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable {
                     val entityTypeCounts = customMobs.toEntityTypeCounts()
