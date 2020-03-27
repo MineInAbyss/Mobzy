@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.pathfinders.hostile
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 
-class PathfinderGoalMeleeAttackPitchLock(mob: CustomMob, private val speed: Double = 1.0) : MobzyPathfinderGoal(mob) {
+class PathfinderGoalMeleeAttackPitchLock(override val mob: CustomMob, private val speed: Double = 1.0) : MobzyPathfinderGoal() {
     override fun shouldExecute(): Boolean = target != null && cooledDown
 
     override fun shouldKeepExecuting(): Boolean = false

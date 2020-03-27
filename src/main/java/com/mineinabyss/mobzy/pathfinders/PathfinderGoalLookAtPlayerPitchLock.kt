@@ -6,10 +6,10 @@ import net.minecraft.server.v1_15_R1.EntityTypes
 import kotlin.random.Random
 
 class PathfinderGoalLookAtPlayerPitchLock(
-        mob: CustomMob,
+        override val mob: CustomMob,
         private val targetType: EntityTypes<*>,
         private val radius: Double,
-        private val startChance: Float = 0.02f) : MobzyPathfinderGoal(mob) {
+        private val startChance: Float = 0.02f) : MobzyPathfinderGoal() {
     var lookAt: org.bukkit.entity.Entity? = null
     private var length = 0
 

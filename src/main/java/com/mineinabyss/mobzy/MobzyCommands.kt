@@ -18,7 +18,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 
-class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
+object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         command("mobzy", "mz") {
             command("configinfo", "cfginfo", desc = "Information about the current state of the plugin") {

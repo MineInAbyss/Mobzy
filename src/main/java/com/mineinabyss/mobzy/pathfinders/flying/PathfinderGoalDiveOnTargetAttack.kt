@@ -6,14 +6,14 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 class PathfinderGoalDiveOnTargetAttack(
-        mob: FlyingMob,
+        override val mob: FlyingMob,
         private val diveVelocity: Double = -0.3,
         private val minHeight: Double = 6.0,
         private val maxHeight: Double = 10.0,
         private val startDiveDistance: Double = 16.0,
         private val startDiveHeightRange: Double = 2.0,
         private val bashVelMultiplier: Double = 0.6,
-        private val bashDuration: Double = 30.0) : MobzyPathfinderGoal(mob) {
+        private val bashDuration: Double = 30.0) : MobzyPathfinderGoal() {
     private var currentAction = Action.FLY
     private var diveHeight: Double = pickDiveHeight()
     private var bashLeft = bashDuration

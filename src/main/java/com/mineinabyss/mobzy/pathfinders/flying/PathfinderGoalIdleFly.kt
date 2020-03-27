@@ -6,7 +6,7 @@ import org.bukkit.Location
 import org.bukkit.util.Vector
 import kotlin.random.Random
 
-open class PathfinderGoalIdleFly(mob: FlyingMob) : MobzyPathfinderGoal(mob) {
+open class PathfinderGoalIdleFly(override val mob: FlyingMob) : MobzyPathfinderGoal() {
     protected var targetLoc: Location? = null
 
     //if there isn't an operation to move somewhere, we can start looking for somewhere to fly

@@ -19,7 +19,7 @@ import org.bukkit.ChatColor
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
- * Gets [Mobzy] via bukkit once, then sends that reference back afterwards
+ * Gets [Mobzy] via Bukkit once, then sends that reference back afterwards
  */
 val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 
@@ -74,10 +74,6 @@ class Mobzy : JavaPlugin() {
     override fun onEnable() {
         //Plugin startup logic
         logger.info("On enable has been called")
-
-//        val test = org.bukkit.configuration.file.YamlConfiguration().apply { loadFromString(Yaml.default.stringify(SpigotSerializer, ItemStack(Material.STONE))) }
-//        test.getItemStack("")
-
         saveDefaultConfig()
         reloadConfig()
         mobzyTypes = MobzyType()
@@ -85,7 +81,7 @@ class Mobzy : JavaPlugin() {
         mobzyConfig.reload() //lots of startup logic in here
 
         //Register events
-        server.pluginManager.registerEvents(MobListener(), this)
+        server.pluginManager.registerEvents(MobListener, this)
         server.pluginManager.registerEvents(GuiListener(this), this)
 
         //Reload existing addons
@@ -98,7 +94,7 @@ class Mobzy : JavaPlugin() {
         }*/
 
         //Register commands
-        MobzyCommands()
+        MobzyCommands
     }
 
     private var spawnTaskID = -1
@@ -123,7 +119,7 @@ class Mobzy : JavaPlugin() {
         Bukkit.getServer().worlds.forEach { world ->
             world.entities.filter {
                 if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
-                it.scoreboardTags.contains("customMob2") && it.toNMS() !is CustomMob
+                it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
             }.forEach {
                 val replacement = it.location.spawnEntity((it.scoreboardTags).toEntityType())!!.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()

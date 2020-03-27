@@ -1,12 +1,12 @@
 package com.mineinabyss.mobzy.mobs
 
+import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.mobTemplate
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.Navigation
 import net.minecraft.server.v1_15_R1.*
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.SoundCategory
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
@@ -72,7 +72,7 @@ interface CustomMob {
      */
     fun createFromBase() {
 //        entity.expToDrop = 3
-        living.addScoreboardTag("customMob2")
+        living.addScoreboardTag("customMob3")
         living.addScoreboardTag(template.name)
 
         //create an item based on model ID in head slot if entity will be using itself for the model
@@ -94,7 +94,7 @@ interface CustomMob {
     fun dieCM(damageSource: DamageSource?) {
         if (!killedMZ) {
             killedMZ = true
-            debug("${ChatColor.RED}${template.name} died at coords ${locX.toInt()} ${locY.toInt()} ${locZ.toInt()}")
+            debug("&c${template.name} died at coords ${locX.toInt()} ${locY.toInt()} ${locZ.toInt()}".color())
             if (killScore >= 0 && killer != null) killer!!.a(entity, killScore, damageSource)
             // this line causes the entity to send a statistics update on death (we don't want this as it causes a NPE exception and crash)
 //            if (entity != null) entity.b(this);
