@@ -3,12 +3,12 @@ package com.mineinabyss.mobzy.listener
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.mobzy.mobName
+import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.toNMS
-import com.mineinabyss.mobzy.toTemplate
 import net.minecraft.server.v1_15_R1.EntityHuman
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
@@ -77,7 +77,7 @@ object MobListener : Listener {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is LivingEntity) {
                 //TODO have ONLY ONE way of accessing the mob template so we don't have to do dumb stuff like this!!!
-                entity.equipment?.helmet = entity.toNMS().entityType.mobName.toTemplate().modelItemStack
+                entity.equipment?.helmet = MobzyTemplates[entity.toNMS().entityType.typeName].modelItemStack
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             }
@@ -86,9 +86,7 @@ object MobListener : Listener {
 
     /**
      * The magic method that lets you hit entities in their server side hitboxes
-     * TODO this doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do.
-     *
-     * @param e the event
+     * TODO this doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do
      */
     @EventHandler
     fun onLeftClick(e: PlayerInteractEvent) { // TODO I'd like some way to ignore hits onto the disguised entity. Perhaps use a marker armorstand?

@@ -9,10 +9,15 @@ import com.mineinabyss.idofront.commands.arguments.StringListArg
 import com.mineinabyss.idofront.commands.onExecuteByPlayer
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.api.isOfType
+import com.mineinabyss.mobzy.api.isRenamed
+import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.gui.MobzyGUI
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -23,20 +28,18 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
         command("mobzy", "mz") {
             command("configinfo", "cfginfo", desc = "Information about the current state of the plugin") {
                 onExecute {
-                    val config = mobzy.mobzyConfig
                     sender.info(("""
                             LOG OF CURRENTLY REGISTERED STUFF:
-                            Mob configs: ${config.mobCfgs}
-                            Spawn configs: ${config.spawnCfgs}
-                            Registered addons: ${config.registeredAddons}
-                            Registered EntityTypes: ${mobzy.mobzyTypes.types}""".trimIndent()))
+                            Mob configs: ${MobzyConfig.mobCfgs}
+                            Spawn configs: ${MobzyConfig.spawnCfgs}
+                            Registered addons: ${MobzyConfig.registeredAddons}
+                            Registered EntityTypes: ${MobzyTypes.typeNames}""".trimIndent()))
                 }
             }
 
             command("reload", "rl", desc = "Reloads the configuration files") {
                 onExecute {
-                    mobzy.mobzyConfig.reload()
-                    sender.info("Reloaded config files (not necessarily successfully) :p")
+                    MobzyConfig.reload(sender)
                 }
             }
 
@@ -86,7 +89,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             command("spawn", "s", desc = "Spawns a custom mob") {
-                val mobName by +StringListArg("mob name", options = mobzy.mobzyTypes.types.keys.toList()) {
+                val mobName by +StringListArg("mob name", options = MobzyTypes.typeNames) {
                     parseErrorMessage = { "No such entity: $it" }
                 }
                 var numOfSpawns by +IntArg("number of mobs to spawn") { default = 1 }
@@ -98,7 +101,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
             command("list", "l", desc = "Lists all custom mob types") {
                 onExecute {
-                    sender.success("All registered types:\n${mobzy.mobzyTypes.types.keys}")
+                    sender.success("All registered types:\n${MobzyTypes.typeNames}")
                 }
             }
 
@@ -128,7 +131,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
         val subCommand = args[0]
         if (subCommand == "spawn" || subCommand == "s")
             if (args.size == 2) {
-                return mobzy.mobzyTypes.types.keys
+                return MobzyTypes.typeNames
                         .filter { it.startsWith(args[1].toLowerCase()) }
             } else if (args.size == 3) {
                 var min = 1
@@ -142,7 +145,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
         if (subCommand in listOf("remove", "rm", "info", "i"))
             if (args.size == 2) {
                 val mobs: MutableList<String> = ArrayList()
-                mobs.addAll(mobzy.mobzyTypes.types.keys)
+                mobs.addAll(MobzyTypes.typeNames)
                 mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
                 return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
             }

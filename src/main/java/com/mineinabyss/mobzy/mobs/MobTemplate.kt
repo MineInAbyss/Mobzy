@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.registration.MobzyTemplates
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material
@@ -23,15 +24,12 @@ data class MobTemplate(
         @SerialName("follow-range") val followRange: Double? = null,
         @SerialName("attack-damage") val attackDamage: Double? = null,
         @SerialName("min-exp") val minExp: Int? = null,
-        @SerialName("max-exp") var maxExp: Int? = null, //TODO if max > min, this equals min
+        @SerialName("max-exp") val maxExp: Int? = null,
         @SerialName("adult") val isAdult: Boolean = true,
         @SerialName("death-commands") val deathCommands: List<String> = ArrayList(),
         val drops: List<MobDrop> = listOf()) {
-
-    val name by lazy {
-        _name ?: (mobzy.mobzyTypes.templates.entries.find { (_, template) -> template === this }
-                ?: error("Template was accessed but not registered in any mob configuration")).key
-    }
+    val name by lazy { _name ?: MobzyTemplates.getNameForTemplate(this) }
+    val type get() = MobzyTypes[name]
 
     fun chooseDrops(looting: Int = 0, fire: Int = 0): List<ItemStack?> = drops.toList().map { it.chooseDrop(looting, fire) }
 

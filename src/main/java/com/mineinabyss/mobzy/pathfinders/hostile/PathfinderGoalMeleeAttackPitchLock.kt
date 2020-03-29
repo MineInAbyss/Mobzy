@@ -14,7 +14,7 @@ class PathfinderGoalMeleeAttackPitchLock(override val mob: CustomMob, private va
         mob.lookAtPitchLock(target)
 
         if (mob.canReach(target))
-            target.damage(mob.staticTemplate.attackDamage ?: 0.0, entity)
+            target.damage(mob.template.attackDamage ?: 0.0, entity)
 
         navigation.moveToEntity(target, speed)
     }

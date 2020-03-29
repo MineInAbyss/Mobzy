@@ -111,7 +111,7 @@ dependencies {
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2" //WorldGuard
     compileOnly "com.comphenix.protocol:ProtocolLib:4.5.0"
     compileOnly "com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721"
-    compileOnly "org.nield:kotlin-statistics:1.2.1"
+    implementation "org.nield:kotlin-statistics:1.2.1"
     compileOnly "org.cultofclang.minecraft:kotlinspice:0.1.12"
 
     if (useLocalGuiy.toBoolean()) implementation project(':guiy')
