@@ -61,7 +61,7 @@ object MobListener : Listener {
                     ee.helmet = ee.helmet?.editItemMeta {
                         setCustomModelData(modelID)
                     }
-            }, 5)
+            }, 7)
         }
     }
 
