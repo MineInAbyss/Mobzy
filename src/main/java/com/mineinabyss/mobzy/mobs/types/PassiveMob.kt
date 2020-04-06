@@ -1,35 +1,29 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.mobs.MobTemplate
 import com.mineinabyss.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import com.mineinabyss.mobzy.pathfinders.PathfinderGoalWalkingAnimation
-import com.mineinabyss.mobzy.toTemplate
-import com.mineinabyss.mobzy.type
+import com.mineinabyss.mobzy.registration.MobzyTemplates
 import net.minecraft.server.v1_15_R1.*
 
 /**
  * Originally based off EntityPig
  */
-abstract class PassiveMob(world: World?, override var template: MobTemplate) : EntityAnimal(template.type as EntityTypes<out EntityAnimal>, world), CustomMob {
-    constructor(world: World?, name: String) : this(world, name.toTemplate())
-
+abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTemplates[name].type as EntityTypes<out EntityAnimal>, world), CustomMob {
     //implementation of properties from CustomMob
     override var killedMZ: Boolean
         get() = killed
         set(value) {
             killed = value
         }
-    override val entity: EntityLiving
-        get() = this
-
+    override val entity: EntityLiving get() = this
     override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime //TODO I want a consistent fix for the ambiguity errors, this might be it
     override val killScore: Int = aW
 
     //implementation of behaviours
 
     override fun createPathfinders() {
-        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, staticTemplate.model))
+        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, template.model))
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))

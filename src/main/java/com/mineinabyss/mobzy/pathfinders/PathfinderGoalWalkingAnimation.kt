@@ -9,6 +9,7 @@ class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID:
 
     override fun shouldExecute(): Boolean {
         val velocity = mob.velocity
+        //play animation when model is not hit model
         return model.itemMeta!!.customModelData != modelID + 2 && !(velocity.x in -0.001..0.001 && velocity.z in -0.001..0.001)
     }
 
@@ -18,9 +19,10 @@ class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID:
     }
 
     override fun reset() {
-        mob.equipment!!.helmet = model.editItemMeta {
-            setCustomModelData(modelID)
-        }
+        if (model.itemMeta!!.customModelData != modelID + 2)
+            mob.equipment!!.helmet = model.editItemMeta {
+                setCustomModelData(modelID)
+            }
 
     }
 

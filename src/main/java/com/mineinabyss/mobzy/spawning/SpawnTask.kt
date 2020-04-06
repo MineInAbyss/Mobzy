@@ -2,6 +2,8 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
+import com.mineinabyss.mobzy.api.creatureType
+import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.sk89q.worldedit.bukkit.BukkitAdapter
@@ -14,8 +16,9 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.nield.kotlinstatistics.dbScanCluster
 
+private const val SPAWN_TRIES = 5
+
 class SpawnTask : BukkitRunnable() {
-    private val config: MobzyConfig = mobzy.mobzyConfig
 
     override fun run() {
         try { //run checks asynchronously
@@ -43,7 +46,7 @@ class SpawnTask : BukkitRunnable() {
                     customMobs.toCreatureTypeCounts().forEach spawnPerType@{ (type, count) ->
                         var newCount = count
                         val creatureTypeCap = MobzyConfig.getMobCap(type)
-                        spawnChunkGrid.shuffledSpawns().forEach spawnLoop@{ chunkSpawn ->
+                        spawnChunkGrid.shuffledSpawns.forEach spawnLoop@{ chunkSpawn ->
                             if (newCount > creatureTypeCap)
 //                                    || newCount - count > creatureTypeCap / 4) //never spawn more than a fourth of the mobs in one run
                                 return@spawnPerType
@@ -54,7 +57,7 @@ class SpawnTask : BukkitRunnable() {
                             val validSpawns = RandomCollection<MobSpawn>()
                             regionManager.getWorldGuardRegions(spawnArea)
                                     .filterWhenOverlapFlag()
-                                    .getMobSpawnsForRegions(type) //convert to a list of MobSpawns
+                                    .getMobSpawnsForRegions(type)
                                     .forEach { validSpawns.add(it.getPriority(spawnArea, entityTypeCounts), it) }
 
                             if (validSpawns.isEmpty) return@spawnLoop
@@ -87,21 +90,15 @@ class SpawnTask : BukkitRunnable() {
         }
     }
 
-    companion object {
-        private const val SPAWN_TRIES = 5
-    }
-
-    /**
-     * @return A map of the names of creature types to the number of creatures of that type, without types that have
-     * exceeded the mob cap.
-     */
+    /** Convert a list of entities to: a map of the names of creature types to the number of creatures of that type,
+     * without types that have exceeded their mob cap. */
     private fun List<Entity>.toCreatureTypeCounts(): Map<String, Int> =
-            config.creatureTypes.associateWith { 0 }
+            MobzyConfig.creatureTypes.associateWith { 0 }
                     .plus(map { it.toNMS().creatureType }.groupingBy { it }.eachCount())
                     .filter { (type, count) -> count < MobzyConfig.getMobCap(type) }
 
-    //TODO we aren't using the center for anything right now, might just remove it
-    private fun List<Player>.toPlayerGroups() = groupBy { it.world }
+    /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
+    private fun List<Player>.toPlayerGroups(): List<List<Player>> = groupBy { it.world }
             .flatMap { (_, players) ->
                 players.dbScanCluster(
                         maximumRadius = MobzyConfig.spawnSearchRadius,
@@ -111,23 +108,20 @@ class SpawnTask : BukkitRunnable() {
                 )
             }.map { it.points }
 
+    /** Converts a list of entities to a map of entity types to the amount of entities of that type. */
     private fun List<Entity>.toEntityTypeCounts(): MutableMap<String, Int> =
-            map { it.toNMS().entityType.name }.groupingBy { it }.eachCountTo(mutableMapOf())
+            map { it.toNMS().entityType.keyName }.groupingBy { it }.eachCountTo(mutableMapOf())
 
-    /**
-     * @return If any of the overlapping regions is set to override, return a list with only the highest priority one,
-     * otherwise the original list
-     */
+    /** If any of the overlapping regions is set to override, return a list with only the highest priority one,
+     * otherwise the original list. */
     private fun List<ProtectedRegion>.filterWhenOverlapFlag(): List<ProtectedRegion> =
             firstOrNull { region -> region.flags.containsKey(MZ_SPAWN_OVERLAP) && region.getFlag(MZ_SPAWN_OVERLAP) == "override" }
                     ?.let {
                         return listOf(it)
                     } ?: this
 
-    /**
-     * @return the list of mob spawns based on WorldGuard regions, then remove all impossible spawns,
-     * and make entity weighted decision on the spawn
-     */
+    /** The list of mob spawns based on WorldGuard regions, then remove all impossible spawns, and make entity weighted
+     * decision on the spawn. */
     private fun RegionManager.getWorldGuardRegions(spawnArea: SpawnArea) =
             getApplicableRegions(BukkitAdapter.asBlockVector(spawnArea.bottom)).regions.sorted()
 }

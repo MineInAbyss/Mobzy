@@ -1,21 +1,17 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.mobs.MobTemplate
 import com.mineinabyss.mobzy.pathfinders.controllers.MZControllerMoveFlying
 import com.mineinabyss.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget
 import com.mineinabyss.mobzy.pathfinders.flying.PathfinderGoalHurtByTarget
 import com.mineinabyss.mobzy.pathfinders.flying.PathfinderGoalIdleFly
-import com.mineinabyss.mobzy.toTemplate
-import com.mineinabyss.mobzy.type
+import com.mineinabyss.mobzy.registration.MobzyTemplates
 import net.minecraft.server.v1_15_R1.*
 
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
  */
-abstract class FlyingMob(world: World?, override var template: MobTemplate) : EntityFlying(template.type as EntityTypes<out EntityFlying>, world), CustomMob {
-    constructor(world: World?, name: String) : this(world, name.toTemplate())
-
+abstract class FlyingMob(world: World?, name: String) : EntityFlying(MobzyTemplates[name].type as EntityTypes<out EntityFlying>, world), CustomMob {
     //implementation of properties from CustomMob
     override var killedMZ: Boolean
         get() = killed
@@ -29,7 +25,7 @@ abstract class FlyingMob(world: World?, override var template: MobTemplate) : En
     override val killScore: Int = aW
 
     //implementation of behaviours
-    
+
     override fun createPathfinders() {
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalFlyDamageTarget(this))

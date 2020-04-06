@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.mobzy.name
-import com.mineinabyss.mobzy.spawnEntity
+import com.mineinabyss.mobzy.api.keyName
+import com.mineinabyss.mobzy.api.spawnEntity
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
-import com.mineinabyss.mobzy.toEntityType
 import net.minecraft.server.v1_15_R1.EntityTypes
 import org.bukkit.Location
 import org.bukkit.Material
@@ -95,7 +95,7 @@ data class MobSpawn(
             /*runInRadius(localGroupRadius) {
                 //TODO count number of entities in this radius
             }*/
-            if((entityTypeCounts[entityType.name] ?: 0) > maxLocalGroup) return -1.0
+            if((entityTypeCounts[entityType.keyName] ?: 0) > maxLocalGroup) return -1.0
         }
         return priority
     }
@@ -185,8 +185,8 @@ data class MobSpawn(
             //create a new builder from the MobSpawn found inside of an already created layer
             val spawn = when {
                 args.containsKey("reuse") -> SpawnRegistry.reuseMobSpawn(args["reuse"] as String).copy()
-                        .apply { setArg("mob") { mob -> entityType = (mob as String).toEntityType() } }
-                args.containsKey("mob") -> MobSpawn((args["mob"] as String).toEntityType())
+                        .apply { setArg("mob") { mob -> entityType = MobzyTypes[mob as String] } }
+                args.containsKey("mob") -> MobSpawn(MobzyTypes[args["mob"] as String])
                 else -> error("Serialization failed. No `mob` or `reuse` tag is defined in the spawn.")
             }
 

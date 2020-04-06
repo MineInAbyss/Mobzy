@@ -34,8 +34,14 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500) : Pathfinde
     override fun reset() = Unit
 
     override fun execute() = Unit
+    override fun e() {
+        super.e()
+        if (cooledDown) executeWhenCooledDown()
+    }
 
-    fun isPlayerValidTarget(player: Player, range: Double = mob.staticTemplate.followRange ?: 0.0) =
+    open fun executeWhenCooledDown() = Unit
+
+    fun isPlayerValidTarget(player: Player, range: Double = mob.template.followRange ?: 0.0) =
             !player.isInvulnerable &&
                     !player.isDead &&
                     player.gameMode != GameMode.SPECTATOR &&

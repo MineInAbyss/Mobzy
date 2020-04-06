@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.mobzy.registration.MobzyTemplates
 import org.bukkit.plugin.Plugin
 import java.io.File
 
@@ -9,12 +10,13 @@ import java.io.File
 interface MobzyAddon : Plugin {
     val mobConfig: File
     val spawnConfig: File
-    val initializeMobs: () -> Unit
+    val initializeMobs: () -> Any
 
     fun registerWithMobzy() {
-        registerMobConfig(mobConfig, this)
+        MobzyConfig.registerMobCfg(mobConfig, this)
         initializeMobs()
-        registerSpawnConfig(spawnConfig, this)
+        MobzyTemplates.loadTemplatesFromConfig()//TODO only load templates from this addon's config, don't reload all of them!
+        MobzyConfig.registerSpawnCfg(spawnConfig, this)
         mobzy.reloadExistingEntities()
     }
 }

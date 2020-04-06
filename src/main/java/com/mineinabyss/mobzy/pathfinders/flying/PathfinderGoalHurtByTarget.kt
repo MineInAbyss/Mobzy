@@ -8,7 +8,7 @@ import org.bukkit.event.entity.EntityTargetEvent
 
 class PathfinderGoalHurtByTarget(
         override val mob: CustomMob,
-        val range: Double = mob.staticTemplate.followRange ?: 0.0
+        private val range: Double = mob.template.followRange ?: 0.0
 ) : MobzyPathfinderGoal() {
     private lateinit var playerDamager: Player
     override fun shouldExecute(): Boolean {

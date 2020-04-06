@@ -9,11 +9,11 @@ import com.derongan.minecraft.guiy.kotlin_dsl.button
 import com.derongan.minecraft.guiy.kotlin_dsl.guiyLayout
 import com.derongan.minecraft.guiy.kotlin_dsl.setElement
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.gui.layouts.MobConfigLayout
-import com.mineinabyss.mobzy.mobTemplate
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.reuseMobSpawn
-import com.mineinabyss.mobzy.toTemplate
 import org.bukkit.Material
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
@@ -25,7 +25,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     private var config: FileConfiguration? = null
 
     private fun buildMobConfigLayout(): Layout {
-        val configs: Collection<FileConfiguration> = mobzy.mobzyConfig.spawnCfgs.values
+        val configs: Collection<FileConfiguration> = MobzyConfig.spawnCfgs.values
         return if (configs.size == 1)
             buildRegions(configs.first())
         else guiyLayout {
@@ -68,9 +68,9 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
                 setElement(0, 0, FillableElement(4, 8)) {
                     spawns.forEach { spawn ->
                         val spawnBuilder = if (spawn.containsKey("reuse"))
-                            reuseMobSpawn(spawn["reuse"] as String).entityType.mobTemplate
+                            MobzyTemplates[reuseMobSpawn(spawn["reuse"] as String).entityType]
                         else
-                            (spawn["mob"] as String).toTemplate()
+                            MobzyTemplates[spawn["mob"] as String]
 
                         //open up the config layout with its menu options
                         button(spawnBuilder.modelItemStack.toCell()) {
@@ -85,7 +85,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     fun saveConfigValues(spawn: MutableMap<String, Any?>, mobProperties: List<Property>) {
         spawn.clear()
         mobProperties.forEach { spawn[it.key] = it.value }
-        mobzy.mobzyConfig.saveSpawnCfg(config ?: error("Could not save config values, config was null"))
+        MobzyConfig.saveSpawnCfg(config ?: error("Could not save config values, config was null"))
         player.success("Successfully saved mob's configuartion")
     }
 

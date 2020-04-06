@@ -57,15 +57,14 @@ class SpawnChunkGrid internal constructor(locs: List<Location>, minRad: Int, max
 
     private fun isValidSpawn(spawn: ChunkSpawn) = spawn.preference > 0
 
-    /**
-     * Slightly shuffles the list of ChunkSpawns, with some consideration for their original preferences
-     */
-    fun shuffledSpawns(): List<ChunkSpawn> {
-        validChunkSpawns.forEach { it.preferenceOffset = Math.random() }
-        return sortedSpawns()
-    }
+    /** Slightly shuffles the list of ChunkSpawns, with some consideration for their original preferences */
+    val shuffledSpawns: List<ChunkSpawn>
+        get() {
+            validChunkSpawns.forEach { it.preferenceOffset = Math.random() }
+            return sortedSpawns
+        }
 
-    private fun sortedSpawns() = validChunkSpawns.sortedBy { it.preference }
+    private val sortedSpawns get() = validChunkSpawns.sortedBy { it.preference }
 }
 
 fun runInRadius(radius: Int, forEach: (x: Int, z: Int, dist: Int) -> Unit) {

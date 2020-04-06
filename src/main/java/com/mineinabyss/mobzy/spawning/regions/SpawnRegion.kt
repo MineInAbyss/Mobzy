@@ -1,14 +1,13 @@
 package com.mineinabyss.mobzy.spawning.regions
 
-import com.mineinabyss.mobzy.creatureType
-import com.mineinabyss.mobzy.name
+import com.mineinabyss.mobzy.api.creatureType
+import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import net.minecraft.server.v1_15_R1.EntityTypes
 import java.util.*
 
 /**
- * A region with determined hostile, passive, flying, etc... spawns. Currently only layers are treated as regions.
- * In the future, this will integrate with WorldGuard regions to allow for more specific region setting
+ * A region with determined hostile, passive, flying, etc... spawns.
  */
 class SpawnRegion(val name: String, vararg spawns: MobSpawn) {
     //TODO maybe mob caps should be determined per region?
@@ -25,9 +24,10 @@ class SpawnRegion(val name: String, vararg spawns: MobSpawn) {
         else spawns[creatureType]!!.add(spawn)
     }
 
-    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn =
-            spawns.values.flatten().firstOrNull { (entityType) -> entityType == type }
-                    ?: error("Could not find ${type.name} in ${spawns.values.flatten().map { it.entityType.name }}")
+    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns.values
+            .flatten()
+            .firstOrNull { (entityType) -> entityType == type }
+            ?: error("Could not find ${type.typeName} in ${spawns.values.flatten().map { it.entityType.typeName }}")
 
     init {
         for (spawn in spawns) addSpawn(spawn)

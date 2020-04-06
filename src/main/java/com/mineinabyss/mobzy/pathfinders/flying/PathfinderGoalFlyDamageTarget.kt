@@ -11,7 +11,7 @@ class PathfinderGoalFlyDamageTarget(override val mob: FlyingMob) : MobzyPathfind
     override fun execute() {
         restartCooldown()
         val target = target ?: return
-        val attackDamage: Double = mob.staticTemplate.attackDamage ?: return
+        val attackDamage: Double = mob.template.attackDamage ?: return
         //if within range, harm
         if (mob.canReach(target)) target.damage(attackDamage, entity)
     }

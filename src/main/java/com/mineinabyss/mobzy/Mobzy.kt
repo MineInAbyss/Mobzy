@@ -6,8 +6,13 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import com.derongan.minecraft.guiy.GuiListener
+import com.mineinabyss.idofront.messaging.logSuccess
+import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.api.spawnEntity
+import com.mineinabyss.mobzy.api.toEntityTypesViaScoreboardTags
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.flags.StringFlag
@@ -15,19 +20,12 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
 import net.minecraft.server.v1_15_R1.EntityLiving
 import net.minecraft.server.v1_15_R1.NBTTagCompound
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.plugin.java.JavaPlugin
 
-/**
- * Gets [Mobzy] via Bukkit once, then sends that reference back afterwards
- */
+/** Gets [Mobzy] via Bukkit once, then sends that reference back afterwards */
 val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 
 class Mobzy : JavaPlugin() {
-    lateinit var mobzyConfig: MobzyConfig
-        private set
-    lateinit var mobzyTypes: MobzyType
-        private set
 
     override fun onLoad() {
         logger.info("On load has been called")
@@ -76,36 +74,26 @@ class Mobzy : JavaPlugin() {
         logger.info("On enable has been called")
         saveDefaultConfig()
         reloadConfig()
-        mobzyTypes = MobzyType()
-        mobzyConfig = MobzyConfig()
-        mobzyConfig.reload() //lots of startup logic in here
+        MobzyTypes
+        MobzyConfig.reload() //lots of startup logic in here
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)
         server.pluginManager.registerEvents(GuiListener(this), this)
 
-        //Reload existing addons
-        /*getLogger().info("Reloading addons: " + getConfig().getStringList(REGISTERED_ADDONS_KEY));
-        for (String name : getConfig().getStringList(REGISTERED_ADDONS_KEY)) {
-            PluginManager pluginManager = Bukkit.getServer().getPluginManager();
-            Plugin addon = pluginManager.getPlugin(name);
-            if (addon instanceof MobzyAddon && pluginManager.isPluginEnabled(name) && !mobzyConfig.getRegisteredAddons().contains(addon))
-                ((MobzyAddon) addon).registerWithMobzy(this);
-        }*/
-
         //Register commands
         MobzyCommands
     }
 
-    private var spawnTaskID = -1
+    private var currentTask: SpawnTask? = null
 
     fun registerSpawnTask() {
-        server.scheduler.cancelTask(spawnTaskID)
-        spawnTaskID = -1
-
-        if (MobzyConfig.doMobSpawns) {
-            val spawnTask: Runnable = SpawnTask()
-            spawnTaskID = server.scheduler.scheduleSyncRepeatingTask(this, spawnTask, 0, MobzyConfig.spawnTaskDelay)
+        if (MobzyConfig.doMobSpawns && currentTask == null){
+            currentTask = SpawnTask()
+            currentTask?.runTaskTimer(this, 0, MobzyConfig.spawnTaskDelay)
+        } else{
+            currentTask?.cancel()
+            currentTask = null
         }
     }
 
@@ -121,7 +109,7 @@ class Mobzy : JavaPlugin() {
                 if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
                 it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
             }.forEach {
-                val replacement = it.location.spawnEntity((it.scoreboardTags).toEntityType())!!.toNMS<EntityLiving>()
+                val replacement = it.location.spawnEntity(it.toEntityTypesViaScoreboardTags())!!.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()
                 it.toNMS<EntityLiving>().b(nbt) //.b copies over the entity's nbt data to the compound
                 it.remove()
@@ -129,16 +117,13 @@ class Mobzy : JavaPlugin() {
                 num++
             }
         }
-        logger.info(ChatColor.GREEN.toString() + "Reloaded " + num + " custom entities")
+        logSuccess("Reloaded $num custom entities")
     }
 
     override fun onDisable() { // Plugin shutdown logic
         super.onDisable()
         logger.info("onDisable has been invoked!")
         server.scheduler.cancelTasks(this)
-        //        Bukkit.broadcastMessage("Saving addons " + mobzyConfig.getRegisteredAddons().toString());
-//        getConfig().set(REGISTERED_ADDONS_KEY, mobzyConfig.getRegisteredAddons().stream().map(addon -> ((Plugin) addon).getName()).collect(Collectors.toList()));
-//        saveConfig();
     }
 
     companion object {
