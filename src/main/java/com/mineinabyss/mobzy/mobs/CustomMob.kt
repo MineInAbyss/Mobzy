@@ -80,6 +80,7 @@ interface CustomMob {
     }
 
     fun setConfiguredAttributes() {
+        //TODO set ARMOR
         template.maxHealth?.let { entity.getAttributeInstance(GenericAttributes.MAX_HEALTH).value = it }
         template.movementSpeed?.let { entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).value = it }
         if (this !is FlyingMob) //flying mobs can't have an attack damage attribute, we use the builder's value instead

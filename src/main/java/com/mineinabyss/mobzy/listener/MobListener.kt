@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.listener
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
@@ -17,6 +18,7 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
@@ -80,6 +82,8 @@ object MobListener : Listener {
                 entity.equipment?.helmet = MobzyTemplates[entity.toNMS().entityType.typeName].modelItemStack
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
+            } else if (entity.isCustomMob && entity.toNMS() !is NPC) {
+                (entity as LivingEntity).removeWhenFarAway = true
             }
         }
     }
