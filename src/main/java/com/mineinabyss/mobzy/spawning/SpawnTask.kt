@@ -15,11 +15,19 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.nield.kotlinstatistics.dbScanCluster
+import kotlin.system.measureNanoTime
 
 private const val SPAWN_TRIES = 5
 
-class SpawnTask : BukkitRunnable() {
+inline fun <T> printTimeMillis(name: String, block: () -> T): T {
+    var result: T? = null
+    debug("$name took: ${measureNanoTime {
+        result = block()
+    }/1000000.0} milliseconds")
+    return result!!
+}
 
+class SpawnTask : BukkitRunnable() {
     override fun run() {
         try { //run checks asynchronously
             if (!MobzyConfig.doMobSpawns) {
@@ -34,9 +42,10 @@ class SpawnTask : BukkitRunnable() {
                 val toSpawn: MutableList<MobSpawnEvent> = mutableListOf()
 
                 //STEP 1: Generate array of ChunkSpawns around player group
-                val spawnChunkGrid = SpawnChunkGrid(playerGroup.map { it.location }, MobzyConfig.minChunkSpawnRad, MobzyConfig.maxChunkSpawnRad)
-
-                val customMobs = spawnChunkGrid.allChunks.filter { it.isLoaded }.customMobs
+                val spawnChunkGrid = printTimeMillis("Spawn chunk grid") {
+                    SpawnChunkGrid(playerGroup.map { it.location }, MobzyConfig.minChunkSpawnRad, MobzyConfig.maxChunkSpawnRad)
+                }
+                val customMobs = printTimeMillis("Get custom mobs") { spawnChunkGrid.allChunks.filter { it.isLoaded }.customMobs }
 
                 Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable {
                     val entityTypeCounts = customMobs.toEntityTypeCounts()

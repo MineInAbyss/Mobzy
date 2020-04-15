@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
-import com.mineinabyss.mobzy.spawning.vertical.getHighestBlock
 import org.bukkit.Chunk
 
 /**
@@ -20,22 +19,10 @@ class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val ma
         get() = truePreference + preferenceOffset
     private var truePreference = 1.0
     var preferenceOffset = 0.0
-    private val randomLocInChunk = chunk.getBlock((Math.random() * 15).toInt(), 0, (Math.random() * 15).toInt()).location
-    private val spawnAreas = VerticalSpawn(randomLocInChunk, minY, maxY).spawnAreas
+    private val randomLocInChunk by lazy { chunk.getBlock((Math.random() * 15).toInt(), 0, (Math.random() * 15).toInt()).location }
+    private val spawnAreas by lazy { VerticalSpawn(randomLocInChunk, minY, maxY).spawnAreas }
 
-    init {
-        calculatePreference()
-    }
-
-    /**
-     * Calculates a weight for how much we think we'll like this chunk for spawns. Looks at whether randomly picked block
-     * was void.
-     * TODO this could have more complex checks in the future
-     */
-    private fun calculatePreference() { //pick random block in chunk
-        if (randomLocInChunk.getHighestBlock(minY, maxY).blockY == minY) //if we found void
-            truePreference = 0.0
-    }
+    //TODO we are not calculating preferences anymore because doing it sync is too slow, make a new spawning system!
 
     fun getSpawnArea(tries: Int): SpawnArea? {
         for (i in 0 until tries) { //generate list of spawn
