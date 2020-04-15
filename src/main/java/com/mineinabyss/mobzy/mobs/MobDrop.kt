@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.idofront.messaging.color
-import com.mineinabyss.idofront.recpies.addFurnaceRecipe
+import com.mineinabyss.idofront.recpies.addCookingRecipes
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.mobzy.mobzy
 import kotlinx.serialization.SerialName
@@ -16,7 +16,7 @@ data class MobDrop(
         val item: SerializableItemStack,
         @SerialName("cooked-item") val cooked: SerializableItemStack? = null,
         @SerialName("cook-exp") val cookExp: Float = 0f,
-        @SerialName("cook-time") val cookTime: Int = 160,
+        @SerialName("cook-time") val cookTime: Int = 200,
         @SerialName("min-amount") val minAmount: Int = 1,
         @SerialName("max-amount") val maxAmount: Int = 1,
         @SerialName("drop-chance") val dropChance: Double = 1.0) {
@@ -25,7 +25,14 @@ data class MobDrop(
             val cookedItem = cooked.toItemStack()
             //TODO pretty hacky way of adding recipes. Won't reload them from config if they've changed.
             try {
-                addFurnaceRecipe(ChatColor.stripColor(cookedItem.itemMeta!!.displayName.color('§').replace(' ', '_'))!!, cookedItem, item.toItemStack(), cookExp, cookTime, mobzy)
+                addCookingRecipes(
+                        ChatColor.stripColor(cookedItem.itemMeta!!.displayName.color('§').replace(' ', '_'))!!,
+                        item.toItemStack(),
+                        cookedItem,
+                        cookExp,
+                        cookTime,
+                        mobzy
+                )
             } catch (e: IllegalStateException) {
             }
         }
