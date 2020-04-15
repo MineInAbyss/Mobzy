@@ -125,6 +125,10 @@ interface CustomMob {
         (entity as EntityInsentient).goalSelector.a(priority, goal)
     }
 
+    fun removePathfinderGoal(goal: PathfinderGoal) {
+        (entity as EntityInsentient).goalSelector.a(goal)
+    }
+
     fun addTargetSelector(priority: Int, goal: PathfinderGoalTarget) {
         (entity as EntityInsentient).targetSelector.a(priority, goal)
     }
