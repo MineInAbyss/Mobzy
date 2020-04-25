@@ -1,11 +1,14 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
+import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.creatureType
 import com.mineinabyss.mobzy.api.keyName
+import com.mineinabyss.mobzy.debug
+import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
+import com.mineinabyss.mobzy.toNMS
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.managers.RegionManager
@@ -23,10 +26,11 @@ inline fun <T> printTimeMillis(name: String, block: () -> T): T {
     var result: T? = null
     debug("$name took: ${measureNanoTime {
         result = block()
-    }/1000000.0} milliseconds")
+    } / 1000000.0} milliseconds")
     return result!!
 }
 
+@Suppress("UNREACHABLE_CODE") //TODO remove
 class SpawnTask : BukkitRunnable() {
     override fun run() {
         try { //run checks asynchronously
@@ -37,46 +41,42 @@ class SpawnTask : BukkitRunnable() {
 
             val container = WorldGuard.getInstance().platform.regionContainer
 
-            Bukkit.getOnlinePlayers().toList().toPlayerGroups().forEach { playerGroup ->
-                val regionManager = container[BukkitAdapter.adapt(playerGroup[0].world)] ?: return@forEach
-                val toSpawn: MutableList<MobSpawnEvent> = mutableListOf()
+            val toSpawn: MutableList<MobSpawnEvent> = mutableListOf()
 
-                //STEP 1: Generate array of ChunkSpawns around player group
-                val spawnChunkGrid = printTimeMillis("Spawn chunk grid") {
-                    SpawnChunkGrid(playerGroup.map { it.location }, MobzyConfig.minChunkSpawnRad, MobzyConfig.maxChunkSpawnRad)
-                }
-                val customMobs = printTimeMillis("Get custom mobs") { spawnChunkGrid.allChunks.filter { it.isLoaded }.customMobs }
+            Bukkit.getOnlinePlayers().forEach { player ->
+                val regionManager = container[BukkitAdapter.adapt(player.world)] ?: return@forEach
 
                 Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable {
-                    val entityTypeCounts = customMobs.toEntityTypeCounts()
-                    val originalCount = customMobs.size
+//                    val entityTypeCounts = customMobs.toEntityTypeCounts()
+                    //TODO get this in a smart way from all existing entities
+//                    val originalCount = customMobs.size
 
                     //STEP 2: Each chunk tries to choose one area inside it for which to attempt a spawn
-                    customMobs.toCreatureTypeCounts().forEach spawnPerType@{ (type, count) ->
+
+                    printTimeMillis("Getting world etities") { player.world.entities }.toCreatureTypeCounts().forEach spawnPerType@{ (type, count) ->
                         var newCount = count
                         val creatureTypeCap = MobzyConfig.getMobCap(type)
-                        spawnChunkGrid.shuffledSpawns.forEach spawnLoop@{ chunkSpawn ->
-                            if (newCount > creatureTypeCap)
-//                                    || newCount - count > creatureTypeCap / 4) //never spawn more than a fourth of the mobs in one run
-                                return@spawnPerType
+                        if (newCount > creatureTypeCap)
+                            return@spawnPerType
 
-                            val spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES) ?: return@spawnLoop
+                        val chunkSpawn: ChunkSpawn = TODO("Get a random spawn")
 
-                            //STEP 3: Pick mob to spawn
-                            val validSpawns = RandomCollection<MobSpawn>()
-                            regionManager.getWorldGuardRegions(spawnArea)
-                                    .filterWhenOverlapFlag()
-                                    .getMobSpawnsForRegions(type)
-                                    .forEach { validSpawns.add(it.getPriority(spawnArea, entityTypeCounts), it) }
+                        val spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES) ?: return@spawnLoop
 
-                            if (validSpawns.isEmpty) return@spawnLoop
-                            //weighted random decision of valid spawn
-                            val spawn = MobSpawnEvent(validSpawns.next(), spawnArea)
-                            toSpawn.add(spawn)
-                            entityTypeCounts[spawn.entityType] = entityTypeCounts.getOrDefault(spawn.entityType, 0).plus(spawn.spawns)
+                        //STEP 3: Pick mob to spawn
+                        val validSpawns = RandomCollection<MobSpawn>()
+                        regionManager.getWorldGuardRegions(spawnArea)
+                                .filterWhenOverlapFlag()
+                                .getMobSpawnsForRegions(type)
+                                .forEach { validSpawns.add(it.getPriority(spawnArea, entityTypeCounts), it) }
 
-                            newCount += spawn.spawns //increment the number of existing mobs by the number we want to spawn
-                        }
+                        if (validSpawns.isEmpty) return@spawnLoop
+                        //weighted random decision of valid spawn
+                        val spawn = MobSpawnEvent(validSpawns.next(), spawnArea)
+                        toSpawn.add(spawn)
+                        entityTypeCounts[spawn.entityType] = entityTypeCounts.getOrDefault(spawn.entityType, 0).plus(spawn.spawns)
+
+                        newCount += spawn.spawns //increment the number of existing mobs by the number we want to spawn
                     }
 
                     //spawn all the mobs we were planning to synchronously (since we can't spawn asynchronously)

@@ -5,7 +5,7 @@ import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Chunk
 
 /**
- *
+ * Wraps around one chunk to add functionality to take
  *
  * @property preference Increases the likelihood of this spawn to be chosen out of a list of other candidates.
  * @property truePreference The [preference] calculated internally without the [preferenceOffset].
@@ -14,7 +14,7 @@ import org.bukkit.Chunk
  * @property randomLocInChunk A random location with y of 0 in the chunk. Only calculated once.
  * @property spawnAreas The spawn areas within the [VerticalSpawn] located at [randomLocInChunk]
  */
-class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val maxY: Int) {
+class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val maxY: Int): Chunk by chunk {
     val preference
         get() = truePreference + preferenceOffset
     private var truePreference = 1.0
@@ -24,6 +24,9 @@ class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val ma
 
     //TODO we are not calculating preferences anymore because doing it sync is too slow, make a new spawning system!
 
+    /**
+     * @return a vertical [SpawnArea], more specifically one gap that's chosen inside the chunk based on its size.
+     */
     fun getSpawnArea(tries: Int): SpawnArea? {
         for (i in 0 until tries) { //generate list of spawn
             if (spawnAreas.isEmpty()) //if there were no blocks there, try again

@@ -95,7 +95,7 @@ data class MobSpawn(
             /*runInRadius(localGroupRadius) {
                 //TODO count number of entities in this radius
             }*/
-            if((entityTypeCounts[entityType.keyName] ?: 0) > maxLocalGroup) return -1.0
+            if ((entityTypeCounts[entityType.keyName] ?: 0) > maxLocalGroup) return -1.0
         }
         return priority
     }
@@ -190,7 +190,7 @@ data class MobSpawn(
                 else -> error("Serialization failed. No `mob` or `reuse` tag is defined in the spawn.")
             }
 
-            with(spawn){
+            with(spawn) {
                 setArg("min-amount") { minAmount = (it as Number).toInt() }
                 setArg("max-amount") { maxAmount = (it as Number).toInt() }
 
