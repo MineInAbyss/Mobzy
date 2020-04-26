@@ -122,6 +122,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")
+                        mobzy.registerSpawnTask()
                     }
                 }
             }

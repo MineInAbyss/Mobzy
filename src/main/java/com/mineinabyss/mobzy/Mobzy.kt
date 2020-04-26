@@ -90,9 +90,11 @@ class Mobzy : JavaPlugin() {
     private var currentTask: SpawnTask? = null
 
     fun registerSpawnTask() {
-        if (mobzyConfig.doMobSpawns && currentTask == null) {
-            currentTask = SpawnTask()
-            currentTask?.runTaskTimer(this, 0, mobzyConfig.spawnTaskDelay)
+        if (mobzyConfig.doMobSpawns) {
+            if(currentTask == null) {
+                currentTask = SpawnTask()
+                currentTask?.runTaskTimer(this, 0, mobzyConfig.spawnTaskDelay)
+            }
         } else {
             currentTask?.cancel()
             currentTask = null

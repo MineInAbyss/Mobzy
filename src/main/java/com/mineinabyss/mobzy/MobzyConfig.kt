@@ -39,7 +39,6 @@ import java.util.*
 data class MobzyConfig(
         var debug: Boolean,
         var doMobSpawns: Boolean,
-        val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC"),
 //        var spawnSearchRadius: Double = 0.0,
         var minChunkSpawnRad: Int = 0,
         var maxChunkSpawnRad: Int = 0,
@@ -47,6 +46,9 @@ data class MobzyConfig(
         var spawnTaskDelay: Long = 0L,
         private val mobCaps: MutableMap<String, Int> = HashMap()
 ) {
+    @Transient
+    val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
+
     @Transient
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
 
@@ -120,9 +122,10 @@ data class MobzyConfig(
     internal fun activateAddons() {
         registeredAddons.forEach { loadMobCfg(it) }
         registeredAddons.forEach { it.initializeMobs() }
-        registeredAddons.forEach { mobzyConfig.loadSpawnCfg(it) }
+        registeredAddons.forEach { loadSpawnCfg(it) }
 
         MobzyTemplates.loadTemplatesFromConfig()
+        mobzy.registerSpawnTask()
 
         logSuccess("Registered addons: $registeredAddons")
     }
