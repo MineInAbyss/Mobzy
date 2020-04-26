@@ -12,7 +12,6 @@ import com.mineinabyss.mobzy.gui.MobzyGUI
 import com.mineinabyss.mobzy.gui.Property
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import de.erethon.headlib.HeadLib
-import net.minecraft.server.v1_15_R1.EntityTypes
 
 private typealias PT = Property.PropertyType
 private typealias HL = HeadLib
@@ -60,7 +59,7 @@ class MobConfigLayout(private val main: MobzyGUI, val spawn: MutableMap<String, 
 
 
     private fun makeMobOptions() {
-        with(MobSpawn(EntityTypes.ZOMBIE)) {
+        with(MobSpawn(entityTypeName = null)) {
             makeProperty(HL.QUARTZ_R, PT.STRING_INPUT, "reuse", "reuse")
             makeProperty(HL.QUARTZ_M, PT.STRING_INPUT, "mob", "ENITTY_TYPE_HERE")
             makeProperty(HL.QUARTZ_P, PT.DOUBLE_INPUT, "priority", basePriority)
