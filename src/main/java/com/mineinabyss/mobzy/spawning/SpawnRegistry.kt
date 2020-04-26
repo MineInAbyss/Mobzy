@@ -1,20 +1,14 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.charleskorn.kaml.Yaml
-import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.mobzy.Mobzy
+import com.mineinabyss.mobzy.configuration.SpawnConfiguration
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
-import kotlinx.serialization.Serializable
-import org.bukkit.configuration.file.FileConfiguration
 import java.util.*
 
-@Serializable
-data class SpawnConfiguration(
-        val regions: Map<String, SpawnRegion>
-)
+
 /**
  * @property regionSpawns A map of region names to their [SpawnRegion].
  */
@@ -24,10 +18,8 @@ object SpawnRegistry {
     fun unregisterSpawns() = regionSpawns.clear()
 
     @Suppress("UNCHECKED_CAST")
-    fun readCfg(config: FileConfiguration) {
-        val spawnConfiguration = Yaml.default.parse(SpawnConfiguration.serializer(), config.saveToString())
-        regionSpawns.putAll(spawnConfiguration.regions)
-        logSuccess("Reloaded spawns.yml")
+    operator fun plusAssign(config: SpawnConfiguration) {
+        regionSpawns.putAll(config.info.regions)
     }
 
     fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this because I have no idea what it's doing

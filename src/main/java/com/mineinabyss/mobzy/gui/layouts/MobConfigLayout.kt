@@ -1,13 +1,11 @@
 package com.mineinabyss.mobzy.gui.layouts
 
-import com.derongan.minecraft.guiy.gui.Cell
 import com.derongan.minecraft.guiy.gui.FillableElement
 import com.derongan.minecraft.guiy.gui.Layout
 import com.derongan.minecraft.guiy.gui.ScrollingPallet
 import com.derongan.minecraft.guiy.helpers.toCell
 import com.derongan.minecraft.guiy.kotlin_dsl.backButtonTo
 import com.derongan.minecraft.guiy.kotlin_dsl.button
-import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.gui.MobzyGUI
 import com.mineinabyss.mobzy.gui.Property
 import com.mineinabyss.mobzy.spawning.MobSpawn
@@ -16,7 +14,7 @@ import de.erethon.headlib.HeadLib
 private typealias PT = Property.PropertyType
 private typealias HL = HeadLib
 
-class MobConfigLayout(private val main: MobzyGUI, val spawn: MutableMap<String, Any?>, val regionName: String) : Layout() {
+class MobConfigLayout(private val main: MobzyGUI, val spawn: MobSpawn) : Layout() {
     private val _mobProperties: MutableList<Property> = mutableListOf()
     private val _unusedProperties: MutableList<Property> = mutableListOf()
     private val grid = FillableElement(4, 9)
@@ -26,13 +24,14 @@ class MobConfigLayout(private val main: MobzyGUI, val spawn: MutableMap<String, 
     val mobProperties: List<Property> get() = mobProperties.toList()
 
     init {
-        makeMobOptions()
+        //TODO make a nice way of editing config ingame
+//        makeMobOptions()
         setElement(0, 0, grid)
         setElement(0, 4, scrollingPallet)
         reloadProperties()
 
         button(4, 5, HL.CHECKMARK.toCell("Save")) {
-            main.saveConfigValues(spawn, _mobProperties)
+            main.saveConfigValues()
         }
 
         backButtonTo(main)
@@ -57,8 +56,7 @@ class MobConfigLayout(private val main: MobzyGUI, val spawn: MutableMap<String, 
         scrollingPallet.addAll(_unusedProperties)
     }
 
-
-    private fun makeMobOptions() {
+    /*private fun makeMobOptions() {
         with(MobSpawn(entityTypeName = null)) {
             makeProperty(HL.QUARTZ_R, PT.STRING_INPUT, "reuse", "reuse")
             makeProperty(HL.QUARTZ_M, PT.STRING_INPUT, "mob", "ENITTY_TYPE_HERE")
@@ -80,7 +78,7 @@ class MobConfigLayout(private val main: MobzyGUI, val spawn: MutableMap<String, 
     }
 
     private fun makeProperty(head: HL, type: PT, key: String, default: Any): Property =
-            if (spawn.containsKey(key))
+            if (spawn.component1())
                 makePropertyFromValue(head, type, key, spawn[key]).also { _mobProperties.add(it) }
             else
                 makePropertyFromValue(head, type, key, default).also { _unusedProperties.add(it) }
@@ -92,5 +90,5 @@ class MobConfigLayout(private val main: MobzyGUI, val spawn: MutableMap<String, 
             head.toItemStack().editItemMeta {
                 setDisplayName(name)
                 this.lore = listOf(lore)
-            }.toCell() as Cell
+            }.toCell() as Cell*/
 }

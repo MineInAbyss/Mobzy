@@ -30,16 +30,16 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 onExecute {
                     sender.info(("""
                             LOG OF CURRENTLY REGISTERED STUFF:
-                            Mob configs: ${MobzyConfig.mobCfgs}
-                            Spawn configs: ${MobzyConfig.spawnCfgs}
-                            Registered addons: ${MobzyConfig.registeredAddons}
+                            Mob configs: ${mobzyConfig.mobCfgs}
+                            Spawn configs: ${mobzyConfig.spawnCfgs}
+                            Registered addons: ${mobzyConfig.registeredAddons}
                             Registered EntityTypes: ${MobzyTypes.typeNames}""".trimIndent()))
                 }
             }
 
             command("reload", "rl", desc = "Reloads the configuration files") {
                 onExecute {
-                    MobzyConfig.reload(sender)
+                    mobzyConfig.reload(sender)
                 }
             }
 
@@ -94,7 +94,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
                 var numOfSpawns by +IntArg("number of mobs to spawn") { default = 1 }
                 onExecuteByPlayer {
-                    if (numOfSpawns > MobzyConfig.maxSpawnAmount) numOfSpawns = MobzyConfig.maxSpawnAmount
+                    if (numOfSpawns > mobzyConfig.maxSpawnAmount) numOfSpawns = mobzyConfig.maxSpawnAmount
                     for (i in 0 until numOfSpawns) (sender as Player).location.spawnEntity(mobName)
                 }
             }
@@ -114,9 +114,14 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
                     val enabled by +BooleanArg("enabled")
 
+                    //TODO expand for all properties
                     onExecute {
-                        MobzyConfig.doMobSpawns = enabled
-                        sender.success("Config option doMobSpawns has been set to $enabled")
+                        if(mobzyConfig.doMobSpawns != enabled) {
+                            mobzyConfig.doMobSpawns = enabled
+                            mobzyConfig.saveConfig()
+                            sender.success("Config option doMobSpawns has been set to $enabled")
+                        }
+                        sender.success("Config option doMobSpawns was already set to $enabled")
                     }
                 }
             }
@@ -139,7 +144,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     min = args[2].toInt()
                 } catch (e: NumberFormatException) {
                 }
-                return (min until MobzyConfig.maxSpawnAmount).asIterable()
+                return (min until mobzyConfig.maxSpawnAmount).asIterable()
                         .map { it.toString() }.filter { it.startsWith(min.toString()) }
             }
         if (subCommand in listOf("remove", "rm", "info", "i"))

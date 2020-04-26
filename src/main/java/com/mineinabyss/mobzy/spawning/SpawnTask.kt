@@ -2,12 +2,12 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
-import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.creatureType
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.mobzyConfig
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.toNMS
@@ -36,7 +36,7 @@ inline fun <T> printTimeMillis(name: String, block: () -> T): T {
 class SpawnTask : BukkitRunnable() {
     override fun run() {
         try {
-            if (!MobzyConfig.doMobSpawns) cancel().let { return }
+            if (!mobzyConfig.doMobSpawns) cancel().let { return }
         } catch (e: NoClassDefFoundError) {
             e.printStackTrace()
             cancel()
@@ -70,7 +70,7 @@ class SpawnTask : BukkitRunnable() {
 
                 customMobs.toCreatureTypeCounts().forEach spawnPerType@{ (type, count) ->
                     var newCount = count
-                    val creatureTypeCap = MobzyConfig.getMobCap(type)
+                    val creatureTypeCap = mobzyConfig.getMobCap(type)
                     if (newCount > creatureTypeCap)
                         return@spawnPerType
 
@@ -85,7 +85,7 @@ class SpawnTask : BukkitRunnable() {
                     container.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions.sorted()
 //                    regionManager.getWorldGuardRegions(spawnArea)
                             .filterWhenOverlapFlag()
-                            .getMobSpawnsForRegions(type)
+                            .getMobSpawnsForRegions()
                             .forEach { validSpawns.add(it.getPriority(spawnArea, entityTypeCounts), it) }
 
                     if (validSpawns.isEmpty) return@spawnPerType
@@ -111,15 +111,15 @@ class SpawnTask : BukkitRunnable() {
     /** Convert a list of entities to: a map of the names of creature types to the number of creatures of that type,
      * without types that have exceeded their mob cap. */
     private fun List<Entity>.toCreatureTypeCounts(): Map<String, Int> =
-            MobzyConfig.creatureTypes.associateWith { 0 }
+            mobzyConfig.creatureTypes.associateWith { 0 }
                     .plus(map { it.toNMS().creatureType }.groupingBy { it }.eachCount())
-                    .filter { (type, count) -> count < MobzyConfig.getMobCap(type) }
+                    .filter { (type, count) -> count < mobzyConfig.getMobCap(type) }
 
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
     private fun List<Player>.toPlayerGroups(): List<List<Player>> = groupBy { it.world }
             .flatMap { (_, players) ->
                 players.dbScanCluster(
-                        maximumRadius = MobzyConfig.spawnSearchRadius,
+                        maximumRadius = mobzyConfig.spawnSearchRadius,
                         minPoints = 0,
                         xSelector = { it.location.x },
                         ySelector = { it.location.z }

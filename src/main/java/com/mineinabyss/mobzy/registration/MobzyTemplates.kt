@@ -1,16 +1,14 @@
 package com.mineinabyss.mobzy.registration
 
-import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.logSuccess
-import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.MobTemplate
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
+import com.mineinabyss.mobzy.mobzyConfig
 import net.minecraft.server.v1_15_R1.EntityTypes
 
 object MobzyTemplates {
     private var templates: Map<String, MobTemplate> = mapOf()
+
     //TODO explanation
     private val hardCodedTemplates: MutableMap<String, MobTemplate> = mutableMapOf()
 
@@ -42,8 +40,8 @@ object MobzyTemplates {
     /** Deserializes the templates for all mobs in the configuration */
     private fun readTemplateConfig(): Map<String, MobTemplate> {
         val map = mutableMapOf<String, MobTemplate>()
-        MobzyConfig.mobCfgs.values.forEach {
-            map.putAll(Yaml.default.parse(MapSerializer(String.serializer(), MobTemplate.serializer()), it.saveToString()))
+        mobzyConfig.mobCfgs.forEach {
+            map += it.info.templates
         }
         return map.toMap()
     }

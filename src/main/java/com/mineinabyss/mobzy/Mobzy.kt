@@ -6,31 +6,34 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import com.derongan.minecraft.guiy.GuiListener
-import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.mobzy.api.isCustomMob
-import com.mineinabyss.mobzy.api.spawnEntity
-import com.mineinabyss.mobzy.api.toEntityTypesViaScoreboardTags
 import com.mineinabyss.mobzy.listener.MobListener
-import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.flags.StringFlag
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
-import net.minecraft.server.v1_15_R1.EntityLiving
-import net.minecraft.server.v1_15_R1.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 /** Gets [Mobzy] via Bukkit once, then sends that reference back afterwards */
 val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 
+/** Mobzy's configuration information */
+val mobzyConfig: MobzyConfig get() = mobzy.mobzyConfig
+
 class Mobzy : JavaPlugin() {
+    val mobzyConfig: MobzyConfig = MobzyConfig.load() //TODO if doesn't work, make this a lateinit var
 
     override fun onLoad() {
         logger.info("On load has been called")
 
-        //TODO try to allow plugin spawning in WorldGuard's config automatically
+        //TODO try to allow plugin spawning in WorldGuard's config automatically (see if this worked)
+        //onCreatureSpawn in WorldGuardEntityListener throws errors if we don't enable custom entity spawns
+        WorldGuard.getInstance().platform.globalStateManager.get(BukkitAdapter.adapt(server.worlds.first()))
+                .blockPluginSpawning = false
+
         //Registering custom WorldGuard flag
         val registry = WorldGuard.getInstance().flagRegistry
         val mzSpawnRegions = registry["cm-spawns"]
@@ -75,7 +78,6 @@ class Mobzy : JavaPlugin() {
         saveDefaultConfig()
         reloadConfig()
         MobzyTypes
-        MobzyConfig.reload() //lots of startup logic in here
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)
@@ -88,36 +90,13 @@ class Mobzy : JavaPlugin() {
     private var currentTask: SpawnTask? = null
 
     fun registerSpawnTask() {
-        if (MobzyConfig.doMobSpawns && currentTask == null){
+        if (mobzyConfig.doMobSpawns && currentTask == null) {
             currentTask = SpawnTask()
-            currentTask?.runTaskTimer(this, 0, MobzyConfig.spawnTaskDelay)
-        } else{
+            currentTask?.runTaskTimer(this, 0, mobzyConfig.spawnTaskDelay)
+        } else {
             currentTask?.cancel()
             currentTask = null
         }
-    }
-
-    /**
-     * Every loaded custom entity in the world stops relating to the CustomMob class heirarchy after reload, so we
-     * can't do something like customEntity instanceof CustomMob. Therefore, we "reload" those entities by deleting
-     * them and copying their NBT data to new entities
-     */
-    fun reloadExistingEntities() {
-        var num = 0
-        Bukkit.getServer().worlds.forEach { world ->
-            world.entities.filter {
-                if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
-                it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
-            }.forEach {
-                val replacement = it.location.spawnEntity(it.toEntityTypesViaScoreboardTags())!!.toNMS<EntityLiving>()
-                val nbt = NBTTagCompound()
-                it.toNMS<EntityLiving>().b(nbt) //.b copies over the entity's nbt data to the compound
-                it.remove()
-                replacement.a(nbt) //.a copies the nbt data to the new entity
-                num++
-            }
-        }
-        logSuccess("Reloaded $num custom entities")
     }
 
     override fun onDisable() { // Plugin shutdown logic
@@ -127,8 +106,6 @@ class Mobzy : JavaPlugin() {
     }
 
     companion object {
-        private const val REGISTERED_ADDONS_KEY = "addons"
-
         //TODO Make these into their own custom flags instead of StringFlag
         //TODO rename this to MZ_... in the WorldGuard config files :mittysweat:
         @JvmStatic

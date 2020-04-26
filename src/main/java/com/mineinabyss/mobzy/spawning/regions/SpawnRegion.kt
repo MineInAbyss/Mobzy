@@ -4,6 +4,7 @@ import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_15_R1.EntityTypes
+import org.bukkit.Material
 
 /**
  * A region with determined hostile, passive, flying, etc... spawns.
@@ -11,6 +12,7 @@ import net.minecraft.server.v1_15_R1.EntityTypes
 @Serializable
 class SpawnRegion(
         val name: String,
+        val icon: Material = Material.BEDROCK,
         val spawns: List<MobSpawn>
 ) {
     //TODO maybe mob caps should be determined per region?
@@ -20,8 +22,8 @@ class SpawnRegion(
 //        return (spawns[creatureType] ?: return emptyList()).toList()
 //    }
 
-    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns.values
-            .flatten()
-            .firstOrNull { (entityType) -> entityType == type }
-            ?: error("Could not find ${type.typeName} in ${spawns.values.flatten().map { it.entityType.typeName }}")
+    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns/*.values*/
+//            .flatten()
+            .firstOrNull { it.entityType == type }
+            ?: error("Could not find ${type.typeName} from ${spawns.map { it.entityTypeName }}")
 }

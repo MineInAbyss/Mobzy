@@ -58,7 +58,7 @@ data class MobSpawn(
         val blockWhitelist: List<Material> = listOf()
 ) {
     @Transient
-    private val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[entityTypeName]} ?: EntityTypes.ZOMBIE
+    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[entityTypeName]} ?: EntityTypes.ZOMBIE
     private val amountRange: IntRange get() = minAmount..maxAmount
     private val timeRange: LongRange get() = minTime..maxTime
     private val lightRange: LongRange get() = minLight..maxLight
