@@ -15,15 +15,7 @@ class SpawnRegion(
         val icon: Material = Material.BEDROCK,
         val spawns: List<MobSpawn>
 ) {
-    //TODO maybe mob caps should be determined per region?
-//    private val spawns: MutableMap<String, MutableList<MobSpawn>> = HashMap()
-
-//    fun getSpawnsFor(creatureType: String): List<MobSpawn> {
-//        return (spawns[creatureType] ?: return emptyList()).toList()
-//    }
-
-    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns/*.values*/
-//            .flatten()
+    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns
             .firstOrNull { it.entityType == type }
             ?: error("Could not find ${type.typeName} from ${spawns.map { it.entityTypeName }}")
 }

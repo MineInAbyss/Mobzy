@@ -10,7 +10,6 @@ import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.flags.StringFlag
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
@@ -24,15 +23,15 @@ val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 val mobzyConfig: MobzyConfig get() = mobzy.mobzyConfig
 
 class Mobzy : JavaPlugin() {
-    val mobzyConfig: MobzyConfig = MobzyConfig.load() //TODO if doesn't work, make this a lateinit var
+    lateinit var mobzyConfig: MobzyConfig
 
     override fun onLoad() {
         logger.info("On load has been called")
 
         //TODO try to allow plugin spawning in WorldGuard's config automatically (see if this worked)
         //onCreatureSpawn in WorldGuardEntityListener throws errors if we don't enable custom entity spawns
-        WorldGuard.getInstance().platform.globalStateManager.get(BukkitAdapter.adapt(server.worlds.first()))
-                .blockPluginSpawning = false
+//        WorldGuard.getInstance().platform.globalStateManager.get(BukkitAdapter.adapt(server.worlds.first()))
+//                .blockPluginSpawning = false
 
         //Registering custom WorldGuard flag
         val registry = WorldGuard.getInstance().flagRegistry
@@ -78,6 +77,7 @@ class Mobzy : JavaPlugin() {
         saveDefaultConfig()
         reloadConfig()
         MobzyTypes
+        mobzyConfig = MobzyConfig.load(config.saveToString())
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)

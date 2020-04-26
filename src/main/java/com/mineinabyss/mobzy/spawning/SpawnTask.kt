@@ -17,9 +17,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-import org.nield.kotlinstatistics.dbScanCluster
 import kotlin.system.measureNanoTime
 
 private const val SPAWN_TRIES = 5
@@ -116,7 +114,7 @@ class SpawnTask : BukkitRunnable() {
                     .filter { (type, count) -> count < mobzyConfig.getMobCap(type) }
 
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
-    private fun List<Player>.toPlayerGroups(): List<List<Player>> = groupBy { it.world }
+    /*private fun List<Player>.toPlayerGroups(): List<List<Player>> = groupBy { it.world }
             .flatMap { (_, players) ->
                 players.dbScanCluster(
                         maximumRadius = mobzyConfig.spawnSearchRadius,
@@ -124,7 +122,7 @@ class SpawnTask : BukkitRunnable() {
                         xSelector = { it.location.x },
                         ySelector = { it.location.z }
                 )
-            }.map { it.points }
+            }.map { it.points }*/
 
     /** Converts a list of entities to a map of entity types to the amount of entities of that type. */
     private fun List<Entity>.toEntityTypeCounts(): MutableMap<String, Int> =

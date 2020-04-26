@@ -27,25 +27,25 @@ import java.util.*
  * @property spawnCfgs A list of [FileConfiguration]s used for defining mob spawning behaviour.
  * @property mobCfgs A list of [FileConfiguration]s used for defining mob attributes, such as drops.
  * @property creatureTypes A list of the types of creatures (currently everything from [EnumCreatureType].
- * @property isDebug whether the plugin is in a debug state (used primarily for broadcasting messages)
+ * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
  * @property spawnSearchRadius the radius around which players will count mobs towards the local mob cap
  * @property minChunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
  * @property maxChunkSpawnRad the maximum number of chunks away from the player in which a mob can spawn
- * @property maxSpawnAmount the maximum number of mobs to spawn with /mobzy spawn
+ * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
  * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
  * @property doMobSpawns whether custom mob spawning enabled
  */
 @Serializable
 data class MobzyConfig(
-        var isDebug: Boolean,
+        var debug: Boolean,
         var doMobSpawns: Boolean,
         val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC"),
-        private val mobCaps: MutableMap<String, Int> = HashMap(),
-        var spawnSearchRadius: Double = 0.0,
+//        var spawnSearchRadius: Double = 0.0,
         var minChunkSpawnRad: Int = 0,
         var maxChunkSpawnRad: Int = 0,
-        var maxSpawnAmount: Int = 0,
-        var spawnTaskDelay: Long = 0L
+        var maxCommandSpawns: Int = 0,
+        var spawnTaskDelay: Long = 0L,
+        private val mobCaps: MutableMap<String, Int> = HashMap()
 ) {
     @Transient
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
@@ -62,7 +62,7 @@ data class MobzyConfig(
         spawnCfgs.forEach { it.save() }
     }
 
-    init{
+    init {
         //first tick only finishes when all plugins are loaded, which is when we activate addons
         Bukkit.getServer().scheduler.runTaskLater(mobzy, Runnable {
             mobzyConfig.activateAddons()
@@ -109,7 +109,7 @@ data class MobzyConfig(
             reloadExistingEntities()
         }
 
-        sender.success("Reloaded config")
+        sender.success("Successfully reloaded config")
     }
 
 
@@ -172,6 +172,6 @@ data class MobzyConfig(
     }
 
     companion object {
-        fun load() = Yaml.default.parse(MobzyConfig.serializer(), mobzy.config.saveToString())
+        fun load(config: String) = Yaml.default.parse(MobzyConfig.serializer(), config)
     }
 }

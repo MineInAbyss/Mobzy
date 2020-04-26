@@ -45,7 +45,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     private fun buildRegions(config: SpawnConfiguration): Layout = guiyLayout {
         this@MobzyGUI.config = config
         setElement(0, 0, FillableElement(4, 8)) {
-            config.info.regions.values.forEach { region ->
+            config.info.regions.forEach { region ->
                 val regionName = region.name
                 val material = region.icon
 

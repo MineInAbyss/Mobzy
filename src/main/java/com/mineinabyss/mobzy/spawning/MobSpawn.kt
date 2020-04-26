@@ -5,6 +5,7 @@ import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.server.v1_15_R1.EntityTypes
@@ -39,26 +40,26 @@ import kotlin.random.Random
 @Serializable
 data class MobSpawn(
         val reuse: String? = null,
-        val entityTypeName: String?,
-        val minAmount: Int = 1, //TODO use IntRanges for the min/max properties
-        val maxAmount: Int = 1,
+        @SerialName("mob") val entityTypeName: String? = null,
+        @SerialName("min-amount") val minAmount: Int = 1, //TODO use IntRanges for the min/max properties
+        @SerialName("max-amount") val maxAmount: Int = 1,
         val radius: Double = 0.0,
-        val basePriority: Double = 1.0,
-        val minTime: Long = -1,
-        val maxTime: Long = 10000000,
-        val minLight: Long = 0,
-        val maxLight: Long = 100,
-        val minY: Int = 0,
-        val maxY: Int = 256,
-        val minGap: Int = 0,
-        val maxGap: Int = 256,
-        val maxLocalGroup: Int = -1,
-        val localGroupRadius: Double = 10.0,
-        val spawnPos: SpawnPosition = SpawnPosition.GROUND,
-        val blockWhitelist: List<Material> = listOf()
+        @SerialName("priority") val basePriority: Double = 1.0,
+        @SerialName("min-time") val minTime: Long = -1,
+        @SerialName("max-time") val maxTime: Long = 10000000,
+        @SerialName("min-light") val minLight: Long = 0,
+        @SerialName("max-light") val maxLight: Long = 100,
+        @SerialName("min-y") val minY: Int = 0,
+        @SerialName("max-y") val maxY: Int = 256,
+        @SerialName("min-gap") val minGap: Int = 0,
+        @SerialName("max-gap") val maxGap: Int = 256,
+        @SerialName("max-local-group") val maxLocalGroup: Int = -1,
+        @SerialName("local-group-radius") val localGroupRadius: Double = 10.0,
+        @SerialName("spawn-pos") val spawnPos: SpawnPosition = SpawnPosition.GROUND,
+        @SerialName("block-whitelist") val blockWhitelist: List<Material> = listOf()
 ) {
     @Transient
-    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[entityTypeName]} ?: EntityTypes.ZOMBIE
+    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[entityTypeName] } ?: EntityTypes.ZOMBIE
     private val amountRange: IntRange get() = minAmount..maxAmount
     private val timeRange: LongRange get() = minTime..maxTime
     private val lightRange: LongRange get() = minLight..maxLight
@@ -66,9 +67,9 @@ data class MobSpawn(
     private val gapRange: IntRange get() = minGap..maxGap
 
     init {
-        if (reuse != null) {
-            SpawnRegistry.reuseMobSpawn(reuse) //TODO oh god what am I going to do here
-        }
+//        if (reuse != null) {
+//            SpawnRegistry.reuseMobSpawn(reuse) //TODO oh god what am I going to do here
+//        }
         //        else error("Serialization failed. No `mob` or `reuse` tag is defined in the spawn.")
     }
 

@@ -14,6 +14,6 @@ class SpawnConfiguration(
     data class SpawnCfgInfo(
             val name: String,
             val icon: Material,
-            val regions: Map<String, SpawnRegion>
+            val regions: List<SpawnRegion>
     )
 }

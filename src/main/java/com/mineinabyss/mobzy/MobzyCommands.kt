@@ -94,7 +94,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
                 var numOfSpawns by +IntArg("number of mobs to spawn") { default = 1 }
                 onExecuteByPlayer {
-                    if (numOfSpawns > mobzyConfig.maxSpawnAmount) numOfSpawns = mobzyConfig.maxSpawnAmount
+                    if (numOfSpawns > mobzyConfig.maxCommandSpawns) numOfSpawns = mobzyConfig.maxCommandSpawns
                     for (i in 0 until numOfSpawns) (sender as Player).location.spawnEntity(mobName)
                 }
             }
@@ -116,12 +116,12 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                     //TODO expand for all properties
                     onExecute {
-                        if(mobzyConfig.doMobSpawns != enabled) {
+                        if (mobzyConfig.doMobSpawns != enabled) {
                             mobzyConfig.doMobSpawns = enabled
                             mobzyConfig.saveConfig()
                             sender.success("Config option doMobSpawns has been set to $enabled")
-                        }
-                        sender.success("Config option doMobSpawns was already set to $enabled")
+                        } else
+                            sender.success("Config option doMobSpawns was already set to $enabled")
                     }
                 }
             }
@@ -144,7 +144,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     min = args[2].toInt()
                 } catch (e: NumberFormatException) {
                 }
-                return (min until mobzyConfig.maxSpawnAmount).asIterable()
+                return (min until mobzyConfig.maxCommandSpawns).asIterable()
                         .map { it.toString() }.filter { it.startsWith(min.toString()) }
             }
         if (subCommand in listOf("remove", "rm", "info", "i"))
