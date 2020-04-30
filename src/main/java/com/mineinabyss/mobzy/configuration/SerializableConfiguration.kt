@@ -37,7 +37,9 @@ abstract class SerializableConfiguration<T>(
     }
 
     fun save() {
-        config.loadFromString(Yaml.default.stringify(serializer, info))
+        //TODO we probably want to have the same YamlConfiguration everywhere, would be worth making easy access to it
+        val yaml = Yaml(configuration = com.charleskorn.kaml.YamlConfiguration(encodeDefaults = false))
+        config.loadFromString(yaml.stringify(serializer, info))
         config.save(file)
     }
 

@@ -19,7 +19,8 @@ data class MobDrop(
         @SerialName("cook-time") val cookTime: Int = 200,
         @SerialName("min-amount") val minAmount: Int = 1,
         @SerialName("max-amount") val maxAmount: Int = 1,
-        @SerialName("drop-chance") val dropChance: Double = 1.0) {
+        @SerialName("drop-chance") val dropChance: Double = 1.0
+) {
     init {
         if (cooked != null) {
             val cookedItem = cooked.toItemStack()

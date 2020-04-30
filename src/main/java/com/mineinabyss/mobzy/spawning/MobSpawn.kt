@@ -1,13 +1,17 @@
+@file:UseSerializers(OptionalPropertySerializer::class)
+
 package com.mineinabyss.mobzy.spawning
 
+import com.charleskorn.kaml.Yaml
+import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
+import kotlinx.serialization.*
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.serializer
 import net.minecraft.server.v1_15_R1.EntityTypes
 import org.bukkit.Location
 import org.bukkit.Material
@@ -16,6 +20,57 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.sign
 import kotlin.random.Random
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.isAccessible
+
+class OptionalProperty<T>(var value: T, val isPresent: Boolean = false) {
+    operator fun getValue(thisRef: Any, property: KProperty<*>): T {
+        return value
+    }
+
+    internal fun updateValue(new: Any) {
+        value = new as T
+    }
+}
+
+
+@Serializer(forClass = OptionalProperty::class)
+class OptionalPropertySerializer<T>(
+        private val valueSerializer: KSerializer<T>
+) : KSerializer<OptionalProperty<T>> {
+    override val descriptor: SerialDescriptor = valueSerializer.descriptor
+
+    override fun deserialize(decoder: Decoder): OptionalProperty<T> {
+        logInfo("We deserializin, boys")
+        return OptionalProperty(valueSerializer.deserialize(decoder), true)
+    }
+
+    override fun serialize(encoder: Encoder, value: OptionalProperty<T>) {
+        logInfo("we serealizing ${value.value}")
+        if (value.value is List<*>) return
+
+        if (value.isPresent) valueSerializer.serialize(encoder, value.value)
+//        else valueSerializer.serialize(encoder, "default")
+    }
+
+    /*final override fun patch(
+            decoder: Decoder,
+            old: OptionalProperty<T>
+    ): OptionalProperty<T> =
+            when (old) {
+                OptionalProperty.NotPresent -> throw SerializationException(
+                        "Tried to patch an optional property that had no value present." +
+                                " Is encodeDefaults false?"
+                )
+                is OptionalProperty.Present ->
+                    OptionalProperty.Present(valueSerializer.patch(decoder, old.value))
+            }*/
+}
+
+private fun <T> T.opt(): OptionalProperty<T> = OptionalProperty(this)
+typealias P<T> = OptionalProperty<T>
 
 /**
  * @property entityType The the type of entity to spawn.
@@ -35,31 +90,42 @@ import kotlin.random.Random
  * @property maxLocalGroup The maximum number of entities of this type that can spawn within the [localGroupRadius].
  * @property localGroupRadius The radius for which the [maxLocalGroup] acts in.
  * @property spawnPos Whether the mob should be spawned directly on the ground, in air, or under cliffs.
- * @property blockWhitelist The list of blocks on top of which this mob can spawn.
+ * @property [blockWhitelist] The list of blocks on top of which this mob can spawn.
  */
 @Serializable
 data class MobSpawn(
-        val reuse: String? = null,
-        @SerialName("mob") val entityTypeName: String? = null,
-        @SerialName("min-amount") val minAmount: Int = 1, //TODO use IntRanges for the min/max properties
-        @SerialName("max-amount") val maxAmount: Int = 1,
-        val radius: Double = 0.0,
-        @SerialName("priority") val basePriority: Double = 1.0,
-        @SerialName("min-time") val minTime: Long = -1,
-        @SerialName("max-time") val maxTime: Long = 10000000,
-        @SerialName("min-light") val minLight: Long = 0,
-        @SerialName("max-light") val maxLight: Long = 100,
-        @SerialName("min-y") val minY: Int = 0,
-        @SerialName("max-y") val maxY: Int = 256,
-        @SerialName("min-gap") val minGap: Int = 0,
-        @SerialName("max-gap") val maxGap: Int = 256,
-        @SerialName("max-local-group") val maxLocalGroup: Int = -1,
-        @SerialName("local-group-radius") val localGroupRadius: Double = 10.0,
-        @SerialName("spawn-pos") val spawnPos: SpawnPosition = SpawnPosition.GROUND,
-        @SerialName("block-whitelist") val blockWhitelist: List<Material> = listOf()
+        val keyMap: Map<String, String> = mapOf()
 ) {
+    //TODO by making T reified, we can let kotlin use reflection to avoid passing serializers like we do below
+    // The performance drawbacks don't matter too much, the bigger issue is it's currently experimental and requires
+    // any chain of functions using it to have an @ImplicitReflectionSerializer annotation.
+    private fun <T> serialize(serializeWith: KSerializer<T>, name: String): T? {
+        return Yaml.default.parse(serializeWith, keyMap[name] ?: return null)
+    }
+    val reuse: String? = serialize(String.serializer(), "reuse")
+    val entityTypeName: String? = serialize(String.serializer(), "mob")
+    val minAmount: Int = serialize(Int.serializer(), "min-amount") ?: 1
+    val maxAmount: Int = serialize(Int.serializer(), "max-amount") ?: 1
+    val radius: Double = serialize(Double.serializer(), "radius") ?: 0.0
+    val basePriority: Double = serialize(Double.serializer(), "priority") ?: 1.0
+    val minTime: Long = serialize(Long.serializer(), "min-time") ?: -1L
+    val maxTime: Long = serialize(Long.serializer(), "max-time") ?: 10000000L
+    val minLight: Long = serialize(Long.serializer(), "min-light") ?: 0L
+    val maxLight: Long = serialize(Long.serializer(), "max-light") ?: 100L
+    val minY: Int = serialize(Int.serializer(), "min-y") ?: 0
+    val maxY: Int = serialize(Int.serializer(), "max-y") ?: 256
+    val minGap: Int = serialize(Int.serializer(), "min-gap") ?: 0
+    val maxGap: Int = serialize(Int.serializer(), "max-gap") ?: 256
+    val maxLocalGroup: Int = serialize(Int.serializer(), "max-local-group") ?: -1
+    val localGroupRadius: Double = serialize(Double.serializer(), "local-group-radius") ?: 10.0
+    val spawnPos: SpawnPosition = serialize(SpawnPosition.serializer(), "spawn-pos") ?: SpawnPosition.GROUND
+    val blockWhitelist: List<Material> = (serialize(MaterialWrapper.serializer().list, "block-whitelist") ?: listOf()).map { it.material }
+
+    @Serializable
+    private class MaterialWrapper(val material: Material)
+
     @Transient
-    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[entityTypeName] } ?: EntityTypes.ZOMBIE
+    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[entityTypeName!!] } ?: EntityTypes.ZOMBIE
     private val amountRange: IntRange get() = minAmount..maxAmount
     private val timeRange: LongRange get() = minTime..maxTime
     private val lightRange: LongRange get() = minLight..maxLight
@@ -67,10 +133,23 @@ data class MobSpawn(
     private val gapRange: IntRange get() = minGap..maxGap
 
     init {
-//        if (reuse != null) {
-//            SpawnRegistry.reuseMobSpawn(reuse) //TODO oh god what am I going to do here
-//        }
-        //        else error("Serialization failed. No `mob` or `reuse` tag is defined in the spawn.")
+//        blockWhitelist
+        //TODO spawns should get registered right away, not regions
+//        if (reuse != null) applyFrom(SpawnRegistry.reuseMobSpawn(reuse!!))
+    }
+
+    fun applyFrom(other: MobSpawn) {
+        MobSpawn::class.primaryConstructor?.parameters?.forEach { param ->
+            val name = param.name ?: return@forEach
+            if (!name.startsWith('_')) return@forEach
+            val reflectProperty = MobSpawn::class.memberProperties.firstOrNull { it.name == name.removePrefix("_") }
+                    ?: return@forEach
+            reflectProperty.isAccessible = true
+            val ourProp = reflectProperty.get(this) as? OptionalProperty<*> ?: return@forEach
+            val otherProp = reflectProperty.get(other) as? OptionalProperty<*> ?: return@forEach
+            if (!ourProp.isPresent)
+                ourProp.updateValue(otherProp.value ?: return@forEach)
+        }
     }
 
     @JvmOverloads
@@ -117,6 +196,7 @@ data class MobSpawn(
     fun chooseSpawnAmount(): Int =
             if (minAmount >= maxAmount) minAmount else (Math.random() * (maxAmount - minAmount + 1)).toInt() + minAmount
 
+    @Serializable
     enum class SpawnPosition {
         AIR, GROUND, OVERHANG
     }

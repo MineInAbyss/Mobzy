@@ -62,7 +62,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         setElement(0, 0, FillableElement(4, 8)) {
             spawns.forEach { spawn ->
                 val spawnBuilder = if (spawn.reuse != null)
-                    MobzyTemplates[reuseMobSpawn(spawn.reuse).entityTypeName ?: error("Reuse was null")]
+                    MobzyTemplates[reuseMobSpawn(spawn.reuse!!).entityTypeName ?: error("Reuse was null")]
                 else
                     MobzyTemplates[spawn.entityTypeName ?: error("Reuse was null")]
 

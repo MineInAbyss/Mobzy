@@ -10,7 +10,6 @@ import com.mineinabyss.mobzy.configuration.MobConfiguration
 import com.mineinabyss.mobzy.configuration.SpawnConfiguration
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -138,7 +137,7 @@ data class MobzyConfig(
     fun loadSpawnCfg(plugin: MobzyAddon) {
         val spawnCfg = SpawnConfiguration(plugin.spawnConfig, plugin)
         spawnCfgs += spawnCfg
-        SpawnRegistry += spawnCfg
+//        SpawnRegistry += spawnCfg
     }
 
     /**

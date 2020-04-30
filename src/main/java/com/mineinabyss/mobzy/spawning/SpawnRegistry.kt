@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.mobzy.Mobzy
-import com.mineinabyss.mobzy.configuration.SpawnConfiguration
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
@@ -17,13 +16,13 @@ object SpawnRegistry {
 
     fun unregisterSpawns() = regionSpawns.clear()
 
-    operator fun plusAssign(config: SpawnConfiguration) {
-        regionSpawns += config.info.regions.associateBy { region -> region.name }
-    }
-
-//    operator fun plusAssign(region: SpawnRegion) {
-//        regionSpawns += region.name to region
+//    operator fun plusAssign(config: SpawnConfiguration) {
+//        regionSpawns += config.info.regions.associateBy { region -> region.name }
 //    }
+
+    operator fun plusAssign(region: SpawnRegion) {
+        regionSpawns += region.name to region
+    }
 
     fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this because I have no idea what it's doing
             (regionSpawns[reusedMob.substring(0, reusedMob.indexOf(':'))]
