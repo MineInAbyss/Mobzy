@@ -23,6 +23,9 @@ object SpawnRegistry {
     operator fun plusAssign(region: SpawnRegion) {
         regionSpawns += region.name to region
     }
+//    fun addSpawn(region: SpawnRegion, spawn: MobSpawn) {
+//        regionSpawns.getOrPut(region.name, { mutableListOf() }).add(spawn)
+//    }
 
     fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this because I have no idea what it's doing
             (regionSpawns[reusedMob.substring(0, reusedMob.indexOf(':'))]

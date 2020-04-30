@@ -4,6 +4,7 @@ import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
@@ -16,6 +17,7 @@ abstract class SerializableConfiguration<T>(
 ) {
     val config: FileConfiguration
     var info: T private set
+    open val serialFormat: StringFormat = Yaml.default
 
     init {
         logInfo("Registering configuration ${file.name}")
@@ -30,16 +32,13 @@ abstract class SerializableConfiguration<T>(
         logSuccess("Registered configuration: ${file.name}")
     }
 
-    fun reload(){
+    fun reload() {
         config.load(file)
         info = parseConfiguration()
-
     }
 
     fun save() {
-        //TODO we probably want to have the same YamlConfiguration everywhere, would be worth making easy access to it
-        val yaml = Yaml(configuration = com.charleskorn.kaml.YamlConfiguration(encodeDefaults = false))
-        config.loadFromString(yaml.stringify(serializer, info))
+        config.loadFromString(serialFormat.stringify(serializer, info))
         config.save(file)
     }
 

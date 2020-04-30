@@ -14,7 +14,7 @@ import org.bukkit.Material
 class SpawnRegion(
         val name: String,
         val icon: Material = Material.BEDROCK,
-        val spawns: List<MobSpawn>
+        val spawns: List<MobSpawn> = listOf()
 ) {
     init {
         SpawnRegistry += this
