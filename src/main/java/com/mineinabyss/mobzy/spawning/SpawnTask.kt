@@ -2,12 +2,12 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
+import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.creatureType
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.mobzyConfig
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.toNMS
@@ -17,7 +17,9 @@ import com.sk89q.worldguard.protection.managers.RegionManager
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import kotlin.math.sign
 import kotlin.system.measureNanoTime
 
 private const val SPAWN_TRIES = 5
@@ -34,7 +36,7 @@ inline fun <T> printTimeMillis(name: String, block: () -> T): T {
 class SpawnTask : BukkitRunnable() {
     override fun run() {
         try {
-            if (!mobzyConfig.doMobSpawns) cancel().let { return }
+            if (!MobzyConfig.doMobSpawns) cancel().let { return }
         } catch (e: NoClassDefFoundError) {
             e.printStackTrace()
             cancel()
@@ -52,12 +54,6 @@ class SpawnTask : BukkitRunnable() {
                 Bukkit.getServer().worlds.flatMap { world -> world.entities.filter { it.isCustomMob } }
             }
 
-            val addNums = fun (one: Int, two: Int): Int {
-                return one + two
-            }
-            addNums.invoke(1, 2)
-
-
             Bukkit.getOnlinePlayers().forEach { player ->
 //                val regionManager = container[BukkitAdapter.adapt(player.world)] ?: return@forEach
 
@@ -68,11 +64,11 @@ class SpawnTask : BukkitRunnable() {
 
                 customMobs.toCreatureTypeCounts().forEach spawnPerType@{ (type, count) ->
                     var newCount = count
-                    val creatureTypeCap = mobzyConfig.getMobCap(type)
+                    val creatureTypeCap = MobzyConfig.getMobCap(type)
                     if (newCount > creatureTypeCap)
                         return@spawnPerType
 
-                    val chunkSpawn: ChunkSpawn = TODO("Get a random spawn")
+                    val chunkSpawn: ChunkSpawn = player.randomChunkNearby
 
                     val spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES) ?: return@spawnPerType
 
@@ -106,12 +102,23 @@ class SpawnTask : BukkitRunnable() {
         })
     }
 
+    private val Player.randomChunkNearby: ChunkSpawn
+        get() {
+            val loc = this.location
+            val chunk = player?.location?.chunk ?: error("Player is not in a chunk")
+            fun randomOffset() = randomSign * (MobzyConfig.minChunkSpawnRad..MobzyConfig.maxChunkSpawnRad).random()
+            val newX = chunk.x + randomOffset()
+            val newZ = chunk.z + randomOffset()
+            val newChunk = this.world.getChunkAt(newX, newZ)
+            return ChunkSpawn(newChunk, 0, 256) //TODO proper min max y
+        }
+
     /** Convert a list of entities to: a map of the names of creature types to the number of creatures of that type,
      * without types that have exceeded their mob cap. */
     private fun List<Entity>.toCreatureTypeCounts(): Map<String, Int> =
-            mobzyConfig.creatureTypes.associateWith { 0 }
+            MobzyConfig.creatureTypes.associateWith { 0 }
                     .plus(map { it.toNMS().creatureType }.groupingBy { it }.eachCount())
-                    .filter { (type, count) -> count < mobzyConfig.getMobCap(type) }
+                    .filter { (type, count) -> count < MobzyConfig.getMobCap(type) }
 
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
     /*private fun List<Player>.toPlayerGroups(): List<List<Player>> = groupBy { it.world }
@@ -140,4 +147,6 @@ class SpawnTask : BukkitRunnable() {
      * decision on the spawn. */
     private fun RegionManager.getWorldGuardRegions(spawnArea: SpawnArea) =
             getApplicableRegions(BukkitAdapter.asBlockVector(spawnArea.bottom)).regions.sorted()
+
+    private val randomSign get() = ((0..1).random() - 0.5).sign.toInt()
 }

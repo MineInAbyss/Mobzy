@@ -30,16 +30,16 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 onExecute {
                     sender.info(("""
                             LOG OF CURRENTLY REGISTERED STUFF:
-                            Mob configs: ${mobzyConfig.mobCfgs}
-                            Spawn configs: ${mobzyConfig.spawnCfgs}
-                            Registered addons: ${mobzyConfig.registeredAddons}
+                            Mob configs: ${MobzyConfig.mobCfgs}
+                            Spawn configs: ${MobzyConfig.spawnCfgs}
+                            Registered addons: ${MobzyConfig.registeredAddons}
                             Registered EntityTypes: ${MobzyTypes.typeNames}""".trimIndent()))
                 }
             }
 
             command("reload", "rl", desc = "Reloads the configuration files") {
                 onExecute {
-                    mobzyConfig.reload(sender)
+                    MobzyConfig.reload(sender)
                 }
             }
 
@@ -94,7 +94,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
                 var numOfSpawns by +IntArg("number of mobs to spawn") { default = 1 }
                 onExecuteByPlayer {
-                    if (numOfSpawns > mobzyConfig.maxCommandSpawns) numOfSpawns = mobzyConfig.maxCommandSpawns
+                    if (numOfSpawns > MobzyConfig.maxCommandSpawns) numOfSpawns = MobzyConfig.maxCommandSpawns
                     for (i in 0 until numOfSpawns) (sender as Player).location.spawnEntity(mobName)
                 }
             }
@@ -114,11 +114,12 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
                     val enabled by +BooleanArg("enabled")
 
-                    //TODO expand for all properties
+                    //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
+                    // be made private once that's done
                     onExecute {
-                        if (mobzyConfig.doMobSpawns != enabled) {
-                            mobzyConfig.doMobSpawns = enabled
-                            mobzyConfig.saveConfig()
+                        if (MobzyConfig.doMobSpawns != enabled) {
+                            MobzyConfig.serialized.doMobSpawns = enabled
+                            MobzyConfig.saveConfig()
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")
@@ -145,7 +146,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     min = args[2].toInt()
                 } catch (e: NumberFormatException) {
                 }
-                return (min until mobzyConfig.maxCommandSpawns).asIterable()
+                return (min until MobzyConfig.maxCommandSpawns).asIterable()
                         .map { it.toString() }.filter { it.startsWith(min.toString()) }
             }
         if (subCommand in listOf("remove", "rm", "info", "i"))

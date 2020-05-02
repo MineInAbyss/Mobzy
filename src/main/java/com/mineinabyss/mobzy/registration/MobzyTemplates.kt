@@ -1,9 +1,9 @@
 package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.idofront.messaging.logSuccess
+import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.MobTemplate
-import com.mineinabyss.mobzy.mobzyConfig
 import net.minecraft.server.v1_15_R1.EntityTypes
 
 object MobzyTemplates {
@@ -40,7 +40,7 @@ object MobzyTemplates {
     /** Deserializes the templates for all mobs in the configuration */
     private fun readTemplateConfig(): Map<String, MobTemplate> {
         val map = mutableMapOf<String, MobTemplate>()
-        mobzyConfig.mobCfgs.forEach {
+        MobzyConfig.mobCfgs.forEach {
             map += it.info.templates
         }
         return map.toMap()

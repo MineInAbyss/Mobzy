@@ -4,6 +4,16 @@ import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.mobzy.MobzyConfig.creatureTypes
+import com.mineinabyss.mobzy.MobzyConfig.debug
+import com.mineinabyss.mobzy.MobzyConfig.doMobSpawns
+import com.mineinabyss.mobzy.MobzyConfig.maxChunkSpawnRad
+import com.mineinabyss.mobzy.MobzyConfig.maxCommandSpawns
+import com.mineinabyss.mobzy.MobzyConfig.minChunkSpawnRad
+import com.mineinabyss.mobzy.MobzyConfig.mobCfgs
+import com.mineinabyss.mobzy.MobzyConfig.registeredAddons
+import com.mineinabyss.mobzy.MobzyConfig.spawnCfgs
+import com.mineinabyss.mobzy.MobzyConfig.spawnTaskDelay
 import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.api.toEntityTypesViaScoreboardTags
 import com.mineinabyss.mobzy.configuration.MobConfiguration
@@ -34,17 +44,26 @@ import java.util.*
  * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
  * @property doMobSpawns whether custom mob spawning enabled
  */
-@Serializable
-data class MobzyConfig(
-        var debug: Boolean,
-        var doMobSpawns: Boolean,
-//        var spawnSearchRadius: Double = 0.0,
-        var minChunkSpawnRad: Int = 0,
-        var maxChunkSpawnRad: Int = 0,
-        var maxCommandSpawns: Int = 0,
-        var spawnTaskDelay: Long = 0L,
-        private val mobCaps: MutableMap<String, Int> = HashMap()
-) {
+object MobzyConfig {
+    lateinit var serialized: SerializedMobzyConfig; private set
+    val debug get() = serialized.debug
+    val doMobSpawns get() = serialized.doMobSpawns
+    val minChunkSpawnRad get() = serialized.minChunkSpawnRad
+    val maxChunkSpawnRad get() = serialized.maxChunkSpawnRad
+    val maxCommandSpawns get() = serialized.maxCommandSpawns
+    val spawnTaskDelay get() = serialized.spawnTaskDelay
+
+    @Serializable
+    data class SerializedMobzyConfig(
+            var debug: Boolean,
+            var doMobSpawns: Boolean,
+            var minChunkSpawnRad: Int,
+            var maxChunkSpawnRad: Int,
+            var maxCommandSpawns: Int,
+            var spawnTaskDelay: Long,
+            val mobCaps: MutableMap<String, Int> = HashMap()
+    )
+
     @Transient
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
 
@@ -57,27 +76,33 @@ data class MobzyConfig(
     @Transient
     val mobCfgs: MutableList<MobConfiguration> = mutableListOf()
 
-    fun saveConfig() {
-        mobzy.config.loadFromString(Yaml.default.stringify(MobzyConfig.serializer(), this))
-        mobzy.saveConfig()
-        spawnCfgs.forEach { it.save() }
+    private fun loadSerializedValues() {
+        serialized = Yaml.default.parse(SerializedMobzyConfig.serializer(), mobzy.config.saveToString())
     }
 
     init {
+        loadSerializedValues()
         //first tick only finishes when all plugins are loaded, which is when we activate addons
-        Bukkit.getServer().scheduler.runTaskLater(mobzy, Runnable {
-            mobzyConfig.activateAddons()
-        }, 1L)
+        Bukkit.getServer().scheduler.runTaskLater(mobzy, Runnable { activateAddons() }, 1L)
+    }
+
+    fun saveConfig() {
+        mobzy.config.loadFromString(Yaml.default.stringify(SerializedMobzyConfig.serializer(), serialized))
+        mobzy.saveConfig()
+        spawnCfgs.forEach { it.save() }
     }
 
     /**
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
      */
-    fun getMobCap(creatureType: String): Int = mobCaps[creatureType]
+    fun getMobCap(creatureType: String): Int = serialized.mobCaps[creatureType]
             ?: error("could not find mob cap for $creatureType")
 
-    /** Reload the configurations stored in the plugin. Most stuff requires a full reload of the plugin now */
+    /**
+     * Reloads the configurations stored in the plugin. Will re-serialize a new instance of MobzyConfig.
+     * Some things require a full plugin reload.
+     */
     fun reload(sender: CommandSender = mobzy.server.consoleSender) {
         val consoleSender = mobzy.server.consoleSender
         fun attempt(success: String, fail: String, block: () -> Unit) {
@@ -87,7 +112,7 @@ data class MobzyConfig(
                 if (sender != consoleSender) consoleSender.success(success)
             } catch (e: Exception) {
                 sender.error(fail)
-                if (sender != consoleSender) consoleSender.error(success)
+                if (sender != consoleSender) consoleSender.error(fail)
                 e.printStackTrace()
                 return
             }
@@ -101,6 +126,11 @@ data class MobzyConfig(
         spawnCfgs.clear()
         mobCfgs.clear()
         unregisterSpawns()
+
+        attempt("Loaded serialized config values", "Failed to load serialized config values") {
+            mobzy.reloadConfig()
+            loadSerializedValues()
+        }
 
         attempt("Reactivated all addonsMobzy", "Failed to reactive addons") {
             activateAddons()
@@ -171,9 +201,5 @@ data class MobzyConfig(
             }
         }
         logSuccess("Reloaded $num custom entities")
-    }
-
-    companion object {
-        fun load(config: String) = Yaml.default.parse(MobzyConfig.serializer(), config)
     }
 }

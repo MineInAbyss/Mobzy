@@ -4,7 +4,6 @@ import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.messaging.logSuccess
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.StringFormat
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
@@ -17,7 +16,7 @@ abstract class SerializableConfiguration<T>(
 ) {
     val config: FileConfiguration
     var info: T private set
-    open val serialFormat: StringFormat = Yaml.default
+    val serialFormat = Yaml(configuration = com.charleskorn.kaml.YamlConfiguration(encodeDefaults = false))
 
     init {
         logInfo("Registering configuration ${file.name}")
@@ -28,6 +27,7 @@ abstract class SerializableConfiguration<T>(
             logSuccess("${file.name} has been created")
         }
         config = YamlConfiguration.loadConfiguration(file)
+        serialFormat
         info = parseConfiguration()
         logSuccess("Registered configuration: ${file.name}")
     }
@@ -42,5 +42,5 @@ abstract class SerializableConfiguration<T>(
         config.save(file)
     }
 
-    private fun parseConfiguration(): T = Yaml.default.parse(serializer, config.saveToString())
+    private fun parseConfiguration(): T = serialFormat.parse(serializer, config.saveToString())
 }

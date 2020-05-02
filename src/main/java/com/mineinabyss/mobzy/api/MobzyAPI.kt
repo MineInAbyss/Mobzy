@@ -4,8 +4,8 @@
 package com.mineinabyss.mobzy.api
 
 import com.mineinabyss.mobzy.MobzyAddon
-import com.mineinabyss.mobzy.mobzyConfig
+import com.mineinabyss.mobzy.MobzyConfig
 
 fun MobzyAddon.registerAddonWithMobzy() {
-    if (!mobzyConfig.registeredAddons.contains(this)) mobzyConfig.registeredAddons += this
+    if (!MobzyConfig.registeredAddons.contains(this)) MobzyConfig.registeredAddons += this
 }

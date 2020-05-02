@@ -9,10 +9,10 @@ import com.derongan.minecraft.guiy.kotlin_dsl.button
 import com.derongan.minecraft.guiy.kotlin_dsl.guiyLayout
 import com.derongan.minecraft.guiy.kotlin_dsl.setElement
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.configuration.SpawnConfiguration
 import com.mineinabyss.mobzy.gui.layouts.MobConfigLayout
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.mobzyConfig
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.reuseMobSpawn
@@ -25,7 +25,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     private var config: SpawnConfiguration? = null
 
     private fun buildMobConfigLayout(): Layout {
-        val configs: Collection<SpawnConfiguration> = mobzyConfig.spawnCfgs
+        val configs: Collection<SpawnConfiguration> = MobzyConfig.spawnCfgs
         return if (configs.size == 1)
             buildRegions(configs.first())
         else guiyLayout {

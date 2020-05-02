@@ -12,7 +12,6 @@ import net.minecraft.server.v1_15_R1.EntityTypes
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.util.Vector
-import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.sign
 import kotlin.random.Random
@@ -144,7 +143,7 @@ data class MobSpawn(
         val loc = area.getSpawnLocation(spawnPos)
         for (i in 0 until spawns) {
             if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
-                (getSpawnInRadius(loc, 0.0, radius) ?: loc).spawnEntity(entityType)
+                (getSpawnInRadius(loc, radius) ?: loc).spawnEntity(entityType)
             else loc.spawnEntity(entityType)
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
             //FIXME
@@ -223,29 +222,28 @@ data class MobSpawn(
      * Gets a location to spawn in a mob given an original location and min/max radii around it
      *
      * @param loc    the location to check off of
-     * @param minRad the minimum radius for the new location to be picked at
      * @param maxRad the maximum radius for the new location to be picked at
      * @return a new position to spawn in
      */
-    private fun getSpawnInRadius(loc: Location, minRad: Double, maxRad: Double): Location? {
-        for (i in 0..29) {
-            val y = (Math.random() - 0.5) * maxRad
-            //if y is minRad blocks away from player, mobs can spawn directly under or above
-            val minRadCalculated = if (abs(y) > minRad) 0.0 else minRad
+    private fun getSpawnInRadius(loc: Location, maxRad: Double): Location? {
+        if (!loc.chunk.isLoaded) return null
+        for (i in 0..29) { //TODO, arbitrary number, should instead search all locations around the spawn
+            val x = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
+            val z = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
+            val searchLoc: Location = loc.clone().add(Vector(x, 0.0, z))
 
-            val x = sign(Math.random() - 0.5) * Random.nextDouble(minRadCalculated, maxRad)
-            val z = sign(Math.random() - 0.5) * Random.nextDouble(minRadCalculated, maxRad)
-            if (!loc.chunk.isLoaded) return null
-            var searchLoc: Location? = loc.clone()
-            searchLoc = searchLoc!!.add(Vector(x, y, z))
-            if (!searchLoc.block.type.isSolid) {
-                searchLoc = VerticalSpawn.checkDown(searchLoc, 25)
-                if (searchLoc != null) return searchLoc
+            return if (!searchLoc.block.type.isSolid) {
+                VerticalSpawn.checkDown(searchLoc, 2) ?: continue
             } else {
-                searchLoc = VerticalSpawn.checkUp(searchLoc, 25)
-                if (searchLoc != null) return searchLoc
+                VerticalSpawn.checkUp(searchLoc, 2) ?: continue
             }
         }
         return null
+    }
+}
+
+fun runAroundLocation(radius: Int, forEach: (x: Int, z: Int) -> Unit) {
+    for (x in -radius..radius) for (z in -radius..radius) {
+        forEach(x, z)
     }
 }

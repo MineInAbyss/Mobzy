@@ -19,11 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin
 /** Gets [Mobzy] via Bukkit once, then sends that reference back afterwards */
 val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 
-/** Mobzy's configuration information */
-val mobzyConfig: MobzyConfig get() = mobzy.mobzyConfig
-
 class Mobzy : JavaPlugin() {
-    lateinit var mobzyConfig: MobzyConfig
 
     override fun onLoad() {
         logger.info("On load has been called")
@@ -77,7 +73,7 @@ class Mobzy : JavaPlugin() {
         saveDefaultConfig()
         reloadConfig()
         MobzyTypes
-        mobzyConfig = MobzyConfig.load(config.saveToString())
+        MobzyConfig
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)
@@ -90,10 +86,10 @@ class Mobzy : JavaPlugin() {
     private var currentTask: SpawnTask? = null
 
     fun registerSpawnTask() {
-        if (mobzyConfig.doMobSpawns) {
+        if (MobzyConfig.doMobSpawns) {
             if(currentTask == null) {
                 currentTask = SpawnTask()
-                currentTask?.runTaskTimer(this, 0, mobzyConfig.spawnTaskDelay)
+                currentTask?.runTaskTimer(this, 0, MobzyConfig.spawnTaskDelay)
             }
         } else {
             currentTask?.cancel()
