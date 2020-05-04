@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.spawning
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Chunk
+import org.nield.kotlinstatistics.WeightedDice
 
 /**
  * Wraps around one chunk to add functionality to take
@@ -14,7 +15,7 @@ import org.bukkit.Chunk
  * @property randomLocInChunk A random location with y of 0 in the chunk. Only calculated once.
  * @property spawnAreas The spawn areas within the [VerticalSpawn] located at [randomLocInChunk]
  */
-class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val maxY: Int): Chunk by chunk {
+class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val maxY: Int) : Chunk by chunk {
     val preference
         get() = truePreference + preferenceOffset
     private var truePreference = 1.0
@@ -32,13 +33,15 @@ class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val ma
             if (spawnAreas.isEmpty()) //if there were no blocks there, try again
                 continue
             //weighted choice based on gap size
-            val weightedChoice = RandomCollection<SpawnArea>()
-            for (spawnArea in spawnAreas) { //add each
-                var weight = spawnArea.gap
-                if (weight > 100) weight = 100 //make underground spawns a little more likely, TODO could be a more complex function eventually
-                weightedChoice.add(weight.toDouble(), spawnArea)
-            }
-            return weightedChoice.next() //pick one
+            val weightedChoice = WeightedDice(
+                    spawnAreas.associateWith { spawnArea ->
+                        //make underground spawns a little more likely by limiting to 100 blocks
+                        //TODO could be a more complex function eventually
+                        spawnArea.gap.coerceAtMost(100).toDouble()
+                    }.filterValues { it > 0 }
+            )
+
+            return weightedChoice.roll() //pick one
         }
         return null
     }

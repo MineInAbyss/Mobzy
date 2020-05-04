@@ -29,7 +29,6 @@ import net.minecraft.server.v1_15_R1.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.FileConfiguration
-import java.util.*
 
 /**
  * @property registeredAddons A list of [MobzyAddon]s that have been registered with the plugin.
@@ -51,17 +50,19 @@ object MobzyConfig {
     val minChunkSpawnRad get() = serialized.minChunkSpawnRad
     val maxChunkSpawnRad get() = serialized.maxChunkSpawnRad
     val maxCommandSpawns get() = serialized.maxCommandSpawns
+    val playerGroupRadius get() = serialized.playerGroupRadius
     val spawnTaskDelay get() = serialized.spawnTaskDelay
 
     @Serializable
     data class SerializedMobzyConfig(
-            var debug: Boolean,
-            var doMobSpawns: Boolean,
-            var minChunkSpawnRad: Int,
-            var maxChunkSpawnRad: Int,
-            var maxCommandSpawns: Int,
-            var spawnTaskDelay: Long,
-            val mobCaps: MutableMap<String, Int> = HashMap()
+            var debug: Boolean = false,
+            var doMobSpawns: Boolean = false,
+            var minChunkSpawnRad: Int = 3,
+            var maxChunkSpawnRad: Int = 7,
+            var maxCommandSpawns: Int = 50,
+            var playerGroupRadius: Double = 128.0,
+            var spawnTaskDelay: Long = 100,
+            val mobCaps: MutableMap<String, Int> = hashMapOf()
     )
 
     @Transient
@@ -136,10 +137,6 @@ object MobzyConfig {
             activateAddons()
         }
 
-        attempt("Reloaded custom entities", "Failed to reload custom entities") {
-            reloadExistingEntities()
-        }
-
         sender.success("Successfully reloaded config")
     }
 
@@ -155,6 +152,8 @@ object MobzyConfig {
 
         MobzyTemplates.loadTemplatesFromConfig()
         mobzy.registerSpawnTask()
+
+        reloadExistingEntities()
 
         logSuccess("Registered addons: $registeredAddons")
     }

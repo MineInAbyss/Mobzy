@@ -15,7 +15,7 @@ import com.mineinabyss.mobzy.gui.layouts.MobConfigLayout
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.spawning.MobSpawn
-import com.mineinabyss.mobzy.spawning.SpawnRegistry.reuseMobSpawn
+import com.mineinabyss.mobzy.spawning.SpawnRegistry.findMobSpawn
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -62,7 +62,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         setElement(0, 0, FillableElement(4, 8)) {
             spawns.forEach { spawn ->
                 val spawnBuilder = if (spawn.reuse != null)
-                    MobzyTemplates[reuseMobSpawn(spawn.reuse!!).entityTypeName ?: error("Reuse was null")]
+                    MobzyTemplates[findMobSpawn(spawn.reuse!!).entityTypeName ?: error("Reuse was null")]
                 else
                     MobzyTemplates[spawn.entityTypeName ?: error("Reuse was null")]
 

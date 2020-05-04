@@ -4,6 +4,7 @@ doMobSpawns: false
 minChunkSpawnRad: 3
 maxChunkSpawnRad: 7
 maxCommandSpawns: 50
+playerGroupRadius: 128.0
 spawnTaskDelay: 100
 mobCaps:
   CREATURE: 20

@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.mineinabyss.mobzy.api.creatureType
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import org.bukkit.Location
@@ -14,6 +15,7 @@ import org.bukkit.Location
 class MobSpawnEvent(private val mobSpawn: MobSpawn, private val area: SpawnArea) {
     val spawns: Int = mobSpawn.chooseSpawnAmount()
     val entityType: String get() = mobSpawn.entityType.typeName
+    val creatureType: String get() = mobSpawn.entityType.creatureType.toString()
     val location: Location get() = area.getSpawnLocation(mobSpawn.spawnPos)
 
     fun spawn() {

@@ -24,7 +24,7 @@ class SpawnChunkGrid internal constructor(locs: List<Location>, minRad: Int, max
             val y = loc.blockY
             if (y < minY) minY = y
             if (y > maxY) maxY = y
-            printTimeMillis("Run in radius") {
+            printMillis("Run in radius") {
                 runInRadius(maxRad) { x, z, dist ->
                     val spawnChunk = loc.world!!.getChunkAt(chunkX + x, chunkZ + z)
                     if (!loc.world!!.isChunkLoaded(spawnChunk)) return@runInRadius
@@ -39,12 +39,12 @@ class SpawnChunkGrid internal constructor(locs: List<Location>, minRad: Int, max
             }
         }
 
-        printTimeMillis("All chunks plus invalidchunks") {
+        printMillis("All chunks plus invalidchunks") {
             allChunks = validChunks.plus(invalidChunks)
         }
 
         //convert chunks to only valid ChunkSpawns
-        printTimeMillis("convert chunks to only valid ChunkSpawns") {
+        printMillis("convert chunks to only valid ChunkSpawns") {
             validChunkSpawns = validChunks
                     .map { ChunkSpawn(it, 0, 254) }
                     .filterTo(mutableListOf()) { isValidSpawn(it) }
@@ -55,7 +55,7 @@ class SpawnChunkGrid internal constructor(locs: List<Location>, minRad: Int, max
                 validChunkSpawns.add(spawn)
         }
 
-        printTimeMillis("for chunk in invalidchunks") {
+        printMillis("for chunk in invalidchunks") {
             for (chunk in invalidChunks) {
                 val minVertical = minRad * 16 //minimum vertical spawn distance is the number of chunks * width of a chunk
                 //do some checks to add areas above and below the player when we've reached inside the minimum radius

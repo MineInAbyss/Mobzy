@@ -27,18 +27,20 @@ object SpawnRegistry {
 //        regionSpawns.getOrPut(region.name, { mutableListOf() }).add(spawn)
 //    }
 
-    fun reuseMobSpawn(reusedMob: String): MobSpawn = //TODO comment this because I have no idea what it's doing
-            (regionSpawns[reusedMob.substring(0, reusedMob.indexOf(':'))]
-                    ?: error("Could not find registered region for $reusedMob"))
-                    .getSpawnOfType(MobzyTypes[reusedMob.substring(reusedMob.indexOf(':') + 1)])
-
     /**
-     * Takes a list of spawn region names and converts to a list of [MobSpawn]s from those regions
+     * Finds a [MobSpawn] in the form `"RegionName:MobName"` and will find the first mob of that type inside the region of
+     * that name.
      */
-    fun List<ProtectedRegion>.getMobSpawnsForRegions(/*creatureType: String*/): List<MobSpawn> = this
+    fun findMobSpawn(spawn: String): MobSpawn =
+            (regionSpawns[spawn.substring(0, spawn.indexOf(':'))]
+                    ?: error("Could not find registered region for $spawn"))
+                    .getSpawnOfType(MobzyTypes[spawn.substring(spawn.indexOf(':') + 1)])
+
+    /** Takes a list of spawn region names and converts to a list of [MobSpawn]s from those regions */
+    fun List<ProtectedRegion>.getMobSpawnsForRegions(): List<MobSpawn> = this
             .filter { it.flags.containsKey(Mobzy.MZ_SPAWN_REGIONS) }
             .flatMap { it.getFlag(Mobzy.MZ_SPAWN_REGIONS)!!.split(",") }
             //up to this point, gets a list of the names of spawn areas in this region
-            .mapNotNull { regionSpawns[it]?.spawns/*.getSpawnsFor(creatureType)*/ }
+            .mapNotNull { regionSpawns[it]?.spawns }
             .flatten()
 }

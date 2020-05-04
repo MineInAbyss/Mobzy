@@ -5,6 +5,7 @@ import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.creatureType
 import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.api.isOfType
 import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.mobzy
@@ -17,14 +18,15 @@ import com.sk89q.worldguard.protection.managers.RegionManager
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import org.nield.kotlinstatistics.WeightedDice
+import org.nield.kotlinstatistics.dbScanCluster
 import kotlin.math.sign
 import kotlin.system.measureNanoTime
 
 private const val SPAWN_TRIES = 5
 
-inline fun <T> printTimeMillis(name: String, block: () -> T): T {
+inline fun <T> printMillis(name: String, block: () -> T): T {
     var result: T? = null
     debug("$name took: ${measureNanoTime {
         result = block()
@@ -43,93 +45,111 @@ class SpawnTask : BukkitRunnable() {
         }
 
         val container = WorldGuard.getInstance().platform.regionContainer
-        val toSpawn: MutableList<MobSpawnEvent> = mutableListOf()
+//        val toSpawn: MutableList<MobSpawnEvent> = mutableListOf()
 
         //go async
-        Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable {
+        Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable async@{
             //STEP 1: Get entities
             //TODO get this in a smart way from all existing entities
             // do this using something that listens to entity spawns/removal
-            val customMobs = printTimeMillis("Getting world etities") {
-                Bukkit.getServer().worlds.flatMap { world -> world.entities.filter { it.isCustomMob } }
-            }
-
-            Bukkit.getOnlinePlayers().forEach { player ->
-//                val regionManager = container[BukkitAdapter.adapt(player.world)] ?: return@forEach
-
-                val entityTypeCounts = customMobs.toEntityTypeCounts()
-                val originalCount = customMobs.size
-
-                //STEP 2: Each chunk tries to choose one area inside it for which to attempt a spawn
-
-                customMobs.toCreatureTypeCounts().forEach spawnPerType@{ (type, count) ->
-                    var newCount = count
-                    val creatureTypeCap = MobzyConfig.getMobCap(type)
-                    if (newCount > creatureTypeCap)
-                        return@spawnPerType
-
-                    val chunkSpawn: ChunkSpawn = player.randomChunkNearby
-
-                    val spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES) ?: return@spawnPerType
-
-                    //STEP 3: Pick mob to spawn
-                    val validSpawns = RandomCollection<MobSpawn>()
-
-                    //TODO revert if this doesn't work
-                    container.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions.sorted()
-//                    regionManager.getWorldGuardRegions(spawnArea)
-                            .filterWhenOverlapFlag()
-                            .getMobSpawnsForRegions()
-                            .forEach { validSpawns.add(it.getPriority(spawnArea, entityTypeCounts), it) }
-
-                    if (validSpawns.isEmpty) return@spawnPerType
-                    //weighted random decision of valid spawn
-                    val spawn = MobSpawnEvent(validSpawns.next(), spawnArea)
-                    toSpawn.add(spawn)
-                    entityTypeCounts[spawn.entityType] = entityTypeCounts.getOrDefault(spawn.entityType, 0).plus(spawn.spawns)
-
-                    newCount += spawn.spawns //increment the number of existing mobs by the number we want to spawn
+            printMillis("&6Full task".color()) {
+                val customMobs = printMillis("Getting world entities".color()) {
+                    Bukkit.getServer().worlds.flatMap { world -> world.entities.filter { it.isCustomMob } }
                 }
 
-                //spawn all the mobs we were planning to synchronously (since we can't spawn asynchronously)
-                Bukkit.getScheduler().runTask(mobzy, Runnable syncSpawnTask@{
-                    if (!mobzy.isEnabled) return@syncSpawnTask
-                    toSpawn.forEach { it.spawn() }
-                    //after we've hit the mob cap, print mob count
-                    if (toSpawn.size > 0) debug("&d&l$originalCount mobs before".color())
-                })
+                val entityTypeCounts: MutableMap<String, Int> = printMillis("Convert entity type counts") { customMobs.toEntityTypeCounts() }
+                val originalCount = customMobs.size
+
+                val creatureTypeCounts: MutableMap<String, Int> = printMillis("Convert creature type counts") { customMobs.toCreatureTypeCounts() }
+
+                //don't run the task if we've hit all mob caps (might be better to run several loops for each mob type?
+                if (creatureTypeCounts.none { (type, amount) -> amount < MobzyConfig.getMobCap(type) }) return@async
+
+                val playerGroups = printMillis("Get player groups entity type counts") {
+                    /*Bukkit.getOnlinePlayers()*/
+                    customMobs.filter { it.isOfType("riko") }.toPlayerGroups()
+                }
+                val playerGroupCount = playerGroups.size
+                //STEP 2: Every player group picks a random chunk around them
+                playerGroups.shuffled().forEach playerLoop@{ players ->
+                    val chunkSpawn: ChunkSpawn = players.randomChunkSpawnNearby ?: return@playerLoop
+                    val spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES) ?: return@playerLoop
+
+                    //STEP 3: Calculate all mobs that can spawn in this area
+                    val validSpawns = printMillis("Get valid spawns") {
+                        WeightedDice(
+                                container.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions
+                                        .sorted()
+                                        .filterWhenOverlapFlag()
+                                        .getMobSpawnsForRegions()
+                                        .associateWith { it.getPriority(spawnArea, entityTypeCounts, creatureTypeCounts, playerGroupCount) }
+                                        .filterValues { it > 0 }
+                                        .also { if (it.isEmpty()) return@playerLoop }
+                        )
+                    }
+
+                    //STEP 4: Pick a random valid spawn and spawn it
+                    val spawn = MobSpawnEvent(validSpawns.roll(), spawnArea)
+//                    toSpawn.add(spawn)
+                    entityTypeCounts[spawn.entityType] = entityTypeCounts.getOrDefault(spawn.entityType, 0) + spawn.spawns
+                    creatureTypeCounts[spawn.creatureType] = creatureTypeCounts.getOrDefault(spawn.creatureType, 0) + spawn.spawns
+
+                    //spawn all the mobs we were planning to synchronously (since we can't spawn asynchronously)
+                    Bukkit.getScheduler().runTask(mobzy, Runnable syncSpawnTask@{
+                        if (!mobzy.isEnabled) return@syncSpawnTask
+                        spawn.spawn()
+//                        toSpawn.forEach { it.spawn() }
+//                    after we've hit the mob cap, print mob count
+                       /* if (toSpawn.size > 0) */debug("&d&l${creatureTypeCounts.values.sum()} mobs while spawning".color())
+                    })
+                }
             }
         })
     }
 
-    private val Player.randomChunkNearby: ChunkSpawn
+    /**
+     * Returns a random [ChunkSpawn] that is further than [MobzyConfig.minChunkSpawnRad] from all the players in this
+     * list, and at least within [MobzyConfig.maxChunkSpawnRad] to one of them.
+     * TODO make it actually do that
+     */
+    private val List<Entity>.randomChunkSpawnNearby: ChunkSpawn?
         get() {
-            val loc = this.location
-            val chunk = player?.location?.chunk ?: error("Player is not in a chunk")
+            val chunk = random().location.chunk
             fun randomOffset() = randomSign * (MobzyConfig.minChunkSpawnRad..MobzyConfig.maxChunkSpawnRad).random()
-            val newX = chunk.x + randomOffset()
-            val newZ = chunk.z + randomOffset()
-            val newChunk = this.world.getChunkAt(newX, newZ)
-            return ChunkSpawn(newChunk, 0, 256) //TODO proper min max y
+            var newX: Int
+            var newZ: Int
+            //TODO proper min max y
+            for (i in 0..10) {
+                newX = chunk.x + randomOffset()
+                newZ = chunk.z + randomOffset()
+                if (none { (newX to newZ).distanceSquared(it.location.chunk.x to it.location.chunk.z) < (MobzyConfig.minChunkSpawnRad * MobzyConfig.minChunkSpawnRad) }) {
+                    val newChunk = chunk.world.getChunkAt(newX, newZ)
+                    return ChunkSpawn(newChunk, 0, 256)
+                }
+            }
+            return null
         }
+
+    private fun Pair<Number, Number>.distanceSquared(other: Pair<Number, Number>): Double =
+            this.first.toDouble() * other.first.toDouble() + this.second.toDouble() * other.second.toDouble()
 
     /** Convert a list of entities to: a map of the names of creature types to the number of creatures of that type,
      * without types that have exceeded their mob cap. */
-    private fun List<Entity>.toCreatureTypeCounts(): Map<String, Int> =
+    private fun List<Entity>.toCreatureTypeCounts(): MutableMap<String, Int> =
             MobzyConfig.creatureTypes.associateWith { 0 }
                     .plus(map { it.toNMS().creatureType }.groupingBy { it }.eachCount())
-                    .filter { (type, count) -> count < MobzyConfig.getMobCap(type) }
+                    .toMutableMap()
 
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
-    /*private fun List<Player>.toPlayerGroups(): List<List<Player>> = groupBy { it.world }
+    private fun Collection<Entity>.toPlayerGroups(): List<List<Entity>> = groupBy { it.world }
             .flatMap { (_, players) ->
                 players.dbScanCluster(
-                        maximumRadius = mobzyConfig.spawnSearchRadius,
+                        maximumRadius = MobzyConfig.playerGroupRadius,
                         minPoints = 0,
                         xSelector = { it.location.x },
                         ySelector = { it.location.z }
                 )
-            }.map { it.points }*/
+            }.map { it.points }
 
     /** Converts a list of entities to a map of entity types to the amount of entities of that type. */
     private fun List<Entity>.toEntityTypeCounts(): MutableMap<String, Int> =

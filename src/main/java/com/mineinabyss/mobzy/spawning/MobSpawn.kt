@@ -1,5 +1,7 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.mineinabyss.mobzy.MobzyConfig
+import com.mineinabyss.mobzy.api.creatureType
 import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.registration.MobzyTypes
@@ -63,16 +65,7 @@ data class MobSpawn(
 ) {
 
     @Transient
-    val copyFrom: MobSpawn? = _reuse?.let { SpawnRegistry.reuseMobSpawn(it) }
-
-    private operator fun <T> KProperty1<MobSpawn, T>.unaryPlus(): T {
-        this.isAccessible = true
-        val thisProp = this.get(this@MobSpawn)
-        return if (copyFrom != null && thisProp == null)
-            this.get(copyFrom)
-        else
-            thisProp
-    }
+    val copyFrom: MobSpawn? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
     //TODO try to get a cleaner way to mark these as Transient
     @Transient
@@ -155,7 +148,7 @@ data class MobSpawn(
         return spawns
     }
 
-    fun getPriority(spawnArea: SpawnArea, entityTypeCounts: Map<String, Int>): Double {
+    fun getPriority(spawnArea: SpawnArea, entityTypeCounts: Map<String, Int>, creatureTypeCounts: Map<String, Int>, playerCount: Int): Double {
         if (spawnArea.gap !in gapRange) return -1.0
 
         val loc = spawnArea.getSpawnLocation(spawnPos)
@@ -163,19 +156,24 @@ data class MobSpawn(
         val time = loc.world!!.time
         val lightLevel = loc.block.lightLevel.toInt()
 
-
         //eliminate impossible spawns
         if (time !in timeRange || lightLevel !in lightRange || loc.blockY !in yRange) return -1.0
         if (blockWhitelist.isNotEmpty() && !blockWhitelist.contains(loc.clone().add(0.0, -1.0, 0.0).block.type)) return -1.0
 
-        //if too many entities of the same type nearby
-        if (maxLocalGroup > 0) {
-
-            /*runInRadius(localGroupRadius) {
-                //TODO count number of entities in this radius
-            }*/
-            if ((entityTypeCounts[entityType.keyName] ?: 0) > maxLocalGroup) return -1.0
+        if (maxLocalGroup > 0) entityTypeCounts[entityType.keyName]?.let {
+            //TODO probably rename maxLocalGroup to maxSpawnsPerPlayer
+            if (it > maxLocalGroup * playerCount) return -1.0
         }
+        creatureTypeCounts[entityType.creatureType.toString()]?.let {
+            if (it > MobzyConfig.getMobCap(entityType.creatureType.toString()) * playerCount) return -1.0
+        }
+
+        //TODO count number of entities around this spawn and prevent it depending on maxLocalGroup
+        /*if (maxLocalGroup > 0) {
+            runInRadius(localGroupRadius) {
+            }
+        }*/
+
         return priority
     }
 
@@ -239,6 +237,15 @@ data class MobSpawn(
             }
         }
         return null
+    }
+
+    private operator fun <T> KProperty1<MobSpawn, T>.unaryPlus(): T {
+        this.isAccessible = true
+        val thisProp = this.get(this@MobSpawn)
+        return if (copyFrom != null && thisProp == null)
+            this.get(copyFrom)
+        else
+            thisProp
     }
 }
 

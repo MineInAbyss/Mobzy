@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.spawning.regions
 
-import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
@@ -18,7 +17,6 @@ class SpawnRegion(
         val spawns: List<MobSpawn> = listOf()
 ) {
     init {
-        logInfo("We registerin $this")
         SpawnRegistry += this
     }
 
