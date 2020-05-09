@@ -1,10 +1,9 @@
 # Send debug messages
-debug: true
+debug: false
 doMobSpawns: false
 minChunkSpawnRad: 3
 maxChunkSpawnRad: 7
 maxCommandSpawns: 50
-playerGroupRadius: 128.0
 spawnTaskDelay: 100
 mobCaps:
   CREATURE: 20
@@ -12,3 +11,4 @@ mobCaps:
   WATER_CREATURE: 0
   MISC: 5
   AMBIENT: 0
+playerGroupRadius: 128.0
