@@ -28,17 +28,13 @@ abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTempl
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
         addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
-        addPathfinderGoal(6, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
-        addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
+        addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
+        addPathfinderGoal(7, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
     }
 
-    /**
-     * TODO make the mobs undisguise when unloaded, not just on death. It should ONLY happen when the chunk the mob is in gets unloaded,
-     *  and this method gets called randomly sometimes. Perhaps a ChunkUnloadEvent or something similar is a good way to do this
-     */
     override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
 
-    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) {} /*= disguise()*/
+    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = Unit
 
     override fun dropExp() = dropExperience()
 
@@ -66,7 +62,6 @@ abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTempl
     init {
         createFromBase()
         addScoreboardTag("passiveMob")
-        //TODO this is a temporary fix to see if it affects performance
-        living.removeWhenFarAway = true
+        living.removeWhenFarAway = false
     }
 }

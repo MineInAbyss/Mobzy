@@ -1,12 +1,14 @@
 # Send debug messages
 debug: false
-doMobSpawns: true
-spawnSearchRadius: 128
-minChunkSpawnRad: 2
+doMobSpawns: false
+minChunkSpawnRad: 3
 maxChunkSpawnRad: 7
-maxSpawnAmount: 50
-spawnTaskDelay: 500
+maxCommandSpawns: 50
+spawnTaskDelay: 100
 mobCaps:
-  passive: 10
-  hostile: 20
-  flying: 5
+  CREATURE: 20
+  MONSTER: 20
+  WATER_CREATURE: 0
+  MISC: 5
+  AMBIENT: 0
+playerGroupRadius: 128.0

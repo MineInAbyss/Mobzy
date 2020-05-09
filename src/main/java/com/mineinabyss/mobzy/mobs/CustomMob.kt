@@ -30,7 +30,7 @@ interface CustomMob {
     // ========== Useful properties ===============
     val entity: EntityLiving
     val living get() = entity.bukkitEntity as LivingEntity
-    val template: MobTemplate get() = MobzyTemplates[entity.entityType]
+    val template: MobTemplate get() = MobzyTemplates[entity]
     val locX get() = living.location.x
     val locY get() = living.location.y
     val locZ get() = living.location.z
@@ -80,6 +80,7 @@ interface CustomMob {
     }
 
     fun setConfiguredAttributes() {
+        //TODO set ARMOR
         template.maxHealth?.let { entity.getAttributeInstance(GenericAttributes.MAX_HEALTH).value = it }
         template.movementSpeed?.let { entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).value = it }
         if (this !is FlyingMob) //flying mobs can't have an attack damage attribute, we use the builder's value instead

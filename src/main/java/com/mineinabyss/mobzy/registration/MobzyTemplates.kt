@@ -1,16 +1,15 @@
 package com.mineinabyss.mobzy.registration
 
-import com.charleskorn.kaml.Yaml
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.MobTemplate
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
 import net.minecraft.server.v1_15_R1.EntityTypes
+import org.bukkit.entity.Entity
 
 object MobzyTemplates {
     private var templates: Map<String, MobTemplate> = mapOf()
+
     //TODO explanation
     private val hardCodedTemplates: MutableMap<String, MobTemplate> = mutableMapOf()
 
@@ -19,8 +18,13 @@ object MobzyTemplates {
             ?: error("Mob template for $name not found")
 
     /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
-    operator fun get(type: EntityTypes<*>): MobTemplate = templates[type.typeName.toEntityTypeName()]
-            ?: error("Mob template for ${type.typeName} not found")
+    operator fun get(type: EntityTypes<*>): MobTemplate = MobzyTemplates[type.typeName]
+
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(entity: Entity): MobTemplate = MobzyTemplates[entity.typeName]
+
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(entity: net.minecraft.server.v1_15_R1.Entity): MobTemplate = MobzyTemplates[entity.entityType.typeName]
 
     /** Gets the entity name from a [MobTemplate] if registered, otherwise throws an [IllegalArgumentException]*/
     fun getNameForTemplate(template: MobTemplate): String {
@@ -42,8 +46,8 @@ object MobzyTemplates {
     /** Deserializes the templates for all mobs in the configuration */
     private fun readTemplateConfig(): Map<String, MobTemplate> {
         val map = mutableMapOf<String, MobTemplate>()
-        MobzyConfig.mobCfgs.values.forEach {
-            map.putAll(Yaml.default.parse(MapSerializer(String.serializer(), MobTemplate.serializer()), it.saveToString()))
+        MobzyConfig.mobCfgs.forEach {
+            map += it.info.templates
         }
         return map.toMap()
     }

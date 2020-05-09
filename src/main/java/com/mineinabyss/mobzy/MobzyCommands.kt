@@ -18,6 +18,7 @@ import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -94,8 +95,23 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
                 var numOfSpawns by +IntArg("number of mobs to spawn") { default = 1 }
                 onExecuteByPlayer {
-                    if (numOfSpawns > MobzyConfig.maxSpawnAmount) numOfSpawns = MobzyConfig.maxSpawnAmount
+                    if (numOfSpawns > MobzyConfig.maxCommandSpawns) numOfSpawns = MobzyConfig.maxCommandSpawns
                     for (i in 0 until numOfSpawns) (sender as Player).location.spawnEntity(mobName)
+                }
+            }
+            command("debug") {
+                command("spawnregion") {
+                    onExecuteByPlayer {
+                        player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
+                    }
+                }
+                command("snapshot") {
+                    onExecuteByPlayer {
+                        val snapshot = player.location.chunk.chunkSnapshot
+                        val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }
+                        val z = (player.location.blockZ % 16).let { if (it < 0) it + 16 else it }
+                        player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
+                    }
                 }
             }
 
@@ -114,9 +130,16 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
                     val enabled by +BooleanArg("enabled")
 
+                    //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
+                    // be made private once that's done
                     onExecute {
-                        MobzyConfig.doMobSpawns = enabled
-                        sender.success("Config option doMobSpawns has been set to $enabled")
+                        if (MobzyConfig.doMobSpawns != enabled) {
+                            MobzyConfig.serialized.doMobSpawns = enabled
+                            MobzyConfig.saveConfig()
+                            sender.success("Config option doMobSpawns has been set to $enabled")
+                        } else
+                            sender.success("Config option doMobSpawns was already set to $enabled")
+                        mobzy.registerSpawnTask()
                     }
                 }
             }
@@ -139,7 +162,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     min = args[2].toInt()
                 } catch (e: NumberFormatException) {
                 }
-                return (min until MobzyConfig.maxSpawnAmount).asIterable()
+                return (min until MobzyConfig.maxCommandSpawns).asIterable()
                         .map { it.toString() }.filter { it.startsWith(min.toString()) }
             }
         if (subCommand in listOf("remove", "rm", "info", "i"))

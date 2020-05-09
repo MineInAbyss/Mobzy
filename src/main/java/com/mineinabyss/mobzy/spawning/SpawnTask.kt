@@ -1,107 +1,162 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.mobzy.*
+import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
+import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.creatureType
+import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.keyName
+import com.mineinabyss.mobzy.debug
+import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
-import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
+import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
+import com.mineinabyss.mobzy.toNMS
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
-import com.sk89q.worldguard.protection.managers.RegionManager
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import org.nield.kotlinstatistics.WeightedDice
 import org.nield.kotlinstatistics.dbScanCluster
+import kotlin.math.PI
+import kotlin.math.ceil
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.random.Random
+import kotlin.system.measureNanoTime
 
-private const val SPAWN_TRIES = 5
+//TODO move into idofront
+inline fun <T> printMillis(name: String, block: () -> T): T {
+    var result: T? = null
+    debug("$name took: ${measureNanoTime {
+        result = block()
+    } / 1000000.0} milliseconds")
+    return result!!
+}
 
+/**
+ * An asynchronous repeating task that finds areas to spawn mobs in.
+ *
+ * ### STEP 1: Get mobs
+ * Get all custom mobs in all worlds on the server, group them by entity type, and creature type.
+ *
+ * Getting all entities through Bukkit and grouping them every time is a little slow, but nothing
+ * compared to the reading info from chunks for finding a spawn area that runs for every player group.
+ *
+ * ### STEP 2: Every player group picks a random chunk around them
+ * Uses [toPlayerGroups] to groups nearby players together and picks a spawn around them with [randomChunkSpawnNearby]
+ *
+ * ### STEP 3: Calculate all mobs that can spawn in this area
+ * Gets all valid [SpawnRegion]s inside a chosen location in the chunk, then gets all the spawns that can spawn
+ * there.
+ *
+ * ### STEP 4: Pick a random valid spawn and spawn it
+ * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
+ * the chosen region
+ */
 class SpawnTask : BukkitRunnable() {
-
     override fun run() {
-        try { //run checks asynchronously
-            if (!MobzyConfig.doMobSpawns) {
-                cancel()
-                return
-            }
-
-            val container = WorldGuard.getInstance().platform.regionContainer
-
-            Bukkit.getOnlinePlayers().toList().toPlayerGroups().forEach { playerGroup ->
-                val regionManager = container[BukkitAdapter.adapt(playerGroup[0].world)] ?: return@forEach
-                val toSpawn: MutableList<MobSpawnEvent> = mutableListOf()
-
-                //STEP 1: Generate array of ChunkSpawns around player group
-                val spawnChunkGrid = SpawnChunkGrid(playerGroup.map { it.location }, MobzyConfig.minChunkSpawnRad, MobzyConfig.maxChunkSpawnRad)
-
-                val customMobs = spawnChunkGrid.allChunks.filter { it.isLoaded }.customMobs
-
-                Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable {
-                    val entityTypeCounts = customMobs.toEntityTypeCounts()
-                    val originalCount = customMobs.size
-
-                    //STEP 2: Each chunk tries to choose one area inside it for which to attempt a spawn
-                    customMobs.toCreatureTypeCounts().forEach spawnPerType@{ (type, count) ->
-                        var newCount = count
-                        val creatureTypeCap = MobzyConfig.getMobCap(type)
-                        spawnChunkGrid.shuffledSpawns.forEach spawnLoop@{ chunkSpawn ->
-                            if (newCount > creatureTypeCap)
-//                                    || newCount - count > creatureTypeCap / 4) //never spawn more than a fourth of the mobs in one run
-                                return@spawnPerType
-
-                            val spawnArea = chunkSpawn.getSpawnArea(SPAWN_TRIES) ?: return@spawnLoop
-
-                            //STEP 3: Pick mob to spawn
-                            val validSpawns = RandomCollection<MobSpawn>()
-                            regionManager.getWorldGuardRegions(spawnArea)
-                                    .filterWhenOverlapFlag()
-                                    .getMobSpawnsForRegions(type)
-                                    .forEach { validSpawns.add(it.getPriority(spawnArea, entityTypeCounts), it) }
-
-                            if (validSpawns.isEmpty) return@spawnLoop
-                            //weighted random decision of valid spawn
-                            val spawn = MobSpawnEvent(validSpawns.next(), spawnArea)
-                            toSpawn.add(spawn)
-                            entityTypeCounts[spawn.entityType] = entityTypeCounts.getOrDefault(spawn.entityType, 0).plus(spawn.spawns)
-
-                            newCount += spawn.spawns //increment the number of existing mobs by the number we want to spawn
-                        }
-                    }
-
-                    //spawn all the mobs we were planning to synchronously (since we can't spawn asynchronously)
-                    Bukkit.getScheduler().runTask(mobzy, Runnable syncSpawnTask@{
-                        if (!mobzy.isEnabled) return@syncSpawnTask
-                        toSpawn.forEach { it.spawn() }
-                        //after we've hit the mob cap, print mob count
-                        if (toSpawn.size > 0) {
-                            debug("&d&l$originalCount mobs before", '&')
-                            //TODO log the number
-//                            if (newCount > count)
-//                                debug("&d${newCount - count} ${type}s spawned", '&')
-                        }
-                    })
-                })
-            }
+        try {
+            if (!MobzyConfig.doMobSpawns) cancel().let { return }
         } catch (e: NoClassDefFoundError) {
             e.printStackTrace()
             cancel()
         }
+
+        val container = WorldGuard.getInstance().platform.regionContainer
+
+        //go async
+        Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable async@{
+            //STEP 1: Get mobs
+            val onlinePlayers = Bukkit.getOnlinePlayers()
+            if (onlinePlayers.isEmpty()) return@async
+
+            val customMobs = Bukkit.getServer().worlds.flatMap { world -> world.entities.filter { it.isCustomMob } }
+
+            val entityTypeCounts: MutableMap<String, Int> = customMobs.toEntityTypeCounts()
+
+            val creatureTypeCounts: MutableMap<String, Int> = customMobs.toCreatureTypeCounts()
+
+            //don't run the task if we've hit all mob caps (might be better to run several loops for each mob type?
+            if (creatureTypeCounts.none { (type, amount) -> amount < MobzyConfig.getMobCap(type) }) return@async
+
+            //STEP 2: Every player group picks a random chunk around them
+            val playerGroups = onlinePlayers.toPlayerGroups()
+            val playerGroupCount = playerGroups.size
+
+            playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
+                val chunkSpawn: ChunkSpawn = playerGroup.randomChunkSpawnNearby ?: return@playerLoop
+
+                val spawnArea = chunkSpawn.getSpawnArea() ?: return@playerLoop
+
+                //STEP 3: Calculate all mobs that can spawn in this area
+                val validSpawns = WeightedDice(
+                        container.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions
+                                .sorted()
+                                .filterWhenOverlapFlag()
+                                .getMobSpawnsForRegions()
+                                .associateWith { it.getPriority(spawnArea, entityTypeCounts, creatureTypeCounts, playerGroupCount) }
+                                .filterValues { it > 0 }
+                                .also { if (it.isEmpty()) return@playerLoop }
+                )
+
+                //STEP 4: Pick a random valid spawn and spawn it
+                val spawn = MobSpawnEvent(validSpawns.roll(), spawnArea)
+//                    toSpawn.add(spawn)
+                entityTypeCounts[spawn.entityType] = entityTypeCounts.getOrDefault(spawn.entityType, 0) + spawn.spawns
+                creatureTypeCounts[spawn.creatureType] = creatureTypeCounts.getOrDefault(spawn.creatureType, 0) + spawn.spawns
+
+                //spawn all the mobs we were planning to synchronously (since we can't spawn asynchronously)
+                Bukkit.getScheduler().runTask(mobzy, Runnable syncSpawnTask@{
+                    if (!mobzy.isEnabled) return@syncSpawnTask
+                    spawn.spawn()
+                })
+            }
+            debug("&d&l${creatureTypeCounts.values.sum()} mobs while spawning".color())
+        })
+    }
+
+    /** Returns a random [ChunkSpawn] that is further than [MobzyConfig.minChunkSpawnRad] from all the players in this
+     * list, and at least within [MobzyConfig.maxChunkSpawnRad] to one of them. */
+    private val List<Entity>.randomChunkSpawnNearby: ChunkSpawn?
+        get() {
+            val chunk = random().location.chunk
+            //TODO proper min max y for 3d space
+            for (i in 0..10) {
+                //get a random angle and distance, then find the side lengths of a triangle with hypotenuse length dist
+                val dist = (MobzyConfig.minChunkSpawnRad..MobzyConfig.maxChunkSpawnRad).random()
+                val angle = Random.nextDouble(0.0, 2 * PI)
+                val newX = ceil(chunk.x + cos(angle) * dist)
+                val newZ = ceil(chunk.z + sin(angle) * dist)
+                if (none { distanceSquared(newX, newZ, it.location.chunk.x, it.location.chunk.z) < (MobzyConfig.minChunkSpawnRad * MobzyConfig.minChunkSpawnRad) }) {
+                    val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())
+                    if (!newChunk.isLoaded) continue
+                    return ChunkSpawn(newChunk, 0, 255)
+                }
+            }
+            return null
+        }
+
+    /** Gets the distance squared between between two points */
+    private fun distanceSquared(x: Number, z: Number, otherX: Number, otherZ: Number): Double {
+        val dx = (x.toDouble() + otherX.toDouble())
+        val dz = (z.toDouble() + otherZ.toDouble())
+        return dx * dx + dz * dz
     }
 
     /** Convert a list of entities to: a map of the names of creature types to the number of creatures of that type,
      * without types that have exceeded their mob cap. */
-    private fun List<Entity>.toCreatureTypeCounts(): Map<String, Int> =
+    private fun List<Entity>.toCreatureTypeCounts(): MutableMap<String, Int> =
             MobzyConfig.creatureTypes.associateWith { 0 }
                     .plus(map { it.toNMS().creatureType }.groupingBy { it }.eachCount())
-                    .filter { (type, count) -> count < MobzyConfig.getMobCap(type) }
+                    .toMutableMap()
 
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
-    private fun List<Player>.toPlayerGroups(): List<List<Player>> = groupBy { it.world }
+    private fun Collection<Entity>.toPlayerGroups(): List<List<Entity>> = groupBy { it.world }
             .flatMap { (_, players) ->
                 players.dbScanCluster(
-                        maximumRadius = MobzyConfig.spawnSearchRadius,
+                        maximumRadius = MobzyConfig.playerGroupRadius,
                         minPoints = 0,
                         xSelector = { it.location.x },
                         ySelector = { it.location.z }
@@ -119,9 +174,4 @@ class SpawnTask : BukkitRunnable() {
                     ?.let {
                         return listOf(it)
                     } ?: this
-
-    /** The list of mob spawns based on WorldGuard regions, then remove all impossible spawns, and make entity weighted
-     * decision on the spawn. */
-    private fun RegionManager.getWorldGuardRegions(spawnArea: SpawnArea) =
-            getApplicableRegions(BukkitAdapter.asBlockVector(spawnArea.bottom)).regions.sorted()
 }

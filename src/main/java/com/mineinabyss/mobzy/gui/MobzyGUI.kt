@@ -10,29 +10,29 @@ import com.derongan.minecraft.guiy.kotlin_dsl.guiyLayout
 import com.derongan.minecraft.guiy.kotlin_dsl.setElement
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.MobzyConfig
+import com.mineinabyss.mobzy.configuration.SpawnConfiguration
 import com.mineinabyss.mobzy.gui.layouts.MobConfigLayout
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import com.mineinabyss.mobzy.spawning.SpawnRegistry.reuseMobSpawn
-import org.bukkit.Material
-import org.bukkit.configuration.file.FileConfiguration
+import com.mineinabyss.mobzy.spawning.MobSpawn
+import com.mineinabyss.mobzy.spawning.SpawnRegistry.findMobSpawn
 import org.bukkit.entity.Player
 import java.util.*
 
 class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     private val mobConfigs: List<ClickableElement> = ArrayList()
     private val spawnList: List<ClickableElement> = ArrayList()
-    private var config: FileConfiguration? = null
+    private var config: SpawnConfiguration? = null
 
     private fun buildMobConfigLayout(): Layout {
-        val configs: Collection<FileConfiguration> = MobzyConfig.spawnCfgs.values
+        val configs: Collection<SpawnConfiguration> = MobzyConfig.spawnCfgs
         return if (configs.size == 1)
             buildRegions(configs.first())
         else guiyLayout {
             setElement(0, 0, FillableElement(4, 8)) {
                 for (config in configs) {
-                    val name = if (config.contains("config.name")) config.getString("config.name")!! else "Unnamed configuration"
-                    val icon = if (config.contains("config.icon")) Material.getMaterial(config.getString("config.icon")!!)!! else Material.BEDROCK
+                    val name = config.info.name
+                    val icon = config.info.icon
                     val cell = icon.toCell(name)
                     val mobConfig = ClickableElement(cell) { setElement(buildRegions(config)) }
                     addElement(mobConfig)
@@ -42,20 +42,15 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         }
     }
 
-    private fun buildRegions(config: FileConfiguration): Layout = guiyLayout {
+    private fun buildRegions(config: SpawnConfiguration): Layout = guiyLayout {
         this@MobzyGUI.config = config
         setElement(0, 0, FillableElement(4, 8)) {
-            config.getMapList("regions").forEach { region ->
-                val regionName = region["name"] as String
-                var material: Material = Material.BEDROCK
-                if (region.containsKey("icon")) {
-                    val tempMaterial = Material.getMaterial((region["icon"] as String?)!!)
-                    if (tempMaterial != null) material = tempMaterial
-                }
+            config.info.regions.forEach { region ->
+                val regionName = region.name
+                val material = region.icon
 
                 button(material.toCell(regionName)) {
-                    @Suppress("UNCHECKED_CAST")
-                    setElement(buildSpawns(region["spawns"] as List<MutableMap<String, Any?>>, region["name"] as String))
+                    setElement(buildSpawns(region.spawns, region.name))
                 }
             }
         }
@@ -63,29 +58,26 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         addBackButton(this)
     }
 
-    private fun buildSpawns(spawns: List<MutableMap<String, Any?>>, regionName: String): Layout =
-            guiyLayout {
-                setElement(0, 0, FillableElement(4, 8)) {
-                    spawns.forEach { spawn ->
-                        val spawnBuilder = if (spawn.containsKey("reuse"))
-                            MobzyTemplates[reuseMobSpawn(spawn["reuse"] as String).entityType]
-                        else
-                            MobzyTemplates[spawn["mob"] as String]
+    private fun buildSpawns(spawns: List<MobSpawn>, regionName: String): Layout = guiyLayout {
+        setElement(0, 0, FillableElement(4, 8)) {
+            spawns.forEach { spawn ->
+                val spawnBuilder = if (spawn.reuse != null)
+                    MobzyTemplates[findMobSpawn(spawn.reuse!!).entityTypeName ?: error("Reuse was null")]
+                else
+                    MobzyTemplates[spawn.entityTypeName ?: error("Reuse was null")]
 
-                        //open up the config layout with its menu options
-                        button(spawnBuilder.modelItemStack.toCell()) {
-                            setElement(MobConfigLayout(this@MobzyGUI, spawn, regionName))
-                        }
-                    }
+                //open up the config layout with its menu options
+                button(spawnBuilder.modelItemStack.toCell()) {
+                    setElement(MobConfigLayout(this@MobzyGUI, spawn))
                 }
-
-                addBackButton(this)
             }
+        }
 
-    fun saveConfigValues(spawn: MutableMap<String, Any?>, mobProperties: List<Property>) {
-        spawn.clear()
-        mobProperties.forEach { spawn[it.key] = it.value }
-        MobzyConfig.saveSpawnCfg(config ?: error("Could not save config values, config was null"))
+        addBackButton(this)
+    }
+
+    fun saveConfigValues() {
+        config!!.save()
         player.success("Successfully saved mob's configuartion")
     }
 

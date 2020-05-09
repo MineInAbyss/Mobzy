@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.pathfinders
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.toNMS
 import net.minecraft.server.v1_15_R1.EntityTypes
+import org.bukkit.entity.Entity
 import kotlin.random.Random
 
 class PathfinderGoalLookAtPlayerPitchLock(
@@ -10,7 +11,7 @@ class PathfinderGoalLookAtPlayerPitchLock(
         private val targetType: EntityTypes<*>,
         private val radius: Double,
         private val startChance: Float = 0.02f) : MobzyPathfinderGoal() {
-    var lookAt: org.bukkit.entity.Entity? = null
+    var lookAt: Entity? = null
     private var length = 0
 
     override fun shouldExecute(): Boolean {

@@ -1,71 +1,68 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
 import org.bukkit.Location
-import org.bukkit.Material
 
-class VerticalSpawn(private val originalLoc: Location, private var minY: Int, private var maxY: Int) {
-    val spawnAreas: List<SpawnArea> = findBlockPairs(originalLoc)
+/**
+ * A vertical strip inside a chunk, with x and z located at [loc], spanning from [minY] to [maxY].
+ *
+ * Will generate a list of [SpawnArea]s, from all air gaps within this vertical strip.
+ */
+class VerticalSpawn(private val loc: Location, private var minY: Int, private var maxY: Int) {
+    val spawnAreas: List<SpawnArea> = findBlockPairs()
 
-    private fun findBlockPairs(loc: Location): List<SpawnArea> { //boundaries
-        if (maxY > 256) maxY = 256
-        if (minY < 0) minY = 0
+    private fun findBlockPairs(): List<SpawnArea> {
+        maxY.coerceAtMost(255)
+        minY.coerceAtLeast(0)
 
         val locations: MutableList<SpawnArea> = mutableListOf()
-        val highest = loc.getHighestBlock(minY, maxY)
+        val highest = loc.world?.getHighestBlockAt(loc)?.location ?: return emptyList()
 
-        if (highest.blockY < maxY) { //if there's a gap with the sky, add the highest block and current
-            if (highest.blockY == minY) //if we found void, return an empty list
-                return locations
-            //add the gap between the top and highest block (i.e. open sky)
-            locations.add(SpawnArea(highest.clone().apply { y = 256.0 }, highest.clone().add(0.0, 1.0, 0.0)))
-        } else  //if there was no gap, there won't be any!
-            return locations
+        if (highest.blockY !in minY until maxY) return locations
+        //add a gap from this location to the sky
+        locations.add(SpawnArea(highest.clone().apply { y = maxY.toDouble() }, highest.clone().add(0.0, 1.0, 0.0)))
+
+        //everything below is by far the slowest part of the task, as it gets repeated a lot
+        val snapshot = highest.chunk.chunkSnapshot
 
         //search for gaps and add them to the list as we go down
-        var searchL = highest.clone().add(0.0, -1.0, 0.0) //location for searching downwards
-        var top = searchL //the top block of a section
-        while (searchL.blockY > minY) {
-            val prevBlock = searchL.block
-            searchL = searchL.add(0.0, -1.0, 0.0)
-            val nextBlock = searchL.block
-            if (!prevBlock.isPassable && nextBlock.isPassable) //if went from solid to air
-                top = searchL.clone()
-            else if (prevBlock.isPassable && (!nextBlock.isPassable || searchL.blockY == 1)) //if went back to solid or reached the bottom of the world
-                locations.add(SpawnArea(top, searchL.clone().add(0.0, 1.0, 0.0)))
+        var top = highest //the top block of a section
+        val x = (highest.blockX % 16).let { if (it < 0) it + 16 else it }
+        val z = (highest.blockZ % 16).let { if (it < 0) it + 16 else it }
+
+        var currentBlock = snapshot.getBlockType(x, highest.blockY, z)
+        (highest.blockY downTo minY).forEach { y ->
+            val nextBlock = snapshot.getBlockType(x, y, z)
+            if (currentBlock.isSolid) { //if went from solid to air
+                if (!nextBlock.isSolid)
+                    top = highest.clone().apply { this.y = y.toDouble() }
+            } else if (nextBlock.isSolid || highest.blockY == 1) //if went back to solid or reached the bottom of the world
+                locations.add(SpawnArea(top, highest.clone().apply { this.y = y.toDouble() + 1 }))
+            currentBlock = nextBlock
         }
         return locations
     }
-
-    companion object {
-        fun checkDown(originalL: Location, maxI: Int): Location? {
-            var l = originalL.clone()
-            for (i in 0 until maxI) {
-                l = l.add(0.0, -1.0, 0.0)
-                if (l.y < 10) return null
-                if (l.y >= 256) l.y = 255.0
-                if (l.block.type.isSolid) return l.add(0.0, 1.0, 0.0)
-            }
-            return null
-        }
-
-        fun checkUp(originalL: Location, maxI: Int): Location? {
-            var l = originalL.clone()
-            for (i in 0 until maxI) {
-                l = l.add(0.0, 1.0, 0.0)
-                if (!l.block.type.isSolid) {
-                    return l
-                }
-                if (l.y >= 256) return null
-                if (l.y < 10) l.y = 10.0
-            }
-            return null
-        }
-    }
 }
 
-fun Location.getHighestBlock(minY: Int, maxY: Int): Location { //make a copy of the given location so we don't change its coords.
-    val highest = clone()
-    highest.y = maxY.toDouble()
-    while (highest.block.isPassable && highest.block.type != Material.WATER && highest.blockY > minY) highest.add(0.0, -1.0, 0.0)
-    return highest
+fun Location.checkDown(maxI: Int): Location? {
+    var l = clone()
+    for (i in 0 until maxI) {
+        l = l.add(0.0, -1.0, 0.0)
+        if (l.y < 10) return null
+        if (l.y >= 256) l.y = 255.0
+        if (l.block.type.isSolid) return l.add(0.0, 1.0, 0.0)
+    }
+    return null
+}
+
+fun Location.checkUp(maxI: Int): Location? {
+    var l = clone()
+    for (i in 0 until maxI) {
+        l = l.add(0.0, 1.0, 0.0)
+        if (!l.block.type.isSolid) {
+            return l
+        }
+        if (l.y >= 256) return null
+        if (l.y < 10) l.y = 10.0
+    }
+    return null
 }
