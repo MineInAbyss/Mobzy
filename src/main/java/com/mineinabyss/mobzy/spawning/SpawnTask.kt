@@ -18,7 +18,8 @@ import org.bukkit.entity.Entity
 import org.bukkit.scheduler.BukkitRunnable
 import org.nield.kotlinstatistics.WeightedDice
 import org.nield.kotlinstatistics.dbScanCluster
-import kotlin.math.sign
+import kotlin.math.*
+import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
 //TODO move into idofront
@@ -30,7 +31,6 @@ inline fun <T> printMillis(name: String, block: () -> T): T {
     return result!!
 }
 
-@Suppress("UNREACHABLE_CODE") //TODO remove
 class SpawnTask : BukkitRunnable() {
     override fun run() {
         try {
@@ -65,6 +65,7 @@ class SpawnTask : BukkitRunnable() {
             //STEP 2: Every player group picks a random chunk around them
             playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
                 val chunkSpawn: ChunkSpawn = playerGroup.randomChunkSpawnNearby ?: return@playerLoop
+
                 val spawnArea = chunkSpawn.getSpawnArea() ?: return@playerLoop
 
                 //STEP 3: Calculate all mobs that can spawn in this area
@@ -97,20 +98,19 @@ class SpawnTask : BukkitRunnable() {
     /**
      * Returns a random [ChunkSpawn] that is further than [MobzyConfig.minChunkSpawnRad] from all the players in this
      * list, and at least within [MobzyConfig.maxChunkSpawnRad] to one of them.
-     * TODO make it actually do that
      */
     private val List<Entity>.randomChunkSpawnNearby: ChunkSpawn?
         get() {
             val chunk = random().location.chunk
-            fun randomOffset() = randomSign * (MobzyConfig.minChunkSpawnRad..MobzyConfig.maxChunkSpawnRad).random()
-            var newX: Int
-            var newZ: Int
             //TODO proper min max y for 3d space
             for (i in 0..10) {
-                newX = chunk.x + randomOffset()
-                newZ = chunk.z + randomOffset()
+                //get a random angle and distance, then find the side lengths of a triangle with hypotenuse length dist
+                val dist = (MobzyConfig.minChunkSpawnRad..MobzyConfig.maxChunkSpawnRad).random()
+                val angle = Random.nextDouble(0.0, 2 * PI)
+                val newX = ceil(chunk.x + cos(angle) * dist)
+                val newZ = ceil(chunk.z + sin(angle) * dist)
                 if (none { distanceSquared(newX, newZ, it.location.chunk.x, it.location.chunk.z) < (MobzyConfig.minChunkSpawnRad * MobzyConfig.minChunkSpawnRad) }) {
-                    val newChunk = chunk.world.getChunkAt(newX, newZ)
+                    val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())
                     if (!newChunk.isLoaded) continue
                     return ChunkSpawn(newChunk, 0, 256)
                 }
