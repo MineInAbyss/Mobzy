@@ -8,41 +8,26 @@ import org.nield.kotlinstatistics.WeightedDice
 /**
  * Wraps around one chunk to add functionality to take
  *
- * @property preference Increases the likelihood of this spawn to be chosen out of a list of other candidates.
- * @property truePreference The [preference] calculated internally without the [preferenceOffset].
- * @property preferenceOffset Introduces noise into our preference so we don't end up with a specific order of chunks
  * spawning entities (e.x. everything spawning in one corner).
  * @property randomLocInChunk A random location with y of 0 in the chunk. Only calculated once.
  * @property spawnAreas The spawn areas within the [VerticalSpawn] located at [randomLocInChunk]
  */
 class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val maxY: Int) : Chunk by chunk {
-    val preference
-        get() = truePreference + preferenceOffset
-    private var truePreference = 1.0
-    var preferenceOffset = 0.0
     private val randomLocInChunk by lazy { chunk.getBlock((Math.random() * 15).toInt(), 0, (Math.random() * 15).toInt()).location }
     private val spawnAreas by lazy { VerticalSpawn(randomLocInChunk, minY, maxY).spawnAreas }
 
-    //TODO we are not calculating preferences anymore because doing it sync is too slow, make a new spawning system!
+    /** Gets a random [SpawnArea] from [spawnAreas], through a [VerticalSpawn] */
+    fun getSpawnArea(): SpawnArea? {
+        if (spawnAreas.isEmpty()) return null
+        //weighted choice based on gap size
+        val weightedChoice = WeightedDice(
+                spawnAreas.associateWith { spawnArea ->
+                    //make underground spawns a little more likely by limiting to 100 blocks
+                    //TODO could be a more complex function eventually
+                    spawnArea.gap.coerceAtMost(100).toDouble()
+                }.filterValues { it > 0 }
+        )
 
-    /**
-     * @return a vertical [SpawnArea], more specifically one gap that's chosen inside the chunk based on its size.
-     */
-    fun getSpawnArea(tries: Int): SpawnArea? {
-        for (i in 0 until tries) { //generate list of spawn
-            if (spawnAreas.isEmpty()) //if there were no blocks there, try again
-                continue
-            //weighted choice based on gap size
-            val weightedChoice = WeightedDice(
-                    spawnAreas.associateWith { spawnArea ->
-                        //make underground spawns a little more likely by limiting to 100 blocks
-                        //TODO could be a more complex function eventually
-                        spawnArea.gap.coerceAtMost(100).toDouble()
-                    }.filterValues { it > 0 }
-            )
-
-            return weightedChoice.roll() //pick one
-        }
-        return null
+        return weightedChoice.roll() //pick one
     }
 }

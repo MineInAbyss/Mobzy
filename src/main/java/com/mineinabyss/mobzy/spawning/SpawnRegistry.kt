@@ -8,28 +8,23 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import java.util.*
 
 /**
+ * A singleton for keeping track of registered [SpawnRegion]s. Used for the mob spawning system
+ *
  * @property regionSpawns A map of region names to their [SpawnRegion].
  */
 object SpawnRegistry {
     private val regionSpawns: MutableMap<String, SpawnRegion> = HashMap()
-//    private val reusableMobSpawns: MutableMap<String, MobSpawn> = HashMap()
 
     fun unregisterSpawns() = regionSpawns.clear()
 
-//    operator fun plusAssign(config: SpawnConfiguration) {
-//        regionSpawns += config.info.regions.associateBy { region -> region.name }
-//    }
-
+    /** Register the specified [SpawnRegion] */
     operator fun plusAssign(region: SpawnRegion) {
         regionSpawns += region.name to region
     }
-//    fun addSpawn(region: SpawnRegion, spawn: MobSpawn) {
-//        regionSpawns.getOrPut(region.name, { mutableListOf() }).add(spawn)
-//    }
 
     /**
-     * Finds a [MobSpawn] in the form `"RegionName:MobName"` and will find the first mob of that type inside the region of
-     * that name.
+     * Finds a [MobSpawn] in the form `"RegionName:MobName"` and will find the first mob of that type inside the region
+     * of that name.
      */
     fun findMobSpawn(spawn: String): MobSpawn =
             (regionSpawns[spawn.substring(0, spawn.indexOf(':'))]

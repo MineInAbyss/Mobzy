@@ -13,7 +13,7 @@ import org.bukkit.entity.Entity
 import net.minecraft.server.v1_15_R1.Entity as EntityNMS
 
 /** Whether an entity is a renamed mob registered with Mobzy. */
-val Entity.isRenamed get() = if (toNMS().isCustomMob || customName == null) false else customName != this.typeName
+val Entity.isRenamed get() = if (!isCustomMob || customName == null) false else customName != this.typeName
 
 /** The mobzy ID for a registered custom mob. */
 val Entity.typeName get() = toNMS().entityType.typeName

@@ -18,6 +18,7 @@ import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -96,6 +97,13 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 onExecuteByPlayer {
                     if (numOfSpawns > MobzyConfig.maxCommandSpawns) numOfSpawns = MobzyConfig.maxCommandSpawns
                     for (i in 0 until numOfSpawns) (sender as Player).location.spawnEntity(mobName)
+                }
+            }
+            command("debug") {
+                command("spawnregion") {
+                    onExecuteByPlayer {
+                        player.info(VerticalSpawn(player.location, 0, 256).spawnAreas.toString())
+                    }
                 }
             }
 

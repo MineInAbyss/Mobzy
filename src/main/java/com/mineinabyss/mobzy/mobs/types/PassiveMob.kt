@@ -62,6 +62,6 @@ abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTempl
     init {
         createFromBase()
         addScoreboardTag("passiveMob")
-        living.removeWhenFarAway = true
+        living.removeWhenFarAway = false
     }
 }

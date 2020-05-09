@@ -6,7 +6,8 @@ import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
-import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
+import com.mineinabyss.mobzy.spawning.vertical.checkDown
+import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -230,11 +231,10 @@ data class MobSpawn(
             val z = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
             val searchLoc: Location = loc.clone().add(Vector(x, 0.0, z))
 
-            return if (!searchLoc.block.type.isSolid) {
-                VerticalSpawn.checkDown(searchLoc, 2) ?: continue
-            } else {
-                VerticalSpawn.checkUp(searchLoc, 2) ?: continue
-            }
+            return if (!searchLoc.block.type.isSolid)
+                searchLoc.checkDown(2) ?: continue
+            else
+                searchLoc.checkUp(2) ?: continue
         }
         return null
     }

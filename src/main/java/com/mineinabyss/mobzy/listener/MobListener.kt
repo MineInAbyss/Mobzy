@@ -4,6 +4,7 @@ import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
@@ -82,7 +83,7 @@ object MobListener : Listener {
                 entity.equipment?.helmet = MobzyTemplates[entity.toNMS().entityType.typeName].modelItemStack
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
-            } else if (entity.isCustomMob && entity.toNMS() !is NPC) {
+            } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {
                 (entity as LivingEntity).removeWhenFarAway = true
             }
         }
