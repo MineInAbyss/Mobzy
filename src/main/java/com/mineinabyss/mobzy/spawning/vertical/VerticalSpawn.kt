@@ -21,8 +21,8 @@ class VerticalSpawn(private val loc: Location, private var minY: Int, private va
 
         //search for gaps and add them to the list as we go down
         var top = highest //the top block of a section
-        val x = highest.blockX % 16
-        val z = highest.blockZ % 16
+        val x = (highest.blockX % 16).let { if (it < 0) it + 16 else it }
+        val z = (highest.blockZ % 16).let { if (it < 0) it + 16 else it }
 
         var currentBlock = snapshot.getBlockType(x, highest.blockY, z)
         (highest.blockY downTo minY).forEach { y ->

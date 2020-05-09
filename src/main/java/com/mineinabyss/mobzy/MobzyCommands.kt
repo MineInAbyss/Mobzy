@@ -105,6 +105,14 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         player.info(VerticalSpawn(player.location, 0, 256).spawnAreas.toString())
                     }
                 }
+                command("snapshot") {
+                    onExecuteByPlayer {
+                        val snapshot = player.location.chunk.chunkSnapshot
+                        val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }
+                        val z = (player.location.blockZ % 16).let { if (it < 0) it + 16 else it }
+                        player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
+                    }
+                }
             }
 
             command("list", "l", desc = "Lists all custom mob types") {
