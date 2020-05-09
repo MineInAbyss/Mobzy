@@ -16,12 +16,19 @@ class SpawnArea(val top: Location, val bottom: Location) {
     //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
     val gap: Int = top.blockY - bottom.blockY + 1
 
+    /**
+     * Get a [Location] to spawn in depending on the specified [SpawnPosition]
+     *
+     * - If [SpawnPosition.AIR], choose a random location between [top] and [bottom]
+     * - If [SpawnPosition.GROUND], return [bottom]
+     * - If [SpawnPosition.OVERHANG], return [top]
+     */
     fun getSpawnLocation(spawnPosition: SpawnPosition): Location =
             when (spawnPosition) {
                 //pick some position between the bottom and top when spawn position is in air
-                SpawnPosition.AIR -> bottom.clone().add(0.0, Random.nextDouble(gap.toDouble()), 0.0)
+                SpawnPosition.AIR -> bottom.clone().apply { if(gap >= 1) y = Random.nextInt(gap - 1).toDouble() }
                 SpawnPosition.GROUND -> bottom
-                else -> top
+                SpawnPosition.OVERHANG -> top
             }
 
     override fun toString(): String = "SpawnArea: " + bottom.blockY + ", " + top.blockY

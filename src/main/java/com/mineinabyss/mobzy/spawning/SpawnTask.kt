@@ -9,6 +9,7 @@ import com.mineinabyss.mobzy.api.keyName
 import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
+import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.mineinabyss.mobzy.toNMS
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
@@ -18,7 +19,10 @@ import org.bukkit.entity.Entity
 import org.bukkit.scheduler.BukkitRunnable
 import org.nield.kotlinstatistics.WeightedDice
 import org.nield.kotlinstatistics.dbScanCluster
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.ceil
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
@@ -31,6 +35,26 @@ inline fun <T> printMillis(name: String, block: () -> T): T {
     return result!!
 }
 
+/**
+ * An asynchronous repeating task that finds areas to spawn mobs in.
+ *
+ * ### STEP 1: Get mobs
+ * Get all custom mobs in all worlds on the server, group them by entity type, and creature type.
+ *
+ * Getting all entities through Bukkit and grouping them every time is a little slow, but nothing
+ * compared to the reading info from chunks for finding a spawn area that runs for every player group.
+ *
+ * ### STEP 2: Every player group picks a random chunk around them
+ * Uses [toPlayerGroups] to groups nearby players together and picks a spawn around them with [randomChunkSpawnNearby]
+ *
+ * ### STEP 3: Calculate all mobs that can spawn in this area
+ * Gets all valid [SpawnRegion]s inside a chosen location in the chunk, then gets all the spawns that can spawn
+ * there.
+ *
+ * ### STEP 4: Pick a random valid spawn and spawn it
+ * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
+ * the chosen region
+ */
 class SpawnTask : BukkitRunnable() {
     override fun run() {
         try {
@@ -44,9 +68,7 @@ class SpawnTask : BukkitRunnable() {
 
         //go async
         Bukkit.getScheduler().runTaskAsynchronously(mobzy, Runnable async@{
-            /*STEP 1: Get entities
-                getting all entities through Bukkit and grouping them every time is a little slow, but nothing
-                compared to the reading info from chunks for finding a spawn area that runs for every player group. */
+            //STEP 1: Get mobs
             val onlinePlayers = Bukkit.getOnlinePlayers()
             if (onlinePlayers.isEmpty()) return@async
 
@@ -59,10 +81,10 @@ class SpawnTask : BukkitRunnable() {
             //don't run the task if we've hit all mob caps (might be better to run several loops for each mob type?
             if (creatureTypeCounts.none { (type, amount) -> amount < MobzyConfig.getMobCap(type) }) return@async
 
-            val playerGroups = onlinePlayers.toPlayerGroups()
-
-            val playerGroupCount = playerGroups.size
             //STEP 2: Every player group picks a random chunk around them
+            val playerGroups = onlinePlayers.toPlayerGroups()
+            val playerGroupCount = playerGroups.size
+
             playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
                 val chunkSpawn: ChunkSpawn = playerGroup.randomChunkSpawnNearby ?: return@playerLoop
 
@@ -95,10 +117,8 @@ class SpawnTask : BukkitRunnable() {
         })
     }
 
-    /**
-     * Returns a random [ChunkSpawn] that is further than [MobzyConfig.minChunkSpawnRad] from all the players in this
-     * list, and at least within [MobzyConfig.maxChunkSpawnRad] to one of them.
-     */
+    /** Returns a random [ChunkSpawn] that is further than [MobzyConfig.minChunkSpawnRad] from all the players in this
+     * list, and at least within [MobzyConfig.maxChunkSpawnRad] to one of them. */
     private val List<Entity>.randomChunkSpawnNearby: ChunkSpawn?
         get() {
             val chunk = random().location.chunk
@@ -118,6 +138,7 @@ class SpawnTask : BukkitRunnable() {
             return null
         }
 
+    /** Gets the distance squared between between two points */
     private fun distanceSquared(x: Number, z: Number, otherX: Number, otherZ: Number): Double {
         val dx = (x.toDouble() + otherX.toDouble())
         val dz = (z.toDouble() + otherZ.toDouble())
@@ -153,6 +174,4 @@ class SpawnTask : BukkitRunnable() {
                     ?.let {
                         return listOf(it)
                     } ?: this
-
-    private val randomSign get() = ((0..1).random() - 0.5).sign.toInt()
 }

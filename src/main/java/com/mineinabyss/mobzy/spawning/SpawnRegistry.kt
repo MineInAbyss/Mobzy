@@ -15,6 +15,7 @@ import java.util.*
 object SpawnRegistry {
     private val regionSpawns: MutableMap<String, SpawnRegion> = HashMap()
 
+    /** Clears [regionSpawns] */
     fun unregisterSpawns() = regionSpawns.clear()
 
     /** Register the specified [SpawnRegion] */

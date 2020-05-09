@@ -132,7 +132,7 @@ data class MobSpawn(
     private val yRange: IntRange get() = minY..maxY
     private val gapRange: IntRange get() = minGap..maxGap
 
-    @JvmOverloads
+    /** Given a [SpawnArea] Spawns a number of entities defined in this [MobSpawn] at its location */
     fun spawn(area: SpawnArea, spawns: Int = chooseSpawnAmount()): Int {
         val loc = area.getSpawnLocation(spawnPos)
         for (i in 0 until spawns) {
@@ -140,7 +140,6 @@ data class MobSpawn(
                 (getSpawnInRadius(loc, radius) ?: loc).spawnEntity(entityType)
             else loc.spawnEntity(entityType)
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
-            //FIXME
             /*if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) { //length is actually the height, don't know why, it's just how it be
                 MobzyAPI.debug(ChatColor.YELLOW + "Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
                 nmsEntity.die();
@@ -149,6 +148,8 @@ data class MobSpawn(
         return spawns
     }
 
+    /** Gets the priority of this [MobSpawn]. If it is negative, the spawn should never succeed. The higher the
+     * priority, the higher the chance of this spawn being picked. */
     fun getPriority(spawnArea: SpawnArea, entityTypeCounts: Map<String, Int>, creatureTypeCounts: Map<String, Int>, playerCount: Int): Double {
         if (spawnArea.gap !in gapRange) return -1.0
 
@@ -181,6 +182,11 @@ data class MobSpawn(
     fun chooseSpawnAmount(): Int =
             if (minAmount >= maxAmount) minAmount else (Math.random() * (maxAmount - minAmount + 1)).toInt() + minAmount
 
+    /**
+     * Where we should look for a location to actually spawn mobs in when calling [spawn]
+     *
+     * @see SpawnArea.getSpawnLocation
+     */
     @Serializable
     enum class SpawnPosition {
         AIR, GROUND, OVERHANG
@@ -246,11 +252,5 @@ data class MobSpawn(
             this.get(copyFrom)
         else
             thisProp
-    }
-}
-
-fun runAroundLocation(radius: Int, forEach: (x: Int, z: Int) -> Unit) {
-    for (x in -radius..radius) for (z in -radius..radius) {
-        forEach(x, z)
     }
 }

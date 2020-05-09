@@ -24,7 +24,7 @@ class Mobzy : JavaPlugin() {
     override fun onLoad() {
         logger.info("On load has been called")
 
-        //TODO try to allow plugin spawning in WorldGuard's config automatically (see if this worked)
+        //TODO try to allow plugin spawning in WorldGuard's config automatically
         //onCreatureSpawn in WorldGuardEntityListener throws errors if we don't enable custom entity spawns
 //        WorldGuard.getInstance().platform.globalStateManager.get(BukkitAdapter.adapt(server.worlds.first()))
 //                .blockPluginSpawning = false
