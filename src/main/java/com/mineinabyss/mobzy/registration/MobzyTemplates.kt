@@ -5,6 +5,7 @@ import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.MobTemplate
 import net.minecraft.server.v1_15_R1.EntityTypes
+import org.bukkit.entity.Entity
 
 object MobzyTemplates {
     private var templates: Map<String, MobTemplate> = mapOf()
@@ -17,8 +18,13 @@ object MobzyTemplates {
             ?: error("Mob template for $name not found")
 
     /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
-    operator fun get(type: EntityTypes<*>): MobTemplate = templates[type.typeName.toEntityTypeName()]
-            ?: error("Mob template for ${type.typeName} not found")
+    operator fun get(type: EntityTypes<*>): MobTemplate = MobzyTemplates[type.typeName]
+
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(entity: Entity): MobTemplate = MobzyTemplates[entity.typeName]
+
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(entity: net.minecraft.server.v1_15_R1.Entity): MobTemplate = MobzyTemplates[entity.entityType.typeName]
 
     /** Gets the entity name from a [MobTemplate] if registered, otherwise throws an [IllegalArgumentException]*/
     fun getNameForTemplate(template: MobTemplate): String {

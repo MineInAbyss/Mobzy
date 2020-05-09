@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack
 import java.util.*
 
 /**
- * TODO make this into a proper immutable builder.
  * A class which stores information on mobs that can be deserialized from the config.
  */
 @Serializable

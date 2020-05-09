@@ -112,7 +112,7 @@ class SpawnTask : BukkitRunnable() {
                 if (none { distanceSquared(newX, newZ, it.location.chunk.x, it.location.chunk.z) < (MobzyConfig.minChunkSpawnRad * MobzyConfig.minChunkSpawnRad) }) {
                     val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())
                     if (!newChunk.isLoaded) continue
-                    return ChunkSpawn(newChunk, 0, 256)
+                    return ChunkSpawn(newChunk, 0, 255)
                 }
             }
             return null

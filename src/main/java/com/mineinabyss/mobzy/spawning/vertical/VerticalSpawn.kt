@@ -2,21 +2,26 @@ package com.mineinabyss.mobzy.spawning.vertical
 
 import org.bukkit.Location
 
+/**
+ * A vertical strip inside a chunk, with x and z located at [loc], spanning from [minY] to [maxY].
+ *
+ * Will generate a list of [SpawnArea]s, from all air gaps within this vertical strip.
+ */
 class VerticalSpawn(private val loc: Location, private var minY: Int, private var maxY: Int) {
     val spawnAreas: List<SpawnArea> = findBlockPairs()
 
-    private fun findBlockPairs(): List<SpawnArea> { //boundaries
-        if (maxY > 256) maxY = 256
-        if (minY < 0) minY = 0
+    private fun findBlockPairs(): List<SpawnArea> {
+        maxY.coerceAtMost(255)
+        minY.coerceAtLeast(0)
 
         val locations: MutableList<SpawnArea> = mutableListOf()
         val highest = loc.world?.getHighestBlockAt(loc)?.location ?: return emptyList()
 
-        if (highest.blockY !in minY..maxY) return locations
+        if (highest.blockY !in minY until maxY) return locations
         //add a gap from this location to the sky
         locations.add(SpawnArea(highest.clone().apply { y = maxY.toDouble() }, highest.clone().add(0.0, 1.0, 0.0)))
 
-        //TODO everything below is by far the slowest part of the task, as it gets repeated a lot
+        //everything below is by far the slowest part of the task, as it gets repeated a lot
         val snapshot = highest.chunk.chunkSnapshot
 
         //search for gaps and add them to the list as we go down
@@ -30,8 +35,8 @@ class VerticalSpawn(private val loc: Location, private var minY: Int, private va
             if (currentBlock.isSolid) { //if went from solid to air
                 if (!nextBlock.isSolid)
                     top = highest.clone().apply { this.y = y.toDouble() }
-            } else if (nextBlock.isSolid || highest.blockY == 1)
-                locations.add(SpawnArea(top, highest.clone().apply { this.y = y.toDouble() + 1 })) //if went back to solid or reached the bottom of the world
+            } else if (nextBlock.isSolid || highest.blockY == 1) //if went back to solid or reached the bottom of the world
+                locations.add(SpawnArea(top, highest.clone().apply { this.y = y.toDouble() + 1 }))
             currentBlock = nextBlock
         }
         return locations

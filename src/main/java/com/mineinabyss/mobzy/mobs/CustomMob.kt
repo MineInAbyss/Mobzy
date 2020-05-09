@@ -30,7 +30,7 @@ interface CustomMob {
     // ========== Useful properties ===============
     val entity: EntityLiving
     val living get() = entity.bukkitEntity as LivingEntity
-    val template: MobTemplate get() = MobzyTemplates[entity.entityType]
+    val template: MobTemplate get() = MobzyTemplates[entity]
     val locX get() = living.location.x
     val locY get() = living.location.y
     val locZ get() = living.location.z

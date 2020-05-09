@@ -5,7 +5,6 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
-import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
@@ -79,8 +78,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is LivingEntity) {
-                //TODO have ONLY ONE way of accessing the mob template so we don't have to do dumb stuff like this!!!
-                entity.equipment?.helmet = MobzyTemplates[entity.toNMS().entityType.typeName].modelItemStack
+                entity.equipment?.helmet = MobzyTemplates[entity].modelItemStack
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {

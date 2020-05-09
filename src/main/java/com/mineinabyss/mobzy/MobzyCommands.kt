@@ -102,7 +102,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             command("debug") {
                 command("spawnregion") {
                     onExecuteByPlayer {
-                        player.info(VerticalSpawn(player.location, 0, 256).spawnAreas.toString())
+                        player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
                     }
                 }
                 command("snapshot") {
