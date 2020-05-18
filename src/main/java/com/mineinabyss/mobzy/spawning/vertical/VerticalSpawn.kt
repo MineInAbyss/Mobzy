@@ -15,11 +15,13 @@ class VerticalSpawn(private val loc: Location, private var minY: Int, private va
         minY.coerceAtLeast(0)
 
         val locations: MutableList<SpawnArea> = mutableListOf()
-        val highest = loc.world?.getHighestBlockAt(loc)?.location ?: return emptyList()
+        val highest = loc.world?.getHighestBlockAt(loc)?.location?.apply { y = y.coerceAtLeast(0.0) }
+                ?: return emptyList()
 
-        if (highest.blockY !in minY until maxY) return locations
+        if (highest.blockY !in minY..maxY) return locations
         //add a gap from this location to the sky
-        locations.add(SpawnArea(highest.clone().apply { y = maxY.toDouble() }, highest.clone().add(0.0, 1.0, 0.0)))
+        if (highest.blockY != maxY)
+            locations.add(SpawnArea(highest.clone().apply { y = maxY.toDouble() }, highest.clone().add(0.0, 1.0, 0.0)))
 
         //everything below is by far the slowest part of the task, as it gets repeated a lot
         val snapshot = highest.chunk.chunkSnapshot
