@@ -5,7 +5,6 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
-import com.derongan.minecraft.guiy.GuiListener
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyTypes
@@ -73,11 +72,10 @@ class Mobzy : JavaPlugin() {
         saveDefaultConfig()
         reloadConfig()
         MobzyTypes
-        MobzyConfig
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)
-        server.pluginManager.registerEvents(GuiListener(this), this)
+//        server.pluginManager.registerEvents(GuiListener(this), this)
 
         //Register commands
         MobzyCommands
@@ -87,7 +85,7 @@ class Mobzy : JavaPlugin() {
 
     fun registerSpawnTask() {
         if (MobzyConfig.doMobSpawns) {
-            if(currentTask == null) {
+            if (currentTask == null) {
                 currentTask = SpawnTask()
                 currentTask?.runTaskTimer(this, 0, MobzyConfig.spawnTaskDelay)
             }

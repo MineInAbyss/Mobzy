@@ -113,6 +113,11 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
                     }
                 }
+                command("nearbyuuid"){
+                    onExecuteByPlayer {
+                        player.info(player.getNearbyEntities(5.0, 5.0, 5.0).first().uniqueId.toString())
+                    }
+                }
             }
 
             command("list", "l", desc = "Lists all custom mob types") {
@@ -134,7 +139,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     // be made private once that's done
                     onExecute {
                         if (MobzyConfig.doMobSpawns != enabled) {
-                            MobzyConfig.serialized.doMobSpawns = enabled
+                            MobzyConfig.doMobSpawns = enabled
                             MobzyConfig.saveConfig()
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else

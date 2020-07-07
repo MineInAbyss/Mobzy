@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 import org.bukkit.plugin.Plugin
 import java.io.File
 
-class MobConfiguration(
+class MobConfig(
         file: File,
         plugin: Plugin
-) : SerializableConfiguration<MobConfiguration.MobCfgInfo>(file, plugin, MobCfgInfo.serializer()) {
+) : SerializableConfig<MobConfig.MobCfgInfo>(file, plugin, MobCfgInfo.serializer()) {
 //    override val serialFormat = Yaml(configuration = YamlConfiguration(encodeDefaults = false))
 
     @Serializable

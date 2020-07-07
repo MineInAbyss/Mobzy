@@ -1,124 +1,84 @@
 package com.mineinabyss.mobzy
 
-import com.charleskorn.kaml.Yaml
-import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.MobzyConfig.creatureTypes
-import com.mineinabyss.mobzy.MobzyConfig.debug
-import com.mineinabyss.mobzy.MobzyConfig.doMobSpawns
-import com.mineinabyss.mobzy.MobzyConfig.maxChunkSpawnRad
-import com.mineinabyss.mobzy.MobzyConfig.maxCommandSpawns
-import com.mineinabyss.mobzy.MobzyConfig.minChunkSpawnRad
-import com.mineinabyss.mobzy.MobzyConfig.mobCfgs
-import com.mineinabyss.mobzy.MobzyConfig.registeredAddons
-import com.mineinabyss.mobzy.MobzyConfig.spawnCfgs
-import com.mineinabyss.mobzy.MobzyConfig.spawnTaskDelay
 import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.api.toEntityTypesViaScoreboardTags
-import com.mineinabyss.mobzy.configuration.MobConfiguration
-import com.mineinabyss.mobzy.configuration.SpawnConfiguration
+import com.mineinabyss.mobzy.configuration.MobConfig
+import com.mineinabyss.mobzy.configuration.PluginConfig
+import com.mineinabyss.mobzy.configuration.PluginConfigHolder
+import com.mineinabyss.mobzy.configuration.ReloadContext
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import net.minecraft.server.v1_15_R1.EntityLiving
 import net.minecraft.server.v1_15_R1.EnumCreatureType
 import net.minecraft.server.v1_15_R1.NBTTagCompound
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
-import org.bukkit.configuration.file.FileConfiguration
+
 
 /**
- * @property registeredAddons A list of [MobzyAddon]s that have been registered with the plugin.
- * @property spawnCfgs A list of [FileConfiguration]s used for defining mob spawning behaviour.
- * @property mobCfgs A list of [FileConfiguration]s used for defining mob attributes, such as drops.
- * @property creatureTypes A list of the types of creatures (currently everything from [EnumCreatureType].
  * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
- * @property spawnSearchRadius the radius around which players will count mobs towards the local mob cap
+ * @property doMobSpawns whether custom mob spawning enabled
  * @property minChunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
  * @property maxChunkSpawnRad the maximum number of chunks away from the player in which a mob can spawn
  * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
+ * @property playerGroupRadius the radius around which players will count mobs towards the local mob cap
  * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
- * @property doMobSpawns whether custom mob spawning enabled
+ * @property mobCaps A map of mobs to the maximum number of that mob to spawn per player online TODO this might actually be mob type caps
  */
-object MobzyConfig {
-    lateinit var serialized: SerializedMobzyConfig; private set
-    val debug get() = serialized.debug
-    val doMobSpawns get() = serialized.doMobSpawns
-    val minChunkSpawnRad get() = serialized.minChunkSpawnRad
-    val maxChunkSpawnRad get() = serialized.maxChunkSpawnRad
-    val maxCommandSpawns get() = serialized.maxCommandSpawns
-    val playerGroupRadius get() = serialized.playerGroupRadius
-    val spawnTaskDelay get() = serialized.spawnTaskDelay
+interface IMobzyConfigData {
+    var debug: Boolean
+    var doMobSpawns: Boolean
+    var minChunkSpawnRad: Int
+    var maxChunkSpawnRad: Int
+    var maxCommandSpawns: Int
+    var playerGroupRadius: Double
+    var spawnTaskDelay: Long
+    var mobCaps: MutableMap<String, Int>
+}
 
-    @Serializable
-    data class SerializedMobzyConfig(
-            var debug: Boolean = false,
-            var doMobSpawns: Boolean = false,
-            var minChunkSpawnRad: Int = 3,
-            var maxChunkSpawnRad: Int = 7,
-            var maxCommandSpawns: Int = 50,
-            var playerGroupRadius: Double = 128.0,
-            var spawnTaskDelay: Long = 100,
-            val mobCaps: MutableMap<String, Int> = hashMapOf()
-    )
+@Serializable
+data class MobzyConfigData(
+        override var debug: Boolean = false,
+        override var doMobSpawns: Boolean = false,
+        override var minChunkSpawnRad: Int = 3,
+        override var maxChunkSpawnRad: Int = 7,
+        override var maxCommandSpawns: Int = 50,
+        override var playerGroupRadius: Double = 128.0,
+        override var spawnTaskDelay: Long = 100,
+        override var mobCaps: MutableMap<String, Int> = hashMapOf()
+) : IMobzyConfigData
 
-    @Transient
+object MobzyConfig :
+        PluginConfig<MobzyConfigData>(Holder),
+        IMobzyConfigData by Holder.data {
+    private object Holder : PluginConfigHolder<MobzyConfigData>(mobzy, MobzyConfigData.serializer())
+
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
-
-    @Transient
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
-
-    @Transient
-    val spawnCfgs: MutableList<SpawnConfiguration> = mutableListOf()
-
-    @Transient
-    val mobCfgs: MutableList<MobConfiguration> = mutableListOf()
-
-    private fun loadSerializedValues() {
-        serialized = Yaml.default.parse(SerializedMobzyConfig.serializer(), mobzy.config.saveToString())
-    }
+    val spawnCfgs: MutableList<SpawnConfig> = mutableListOf()
+    val mobCfgs: MutableList<MobConfig> = mutableListOf()
 
     init {
-        loadSerializedValues()
         //first tick only finishes when all plugins are loaded, which is when we activate addons
         Bukkit.getServer().scheduler.runTaskLater(mobzy, Runnable { activateAddons() }, 1L)
     }
 
-    fun saveConfig() {
-        mobzy.config.loadFromString(Yaml.default.stringify(SerializedMobzyConfig.serializer(), serialized))
-        mobzy.saveConfig()
-        spawnCfgs.forEach { it.save() }
+    override fun saveData() {
+        super.saveData()
+        spawnCfgs.forEach { it.saveData() }
     }
 
     /**
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
      */
-    fun getMobCap(creatureType: String): Int = serialized.mobCaps[creatureType]
+    fun getMobCap(creatureType: String): Int = mobCaps[creatureType]
             ?: error("could not find mob cap for $creatureType")
 
-    /**
-     * Reloads the configurations stored in the plugin. Will re-serialize a new instance of MobzyConfig.
-     * Some things require a full plugin reload.
-     */
-    fun reload(sender: CommandSender = mobzy.server.consoleSender) {
-        val consoleSender = mobzy.server.consoleSender
-        fun attempt(success: String, fail: String, block: () -> Unit) {
-            try {
-                block()
-                sender.success(success)
-                if (sender != consoleSender) consoleSender.success(success)
-            } catch (e: Exception) {
-                sender.error(fail)
-                if (sender != consoleSender) consoleSender.error(fail)
-                e.printStackTrace()
-                return
-            }
-        }
-
+    override fun reload(): ReloadContext.() -> Unit = {
         logSuccess("Reloading mobzy config")
 
         //We don't clear MobzyTypes since those will only ever change if an addon's code was changed which is impossible
@@ -129,8 +89,7 @@ object MobzyConfig {
         unregisterSpawns()
 
         attempt("Loaded serialized config values", "Failed to load serialized config values") {
-            mobzy.reloadConfig()
-            loadSerializedValues()
+            loadData()
         }
 
         attempt("Reactivated all addonsMobzy", "Failed to reactive addons") {
@@ -148,7 +107,7 @@ object MobzyConfig {
     internal fun activateAddons() {
         registeredAddons.forEach { loadMobCfg(it) }
         registeredAddons.forEach { it.initializeMobs() }
-        registeredAddons.forEach { loadSpawnCfg(it) }
+        registeredAddons.forEach { spawnCfgs += loadSpawnCfg(it) }
 
         MobzyTemplates.loadTemplatesFromConfig()
         mobzy.registerSpawnTask()
@@ -159,23 +118,21 @@ object MobzyConfig {
     }
 
     /**
-     * Loads a [SpawnConfiguration] for an addon
+     * Loads a [SpawnConfig] for an addon
      *
      * @param plugin the addon registering it
      */
     fun loadSpawnCfg(plugin: MobzyAddon) {
-        val spawnCfg = SpawnConfiguration(plugin.spawnConfig, plugin)
-        spawnCfgs += spawnCfg
-//        SpawnRegistry += spawnCfg
+        val spawnCfg = SpawnConfig(plugin.spawnConfig, plugin)
     }
 
     /**
-     * Loads a [MobConfiguration] for an addon
+     * Loads a [MobConfig] for an addon
      *
      * @param plugin the addon registering it
      */
     fun loadMobCfg(plugin: MobzyAddon) {
-        val mobCfg = MobConfiguration(plugin.mobConfig, plugin)
+        val mobCfg = MobConfig(plugin.mobConfig, plugin)
         mobCfgs += mobCfg
     }
 

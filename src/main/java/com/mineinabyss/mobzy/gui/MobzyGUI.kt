@@ -10,7 +10,7 @@ import com.derongan.minecraft.guiy.kotlin_dsl.guiyLayout
 import com.derongan.minecraft.guiy.kotlin_dsl.setElement
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.MobzyConfig
-import com.mineinabyss.mobzy.configuration.SpawnConfiguration
+import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.gui.layouts.MobConfigLayout
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTemplates
@@ -22,10 +22,10 @@ import java.util.*
 class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     private val mobConfigs: List<ClickableElement> = ArrayList()
     private val spawnList: List<ClickableElement> = ArrayList()
-    private var config: SpawnConfiguration? = null
+    private var config: SpawnConfig? = null
 
     private fun buildMobConfigLayout(): Layout {
-        val configs: Collection<SpawnConfiguration> = MobzyConfig.spawnCfgs
+        val configs: Collection<SpawnConfig> = MobzyConfig.spawnCfgs
         return if (configs.size == 1)
             buildRegions(configs.first())
         else guiyLayout {
@@ -42,7 +42,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         }
     }
 
-    private fun buildRegions(config: SpawnConfiguration): Layout = guiyLayout {
+    private fun buildRegions(config: SpawnConfig): Layout = guiyLayout {
         this@MobzyGUI.config = config
         setElement(0, 0, FillableElement(4, 8)) {
             config.info.regions.forEach { region ->

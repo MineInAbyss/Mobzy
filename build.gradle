@@ -114,7 +114,7 @@ dependencies {
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
 
     if (useLocalGuiy.toBoolean()) implementation project(':guiy')
-    else implementation "com.derongan.minecraft:guiy:0.1.+"
+    else compileOnly "com.derongan.minecraft:guiy:0.1.+"
 
     if (useLocalIdofront.toBoolean()) implementation project(':idofront')
     else implementation "com.mineinabyss:idofront:0.1.+"
