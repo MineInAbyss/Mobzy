@@ -1,24 +1,14 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-    }
-}
-
 plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
+    id "com.jarnoharno.github-packages" version "1.0.0"
 }
-
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: "kotlin"
 
 group = 'com.mineinabyss'
 version = plugin_version
@@ -30,41 +20,18 @@ targetCompatibility = 1.8
 
 def github_username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
 def github_password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+githubPackages {
+    username = github_username
+    accessToken = github_password
+}
 
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-        content {
-            includeGroup 'org.bukkit'
-            includeGroup 'org.spigotmc'
-        }
-    }
-    maven {
-        name = "MineInAbyss"
-        url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
-        credentials {
-            username = github_username
-            password = github_password
-        }
-    }
-    maven {
-        name = "MineInAbyss"
-        url = uri("https://maven.pkg.github.com/MineInAbyss/Guiy")
-        credentials {
-            username = github_username
-            password = github_password
-        }
-    }
-    maven {
-        name = "CultOfClang"
-        url = uri("https://maven.pkg.github.com/CultOfClang/Minecraft/")
-        credentials {
-            username = github_username
-            password = github_password
-        }
-    }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven githubPackages("MineInAbyss/Idofront")
+    maven githubPackages("MineInAbyss/Guiy")
+    maven githubPackages("CultOfClang/Minecraft")
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://erethon.de/repo/' } //HeadLib
     maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
@@ -86,14 +53,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 publishing {
     repositories {
-        maven {
-            name = "Mobzy"
-            url = uri("https://maven.pkg.github.com/MineInAbyss/Mobzy")
-            credentials {
-                username = github_username
-                password = github_password
-            }
-        }
+        maven githubPackages("MineInAbyss/Mobzy")
     }
     publications {
         gpr(MavenPublication) {
@@ -113,10 +73,10 @@ dependencies {
     compileOnly "com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721"
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
 
-    if (useLocalGuiy.toBoolean()) implementation project(':guiy')
+    if (project.hasProperty("useLocalGuiy") && useLocalGuiy.toBoolean()) implementation "com.derongan.minecraft:guiy"
     else implementation "com.derongan.minecraft:guiy:0.1.+"
 
-    if (useLocalIdofront.toBoolean()) implementation project(':idofront')
+    if (project.hasProperty("useLocalIdofront") && useLocalIdofront.toBoolean()) implementation "com.mineinabyss:idofront"
     else implementation "com.mineinabyss:idofront:0.1.+"
 }
 
