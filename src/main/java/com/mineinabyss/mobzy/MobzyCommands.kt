@@ -2,10 +2,7 @@ package com.mineinabyss.mobzy
 
 import com.mineinabyss.idofront.commands.Command.PlayerExecution
 import com.mineinabyss.idofront.commands.IdofrontCommandExecutor
-import com.mineinabyss.idofront.commands.arguments.BooleanArg
-import com.mineinabyss.idofront.commands.arguments.IntArg
-import com.mineinabyss.idofront.commands.arguments.StringArg
-import com.mineinabyss.idofront.commands.arguments.StringListArg
+import com.mineinabyss.idofront.commands.arguments.*
 import com.mineinabyss.idofront.commands.onExecuteByPlayer
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
@@ -45,8 +42,8 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             commandGroup {
-                val entityType by +StringArg("entity type")
-                val radius by +IntArg("radius") {
+                val entityType by stringArg()
+                val radius by intArg() {
                     default = 0
                     ensureChangedByPlayer()
                 }
@@ -90,10 +87,10 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             command("spawn", "s", desc = "Spawns a custom mob") {
-                val mobName by +StringListArg("mob name", options = MobzyTypes.typeNames) {
-                    parseErrorMessage = { "No such entity: $it" }
+                val mobName by optionArg(options = MobzyTypes.typeNames) {
+                    parseErrorMessage = { "No such entity: $passed" }
                 }
-                var numOfSpawns by +IntArg("number of mobs to spawn") { default = 1 }
+                var numOfSpawns by intArg() { default = 1 }
                 onExecuteByPlayer {
                     if (numOfSpawns > MobzyConfig.maxCommandSpawns) numOfSpawns = MobzyConfig.maxCommandSpawns
                     for (i in 0 until numOfSpawns) (sender as Player).location.spawnEntity(mobName)
@@ -128,7 +125,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     }
                 }
                 command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
-                    val enabled by +BooleanArg("enabled")
+                    val enabled by booleanArg()
 
                     //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
                     // be made private once that's done

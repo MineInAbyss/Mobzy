@@ -4,7 +4,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
     id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
     id 'com.jarnoharno.github-packages' version '1.0.0'
@@ -16,7 +16,6 @@ if (project.hasProperty("buildNo")) version += ".$buildNo"
 
 java {
     setSourceCompatibility(1.8)
-    setTargetCompatibility(1.8)
     withSourcesJar()
     withJavadocJar()
 }
