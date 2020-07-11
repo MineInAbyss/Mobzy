@@ -1,107 +1,44 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-    }
-}
-
 plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
+    id 'com.jarnoharno.github-packages' version '1.0.0'
 }
-
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: "kotlin"
 
 group = 'com.mineinabyss'
 version = plugin_version
-
 if (project.hasProperty("buildNo")) version += ".$buildNo"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    setSourceCompatibility(1.8)
+    withSourcesJar()
+    withJavadocJar()
+}
 
-def github_username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-def github_password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+githubPackages {
+    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+    accessToken = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+}
 
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-        content {
-            includeGroup 'org.bukkit'
-            includeGroup 'org.spigotmc'
-        }
-    }
-    maven {
-        name = "MineInAbyss"
-        url = uri("https://maven.pkg.github.com/MineInAbyss/Idofront")
-        credentials {
-            username = github_username
-            password = github_password
-        }
-    }
-    maven {
-        name = "MineInAbyss"
-        url = uri("https://maven.pkg.github.com/MineInAbyss/Guiy")
-        credentials {
-            username = github_username
-            password = github_password
-        }
-    }
-    maven {
-        name = "CultOfClang"
-        url = uri("https://maven.pkg.github.com/CultOfClang/Minecraft/")
-        credentials {
-            username = github_username
-            password = github_password
-        }
-    }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://erethon.de/repo/' } //HeadLib
     maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
     maven { url 'https://jitpack.io' } //JitPack
     maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
     maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+    maven githubPackages("MineInAbyss/Idofront")
+    maven githubPackages("MineInAbyss/Guiy")
+    maven githubPackages("CultOfClang/Minecraft")
     mavenLocal()
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    getArchiveClassifier().set('sources')
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    getArchiveClassifier().set('javadoc')
-    from javadoc.destinationDir
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "Mobzy"
-            url = uri("https://maven.pkg.github.com/MineInAbyss/Mobzy")
-            credentials {
-                username = github_username
-                password = github_password
-            }
-        }
-    }
-    publications {
-        gpr(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
 }
 
 dependencies {
@@ -113,11 +50,8 @@ dependencies {
     compileOnly "com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721"
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
 
-    if (useLocalGuiy.toBoolean()) implementation project(':guiy')
-    else compileOnly "com.derongan.minecraft:guiy:0.1.+"
-
-    if (useLocalIdofront.toBoolean()) implementation project(':idofront')
-    else implementation "com.mineinabyss:idofront:0.1.+"
+    implementation "com.derongan.minecraft:guiy:0.1.+"
+    implementation "com.mineinabyss:idofront:0.1.+"
 }
 
 shadowJar {
@@ -135,9 +69,7 @@ shadowJar {
 build.dependsOn shadowJar
 
 processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: [plugin_version: plugin_version]
-    }
+    filter ReplaceTokens, tokens: [plugin_version: plugin_version]
 }
 
 compileKotlin { kotlinOptions { jvmTarget = "1.8" } }
@@ -151,4 +83,17 @@ if (project.hasProperty("plugin_path") && plugin_path) {
         into plugin_path
     }
     build.dependsOn copyJar
+}
+
+publishing {
+    repositories {
+        maven githubPackages("MineInAbyss/Mobzy")
+    }
+    publications {
+        gpr(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
 }

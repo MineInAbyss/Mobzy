@@ -1,12 +1,5 @@
-rootProject.name = 'Mobzy'
+rootProject.name = 'mobzy'
 
-//FIXME this screws up the project hierarchy but only sometimes
-if (useLocalGuiy.toBoolean()) {
-    include 'guiy'
-    project(':guiy').projectDir = new File('../guiy')
-}
+if (rootProject.hasProperty("useLocalGuiy") && useLocalGuiy.toBoolean()) includeBuild '../guiy'
 
-if (useLocalIdofront.toBoolean()) {
-    include 'idofront'
-    project(':idofront').projectDir = new File('../idofront')
-}
+if (rootProject.hasProperty("useLocalIdofront") && useLocalIdofront.toBoolean()) includeBuild '../idofront'
