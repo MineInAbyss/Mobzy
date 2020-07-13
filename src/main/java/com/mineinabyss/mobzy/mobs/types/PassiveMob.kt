@@ -29,7 +29,7 @@ abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTempl
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
         addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
         addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
-        addPathfinderGoal(7, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
+        addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 6.0f))
     }
 
     override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit

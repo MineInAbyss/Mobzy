@@ -30,7 +30,7 @@ abstract class FlyingMob(world: World?, name: String) : EntityFlying(MobzyTempla
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalFlyDamageTarget(this))
         addPathfinderGoal(5, PathfinderGoalIdleFly(this))
-        addPathfinderGoal(1, PathfinderGoalHurtByTarget(this, 60.0))
+        addPathfinderGoal(1, PathfinderGoalHurtByTarget(this, 100.0))
         addTargetSelector(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
     }
 

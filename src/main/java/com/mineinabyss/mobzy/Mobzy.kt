@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy
 
-import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
@@ -14,6 +13,7 @@ import com.sk89q.worldguard.protection.flags.StringFlag
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import com.comphenix.protocol.PacketType.Play.Server as Packets
 
 /** Gets [Mobzy] via Bukkit once, then sends that reference back afterwards */
 val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
@@ -55,13 +55,26 @@ class Mobzy : JavaPlugin() {
         //register protocol manager
         val protocolManager = ProtocolLibrary.getProtocolManager()!!
 
+        //send zombie as entity type for custom mobs
         protocolManager.addPacketListener(object : PacketAdapter(this, ListenerPriority.NORMAL,
-                PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
-            override fun onPacketSending(event: PacketEvent) { // Item packets (id: 0x29)
-                if (event.packetType == PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
-                    if (Bukkit.getEntity(event.packet.uuiDs.read(0))?.isCustomMob == true)
-                        event.packet.integers.write(1, 95)
-                }
+                Packets.SPAWN_ENTITY_LIVING) {
+            override fun onPacketSending(event: PacketEvent) {
+                if (Bukkit.getEntity(event.packet.uuiDs.read(0))?.isCustomMob == true)
+                    event.packet.integers.write(1, 95)
+            }
+        })
+
+        //pitch lock custom mobs
+        protocolManager.addPacketListener(object : PacketAdapter(this, ListenerPriority.NORMAL,
+                //all these packets seem to be enough to cover all head rotations
+                Packets.ENTITY_LOOK,
+                Packets.REL_ENTITY_MOVE_LOOK,
+                Packets.LOOK_AT,
+                Packets.ENTITY_TELEPORT
+        ) {
+            override fun onPacketSending(event: PacketEvent) {
+                if (event.packet.getEntityModifier(event).read(0).isCustomMob) //check entity involved
+                    event.packet.bytes.write(1, 0) //modify pitch to be zero
             }
         })
     }

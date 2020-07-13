@@ -28,10 +28,10 @@ abstract class HostileMob(world: World?, name: String) : EntityMonster(MobzyTemp
 
     override fun createPathfinders() {
         addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, template.model))
-        addPathfinderGoal(2, PathfinderGoalMeleeAttackPitchLock(this))
+        addPathfinderGoal(2, PathfinderGoalMeleeAttackPitchLock(this)) //TODO dont force pitch lock but keep pathfinder
         addPathfinderGoal(3, PathfinderGoalFloat(this))
         addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
-        addPathfinderGoal(8, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 8.0))
+        addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 8.0f))
         addPathfinderGoal(8, PathfinderGoalRandomLookaround(this))
 
         addTargetSelector(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
