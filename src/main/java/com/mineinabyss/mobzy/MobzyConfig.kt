@@ -1,13 +1,14 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.idofront.annotations.GenerateConfigExtensions
+import com.mineinabyss.idofront.config.IdofrontConfig
+import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.api.spawnEntity
 import com.mineinabyss.mobzy.api.toEntityTypesViaScoreboardTags
 import com.mineinabyss.mobzy.configuration.MobConfig
-import com.mineinabyss.mobzy.configuration.PluginConfig
-import com.mineinabyss.mobzy.configuration.PluginConfigHolder
-import com.mineinabyss.mobzy.configuration.ReloadContext
+import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
@@ -17,44 +18,29 @@ import net.minecraft.server.v1_15_R1.EnumCreatureType
 import net.minecraft.server.v1_15_R1.NBTTagCompound
 import org.bukkit.Bukkit
 
-
-/**
- * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
- * @property doMobSpawns whether custom mob spawning enabled
- * @property minChunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
- * @property maxChunkSpawnRad the maximum number of chunks away from the player in which a mob can spawn
- * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
- * @property playerGroupRadius the radius around which players will count mobs towards the local mob cap
- * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
- * @property mobCaps A map of mobs to the maximum number of that mob to spawn per player online TODO this might actually be mob type caps
- */
-interface IMobzyConfigData {
-    var debug: Boolean
-    var doMobSpawns: Boolean
-    var minChunkSpawnRad: Int
-    var maxChunkSpawnRad: Int
-    var maxCommandSpawns: Int
-    var playerGroupRadius: Double
-    var spawnTaskDelay: Long
-    var mobCaps: MutableMap<String, Int>
-}
-
-@Serializable
-data class MobzyConfigData(
-        override var debug: Boolean = false,
-        override var doMobSpawns: Boolean = false,
-        override var minChunkSpawnRad: Int = 3,
-        override var maxChunkSpawnRad: Int = 7,
-        override var maxCommandSpawns: Int = 50,
-        override var playerGroupRadius: Double = 128.0,
-        override var spawnTaskDelay: Long = 100,
-        override var mobCaps: MutableMap<String, Int> = hashMapOf()
-) : IMobzyConfigData
-
-object MobzyConfig :
-        PluginConfig<MobzyConfigData>(Holder),
-        IMobzyConfigData by Holder.data {
-    private object Holder : PluginConfigHolder<MobzyConfigData>(mobzy, MobzyConfigData.serializer())
+@GenerateConfigExtensions
+object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) {
+    /**
+     * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
+     * @property doMobSpawns whether custom mob spawning enabled
+     * @property minChunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
+     * @property maxChunkSpawnRad the maximum number of chunks away from the player in which a mob can spawn
+     * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
+     * @property playerGroupRadius the radius around which players will count mobs towards the local mob cap
+     * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
+     * @property mobCaps A map of mobs to the maximum number of that mob to spawn per player online TODO this might actually be mob type caps
+     */
+    @Serializable
+    class Data(
+            var debug: Boolean = false,
+            var doMobSpawns: Boolean = false,
+            var minChunkSpawnRad: Int = 3,
+            var maxChunkSpawnRad: Int = 7,
+            var maxCommandSpawns: Int = 50,
+            var playerGroupRadius: Double = 128.0,
+            var spawnTaskDelay: Long = 100,
+            var mobCaps: MutableMap<String, Int> = hashMapOf()
+    )
 
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
@@ -66,9 +52,9 @@ object MobzyConfig :
         Bukkit.getServer().scheduler.runTaskLater(mobzy, Runnable { activateAddons() }, 1L)
     }
 
-    override fun saveData() {
-        super.saveData()
-        spawnCfgs.forEach { it.saveData() }
+    override fun save() {
+        super.save()
+        spawnCfgs.forEach { it.save() }
     }
 
     /**
@@ -78,7 +64,7 @@ object MobzyConfig :
     fun getMobCap(creatureType: String): Int = mobCaps[creatureType]
             ?: error("could not find mob cap for $creatureType")
 
-    override fun reload(): ReloadContext.() -> Unit = {
+    override fun reload(): ReloadScope.() -> Unit = {
         logSuccess("Reloading mobzy config")
 
         //We don't clear MobzyTypes since those will only ever change if an addon's code was changed which is impossible
@@ -87,10 +73,6 @@ object MobzyConfig :
         spawnCfgs.clear()
         mobCfgs.clear()
         unregisterSpawns()
-
-        attempt("Loaded serialized config values", "Failed to load serialized config values") {
-            loadData()
-        }
 
         attempt("Reactivated all addonsMobzy", "Failed to reactive addons") {
             activateAddons()
@@ -122,9 +104,7 @@ object MobzyConfig :
      *
      * @param plugin the addon registering it
      */
-    fun loadSpawnCfg(plugin: MobzyAddon) {
-        val spawnCfg = SpawnConfig(plugin.spawnConfig, plugin)
-    }
+    fun loadSpawnCfg(plugin: MobzyAddon) = SpawnConfig(plugin.spawnConfig, plugin)
 
     /**
      * Loads a [MobConfig] for an addon

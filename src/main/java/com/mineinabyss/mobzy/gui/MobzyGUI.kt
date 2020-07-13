@@ -11,6 +11,9 @@ import com.derongan.minecraft.guiy.kotlin_dsl.setElement
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.configuration.SpawnConfig
+import com.mineinabyss.mobzy.configuration.icon
+import com.mineinabyss.mobzy.configuration.name
+import com.mineinabyss.mobzy.configuration.regions
 import com.mineinabyss.mobzy.gui.layouts.MobConfigLayout
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTemplates
@@ -31,8 +34,8 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         else guiyLayout {
             setElement(0, 0, FillableElement(4, 8)) {
                 for (config in configs) {
-                    val name = config.info.name
-                    val icon = config.info.icon
+                    val name = config.name
+                    val icon = config.icon
                     val cell = icon.toCell(name)
                     val mobConfig = ClickableElement(cell) { setElement(buildRegions(config)) }
                     addElement(mobConfig)
@@ -45,7 +48,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
     private fun buildRegions(config: SpawnConfig): Layout = guiyLayout {
         this@MobzyGUI.config = config
         setElement(0, 0, FillableElement(4, 8)) {
-            config.info.regions.forEach { region ->
+            config.regions.forEach { region ->
                 val regionName = region.name
                 val material = region.icon
 
@@ -62,7 +65,7 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         setElement(0, 0, FillableElement(4, 8)) {
             spawns.forEach { spawn ->
                 val spawnBuilder = if (spawn.reuse != null)
-                    MobzyTemplates[findMobSpawn(spawn.reuse!!).entityTypeName ?: error("Reuse was null")]
+                    MobzyTemplates[findMobSpawn(spawn.reuse).entityTypeName ?: error("Reuse was null")]
                 else
                     MobzyTemplates[spawn.entityTypeName ?: error("Reuse was null")]
 

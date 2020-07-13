@@ -137,7 +137,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     onExecute {
                         if (MobzyConfig.doMobSpawns != enabled) {
                             MobzyConfig.doMobSpawns = enabled
-                            MobzyConfig.saveConfig()
+                            MobzyConfig.save() //TODO remove when auto save introduced
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")

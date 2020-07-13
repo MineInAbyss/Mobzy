@@ -1,5 +1,14 @@
 rootProject.name = 'mobzy'
 
-if (rootProject.hasProperty("useLocalGuiy") && useLocalGuiy.toBoolean()) includeBuild '../guiy'
+//TODO clean up how we check if properties exist
+if (properties.containsKey("useLocalGuiy") && useLocalGuiy.toBoolean()) includeBuild '../guiy'
 
-if (rootProject.hasProperty("useLocalIdofront") && useLocalIdofront.toBoolean()) includeBuild '../idofront'
+if (properties.containsKey("useLocalIdofront") && useLocalIdofront.toBoolean()){
+    includeBuild('../idofront') {
+        dependencySubstitution {
+            substitute module("com.mineinabyss:idofront") with project(":")
+            substitute module("com.mineinabyss:idofront-annotation") with project(":annotation")
+            substitute module("com.mineinabyss:idofront-processor") with project(":processor")
+        }
+    }
+}

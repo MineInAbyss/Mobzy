@@ -7,6 +7,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
     id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
+    id 'org.jetbrains.kotlin.kapt' version "$kotlin_version"
     id 'com.jarnoharno.github-packages' version '1.0.0'
 }
 
@@ -35,9 +36,9 @@ repositories {
     maven { url 'https://jitpack.io' } //JitPack
     maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
     maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
-    maven githubPackages("MineInAbyss/Idofront")
+    maven githubPackages("MineInAbyss/Idofront") //TODO not working with actions
     maven githubPackages("MineInAbyss/Guiy")
-    maven githubPackages("CultOfClang/Minecraft")
+    maven githubPackages("MineInAbyss/KotlinSpice")
     mavenLocal()
 }
 
@@ -52,6 +53,8 @@ dependencies {
 
     implementation "com.derongan.minecraft:guiy:0.1.+"
     implementation "com.mineinabyss:idofront:0.1.+"
+    implementation("com.mineinabyss:idofront-annotation")
+    kapt("com.mineinabyss:idofront-processor")
 }
 
 shadowJar {

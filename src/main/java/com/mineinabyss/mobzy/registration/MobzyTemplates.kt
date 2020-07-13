@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.typeName
+import com.mineinabyss.mobzy.configuration.templates
 import com.mineinabyss.mobzy.mobs.MobTemplate
 import net.minecraft.server.v1_15_R1.EntityTypes
 import org.bukkit.entity.Entity
@@ -47,7 +48,7 @@ object MobzyTemplates {
     private fun readTemplateConfig(): Map<String, MobTemplate> {
         val map = mutableMapOf<String, MobTemplate>()
         MobzyConfig.mobCfgs.forEach {
-            map += it.info.templates
+            map += it.templates
         }
         return map.toMap()
     }
