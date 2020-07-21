@@ -52,9 +52,9 @@ dependencies {
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
 
     implementation "com.derongan.minecraft:guiy:0.1.+"
-    implementation "com.mineinabyss:idofront:0.1.+"
-    implementation("com.mineinabyss:idofront-annotation")
-    kapt("com.mineinabyss:idofront-processor")
+    implementation "com.mineinabyss:idofront:0.2.+"
+    implementation("com.mineinabyss:idofront-annotation:0.2.+")
+    kapt("com.mineinabyss:idofront-processor:0.2.+")
 }
 
 shadowJar {
@@ -95,8 +95,6 @@ publishing {
     publications {
         gpr(MavenPublication) {
             from components.java
-            artifact sourcesJar
-            artifact javadocJar
         }
     }
 }

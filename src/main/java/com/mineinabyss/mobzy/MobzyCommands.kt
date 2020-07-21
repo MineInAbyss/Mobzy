@@ -1,9 +1,13 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.idofront.commands.Command.PlayerExecution
-import com.mineinabyss.idofront.commands.IdofrontCommandExecutor
-import com.mineinabyss.idofront.commands.arguments.*
-import com.mineinabyss.idofront.commands.onExecuteByPlayer
+import com.mineinabyss.idofront.commands.arguments.booleanArg
+import com.mineinabyss.idofront.commands.arguments.intArg
+import com.mineinabyss.idofront.commands.arguments.optionArg
+import com.mineinabyss.idofront.commands.arguments.stringArg
+import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
+import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
+import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
+import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.api.isCustomMob
@@ -19,36 +23,29 @@ import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
-import org.bukkit.entity.Player
 
+@ExperimentalCommandDSL
 object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         command("mobzy", "mz") {
-            command("configinfo", "cfginfo", desc = "Information about the current state of the plugin") {
-                onExecute {
-                    sender.info(("""
+            command("configinfo", "cfginfo", desc = "Information about the current state of the plugin")?.action {
+                sender.info(("""
                             LOG OF CURRENTLY REGISTERED STUFF:
                             Mob configs: ${MobzyConfig.mobCfgs}
                             Spawn configs: ${MobzyConfig.spawnCfgs}
                             Registered addons: ${MobzyConfig.registeredAddons}
                             Registered EntityTypes: ${MobzyTypes.typeNames}""".trimIndent()))
-                }
             }
 
-            command("reload", "rl", desc = "Reloads the configuration files") {
-                onExecute {
-                    MobzyConfig.reload(sender)
-                }
+            command("reload", "rl", desc = "Reloads the configuration files")?.action {
+                MobzyConfig.reload(sender)
             }
 
             commandGroup {
                 val entityType by stringArg()
-                val radius by intArg() {
-                    default = 0
-                    ensureChangedByPlayer()
-                }
+                val radius by intArg() { default = 0 }
 
-                fun PlayerExecution.removeOrInfo(isInfo: Boolean) {
+                fun PlayerAction.removeOrInfo(isInfo: Boolean) {
                     val worlds = mobzy.server.worlds
                     var mobCount = 0
                     var entityCount = 0
@@ -81,63 +78,60 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     )
                 }
 
-                command("remove", "rm", desc = "Removes mobs") { onExecuteByPlayer { removeOrInfo(false) } }
+                command("remove", "rm", desc = "Removes mobs")?.playerAction {
+                    removeOrInfo(false)
+                }
 
-                command("info", "i", desc = "Lists how many mobs are around you") { onExecuteByPlayer { removeOrInfo(true) } }
+                command("info", "i", desc = "Lists how many mobs are around you")?.playerAction {
+                    removeOrInfo(true)
+                }
             }
 
             command("spawn", "s", desc = "Spawns a custom mob") {
                 val mobName by optionArg(options = MobzyTypes.typeNames) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
-                var numOfSpawns by intArg() { default = 1 }
-                onExecuteByPlayer {
-                    if (numOfSpawns > MobzyConfig.maxCommandSpawns) numOfSpawns = MobzyConfig.maxCommandSpawns
-                    for (i in 0 until numOfSpawns) (sender as Player).location.spawnEntity(mobName)
+                val numOfSpawns by intArg() {
+                    name = "number of spawns"
+                    default = 1
+                }
+
+                playerAction {
+                    val cappedSpawns = numOfSpawns.coerceAtMost(MobzyConfig.maxCommandSpawns)
+                    for (i in 1..cappedSpawns) player.location.spawnEntity(mobName)
                 }
             }
             command("debug") {
-                command("spawnregion") {
-                    onExecuteByPlayer {
-                        player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
-                    }
+                command("spawnregion")?.playerAction {
+                    player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
                 }
-                command("snapshot") {
-                    onExecuteByPlayer {
-                        val snapshot = player.location.chunk.chunkSnapshot
-                        val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }
-                        val z = (player.location.blockZ % 16).let { if (it < 0) it + 16 else it }
-                        player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
-                    }
+                command("snapshot")?.playerAction {
+                    val snapshot = player.location.chunk.chunkSnapshot
+                    val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }
+                    val z = (player.location.blockZ % 16).let { if (it < 0) it + 16 else it }
+                    player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
                 }
-                command("nearbyuuid"){
-                    onExecuteByPlayer {
-                        player.info(player.getNearbyEntities(5.0, 5.0, 5.0).first().uniqueId.toString())
-                    }
+                command("nearbyuuid")?.playerAction {
+                    player.info(player.getNearbyEntities(5.0, 5.0, 5.0).first().uniqueId.toString())
                 }
             }
 
-            command("list", "l", desc = "Lists all custom mob types") {
-                onExecute {
-                    sender.success("All registered types:\n${MobzyTypes.typeNames}")
-                }
+            command("list", "l", desc = "Lists all custom mob types")?.action {
+                sender.success("All registered types:\n${MobzyTypes.typeNames}")
             }
 
             command("config", desc = "Configuration options") {
-                command("spawns", desc = "Allows editing of spawn config with a GUI") {
-                    onExecuteByPlayer {
-                        MobzyGUI(player).show(player)
-                    }
+                command("spawns", desc = "Allows editing of spawn config with a GUI")?.playerAction {
+                    MobzyGUI(player).show(player)
                 }
                 command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
                     val enabled by booleanArg()
 
                     //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
                     // be made private once that's done
-                    onExecute {
+                    action {
                         if (MobzyConfig.doMobSpawns != enabled) {
                             MobzyConfig.doMobSpawns = enabled
-                            MobzyConfig.save() //TODO remove when auto save introduced
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")
