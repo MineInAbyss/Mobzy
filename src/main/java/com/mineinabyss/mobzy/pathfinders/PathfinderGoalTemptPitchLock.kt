@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.toNMS
-import net.minecraft.server.v1_15_R1.EntityLiving
+import net.minecraft.server.v1_16_R1.EntityLiving
 import org.bukkit.Material
 import org.bukkit.event.entity.EntityTargetEvent
 

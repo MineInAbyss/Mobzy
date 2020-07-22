@@ -10,12 +10,12 @@ import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.toNMS
-import net.minecraft.server.v1_15_R1.EntityHuman
+import net.minecraft.server.v1_16_R1.EntityHuman
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Statistic
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.NPC

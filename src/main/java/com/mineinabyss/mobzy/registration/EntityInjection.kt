@@ -1,29 +1,32 @@
 package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.idofront.messaging.logWarn
+import com.mineinabyss.mobzy.api.nmsextensions.Registry
+import com.mineinabyss.mobzy.api.nmsextensions.build
+import com.mineinabyss.mobzy.api.nmsextensions.registerEntityType
 import com.mineinabyss.mobzy.mobs.behaviours.AfterSpawnBehaviour
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
-import net.minecraft.server.v1_15_R1.*
+import net.minecraft.server.v1_16_R1.*
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
 import org.bukkit.event.entity.CreatureSpawnEvent
 
-internal fun bToa(b: EntityTypes.b<Entity>, creatureType: EnumCreatureType): EntityTypes.a<Entity> = EntityTypes.a.a(b, creatureType)
+internal fun bToa(b: EntityTypes.b<Entity>, creatureType: EnumCreatureType): EntityTypes.Builder<Entity> = EntityTypes.Builder.a(b, creatureType)
 
 /**
  * Injects an entity into the server
  *
  * Originally from [paper forms](https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293)
  */
-internal fun injectNewEntity(name: String, extend_from: String, a: EntityTypes.a<Entity>): EntityTypes<Entity> { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
+internal fun injectNewEntity(name: String, extend_from: String, builder: EntityTypes.Builder<Entity>): EntityTypes<Entity> { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
     @Suppress("UNCHECKED_CAST") val dataTypes = DataConverterRegistry.a()
             .getSchema(DataFixUtils.makeKey(SharedConstants.getGameVersion().worldVersion))
             .findChoiceType(DataConverterTypes.ENTITY).types() as MutableMap<String, Type<*>>
     if (dataTypes.containsKey("minecraft:$name")) logWarn("ALREADY CONTAINS KEY: $name")
     dataTypes["minecraft:$name"] = dataTypes["minecraft:$extend_from"]!!
 
-    return IRegistry.a(IRegistry.ENTITY_TYPE, name, a.a(name))
+    return registerEntityType(name, builder.build(name))
 }
 
 /**

@@ -13,9 +13,9 @@ import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_15_R1.EntityLiving
-import net.minecraft.server.v1_15_R1.EnumCreatureType
-import net.minecraft.server.v1_15_R1.NBTTagCompound
+import net.minecraft.server.v1_16_R1.EntityLiving
+import net.minecraft.server.v1_16_R1.EnumCreatureType
+import net.minecraft.server.v1_16_R1.NBTTagCompound
 import org.bukkit.Bukkit
 
 @GenerateConfigExtensions
@@ -130,9 +130,9 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
             }.forEach {
                 val replacement = it.location.spawnEntity(it.toEntityTypesViaScoreboardTags())!!.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()
-                it.toNMS<EntityLiving>().b(nbt) //.b copies over the entity's nbt data to the compound
+                it.toNMS<EntityLiving>().loadData(nbt) //.b copies over the entity's nbt data to the compound
                 it.remove()
-                replacement.a(nbt) //.a copies the nbt data to the new entity
+                replacement.save(nbt) //.a copies the nbt data to the new entity
                 num++
             }
         }

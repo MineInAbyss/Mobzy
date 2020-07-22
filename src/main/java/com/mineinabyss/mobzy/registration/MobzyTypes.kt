@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.mobzy.mobs.MobTemplate
-import net.minecraft.server.v1_15_R1.Entity
-import net.minecraft.server.v1_15_R1.EntityTypes
-import net.minecraft.server.v1_15_R1.EnumCreatureType
-import net.minecraft.server.v1_15_R1.World
+import net.minecraft.server.v1_16_R1.Entity
+import net.minecraft.server.v1_16_R1.EntityTypes
+import net.minecraft.server.v1_16_R1.EnumCreatureType
+import net.minecraft.server.v1_16_R1.World
 import kotlin.collections.set
 
 /**

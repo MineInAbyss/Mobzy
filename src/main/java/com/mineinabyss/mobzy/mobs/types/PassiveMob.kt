@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import com.mineinabyss.mobzy.pathfinders.PathfinderGoalWalkingAnimation
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import net.minecraft.server.v1_15_R1.*
+import net.minecraft.server.v1_16_R1.*
 
 /**
  * Originally based off EntityPig
@@ -18,7 +17,7 @@ abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTempl
         }
     override val entity: EntityLiving get() = this
     override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime //TODO I want a consistent fix for the ambiguity errors, this might be it
-    override val killScore: Int = aW
+    override val killScore: Int = aV
 
     //implementation of behaviours
 
@@ -40,11 +39,15 @@ abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTempl
 
     //overriding NMS methods
 
-    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
+
+    open fun eL(): AttributeProvider.Builder? {
+        return EntityInsentient.p().a(GenericAttributes.MAX_HEALTH, 10.0).a(GenericAttributes.MOVEMENT_SPEED, 0.25)
+    }
+//    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
     override fun initPathfinder() = createPathfinders()
 
-    override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
-    override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
+    override fun saveData(nbttagcompound: NBTTagCompound) = super.saveData(nbttagcompound).also { loadMobNBT(nbttagcompound) }
+    override fun loadData(nbttagcompound: NBTTagCompound) = super.loadData(nbttagcompound).also { saveMobNBT(nbttagcompound) }
 
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ

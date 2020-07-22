@@ -7,10 +7,10 @@ import com.mineinabyss.mobzy.mobs.MobTemplate
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.registration.spawnEntity
-import net.minecraft.server.v1_15_R1.Entity
-import net.minecraft.server.v1_15_R1.EntityTypes
-import net.minecraft.server.v1_15_R1.EnumCreatureType
-import net.minecraft.server.v1_15_R1.World
+import net.minecraft.server.v1_16_R1.Entity
+import net.minecraft.server.v1_16_R1.EntityTypes
+import net.minecraft.server.v1_16_R1.EnumCreatureType
+import net.minecraft.server.v1_16_R1.World
 import org.bukkit.Location
 
 fun Location.spawnEntity(name: String) = spawnEntity(MobzyTypes[name])

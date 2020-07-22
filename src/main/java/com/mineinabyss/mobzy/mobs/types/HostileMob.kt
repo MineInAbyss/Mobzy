@@ -1,11 +1,13 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
 import com.mineinabyss.mobzy.pathfinders.PathfinderGoalWalkingAnimation
 import com.mineinabyss.mobzy.pathfinders.hostile.PathfinderGoalMeleeAttackPitchLock
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import net.minecraft.server.v1_15_R1.*
+import net.minecraft.server.v1_16_R1.*
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
+
 
 /**
  * Lots of code taken from EntityZombie
@@ -22,13 +24,13 @@ abstract class HostileMob(world: World?, name: String) : EntityMonster(MobzyTemp
         get() = this
 
     override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime
-    override val killScore: Int = aW
+    override val killScore: Int = aV
 
     //implementation of behaviours
 
     override fun createPathfinders() {
         addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, template.model))
-        addPathfinderGoal(2, PathfinderGoalMeleeAttackPitchLock(this)) //TODO dont force pitch lock but keep pathfinder
+        addPathfinderGoal(2, PathfinderGoalMeleeAttack(this, 1.0, false )) //TODO dont force pitch lock but keep pathfinder
         addPathfinderGoal(3, PathfinderGoalFloat(this))
         addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
         addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 8.0f))
@@ -44,11 +46,15 @@ abstract class HostileMob(world: World?, name: String) : EntityMonster(MobzyTemp
 
     //overriding NMS methods
 
-    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
+//    open fun eL(): AttributeProvider.Builder? {
+//        return EntityInsentient.p().a(GenericAttributes.MAX_HEALTH, 10.0).a(GenericAttributes.MOVEMENT_SPEED, 0.25)
+//    }
+//    fun eT() = super.eT().also { setConfiguredAttributes() }
+
     override fun initPathfinder() = createPathfinders()
 
-    override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
-    override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
+    override fun saveData(nbttagcompound: NBTTagCompound) = super.saveData(nbttagcompound).also { loadMobNBT(nbttagcompound) }
+    override fun loadData(nbttagcompound: NBTTagCompound) = super.loadData(nbttagcompound).also { saveMobNBT(nbttagcompound) }
 
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
@@ -58,7 +64,6 @@ abstract class HostileMob(world: World?, name: String) : EntityMonster(MobzyTemp
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
     override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
     override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
-//
 
     //EntityMonster specific overriding
 
@@ -66,10 +71,10 @@ abstract class HostileMob(world: World?, name: String) : EntityMonster(MobzyTemp
      * Removes entity if not in peaceful mode
      */
     override fun tick() = super.tick().also { if (!world.isClientSide && world.difficulty == EnumDifficulty.PEACEFUL) die() }
-
     init {
         createFromBase()
         addScoreboardTag("hostileMob")
         living.removeWhenFarAway = true
+        attributeMap
     }
 }

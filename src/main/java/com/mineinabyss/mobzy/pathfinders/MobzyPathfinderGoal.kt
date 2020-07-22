@@ -2,9 +2,9 @@ package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.toNMS
-import net.minecraft.server.v1_15_R1.ControllerMove
-import net.minecraft.server.v1_15_R1.EntityInsentient
-import net.minecraft.server.v1_15_R1.EntityLiving
+import net.minecraft.server.v1_16_R1.ControllerMove
+import net.minecraft.server.v1_16_R1.EntityInsentient
+import net.minecraft.server.v1_16_R1.EntityLiving
 import org.bukkit.GameMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player

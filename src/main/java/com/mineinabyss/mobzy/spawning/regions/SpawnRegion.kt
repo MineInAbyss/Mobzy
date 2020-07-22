@@ -4,7 +4,7 @@ import com.mineinabyss.mobzy.api.typeName
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_15_R1.EntityTypes
+import net.minecraft.server.v1_16_R1.EntityTypes
 import org.bukkit.Material
 
 /**

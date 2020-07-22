@@ -6,7 +6,7 @@ import com.mineinabyss.mobzy.pathfinders.flying.PathfinderGoalFlyDamageTarget
 import com.mineinabyss.mobzy.pathfinders.flying.PathfinderGoalHurtByTarget
 import com.mineinabyss.mobzy.pathfinders.flying.PathfinderGoalIdleFly
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import net.minecraft.server.v1_15_R1.*
+import net.minecraft.server.v1_16_R1.*
 
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
@@ -22,7 +22,7 @@ abstract class FlyingMob(world: World?, name: String) : EntityFlying(MobzyTempla
         get() = this
 
     override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime
-    override val killScore: Int = aW
+    override val killScore: Int = aV
 
     //implementation of behaviours
 
@@ -41,11 +41,11 @@ abstract class FlyingMob(world: World?, name: String) : EntityFlying(MobzyTempla
 
     //overriding NMS methods
 
-    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
+//    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
     override fun initPathfinder() = createPathfinders()
 
-    override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
-    override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
+    override fun saveData(nbttagcompound: NBTTagCompound) = super.saveData(nbttagcompound).also { loadMobNBT(nbttagcompound) }
+    override fun loadData(nbttagcompound: NBTTagCompound) = super.loadData(nbttagcompound).also { saveMobNBT(nbttagcompound) }
 
     override fun die(damagesource: DamageSource) = dieCM(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ

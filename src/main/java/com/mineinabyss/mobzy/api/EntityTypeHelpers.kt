@@ -4,7 +4,7 @@
 package com.mineinabyss.mobzy.api
 
 import com.mineinabyss.mobzy.registration.MobzyTypes
-import net.minecraft.server.v1_15_R1.EntityTypes
+import net.minecraft.server.v1_16_R1.EntityTypes
 import org.bukkit.entity.Entity
 
 fun Entity.toEntityTypesViaScoreboardTags(): EntityTypes<*> = MobzyTypes[scoreboardTags.first { MobzyTypes.contains(it) }]

@@ -60,7 +60,7 @@ class Mobzy : JavaPlugin() {
                 Packets.SPAWN_ENTITY_LIVING) {
             override fun onPacketSending(event: PacketEvent) {
                 if (Bukkit.getEntity(event.packet.uuiDs.read(0))?.isCustomMob == true)
-                    event.packet.integers.write(1, 95)
+                    event.packet.integers.write(1, 101)
             }
         })
 

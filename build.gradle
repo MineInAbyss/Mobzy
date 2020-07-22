@@ -53,8 +53,8 @@ dependencies {
 
     implementation "com.derongan.minecraft:guiy:0.1.+"
     implementation "com.mineinabyss:idofront:0.2.+"
-    implementation("com.mineinabyss:idofront-annotation:0.2.+")
-    kapt("com.mineinabyss:idofront-processor:0.2.+")
+    implementation "com.mineinabyss:idofront-annotation:0.2.+"
+    kapt "com.mineinabyss:idofront-processor:0.2.+"
 }
 
 shadowJar {

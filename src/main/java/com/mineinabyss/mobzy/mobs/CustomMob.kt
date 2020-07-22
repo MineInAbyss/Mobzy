@@ -5,12 +5,12 @@ import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.Navigation
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import net.minecraft.server.v1_15_R1.*
+import net.minecraft.server.v1_16_R1.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.SoundCategory
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_15_R1.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_16_R1.event.CraftEventFactory
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -81,11 +81,11 @@ interface CustomMob {
 
     fun setConfiguredAttributes() {
         //TODO set ARMOR
-        template.maxHealth?.let { entity.getAttributeInstance(GenericAttributes.MAX_HEALTH).value = it }
-        template.movementSpeed?.let { entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).value = it }
+        template.maxHealth?.let { entity.getAttributeInstance(GenericAttributes.MAX_HEALTH)?.value = it }
+        template.movementSpeed?.let { entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED)?.value = it }
         if (this !is FlyingMob) //flying mobs can't have an attack damage attribute, we use the builder's value instead
-            template.attackDamage?.let { entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).value = it }
-        template.followRange?.let { entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).value = it }
+            template.attackDamage?.let { entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE)?.value = it }
+        template.followRange?.let { entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE)?.value = it }
     }
 
     fun dieCM(damageSource: DamageSource?) {

@@ -2,8 +2,8 @@ package com.mineinabyss.mobzy.pathfinders.hostile
 
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import org.bukkit.Sound
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack
 import org.bukkit.entity.LivingEntity
 import kotlin.math.min
 import kotlin.random.Random

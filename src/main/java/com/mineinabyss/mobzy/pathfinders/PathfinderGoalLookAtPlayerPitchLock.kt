@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.toNMS
-import net.minecraft.server.v1_15_R1.EntityTypes
+import net.minecraft.server.v1_16_R1.EntityTypes
 import org.bukkit.entity.Entity
 import kotlin.random.Random
 

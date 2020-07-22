@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.pathfinders.controllers
 
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
-import net.minecraft.server.v1_15_R1.AxisAlignedBB
-import net.minecraft.server.v1_15_R1.ControllerMove
-import net.minecraft.server.v1_15_R1.MathHelper
-import net.minecraft.server.v1_15_R1.Vec3D
+import net.minecraft.server.v1_16_R1.AxisAlignedBB
+import net.minecraft.server.v1_16_R1.ControllerMove
+import net.minecraft.server.v1_16_R1.MathHelper
+import net.minecraft.server.v1_16_R1.Vec3D
 import kotlin.random.Random
 
 /**

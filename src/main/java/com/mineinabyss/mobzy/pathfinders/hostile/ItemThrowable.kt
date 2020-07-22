@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.pathfinders.hostile
 
 import com.mineinabyss.mobzy.mobs.CustomMob
-import net.minecraft.server.v1_15_R1.EntityProjectileThrowable
-import net.minecraft.server.v1_15_R1.EntitySnowball
+import net.minecraft.server.v1_16_R1.EntityProjectileThrowable
+import net.minecraft.server.v1_16_R1.EntitySnowball
 import org.bukkit.inventory.ItemStack
 
 /**

@@ -11,7 +11,7 @@ import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import net.minecraft.server.v1_15_R1.EntityTypes
+import net.minecraft.server.v1_16_R1.EntityTypes
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.util.Vector

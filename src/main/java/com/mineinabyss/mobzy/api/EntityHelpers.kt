@@ -7,10 +7,10 @@ import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobTemplate
 import com.mineinabyss.mobzy.registration.toEntityTypeName
 import com.mineinabyss.mobzy.toNMS
-import net.minecraft.server.v1_15_R1.EntityTypes
-import net.minecraft.server.v1_15_R1.EnumCreatureType
+import net.minecraft.server.v1_16_R1.EntityTypes
+import net.minecraft.server.v1_16_R1.EnumCreatureType
 import org.bukkit.entity.Entity
-import net.minecraft.server.v1_15_R1.Entity as EntityNMS
+import net.minecraft.server.v1_16_R1.Entity as EntityNMS
 
 /** Whether an entity is a renamed mob registered with Mobzy. */
 val Entity.isRenamed get() = if (!isCustomMob || customName == null) false else customName != this.typeName
