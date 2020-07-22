@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.mobzy.MobzyConfig
-import com.mineinabyss.mobzy.api.creatureType
-import com.mineinabyss.mobzy.api.keyName
-import com.mineinabyss.mobzy.api.spawnEntity
+import com.mineinabyss.mobzy.api.nms.entity.creatureType
+import com.mineinabyss.mobzy.api.nms.entity.keyName
+import com.mineinabyss.mobzy.api.spawnMobzyMob
 import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.registration.spawnEntity
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
@@ -167,7 +168,7 @@ data class MobSpawn(
             if (it > maxLocalGroup * playerCount) return -1.0
         }
         creatureTypeCounts[entityType.creatureType.toString()]?.let {
-            if (it > MobzyConfig.getMobCap(entityType.creatureType.toString()) * playerCount) return -1.0
+            if (it > MobzyConfig.getMobCap(entityType.creatureType) * playerCount) return -1.0
         }
 
         //TODO count number of entities around this spawn and prevent it depending on maxLocalGroup

@@ -3,9 +3,11 @@ package com.mineinabyss.mobzy.spawning
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
-import com.mineinabyss.mobzy.api.creatureType
 import com.mineinabyss.mobzy.api.isCustomMob
-import com.mineinabyss.mobzy.api.keyName
+import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.nms.entity.creatureType
+import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.sk89q.worldedit.bukkit.BukkitAdapter
@@ -76,7 +78,7 @@ class SpawnTask : BukkitRunnable() {
             val creatureTypeCounts: MutableMap<String, Int> = customMobs.toCreatureTypeCounts()
 
             //don't run the task if we've hit all mob caps (might be better to run several loops for each mob type?
-            if (creatureTypeCounts.none { (type, amount) -> amount < MobzyConfig.getMobCap(type) }) return@async
+            if (creatureTypeCounts.none { (type, amount) -> amount < MobzyConfig.getMobCap(NMSCreatureType.valueOf(type)) }) return@async
 
             //STEP 2: Every player group picks a random chunk around them
             val playerGroups = onlinePlayers.toPlayerGroups()
@@ -146,7 +148,7 @@ class SpawnTask : BukkitRunnable() {
      * without types that have exceeded their mob cap. */
     private fun List<Entity>.toCreatureTypeCounts(): MutableMap<String, Int> =
             MobzyConfig.creatureTypes.associateWith { 0 }
-                    .plus(map { it.toNMS().creatureType }.groupingBy { it }.eachCount())
+                    .plus(map { it.creatureType }.groupingBy { it }.eachCount())
                     .toMutableMap()
 
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */

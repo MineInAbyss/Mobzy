@@ -4,7 +4,7 @@ import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import org.bukkit.Location
 import kotlin.random.Random
 
-class PathfinderGoalIdleFlyAboveGround(mob: FlyingMob, private val maxHeight: Double = 4.0, private val radius: Double = 5.0) : PathfinderGoalIdleFly(mob) {
+class IdleFlyAboveGroundGoal(mob: FlyingMob, private val maxHeight: Double = 4.0, private val radius: Double = 5.0) : IdleFlyGoal(mob) {
 
     override fun init() {
         val x = mob.locX + Random.nextDouble(-radius, radius)

@@ -1,6 +1,6 @@
-package com.mineinabyss.mobzy.pathfinders
+package com.mineinabyss.mobzy.api.pathfindergoals
 
-import com.mineinabyss.mobzy.toNMS
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import net.minecraft.server.v1_16_R1.EntityInsentient
 import net.minecraft.server.v1_16_R1.EntityLiving
 import net.minecraft.server.v1_16_R1.GenericAttributes

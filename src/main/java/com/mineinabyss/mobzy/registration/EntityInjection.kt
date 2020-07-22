@@ -1,9 +1,10 @@
 package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.idofront.messaging.logWarn
-import com.mineinabyss.mobzy.api.nmsextensions.Registry
-import com.mineinabyss.mobzy.api.nmsextensions.build
-import com.mineinabyss.mobzy.api.nmsextensions.registerEntityType
+import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.api.nms.typeinjection.build
+import com.mineinabyss.mobzy.api.nms.typeinjection.registerEntityType
 import com.mineinabyss.mobzy.mobs.behaviours.AfterSpawnBehaviour
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
@@ -12,37 +13,36 @@ import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
 import org.bukkit.event.entity.CreatureSpawnEvent
 
-internal fun bToa(b: EntityTypes.b<Entity>, creatureType: EnumCreatureType): EntityTypes.Builder<Entity> = EntityTypes.Builder.a(b, creatureType)
 
 /**
  * Injects an entity into the server
  *
  * Originally from [paper forms](https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293)
  */
-internal fun injectNewEntity(name: String, extend_from: String, builder: EntityTypes.Builder<Entity>): EntityTypes<Entity> { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
+fun EntityTypes.Builder<Entity>.injectType(name: String, extendFrom: String): NMSEntityType<Entity> { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
     @Suppress("UNCHECKED_CAST") val dataTypes = DataConverterRegistry.a()
             .getSchema(DataFixUtils.makeKey(SharedConstants.getGameVersion().worldVersion))
             .findChoiceType(DataConverterTypes.ENTITY).types() as MutableMap<String, Type<*>>
     if (dataTypes.containsKey("minecraft:$name")) logWarn("ALREADY CONTAINS KEY: $name")
-    dataTypes["minecraft:$name"] = dataTypes["minecraft:$extend_from"]!!
+    dataTypes["minecraft:$name"] = dataTypes["minecraft:$extendFrom"]!!
 
-    return registerEntityType(name, builder.build(name))
+    return build(name).registerEntityType(name)
 }
 
 /**
  * Spawns entity at specified Location
  *
- * @param entityTypes type of entity to spawn
- * @param loc         Location to spawn at
+ * @param this@spawnEntity type of entity to spawn
+ * @param this@spawn         Location to spawn at
  * @return Reference to the spawned bukkit Entity
  */
-internal fun spawnEntity(entityTypes: EntityTypes<*>, loc: Location): org.bukkit.entity.Entity? {
-    val nmsEntity = entityTypes.spawnCreature( // NMS method to spawn an entity from an EntityTypes
-            (loc.world as CraftWorld?)!!.handle,  // reference to the NMS world
+fun Location.spawnEntity(type: NMSEntityType<*>): BukkitEntity? {
+    val nmsEntity = type.spawnCreature( // NMS method to spawn an entity from an EntityTypes
+            (this.world as CraftWorld?)!!.handle,  // reference to the NMS world
             null,  // EntityTag NBT compound
             null,  // custom name of entity
             null,  // player reference. used to know if player is OP to apply EntityTag NBT compound
-            BlockPosition(loc.blockX, loc.blockY, loc.blockZ),  // the BlockPosition to spawn at
+            BlockPosition(this.blockX, this.blockY, this.blockZ),  // the BlockPosition to spawn at
             EnumMobSpawn.NATURAL,
             false,
             false,

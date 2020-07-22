@@ -1,7 +1,9 @@
 package com.mineinabyss.mobzy.pathfinders
 
+import com.mineinabyss.mobzy.api.helpers.distanceTo
+import com.mineinabyss.mobzy.api.pathfindergoals.living
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.toNMS
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import net.minecraft.server.v1_16_R1.ControllerMove
 import net.minecraft.server.v1_16_R1.EntityInsentient
 import net.minecraft.server.v1_16_R1.EntityLiving
@@ -41,10 +43,10 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500) : Pathfinde
 
     open fun executeWhenCooledDown() = Unit
 
-    fun isPlayerValidTarget(player: Player, range: Double = mob.template.followRange ?: 0.0) =
+    fun isPlayerValidTarget(player: Player, range: Double = mob.template.attributes.followRange ?: 0.0) =
             !player.isInvulnerable &&
                     !player.isDead &&
                     player.gameMode != GameMode.SPECTATOR &&
                     player.gameMode != GameMode.CREATIVE &&
-                    mob.distanceTo(player) < range
+                    mob.living.distanceTo(player) < range
 }

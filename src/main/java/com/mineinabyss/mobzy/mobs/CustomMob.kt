@@ -1,9 +1,9 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.idofront.messaging.color
+import com.mineinabyss.mobzy.api.helpers.distanceTo
 import com.mineinabyss.mobzy.debug
-import com.mineinabyss.mobzy.mobs.types.FlyingMob
-import com.mineinabyss.mobzy.pathfinders.Navigation
+import com.mineinabyss.mobzy.api.pathfindergoals.Navigation
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import net.minecraft.server.v1_16_R1.*
 import org.bukkit.Bukkit
@@ -79,15 +79,6 @@ interface CustomMob {
         living.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
     }
 
-    fun setConfiguredAttributes() {
-        //TODO set ARMOR
-        template.maxHealth?.let { entity.getAttributeInstance(GenericAttributes.MAX_HEALTH)?.value = it }
-        template.movementSpeed?.let { entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED)?.value = it }
-        if (this !is FlyingMob) //flying mobs can't have an attack damage attribute, we use the builder's value instead
-            template.attackDamage?.let { entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE)?.value = it }
-        template.followRange?.let { entity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE)?.value = it }
-    }
-
     fun dieCM(damageSource: DamageSource?) {
         if (!killedMZ) {
             killedMZ = true
@@ -136,23 +127,6 @@ interface CustomMob {
 
     fun randomSound(vararg sounds: String?): String? = sounds[Random.nextInt(sounds.size)]
 
-    /**
-     * @param other Another entity.
-     * @return The distance between the current entity and other entity's locations.
-     */
-    fun distanceTo(other: Entity): Double = distanceTo(other.location)
-
-    /**
-     * @param other Some location
-     * @return The distance between the current entity and the other location
-     */
-    fun distanceTo(other: Location): Double = location.distance(other)
-
-    /**
-     * @param range the range to search within
-     * @return a nearby player, or null if none are in the range
-     */
-    fun findNearbyPlayer(range: Double) = world.findNearbyPlayer(this.entity, range)
 
     fun lookAt(x: Double, z: Double) = lookAt(x, locY, z)
 
@@ -181,7 +155,7 @@ interface CustomMob {
 
     fun lookAtPitchLock(entity: Entity) = lookAtPitchLock(entity.location)
 
-    fun canReach(target: Entity) = distanceTo(target) < entity.width / 2.0 + 1.5
+    fun canReach(target: Entity) = living.distanceTo(target) < entity.width / 2.0 + 1.5
 
 //    fun jump() = (entity as EntityInsentient).controllerJump.jump()
 }

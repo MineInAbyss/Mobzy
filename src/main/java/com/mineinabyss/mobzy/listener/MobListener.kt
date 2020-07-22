@@ -5,12 +5,13 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import com.mineinabyss.mobzy.toNMS
 import net.minecraft.server.v1_16_R1.EntityHuman
+import net.minecraft.server.v1_16_R1.EntityPlayer
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Statistic
@@ -87,23 +88,29 @@ object MobListener : Listener {
         }
     }
 
+    /*@EventHandler
+    fun onDamage(e: EntityDamageEvent){
+        if(e.entity.isCustomMob && e.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK)
+            broadcast("damaged!")
+    }*/
+
     /**
      * The magic method that lets you hit entities in their server side hitboxes
      * TODO this doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do
      */
     @EventHandler
     fun onLeftClick(e: PlayerInteractEvent) { // TODO I'd like some way to ignore hits onto the disguised entity. Perhaps use a marker armorstand?
-        val p = e.player
+        val player = e.player
         if (e.leftClicked || e.rightClicked) {
-            val trace = p.world.rayTrace(p.eyeLocation, p.location.direction, 3.0, FluidCollisionMode.ALWAYS, true, 0.0) { entity: Entity -> entity != p }
+            val trace = player.world.rayTrace(player.eyeLocation, player.location.direction, 3.0, FluidCollisionMode.ALWAYS, true, 0.0) { entity: Entity -> entity != player }
             if (trace != null && trace.hitEntity != null) {
                 val hit = trace.hitEntity!!.toNMS()
                 if (hit !is CustomMob) return
                 if (e.leftClicked) {
                     e.isCancelled = true
-                    (p as CraftPlayer).handle.attack(hit)
+                    player.toNMS<EntityPlayer>().attack(hit)
                 } else {
-                    val nmsPlayer: EntityHuman = (p as CraftPlayer).handle
+                    val nmsPlayer: EntityHuman = (player as CraftPlayer).handle
                     (hit as CustomMob).onRightClick(nmsPlayer)
                 }
             }

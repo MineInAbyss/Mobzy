@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.pathfinders.hostile
 
+import com.mineinabyss.mobzy.api.helpers.distanceTo
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import org.bukkit.Sound
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
@@ -14,7 +15,7 @@ import kotlin.random.Random
  * @param minThrowRad The minimum radius at which to start throwing item at the target.
  * @param cooldown How long to wait between firing at the target.
  */
-class PathfinderGoalThrowItems(
+class ThrowItemsGoal(
         override val mob: ItemThrowable,
         val minChaseRad: Double,
         val minThrowRad: Double,
@@ -24,7 +25,7 @@ class PathfinderGoalThrowItems(
     private var distance = 0.0
 
     override fun shouldExecute(): Boolean {
-        return target != null && mob.distanceTo(target ?: return false).also { distance = it } >
+        return target != null && mob.living.distanceTo(target ?: return false).also { distance = it } >
                 //if there's no minChaseRad, stop pathfinder completely when we can't throw anymore
                 if (minChaseRad <= 0) minThrowRad else min(minChaseRad, minThrowRad)
     }

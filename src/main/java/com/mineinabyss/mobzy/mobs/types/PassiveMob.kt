@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalWalkingAnimation
+import com.mineinabyss.mobzy.pathfinders.WalkingAnimationGoal
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import net.minecraft.server.v1_16_R1.*
 
@@ -22,7 +22,7 @@ abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTempl
     //implementation of behaviours
 
     override fun createPathfinders() {
-        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, template.model))
+        addPathfinderGoal(0, WalkingAnimationGoal(living, template.model))
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))

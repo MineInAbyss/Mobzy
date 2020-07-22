@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.pathfinders.flying
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 
-class PathfinderGoalFlyTowardsTarget(override val mob: FlyingMob) : MobzyPathfinderGoal() {
+class FlyTowardsTargetGoal(override val mob: FlyingMob) : MobzyPathfinderGoal() {
     override fun shouldExecute(): Boolean = (target != null)
 
     override fun shouldKeepExecuting(): Boolean = target != null

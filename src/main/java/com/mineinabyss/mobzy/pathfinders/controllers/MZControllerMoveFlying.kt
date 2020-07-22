@@ -19,7 +19,7 @@ class MZControllerMoveFlying(private val mob: FlyingMob) : ControllerMove(mob) {
             var vec3d = Vec3D(b - mob.locX, c - mob.locY, d - mob.locZ)
             vec3d = vec3d.d()
             if (this.hasLineOfSight(vec3d, MathHelper.f(vec3d.f()))) {
-                val speed: Double = mob.template.movementSpeed ?: 0.1
+                val speed: Double = mob.template.attributes.movementSpeed ?: 0.1 //TODO access via extensions on NMS entity
                 mob.mot = mob.mot.e(vec3d.a(speed))
             } else h = Operation.WAIT
         }

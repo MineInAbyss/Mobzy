@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.spawning.regions
 
-import com.mineinabyss.mobzy.api.typeName
+import com.mineinabyss.mobzy.api.nms.entity.typeName
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import kotlinx.serialization.Serializable

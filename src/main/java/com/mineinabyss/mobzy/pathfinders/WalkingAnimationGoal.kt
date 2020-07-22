@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.pathfinders
 import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.entity.LivingEntity
 
-class PathfinderGoalWalkingAnimation(val mob: LivingEntity, private val modelID: Int) : PathfinderGoal() {
+class WalkingAnimationGoal(val mob: LivingEntity, private val modelID: Int) : PathfinderGoal() {
     private val model
         get() = mob.equipment!!.helmet!!
 

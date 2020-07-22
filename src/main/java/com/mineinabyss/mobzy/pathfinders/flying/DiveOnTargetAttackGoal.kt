@@ -1,11 +1,12 @@
 package com.mineinabyss.mobzy.pathfinders.flying
 
+import com.mineinabyss.mobzy.api.helpers.distanceTo
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlin.math.abs
 import kotlin.random.Random
 
-class PathfinderGoalDiveOnTargetAttack(
+class DiveOnTargetAttackGoal(
         override val mob: FlyingMob,
         private val diveVelocity: Double = -0.3,
         private val minHeight: Double = 6.0,
@@ -56,7 +57,7 @@ class PathfinderGoalDiveOnTargetAttack(
         val target = target ?: return
         mob.lookAtPitchLock(target)
         val targetLoc = target.location
-        if (mob.distanceTo(target) < 2 || entity.velocity.y == 0.0 || mob.locY <= target.location.y + 1.0) {
+        if (entity.distanceTo(target) < 2 || entity.velocity.y == 0.0 || mob.locY <= target.location.y + 1.0) {
             currentAction = Action.BASH
             bashVelX = entity.location.direction.x * bashVelMultiplier
             bashVelZ = entity.location.direction.z * bashVelMultiplier
@@ -69,7 +70,7 @@ class PathfinderGoalDiveOnTargetAttack(
     private fun bash() {
         mob.lookAt(mob.locX + bashVelX, mob.locZ + bashVelZ)
         entity.velocity = entity.velocity.setX(bashVelX).setZ(bashVelZ)
-        if (bashLeft-- <= 0 || target == null || mob.distanceTo(target!!) < 2 || entity.velocity.x == 0.0 || entity.velocity.z == 0.0) {
+        if (bashLeft-- <= 0 || target == null || entity.distanceTo(target!!) < 2 || entity.velocity.x == 0.0 || entity.velocity.z == 0.0) {
             currentAction = Action.FLY
             bashLeft = bashDuration
         }
