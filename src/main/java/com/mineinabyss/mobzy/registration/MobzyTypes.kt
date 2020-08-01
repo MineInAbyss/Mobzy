@@ -27,7 +27,7 @@ object MobzyTypes {
 
     private val customAttributes = mutableMapOf<EntityTypes<*>, AttributeProvider>()
 
-    internal fun injectDefaultAttributes(){
+    internal fun injectDefaultAttributes() {
         try {
             val modifiers: Field = Field::class.java.getDeclaredField("modifiers")
             modifiers.isAccessible = true
@@ -43,6 +43,7 @@ object MobzyTypes {
             error("Failed to inject custom attribute defaults")
         }
     }
+
     /**
      * Registers a new entity with the server with extra parameters for width, height, and the function for creating the
      * entity.

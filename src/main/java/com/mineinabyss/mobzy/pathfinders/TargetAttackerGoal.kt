@@ -1,8 +1,7 @@
 package com.mineinabyss.mobzy.pathfinders
 
+import com.mineinabyss.mobzy.api.nms.aliases.living
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
-import com.mineinabyss.mobzy.api.pathfindergoals.living
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 

@@ -1,11 +1,10 @@
-package com.mineinabyss.mobzy.pathfinders
+package com.mineinabyss.mobzy.api.pathfindergoals
 
 import net.minecraft.server.v1_16_R1.PathfinderGoal
 
 /**
  * Original methods by Yannick Lamprecht under the MIT license from https://github.com/yannicklamprecht/PathfindergoalAPI
  */
-
 abstract class PathfinderGoal : PathfinderGoal() {
 
     /**

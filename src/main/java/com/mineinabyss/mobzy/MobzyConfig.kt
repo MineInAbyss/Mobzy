@@ -8,13 +8,13 @@ import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
 import com.mineinabyss.mobzy.configuration.MobConfig
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.configuration.templates
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.MobzyTemplates
 import com.mineinabyss.mobzy.registration.MobzyTypes
-import com.mineinabyss.mobzy.registration.spawnEntity
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R1.EntityLiving

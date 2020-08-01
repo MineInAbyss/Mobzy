@@ -3,9 +3,9 @@ package com.mineinabyss.mobzy.spawning
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.nms.entity.creatureType
 import com.mineinabyss.mobzy.api.nms.entity.keyName
+import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
 import com.mineinabyss.mobzy.api.spawnMobzyMob
 import com.mineinabyss.mobzy.registration.MobzyTypes
-import com.mineinabyss.mobzy.registration.spawnEntity
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp

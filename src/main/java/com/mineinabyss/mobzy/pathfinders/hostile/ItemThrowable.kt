@@ -13,5 +13,5 @@ interface ItemThrowable : CustomMob {
     val itemToThrow: ItemStack? get() = null
 
     /** @return A new entity that will be spawned and thrown at the player. Defaults to a snowball. **/
-    fun createThrownEntity(): EntityProjectileThrowable = EntitySnowball(entity.world, entity)
+    fun createThrownEntity(): EntityProjectileThrowable = EntitySnowball(nmsEntity.world, nmsEntity)
 }

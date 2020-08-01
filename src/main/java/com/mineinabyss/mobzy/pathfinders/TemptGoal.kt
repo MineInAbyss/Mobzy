@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.pathfinders
 
-import com.mineinabyss.mobzy.api.helpers.distanceTo
-import com.mineinabyss.mobzy.api.helpers.findNearbyPlayer
-import com.mineinabyss.mobzy.api.pathfindergoals.living
-import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.api.helpers.entity.findNearbyPlayer
+import com.mineinabyss.mobzy.api.helpers.entity.lookAt
+import com.mineinabyss.mobzy.api.nms.aliases.living
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.mobs.CustomMob
 import net.minecraft.server.v1_16_R1.EntityLiving
 import org.bukkit.Material
 import org.bukkit.event.entity.EntityTargetEvent
@@ -15,7 +16,7 @@ class TemptGoal(override val mob: CustomMob, targetItems: List<Material>?, priva
 
     override fun shouldExecute(): Boolean {
         //TODO don't find a new player every time, just check if existing target is within range, add range as param in constructor
-        val nearbyPlayer = mob.living.findNearbyPlayer(10.0)?.living ?: return false
+        val nearbyPlayer = mob.entity.findNearbyPlayer(10.0)?.living ?: return false
         val equipment = nearbyPlayer.equipment ?: return false
 
         if (targetItems.any { it == equipment.itemInMainHand.type || it == equipment.itemInOffHand.type }) {
@@ -31,13 +32,13 @@ class TemptGoal(override val mob: CustomMob, targetItems: List<Material>?, priva
 
     override fun execute() {
         val target = target ?: return
-        mob.lookAt(target)
+        entity.lookAt(target)
     }
 
     override fun executeWhenCooledDown() {
         val target = target ?: return
         restartCooldown()
-        val dist = mob.living.distanceTo(target)
+        val dist = mob.entity.distanceSqrTo(target)
         if (dist in 1.0..6.25) navigation.moveToEntity(target, speed)
     }
 }

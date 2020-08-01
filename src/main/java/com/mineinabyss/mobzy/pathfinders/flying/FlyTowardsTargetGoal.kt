@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.pathfinders.flying
 
+import com.mineinabyss.mobzy.api.helpers.entity.lookAt
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 
@@ -10,7 +11,7 @@ class FlyTowardsTargetGoal(override val mob: FlyingMob) : MobzyPathfinderGoal() 
 
     override fun execute() {
         val target = target ?: return
-        mob.lookAtPitchLock(target)
+        entity.lookAt(target)
 
         val targetLoc = target.location
         moveController.a(targetLoc.x, targetLoc.y, targetLoc.z, 1.0) //TODO change to wrapper

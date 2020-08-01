@@ -5,18 +5,16 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
+import com.mineinabyss.mobzy.api.nms.aliases.NMSPlayer
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTemplates
-import net.minecraft.server.v1_16_R1.EntityHuman
-import net.minecraft.server.v1_16_R1.EntityPlayer
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Statistic
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.NPC
@@ -108,10 +106,9 @@ object MobListener : Listener {
                 if (hit !is CustomMob) return
                 if (e.leftClicked) {
                     e.isCancelled = true
-                    player.toNMS<EntityPlayer>().attack(hit)
+                    player.toNMS<NMSPlayer>().attack(hit)
                 } else {
-                    val nmsPlayer: EntityHuman = (player as CraftPlayer).handle
-                    (hit as CustomMob).onRightClick(nmsPlayer)
+                    (hit as CustomMob).onRightClick(player)
                 }
             }
         }

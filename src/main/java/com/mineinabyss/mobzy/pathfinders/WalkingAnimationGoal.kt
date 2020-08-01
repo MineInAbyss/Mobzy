@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.mobzy.api.pathfindergoals.PathfinderGoal
 import org.bukkit.entity.LivingEntity
 
 class WalkingAnimationGoal(val mob: LivingEntity, private val modelID: Int) : PathfinderGoal() {

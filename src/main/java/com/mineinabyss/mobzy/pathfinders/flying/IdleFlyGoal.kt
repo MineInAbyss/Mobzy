@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.pathfinders.flying
 
-import com.mineinabyss.mobzy.api.helpers.distanceTo
+import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.api.helpers.entity.lookAt
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import org.bukkit.Location
@@ -15,7 +16,7 @@ open class IdleFlyGoal(override val mob: FlyingMob) : MobzyPathfinderGoal() {
 
     override fun shouldKeepExecuting(): Boolean {
         val targetLoc = targetLoc ?: return false
-        val dist = entity.distanceTo(targetLoc)
+        val dist = entity.distanceSqrTo(targetLoc)
         return dist in 1.0..60.0 && entity.velocity != Vector(0, 0, 0) && target == null
     }
 
@@ -34,6 +35,6 @@ open class IdleFlyGoal(override val mob: FlyingMob) : MobzyPathfinderGoal() {
 
     override fun execute() {
         val targetLoc = targetLoc ?: return
-        mob.lookAtPitchLock(targetLoc)
+        entity.lookAt(targetLoc)
     }
 }

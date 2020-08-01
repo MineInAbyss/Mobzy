@@ -1,18 +1,19 @@
 package com.mineinabyss.mobzy.api.pathfindergoals
 
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityLiving
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import net.minecraft.server.v1_16_R1.EntityInsentient
-import net.minecraft.server.v1_16_R1.EntityLiving
 import net.minecraft.server.v1_16_R1.GenericAttributes
 import net.minecraft.server.v1_16_R1.NavigationAbstract
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
 
 /**
  * Original methods by Yannick Lamprecht under the MIT license from [PathfindergoalAPI](https://github.com/yannicklamprecht/PathfindergoalAPI)
  */
-
-class Navigation(private val navigationAbstract: NavigationAbstract, private val handle: EntityInsentient) {
+//TODO document
+class Navigation(private val navigationAbstract: NavigationAbstract, private val handle: NMSEntityInsentient) {
     val doneNavigating get() = navigationAbstract.m()
     val inProgress get() = navigationAbstract.n()
     val pathSearchRange get() = handle.getAttributeInstance(GenericAttributes.FOLLOW_RANGE)?.value?.toFloat()
@@ -22,5 +23,5 @@ class Navigation(private val navigationAbstract: NavigationAbstract, private val
     fun stopNavigation() = navigationAbstract.o()
 }
 
-val EntityInsentient.navigationMZ get() = Navigation(this.navigation, this)
-val EntityLiving.living get() = this.bukkitEntity as LivingEntity
+val Mob.navigation get() = toNMS<NMSEntityInsentient>().navigation
+val NMSEntityInsentient.navigation get() = Navigation(this.navigation, this)

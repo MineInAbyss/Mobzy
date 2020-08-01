@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.idofront.messaging.color
-import com.mineinabyss.mobzy.api.helpers.distanceTo
+import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.api.pathfindergoals.Navigation
 import com.mineinabyss.mobzy.registration.MobzyTemplates
@@ -9,11 +10,11 @@ import net.minecraft.server.v1_16_R1.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.SoundCategory
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_16_R1.event.CraftEventFactory
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.Entity
+import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import kotlin.random.Random
@@ -28,22 +29,16 @@ import kotlin.random.Random
  */
 interface CustomMob {
     // ========== Useful properties ===============
-    val entity: EntityLiving
-    val living get() = entity.bukkitEntity as LivingEntity
-    val template: MobTemplate get() = MobzyTemplates[entity]
-    val locX get() = living.location.x
-    val locY get() = living.location.y
-    val locZ get() = living.location.z
-    private val world: World get() = (living.world as CraftWorld).handle
-    private val location: Location get() = living.location
-    val navigation get() = Navigation((entity as EntityInsentient).navigation, entity as EntityInsentient)
-    val killer: EntityHuman? get() = entity.killer
-
-    fun expToDrop(): Int {
-        return if (template.minExp == null || template.maxExp == null) entity.expToDrop
-        else if (template.maxExp!! <= template.minExp!!) template.minExp!!
-        else Random.nextInt(template.minExp!!, template.maxExp!!)
-    }
+    val nmsEntity: EntityLiving
+    val entity get() = nmsEntity.bukkitEntity as LivingEntity
+    val template: MobTemplate get() = MobzyTemplates[nmsEntity]
+    val locX get() = entity.location.x
+    val locY get() = entity.location.y
+    val locZ get() = entity.location.z
+    private val world: World get() = entity.world.toNMS()
+    private val location: Location get() = entity.location
+    val navigation get() = Navigation((nmsEntity as EntityInsentient).navigation, nmsEntity as EntityInsentient)
+    val killer: EntityHuman? get() = nmsEntity.killer
 
     val scoreboardDisplayNameMZ: ChatMessage get() = ChatMessage(template.name.split('_').joinToString(" ") { it.capitalize() })
 
@@ -53,15 +48,15 @@ interface CustomMob {
     val soundHurt: String? get() = null
     val soundDeath: String? get() = null
     val soundStep: String? get() = null
-    var killedMZ: Boolean
+    var dead: Boolean
     val killScore: Int
 
     fun createPathfinders()
     fun lastDamageByPlayerTime(): Int
-    fun saveMobNBT(nbttagcompound: NBTTagCompound?)
-    fun loadMobNBT(nbttagcompound: NBTTagCompound?)
+    fun saveMobNBT(nbttagcompound: NMSDataContainer) = Unit
+    fun loadMobNBT(nbttagcompound: NMSDataContainer) = Unit
 
-    fun onRightClick(player: EntityHuman) {}
+    fun onRightClick(player: Player) {}
 
     fun dropExp()
 
@@ -71,91 +66,61 @@ interface CustomMob {
      * identifier scoreboard tag
      */
     fun createFromBase() {
-        living.addScoreboardTag("customMob3")
-        living.addScoreboardTag(template.name)
+        entity.addScoreboardTag("customMob3")
+        entity.addScoreboardTag(template.name)
 
         //create an item based on model ID in head slot if entity will be using itself for the model
-        living.equipment!!.helmet = template.modelItemStack
-        living.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
+        entity.equipment!!.helmet = template.modelItemStack
+        entity.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
     }
 
     fun dieCM(damageSource: DamageSource?) {
-        if (!killedMZ) {
-            killedMZ = true
+        if (!dead) {
+//            killedMZ = true
+            val killer = killer
             debug("&c${template.name} died at coords ${locX.toInt()} ${locY.toInt()} ${locZ.toInt()}".color())
-            if (killScore >= 0 && killer != null) killer!!.a(entity, killScore, damageSource)
+            if (killScore >= 0 && killer != null) killer.a(nmsEntity, killScore, damageSource)
             // this line causes the entity to send a statistics update on death (we don't want this as it causes a NPE exception and crash)
-//            if (entity != null) entity.b(this);
+//            killer?.a_(nmsEntity);
 
-            if (entity.isSleeping) entity.entityWakeup()
+            if (entity.isSleeping) nmsEntity.entityWakeup()
 
-            if (!entity.world.isClientSide) {
-                if (world.gameRules.getBoolean(GameRules.DO_MOB_LOOT)) {
-                    val killer = killer?.bukkitEntity
-                    val heldItem = killer?.inventory?.itemInMainHand
-                    val looting = heldItem?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
-                    val fireAspect = heldItem?.enchantments?.get(Enchantment.FIRE_ASPECT) ?: 0
-                    CraftEventFactory.callEntityDeathEvent(entity, template.chooseDrops(looting, fireAspect))
-                    entity.expToDrop = expToDrop()
-                    dropExp()
-                } else CraftEventFactory.callEntityDeathEvent(entity)
+            if (!nmsEntity.world.isClientSide) {
+                if (world.gameRules.getBoolean(GameRules.DO_MOB_LOOT) && killer != null) {
+                    dropItems(killer.bukkitEntity)
+                } else CraftEventFactory.callEntityDeathEvent(nmsEntity)
             }
+            nmsEntity.combatTracker.g() //resets combat tracker
 
-            world.broadcastEntityEffect(entity, 3.toByte())
+            world.broadcastEntityEffect(nmsEntity, 3.toByte())
+            nmsEntity.pose = EntityPose.DYING
             //TODO add PlaceHolderAPI support
             template.deathCommands.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it) }
         }
     }
 
+    fun dropItems(killer: HumanEntity){
+        val heldItem = killer.inventory.itemInMainHand
+        val looting = heldItem.enchantments[Enchantment.LOOT_BONUS_MOBS] ?: 0
+        val fireAspect = heldItem.enchantments[Enchantment.FIRE_ASPECT] ?: 0
+        CraftEventFactory.callEntityDeathEvent(nmsEntity, template.chooseDrops(looting, fireAspect))
+        nmsEntity.expToDrop = expToDrop()
+        dropExp()
+    }
+
+    fun expToDrop(): Int {
+        return if (template.minExp == null || template.maxExp == null) nmsEntity.expToDrop
+        else if (template.maxExp!! <= template.minExp!!) template.minExp!!
+        else Random.nextInt(template.minExp!!, template.maxExp!!)
+    }
+
+
     fun makeSound(sound: String?) {
         if (sound != null)
-            living.world.playSound(location, sound, SoundCategory.NEUTRAL, 1f, (Random.nextDouble(1.0, 1.02).toFloat()))
+            entity.world.playSound(location, sound, SoundCategory.NEUTRAL, 1f, (Random.nextDouble(1.0, 1.02).toFloat()))
     }
 
     // ========== Helper methods ===================
-    fun addPathfinderGoal(priority: Int, goal: PathfinderGoal) {
-        (entity as EntityInsentient).goalSelector.a(priority, goal)
-    }
 
-    fun removePathfinderGoal(goal: PathfinderGoal) {
-        (entity as EntityInsentient).goalSelector.a(goal)
-    }
-
-    fun addTargetSelector(priority: Int, goal: PathfinderGoalTarget) {
-        (entity as EntityInsentient).targetSelector.a(priority, goal)
-    }
-
-    fun randomSound(vararg sounds: String?): String? = sounds[Random.nextInt(sounds.size)]
-
-
-    fun lookAt(x: Double, z: Double) = lookAt(x, locY, z)
-
-    fun lookAt(x: Double, y: Double, z: Double) {
-        val dirBetweenLocations = org.bukkit.util.Vector(x, y, z).subtract(location.toVector())
-        val location = living.location
-        location.direction = dirBetweenLocations
-        living.setRotation(location.yaw, location.pitch)
-    }
-
-    /**
-     * Looks at [location]
-     *
-     * Be careful and ensure that the custom mob using this is an [EntityInsentient]
-     */
-    fun lookAt(location: Location) = lookAt(location.x, location.y, location.z)
-
-    /**
-     * Looks at [entity]
-     *
-     * Be careful and ensure that the custom mob using this is an [EntityInsentient]
-     */
-    fun lookAt(entity: Entity) = lookAt(entity.location)
-
-    fun lookAtPitchLock(location: Location) = lookAt(location.x, location.z)
-
-    fun lookAtPitchLock(entity: Entity) = lookAtPitchLock(entity.location)
-
-    fun canReach(target: Entity) = living.distanceTo(target) < entity.width / 2.0 + 1.5
-
-//    fun jump() = (entity as EntityInsentient).controllerJump.jump()
+    fun randomSound(vararg sounds: String) = sounds.random()
 }

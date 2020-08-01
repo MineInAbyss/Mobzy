@@ -10,10 +10,10 @@ import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isOfType
 import com.mineinabyss.mobzy.api.isRenamed
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.spawnMobzyMob
 import com.mineinabyss.mobzy.gui.MobzyGUI
 import com.mineinabyss.mobzy.mobs.types.FlyingMob

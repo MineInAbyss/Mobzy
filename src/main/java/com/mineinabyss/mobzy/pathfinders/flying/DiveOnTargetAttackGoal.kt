@@ -1,6 +1,8 @@
 package com.mineinabyss.mobzy.pathfinders.flying
 
-import com.mineinabyss.mobzy.api.helpers.distanceTo
+import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.api.helpers.entity.lookAt
+import com.mineinabyss.mobzy.api.helpers.entity.lookAtPitchLock
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlin.math.abs
@@ -39,7 +41,7 @@ class DiveOnTargetAttackGoal(
 
     private fun prepareDive() {
         val target = target ?: return
-        mob.lookAtPitchLock(target)
+        entity.lookAtPitchLock(target)
 
         //if arrived to dive
         val diveTarget = target.location.clone().add(0.0, diveHeight, 0.0)
@@ -55,9 +57,9 @@ class DiveOnTargetAttackGoal(
 
     private fun beginDive() {
         val target = target ?: return
-        mob.lookAtPitchLock(target)
+        entity.lookAtPitchLock(target)
         val targetLoc = target.location
-        if (entity.distanceTo(target) < 2 || entity.velocity.y == 0.0 || mob.locY <= target.location.y + 1.0) {
+        if (entity.distanceSqrTo(target) < 2 || entity.velocity.y == 0.0 || mob.locY <= target.location.y + 1.0) {
             currentAction = Action.BASH
             bashVelX = entity.location.direction.x * bashVelMultiplier
             bashVelZ = entity.location.direction.z * bashVelMultiplier
@@ -68,9 +70,9 @@ class DiveOnTargetAttackGoal(
     }
 
     private fun bash() {
-        mob.lookAt(mob.locX + bashVelX, mob.locZ + bashVelZ)
+        entity.lookAt(mob.locX + bashVelX, mob.locZ + bashVelZ)
         entity.velocity = entity.velocity.setX(bashVelX).setZ(bashVelZ)
-        if (bashLeft-- <= 0 || target == null || entity.distanceTo(target!!) < 2 || entity.velocity.x == 0.0 || entity.velocity.z == 0.0) {
+        if (bashLeft-- <= 0 || target == null || entity.distanceSqrTo(target!!) < 2 || entity.velocity.x == 0.0 || entity.velocity.z == 0.0) {
             currentAction = Action.FLY
             bashLeft = bashDuration
         }
