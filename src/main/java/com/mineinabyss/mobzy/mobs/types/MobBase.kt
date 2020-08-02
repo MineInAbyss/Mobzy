@@ -1,12 +1,11 @@
 package com.mineinabyss.mobzy.mobs.types
 
+import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mieninabyss.mobzy.processor.CustomMobOverrides
 import net.minecraft.server.v1_16_R1.*
 
-@CustomMobOverrides(createFor = [EntityMonster::class, EntityAnimal::class, EntityFlying::class])
-abstract class MobBase: EntityInsentient(error(""), error("")), CustomMob {
+abstract class MobBase : EntityInsentient(error(""), error("")), CustomMob {
     //implementation of properties from CustomMob
     override var dead: Boolean
         get() = killed

@@ -5,7 +5,6 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.classinspector.elements.ElementsClassInspector
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.specs.toTypeSpec
-import me.eugeniomarletti.kotlin.metadata.jvm.internalName
 import net.minecraft.server.v1_16_R1.EntityTypes
 import net.minecraft.server.v1_16_R1.World
 import java.io.File
@@ -13,14 +12,14 @@ import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.MirroredTypesException
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
-annotation class CustomMobOverrides(val createFor: Array<KClass<*>>)
+@Retention(AnnotationRetention.SOURCE)
+annotation class GenerateFromBase(val base: KClass<*>, val createFor: Array<KClass<*>>)
 
 @Suppress("unused")
 @AutoService(Processor::class)
@@ -33,85 +32,72 @@ class SharedOverridesProcessor : AbstractProcessor() {
         const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
     }
 
-    override fun getSupportedAnnotationTypes(): MutableSet<String> {
-        return mutableSetOf(CustomMobOverrides::class.java.name)
-    }
+    override fun getSupportedAnnotationTypes() = mutableSetOf(GenerateFromBase::class.java.name)
 
     private val elements: Elements by lazy { processingEnv.elementUtils }
     private val types: Types by lazy { processingEnv.typeUtils }
-
-    val classInspector by lazy { ElementsClassInspector.create(elements, types) }
+    private val classInspector by lazy { ElementsClassInspector.create(elements, types) }
 
     override fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        roundEnv.getElementsAnnotatedWith(CustomMobOverrides::class.java)
-                .map { it as TypeElement }
-                .associateWith { it.toTypeSpec(classInspector) }
-                .forEach { (element, typeSpec) ->
-                    if (!createType(element, typeSpec)) return true
+        roundEnv.getElementsAnnotatedWith(GenerateFromBase::class.java)
+                .filterIsInstance<TypeElement>()
+                .forEach { element ->
+                    val annotation = element.getAnnotation(GenerateFromBase::class.java)
+                    val base = (getTypeMirror { annotation.base } as DeclaredType).asElement() as TypeElement
+                    val targets = getTypeMirrors { annotation.createFor }
+
+                    targets?.forEach { target ->
+                        createTargetsFromBase(base, target)
+                    }
                 }
         return true
     }
 
-    //TODO name things better
-    private fun createType(element: TypeElement, overridesClassSpec: TypeSpec): Boolean {
-        val overrides = element.getAnnotation(CustomMobOverrides::class.java)
+    private fun createTargetsFromBase(baseElement: TypeElement, targetMirror: TypeMirror) {
+        val baseSpec = baseElement.toTypeSpec(classInspector)
+        val targetElement = (targetMirror as DeclaredType).asElement()
 
-        getTypeMirrors { overrides.createFor }?.forEach { createFor ->
-            val packageName = element.packageName
-            val createForElement = (createFor as DeclaredType).asElement()
-            val fileName = "Mobzy${createForElement.simpleName}"
-            val fileBuilder = FileSpec.builder(packageName, fileName)
+        val packageName = baseElement.packageName
+        val fileName = "Mobzy${targetElement.simpleName}"
+        val fileBuilder = FileSpec.builder(packageName, fileName)
 
-            val lines = element.readSource()
+        val sourceLines = baseElement.readSource()
 
-            val newClass = TypeSpec.classBuilder(fileName)
-                    .superclass(createFor.asTypeName())
-                    .primaryConstructor(FunSpec.constructorBuilder()
-                            .addParameter("world", World::class)
-                            .addParameter("type", typeOf<EntityTypes<*>>().asTypeName())
-                            .build())
-                    .addSuperclassConstructorParameter("type as EntityTypes<$createFor>, world".replace(' ', '·'))
-                    .addSuperinterfaces(overridesClassSpec.superinterfaces.map { it.key })
-                    .addModifiers(KModifier.ABSTRACT)
-            fileBuilder.addType(newClass.build())
+        //create class
+        val newClass = TypeSpec.classBuilder(fileName)
+                .superclass(targetMirror.asTypeName())
+                .primaryConstructor(FunSpec.constructorBuilder()
+                        .addParameter("world", World::class)
+                        .addParameter("type", typeOf<EntityTypes<*>>().asTypeName())
+                        .build())
+                .addSuperclassConstructorParameter("type as EntityTypes<$targetMirror>, world".replace(' ', '·')) //https://github.com/square/kotlinpoet#spaces-wrap-by-default
+                .addSuperinterfaces(baseSpec.superinterfaces.map { it.key })
+                .addModifiers(KModifier.ABSTRACT)
 
-            val file = fileBuilder.build().toJavaFileObject()
-            val outputLines = file.openReader(true).readLines().toMutableList()
+        fileBuilder.addType(newClass.build())
 
-            val existingImports = outputLines.filter { it.startsWith("import") }
-            outputLines.addAll(1, lines.filter { it.startsWith("import") && !existingImports.contains(it) })
+        //build to file
+        val file = fileBuilder.build().toJavaFileObject()
+        val outputLines = file.openReader(true).readLines().toMutableList()
 
-            val start = lines.indexOfFirst { it.contains("class ${element.simpleName}") }
-            val innerCode = lines.drop(start + 1)
-            val classLines = innerCode.takeWhile { line ->
-                !line.startsWith('}')
-            }
-            outputLines[outputLines.lastIndex] = outputLines[outputLines.lastIndex] + " {"
-            outputLines.addAll(classLines + "}")
+        //add imports
+        val existingImports = outputLines.filter { it.startsWith("import") }
+        outputLines.addAll(1, sourceLines.filter { it.startsWith("import") && !existingImports.contains(it) })
 
-            val generatedDirectory = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]!!
-            val writeTo = File(generatedDirectory, file.toUri().toString())
-            writeTo.parentFile.mkdirs()
-            writeTo.writeText(outputLines.joinToString(separator = "\n"))
-        }
-        return true
+        //copy code within the base class
+        val start = sourceLines.indexOfFirst { it.contains("class ${baseElement.simpleName}") }
+        val innerCode = sourceLines.drop(start + 1)
+        val classLines = innerCode.takeWhile { line -> !line.startsWith('}') }
+
+        outputLines[outputLines.lastIndex] = outputLines[outputLines.lastIndex] + " {"
+        outputLines.addAll(classLines + "}")
+
+        //write file
+        val generatedDirectory = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]!!
+        val writeTo = File(generatedDirectory, file.toUri().toString())
+        writeTo.parentFile.mkdirs()
+        writeTo.writeText(outputLines.joinToString(separator = "\n"))
     }
 
     private val TypeElement.packageName get() = processingEnv.elementUtils.getPackageOf(this).qualifiedName.toString()
-}
-
-fun getTypeMirrors(block: () -> Unit): MutableList<out TypeMirror>? {
-    //this is the simplest way of getting the classes before they finish being created
-    try {
-        block()
-    } catch (e: MirroredTypesException) {
-        return e.typeMirrors
-    }
-    return null
-}
-
-fun TypeElement.readSource(): List<String> {
-    val path = internalName.replace(',', '/')
-    val ext = ".kt"
-    return File("src/main/java/$path$ext").readLines()
 }

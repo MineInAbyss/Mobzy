@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.mobs.types
 
+import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.mobs.CustomMob
@@ -12,6 +13,7 @@ import org.bukkit.entity.Creature
 /**
  * Lots of code taken from EntityZombie
  */
+@GenerateFromBase(base = MobBase::class, createFor = [EntityMonster::class])
 abstract class HostileMob(world: World, name: String) : MobzyEntityMonster(world, TODO()), CustomMob {
     override fun createPathfinders() {
         addPathfinderGoal(0, WalkingAnimationGoal(entity, template.model))

@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.mobs.types
 
+import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.pathfinders.WalkingAnimationGoal
@@ -8,6 +9,7 @@ import net.minecraft.server.v1_16_R1.*
 /**
  * Originally based off EntityPig
  */
+@GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
 abstract class PassiveMob(world: World, name: String) : MobzyEntityAnimal(world, TODO()), CustomMob {
     override fun createPathfinders() {
         addPathfinderGoal(0, WalkingAnimationGoal(entity, template.model))
