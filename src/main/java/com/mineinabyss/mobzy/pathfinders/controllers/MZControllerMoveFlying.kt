@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.pathfinders.controllers
 
+import com.mineinabyss.mobzy.ecs.components.attributes
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import net.minecraft.server.v1_16_R1.AxisAlignedBB
 import net.minecraft.server.v1_16_R1.ControllerMove
@@ -19,7 +20,7 @@ class MZControllerMoveFlying(private val mob: FlyingMob) : ControllerMove(mob) {
             var vec3d = Vec3D(b - mob.locX, c - mob.locY, d - mob.locZ)
             vec3d = vec3d.d()
             if (this.hasLineOfSight(vec3d, MathHelper.f(vec3d.f()))) {
-                val speed: Double = mob.template.attributes.movementSpeed ?: 0.1 //TODO access via extensions on NMS entity
+                val speed: Double = mob.type.attributes?.movementSpeed ?: 0.1 //TODO access via extensions on NMS entity
                 mob.mot = mob.mot.e(vec3d.a(speed))
             } else h = Operation.WAIT
         }

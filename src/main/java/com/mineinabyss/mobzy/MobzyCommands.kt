@@ -19,12 +19,14 @@ import com.mineinabyss.mobzy.gui.MobzyGUI
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.registration.MobzyRegistry
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 @ExperimentalCommandDSL
 object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
@@ -32,10 +34,9 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             command("configinfo", "cfginfo", desc = "Information about the current state of the plugin")?.action {
                 sender.info(("""
                             LOG OF CURRENTLY REGISTERED STUFF:
-                            Mob configs: ${MobzyConfig.mobTemplateCfgs}
                             Spawn configs: ${MobzyConfig.spawnCfgs}
                             Registered addons: ${MobzyConfig.registeredAddons}
-                            Registered EntityTypes: ${MobzyTypes.typeNames}""".trimIndent()))
+                            Registered EntityTypes: ${MobzyRegistry.typeNames}""".trimIndent()))
             }
 
             command("reload", "rl", desc = "Reloads the configuration files")?.action {
@@ -89,7 +90,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             command("spawn", "s", desc = "Spawns a custom mob") {
-                val mobName by optionArg(options = MobzyTypes.typeNames) {
+                val mobName by optionArg(options = MobzyRegistry.typeNames) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val numOfSpawns by intArg() {
@@ -118,7 +119,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             command("list", "l", desc = "Lists all custom mob types")?.action {
-                sender.success("All registered types:\n${MobzyTypes.typeNames}")
+                sender.success("All registered types:\n${MobzyRegistry.typeNames}")
             }
 
             command("config", desc = "Configuration options") {
@@ -151,7 +152,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
         val subCommand = args[0]
         if (subCommand == "spawn" || subCommand == "s")
             if (args.size == 2) {
-                return MobzyTypes.typeNames
+                return MobzyRegistry.typeNames
                         .filter { it.startsWith(args[1].toLowerCase()) }
             } else if (args.size == 3) {
                 var min = 1
@@ -165,7 +166,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
         if (subCommand in listOf("remove", "rm", "info", "i"))
             if (args.size == 2) {
                 val mobs: MutableList<String> = ArrayList()
-                mobs.addAll(MobzyTypes.typeNames)
+                mobs.addAll(MobzyRegistry.typeNames)
                 mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
                 return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
             }

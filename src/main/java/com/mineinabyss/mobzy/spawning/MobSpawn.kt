@@ -4,8 +4,7 @@ import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.nms.entity.creatureType
 import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
-import com.mineinabyss.mobzy.api.spawnMobzyMob
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.registration.MobzyRegistry
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
@@ -125,7 +124,7 @@ data class MobSpawn(
     val blockWhitelist: List<Material> = +MobSpawn::_blockWhitelist ?: listOf()
 
     @Transient
-    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[it] } ?: EntityTypes.ZOMBIE
+    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyRegistry[it] } ?: EntityTypes.ZOMBIE
 
     private val amountRange: IntRange get() = minAmount..maxAmount
     private val timeRange: LongRange get() = minTime..maxTime

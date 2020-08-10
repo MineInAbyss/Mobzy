@@ -9,12 +9,12 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
-import com.mineinabyss.mobzy.configuration.MobConfig
+import com.mineinabyss.mobzy.ecs.components.MobType
+import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.configuration.SpawnConfig
-import com.mineinabyss.mobzy.configuration.templates
-import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.registration.MobzyTemplates
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.mobs.AnyCustomMob
+import com.mineinabyss.mobzy.registration.MobTypes
+import com.mineinabyss.mobzy.registration.MobzyRegistry
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R1.EntityLiving
@@ -50,7 +50,6 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
     val spawnCfgs: MutableList<SpawnConfig> = mutableListOf()
-    val mobTemplateCfgs: MutableList<MobConfig> = mutableListOf()
 
     init {
         //first tick only finishes when all plugins are loaded, which is when we activate addons
@@ -74,12 +73,11 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
 
         //We don't clear MobzyTypes since those will only ever change if an addon's code was changed which is impossible
         // to see during a soft reload like this.
-        MobzyTemplates.reset()
+        MobTypes.reset()
         spawnCfgs.clear()
-        mobTemplateCfgs.clear()
         unregisterSpawns()
 
-        attempt("Reactivated all addonsMobzy", "Failed to reactive addons") {
+        attempt("Reactivated all addonsMobzy", "Failed to reactivate addons") {
             activateAddons()
         }
 
@@ -91,35 +89,31 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * and create everything they need for them.
      */
     private fun activateAddons() {
-        registeredAddons.forEach { loadMobCfg(it) }
-        registeredAddons.forEach { it.initializeMobs() }
-        registeredAddons.forEach { spawnCfgs += loadSpawnCfg(it) }
+        registeredAddons.forEach { it.loadMobTypes() }
+//        registeredAddons.forEach { it.initializeMobs() }
+        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
-        MobzyTypes.injectDefaultAttributes()
+        MobzyRegistry.injectDefaultAttributes()
         mobzy.registerSpawnTask()
 
         reloadExistingEntities()
 
         logSuccess("Registered addons: $registeredAddons")
-        logSuccess("Loaded types: ${MobzyTypes.typeNames}")
+        logSuccess("Loaded types: ${MobzyRegistry.typeNames}")
     }
 
     /**
      * Loads a [SpawnConfig] for an addon
      *
-     * @param plugin the addon registering it
+     * @param this@loadSpawns the addon registering it
      */
-    fun loadSpawnCfg(plugin: MobzyAddon) = SpawnConfig(plugin.spawnConfig, plugin)
+    private fun MobzyAddon.loadSpawns() = SpawnConfig(spawnConfig, this)
 
     /**
-     * Loads a [MobConfig] for an addon
-     *
-     * @param plugin the addon registering it
+     * Loads [MobType]s for an addon
      */
-    fun loadMobCfg(plugin: MobzyAddon) {
-        val mobCfg = MobConfig(plugin.mobConfig, plugin)
-        MobzyTemplates.registerTemplates(mobCfg.templates)
-        mobTemplateCfgs += mobCfg
+    private fun MobzyAddon.loadMobTypes() {
+        MobTypeConfigs.registerTypes(this)
     }
 
     /**
@@ -132,7 +126,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         Bukkit.getServer().worlds.forEach { world ->
             world.entities.filter {
                 if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
-                it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
+                it.scoreboardTags.contains("customMob3") && it.toNMS() !is AnyCustomMob
             }.forEach {
                 val replacement = it.location.spawnEntity(it.toNMSEntityTypeViaScoreboardTags())?.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()
@@ -145,5 +139,5 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         logSuccess("Reloaded $num custom entities")
     }
 
-    private fun Entity.toNMSEntityTypeViaScoreboardTags(): NMSEntityType<*> = MobzyTypes[scoreboardTags.first { MobzyTypes.contains(it) }]
+    private fun Entity.toNMSEntityTypeViaScoreboardTags(): NMSEntityType<*> = MobzyRegistry[scoreboardTags.first { MobzyRegistry.contains(it) }]
 }

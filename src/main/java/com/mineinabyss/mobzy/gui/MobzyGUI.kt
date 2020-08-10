@@ -16,7 +16,7 @@ import com.mineinabyss.mobzy.configuration.name
 import com.mineinabyss.mobzy.configuration.regions
 import com.mineinabyss.mobzy.gui.layouts.MobConfigLayout
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.registration.MobzyTemplates
+import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.findMobSpawn
 import org.bukkit.entity.Player
@@ -65,9 +65,9 @@ class MobzyGUI(val player: Player) : HistoryGuiHolder(6, "Mobzy", mobzy) {
         setElement(0, 0, FillableElement(4, 8)) {
             spawns.forEach { spawn ->
                 val spawnBuilder = if (spawn.reuse != null)
-                    MobzyTemplates[findMobSpawn(spawn.reuse).entityTypeName ?: error("Reuse was null")]
+                    MobTypes[findMobSpawn(spawn.reuse).entityTypeName ?: error("Reuse was null")]
                 else
-                    MobzyTemplates[spawn.entityTypeName ?: error("Reuse was null")]
+                    MobTypes[spawn.entityTypeName ?: error("Reuse was null")]
 
                 //open up the config layout with its menu options
                 button(spawnBuilder.modelItemStack.toCell()) {

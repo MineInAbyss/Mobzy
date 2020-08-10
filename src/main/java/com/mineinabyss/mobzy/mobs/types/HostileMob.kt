@@ -1,6 +1,8 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mieninabyss.mobzy.processor.GenerateFromBase
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.mobs.CustomMob
@@ -14,9 +16,9 @@ import org.bukkit.entity.Creature
  * Lots of code taken from EntityZombie
  */
 @GenerateFromBase(base = MobBase::class, createFor = [EntityMonster::class])
-abstract class HostileMob(world: World, name: String) : MobzyEntityMonster(world, TODO()), CustomMob {
+class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMonster(world, type) {
     override fun createPathfinders() {
-        addPathfinderGoal(0, WalkingAnimationGoal(entity, template.model))
+        addPathfinderGoal(0, WalkingAnimationGoal(entity, type.model))
         addPathfinderGoal(2, MeleeAttackGoal(entity as Creature, attackSpeed = 1.0, seeThroughWalls = false))
         addPathfinderGoal(3, PathfinderGoalFloat(this))
         addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))

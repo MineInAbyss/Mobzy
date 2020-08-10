@@ -7,16 +7,17 @@ import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.nms.aliases.NMSPlayer
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.mobs.AnyCustomMob
 import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.registration.MobzyTemplates
+import com.mineinabyss.mobzy.registration.MobTypes
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Statistic
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
 import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -50,7 +51,7 @@ object MobListener : Listener {
     fun onHit(e: EntityDamageEvent) {
         val entity = (e.entity as CraftEntity).handle
         if (entity is HitBehaviour) { //change the model to its hit version
-            val modelID = (entity as CustomMob).template.model
+            val modelID = (entity as AnyCustomMob).type.model
             val ee = (entity.bukkitEntity as LivingEntity).equipment ?: return
             ee.helmet = ee.helmet?.editItemMeta {
                 setCustomModelData(modelID + 2)
@@ -76,8 +77,8 @@ object MobListener : Listener {
         for (entity in e.chunk.entities) {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
-            } else if (entity.scoreboardTags.contains("customMob2") && entity is LivingEntity) {
-                entity.equipment?.helmet = MobzyTemplates[entity].modelItemStack
+            } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
+                entity.equipment?.helmet = MobTypes[entity].modelItemStack
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {
@@ -103,12 +104,12 @@ object MobListener : Listener {
             val trace = player.world.rayTrace(player.eyeLocation, player.location.direction, 3.0, FluidCollisionMode.ALWAYS, true, 0.0) { entity: Entity -> entity != player }
             if (trace != null && trace.hitEntity != null) {
                 val hit = trace.hitEntity!!.toNMS()
-                if (hit !is CustomMob) return
+                if (hit !is AnyCustomMob) return
                 if (e.leftClicked) {
                     e.isCancelled = true
                     player.toNMS<NMSPlayer>().attack(hit)
                 } else {
-                    (hit as CustomMob).onRightClick(player)
+                    (hit as AnyCustomMob).onRightClick(player)
                 }
             }
         }

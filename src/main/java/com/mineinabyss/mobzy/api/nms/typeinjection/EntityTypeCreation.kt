@@ -17,7 +17,7 @@ fun NMSEntityTypeBuilder.withoutSave() = this.b()
 
 fun NMSEntityTypeBuilder.withFireImmunity() = this.c()
 
-fun NMSEntityTypeFactory<Entity>.builderForType(creatureType: EnumCreatureType): EntityTypes.Builder<Entity>
+fun NMSEntityTypeFactory<Entity>.builderForCreatureType(creatureType: EnumCreatureType): EntityTypes.Builder<Entity>
         = EntityTypes.Builder.a(this, creatureType)
 
 object NMSDataConverterRegistry {

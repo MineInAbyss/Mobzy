@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mieninabyss.mobzy.processor.GenerateFromBase
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
@@ -9,12 +10,13 @@ import com.mineinabyss.mobzy.pathfinders.TargetAttackerGoal
 import com.mineinabyss.mobzy.pathfinders.flying.FlyDamageTargetGoal
 import com.mineinabyss.mobzy.pathfinders.flying.IdleFlyGoal
 import net.minecraft.server.v1_16_R1.*
+import org.bukkit.entity.Flying
 
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
  */
 @GenerateFromBase(base = MobBase::class, createFor = [EntityFlying::class])
-abstract class FlyingMob(world: NMSWorld, name: String) : MobzyEntityFlying(world, TODO()), CustomMob {
+class FlyingMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFlying(world, type) {
     override fun createPathfinders() {
         entity.persistentDataContainer
         addPathfinderGoal(1, PathfinderGoalFloat(this))

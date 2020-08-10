@@ -1,18 +1,19 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.mobs.CustomMob
 import net.minecraft.server.v1_16_R1.*
+import org.bukkit.entity.Mob
 
-abstract class MobBase : EntityInsentient(error(""), error("")), CustomMob {
+abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob<Mob> {
     //implementation of properties from CustomMob
     override var dead: Boolean
         get() = killed
         set(value) {
             killed = value
         }
-    override val nmsEntity: EntityLiving
+    override val nmsEntity: EntityInsentient
         get() = this
 
     override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime

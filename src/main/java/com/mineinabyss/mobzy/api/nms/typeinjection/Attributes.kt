@@ -14,7 +14,9 @@ object NMSAttributes {
     fun forEntityInsentient(): NMSAttributeBuilder = NMSEntityInsentient.p()
 }
 
-fun NMSAttributeBuilder.set(attribute: AttributeBase, value: Double? = null): NMSAttributeBuilder =
-        if (value != null) a(attribute, value) else a(attribute)
+fun NMSAttributeBuilder.set(attribute: AttributeBase, value: Double? = null): NMSAttributeBuilder {
+    if (value != null) a(attribute, value)
+    return this
+}// else a(attribute)
 
 fun NMSAttributeBuilder.build(): NMSAttributeProvider = a()

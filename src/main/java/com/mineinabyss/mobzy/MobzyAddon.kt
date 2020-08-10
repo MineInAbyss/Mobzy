@@ -7,7 +7,6 @@ import java.io.File
  * Allows a plugin to interact and register its own entities with Mobzy
  */
 interface MobzyAddon : Plugin {
-    val mobConfig: File
+    val mobConfigDir: File
     val spawnConfig: File
-    val initializeMobs: () -> Any
 }

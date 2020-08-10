@@ -5,14 +5,20 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.ecs.components.Temptable
+import com.mineinabyss.mobzy.ecs.components.temptItems
+import com.mineinabyss.mobzy.ecs.systems.PathfinderAttachSystem
+import com.mineinabyss.mobzy.ecs.systems.SystemManager
 import com.mineinabyss.mobzy.listener.MobListener
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.pathfinders.TemptGoal
+import com.mineinabyss.mobzy.registration.MobzyRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.flags.StringFlag
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import kotlin.time.ExperimentalTime
 import com.comphenix.protocol.PacketType.Play.Server as Packets
 
 /** Gets [Mobzy] via Bukkit once, then sends that reference back afterwards */
@@ -79,12 +85,20 @@ class Mobzy : JavaPlugin() {
         })
     }
 
+    @ExperimentalTime
     override fun onEnable() {
         //Plugin startup logic
         logger.info("On enable has been called")
         saveDefaultConfig()
         reloadConfig()
-        MobzyTypes
+        MobzyRegistry
+
+
+        SystemManager.registerSystem(PathfinderAttachSystem)
+        PathfinderAttachSystem.add(Temptable::class) {
+            val items = type.temptItems!!.items
+            TemptGoal(this, items)
+        }
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)

@@ -1,12 +1,13 @@
 package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.mobzy.api.nms.aliases.living
+import com.mineinabyss.mobzy.mobs.AnyCustomMob
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
-class TargetNearbyPlayerGoal(override val mob: CustomMob) : MobzyPathfinderGoal() {
+class TargetNearbyPlayerGoal(override val mob: AnyCustomMob) : MobzyPathfinderGoal() {
     private lateinit var playerDamager: Player
     override fun shouldExecute(): Boolean {
         val damager = (nmsEntity.lastDamager ?: return false).living

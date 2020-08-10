@@ -5,13 +5,14 @@ import com.mineinabyss.mobzy.api.helpers.entity.findNearbyPlayer
 import com.mineinabyss.mobzy.api.helpers.entity.lookAt
 import com.mineinabyss.mobzy.api.nms.aliases.living
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.mobs.AnyCustomMob
 import com.mineinabyss.mobzy.mobs.CustomMob
 import net.minecraft.server.v1_16_R1.EntityLiving
 import org.bukkit.Material
 import org.bukkit.event.entity.EntityTargetEvent
 
 //TODO javadoc
-class TemptGoal(override val mob: CustomMob, targetItems: List<Material>?, private val speed: Double = 1.0) : MobzyPathfinderGoal(cooldown = 200) {
+class TemptGoal(override val mob: AnyCustomMob, targetItems: List<Material>?, private val speed: Double = 1.0) : MobzyPathfinderGoal(cooldown = 100) {
     private val targetItems = targetItems ?: error("Cannot create pathfinder without tempt items")
 
     override fun shouldExecute(): Boolean {
@@ -39,6 +40,6 @@ class TemptGoal(override val mob: CustomMob, targetItems: List<Material>?, priva
         val target = target ?: return
         restartCooldown()
         val dist = mob.entity.distanceSqrTo(target)
-        if (dist in 1.0..6.25) navigation.moveToEntity(target, speed)
+        if (dist in 1.0..36.00) navigation.moveToEntity(target, speed)
     }
 }

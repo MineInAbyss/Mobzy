@@ -3,26 +3,15 @@
 
 package com.mineinabyss.mobzy.api
 
-import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
-import com.mineinabyss.mobzy.mobs.MobTemplate
-import com.mineinabyss.mobzy.registration.MobzyTemplates
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.ecs.components.AnyMobType
+import com.mineinabyss.mobzy.registration.MobTypes
+import com.mineinabyss.mobzy.registration.MobzyRegistry
 import org.bukkit.Location
 
-fun Location.spawnMobzyMob(name: String) = spawnEntity(MobzyTypes[name])
+fun Location.spawnMobzyMob(name: String) = spawnEntity(MobzyRegistry[name])
 
-fun registerPersistentTemplate(mob: String, template: MobTemplate): MobTemplate {
-    MobzyTemplates.registerPersistentTemplate(mob, template)
-    return template
+fun registerPersistentTemplate(mob: String, type: AnyMobType): AnyMobType {
+    MobTypes.registerPersistentTemplate(mob, type)
+    return type
 }
-
-fun registerMob(
-        name: String,
-        creatureType: NMSCreatureType,
-        width: Float = 1f,
-        height: Float = 2f,
-        init: (NMSWorld) -> NMSEntity
-) = MobzyTypes.registerMob(name, creatureType, width, height, init)

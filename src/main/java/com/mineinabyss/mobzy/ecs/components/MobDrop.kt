@@ -1,10 +1,9 @@
-package com.mineinabyss.mobzy.mobs
+package com.mineinabyss.mobzy.ecs.components
 
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.recpies.addCookingRecipes
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.mobzy.mobzy
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.ChatColor
 import org.bukkit.inventory.ItemStack
@@ -14,12 +13,12 @@ import kotlin.random.Random
 @Serializable
 data class MobDrop(
         val item: SerializableItemStack,
-        @SerialName("cooked-item") val cooked: SerializableItemStack? = null,
-        @SerialName("cook-exp") val cookExp: Float = 0f,
-        @SerialName("cook-time") val cookTime: Int = 200,
-        @SerialName("min-amount") val minAmount: Int = 1,
-        @SerialName("max-amount") val maxAmount: Int = 1,
-        @SerialName("drop-chance") val dropChance: Double = 1.0
+        val cooked: SerializableItemStack? = null,
+        val cookExp: Float = 0f,
+        val cookTime: Int = 200,
+        val minAmount: Int = 1,
+        val maxAmount: Int = 1,
+        val dropChance: Double = 1.0
 ) {
     init {
         if (cooked != null) {
