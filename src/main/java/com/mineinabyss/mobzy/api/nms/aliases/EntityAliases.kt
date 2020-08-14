@@ -6,7 +6,6 @@ import net.minecraft.server.v1_16_R1.*
 typealias NMSEntityLiving = EntityLiving
 typealias NMSEntityInsentient = EntityInsentient
 typealias NMSEntityCreature = EntityCreature
-
 typealias NMSPlayer = EntityPlayer
 
 typealias NMSEntityType<T> = EntityTypes<T>

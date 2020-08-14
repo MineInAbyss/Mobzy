@@ -18,7 +18,7 @@ val Entity.isRenamed get() = if (!isCustomMob || customName == null) false else 
 fun Entity.toMobzy() = toNMS().toMobzy()
 
 /** Converts [NMSEntity] to [CustomMob]. */
-fun NMSEntity.toMobzy() = this as AnyCustomMob
+fun NMSEntity.toMobzy() = this as? AnyCustomMob
 
 /** @return Whether the mob is of type of the given [typeName]. */
 fun Entity.isOfType(typeName: String) = this.typeName == typeName.toEntityTypeName()

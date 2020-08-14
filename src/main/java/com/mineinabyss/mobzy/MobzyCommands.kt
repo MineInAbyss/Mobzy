@@ -15,7 +15,6 @@ import com.mineinabyss.mobzy.api.isOfType
 import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.spawnMobzyMob
-import com.mineinabyss.mobzy.gui.MobzyGUI
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
@@ -123,9 +122,6 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             command("config", desc = "Configuration options") {
-                command("spawns", desc = "Allows editing of spawn config with a GUI")?.playerAction {
-                    MobzyGUI(player).show(player)
-                }
                 command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
                     val enabled by booleanArg()
 

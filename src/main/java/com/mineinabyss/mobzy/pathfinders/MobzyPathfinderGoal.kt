@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.living
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.PathfinderGoal
-import com.mineinabyss.mobzy.ecs.components.attributes
+import com.mineinabyss.mobzy.ecs.components.minecraft.attributes
 import com.mineinabyss.mobzy.mobs.AnyCustomMob
 import net.minecraft.server.v1_16_R1.ControllerMove
 import net.minecraft.server.v1_16_R1.EntityInsentient
@@ -19,11 +20,11 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500) : Pathfinde
     protected val nmsEntity: EntityInsentient by lazy { mob.nmsEntity }
     protected val moveController: ControllerMove get() = nmsEntity.controllerMove
     protected val navigation by lazy { mob.navigation }
-    protected var target
-        get() = nmsEntity.goalTarget?.living
-        set(value) {
-            nmsEntity.goalTarget = value?.toNMS<EntityLiving>()
-        }
+//    protected var target
+//        get() = nmsEntity.goalTarget?.living
+//        set(value) {
+//            nmsEntity.goalTarget = value?.toNMS<NMSEntityInsentient>()
+//        }
 
     private var cooldownStart: Long = 0
 

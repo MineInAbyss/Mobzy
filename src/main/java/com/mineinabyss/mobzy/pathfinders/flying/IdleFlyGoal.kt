@@ -12,12 +12,12 @@ open class IdleFlyGoal(override val mob: FlyingMob) : MobzyPathfinderGoal() {
     protected var targetLoc: Location? = null
 
     //if there isn't an operation to move somewhere, we can start looking for somewhere to fly
-    override fun shouldExecute(): Boolean = target == null
+    override fun shouldExecute(): Boolean = mob.target == null
 
     override fun shouldKeepExecuting(): Boolean {
         val targetLoc = targetLoc ?: return false
         val dist = entity.distanceSqrTo(targetLoc)
-        return dist in 1.0..60.0 && entity.velocity != Vector(0, 0, 0) && target == null
+        return dist in 1.0..60.0 && entity.velocity != Vector(0, 0, 0) && mob.target == null
     }
 
     override fun init() {

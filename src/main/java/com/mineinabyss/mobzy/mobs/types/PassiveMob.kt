@@ -4,6 +4,7 @@ import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
+import com.mineinabyss.mobzy.ecs.components.model
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.pathfinders.WalkingAnimationGoal
 import net.minecraft.server.v1_16_R1.*
@@ -15,7 +16,6 @@ import java.io.File
 @GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
 class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
     override fun createPathfinders() {
-        addPathfinderGoal(0, WalkingAnimationGoal(entity, type.model))
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))

@@ -5,12 +5,12 @@ import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 
 class FlyTowardsTargetGoal(override val mob: FlyingMob) : MobzyPathfinderGoal() {
-    override fun shouldExecute(): Boolean = (target != null)
+    override fun shouldExecute(): Boolean = (mob.target != null)
 
-    override fun shouldKeepExecuting(): Boolean = target != null
+    override fun shouldKeepExecuting(): Boolean = mob.target != null
 
     override fun execute() {
-        val target = target ?: return
+        val target = mob.target ?: return
         entity.lookAt(target)
 
         val targetLoc = target.location

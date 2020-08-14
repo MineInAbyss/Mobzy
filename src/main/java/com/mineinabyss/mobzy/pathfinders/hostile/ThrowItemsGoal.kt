@@ -25,7 +25,7 @@ class ThrowItemsGoal(
     private var distance = 0.0
 
     override fun shouldExecute(): Boolean {
-        return target != null && mob.entity.distanceSqrTo(target ?: return false).also { distance = it } >
+        return mob.target != null && mob.entity.distanceSqrTo(mob.target ?: return false).also { distance = it } >
                 //if there's no minChaseRad, stop pathfinder completely when we can't throw anymore
                 if (minChaseRad <= 0) minThrowRad else min(minChaseRad, minThrowRad)
     }
@@ -33,7 +33,7 @@ class ThrowItemsGoal(
     override fun shouldKeepExecuting() = shouldExecute() && !navigation.doneNavigating
 
     override fun init() {
-        navigation.moveToEntity(target!!, 1.0)
+        navigation.moveToEntity(mob.target!!, 1.0)
     }
 
     override fun reset() {
@@ -41,7 +41,7 @@ class ThrowItemsGoal(
     }
 
     override fun execute() {
-        val target = target ?: return
+        val target = mob.target ?: return
 
         if (distance < minChaseRad)
             navigation.stopNavigation()
@@ -64,7 +64,7 @@ class ThrowItemsGoal(
         world.playSound(entity.location, Sound.ENTITY_SNOW_GOLEM_SHOOT, 1.0f, 1.0f / (Random.nextDouble(0.8, 1.2).toFloat()))
         projectile.shoot(dX, dY, dZ, 1.6f, 12.0f)
         if (mob.itemToThrow != null)
-            projectile.setItem(CraftItemStack.asNMSCopy(mob.itemToThrow))
+            projectile.item = CraftItemStack.asNMSCopy(mob.itemToThrow)
         (world as CraftWorld).handle.addEntity(projectile)
     }
 }

@@ -2,11 +2,13 @@ package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
+import com.mineinabyss.mobzy.ecs.systems.Engine
 import com.mineinabyss.mobzy.mobs.CustomMob
 import net.minecraft.server.v1_16_R1.*
 import org.bukkit.entity.Mob
 
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob<Mob> {
+    override val mobzyId: Int = Engine.addEntity()
     //implementation of properties from CustomMob
     override var dead: Boolean
         get() = killed

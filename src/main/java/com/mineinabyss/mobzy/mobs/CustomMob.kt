@@ -1,13 +1,15 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
+import com.mineinabyss.mobzy.api.nms.aliases.living
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.Navigation
-import com.mineinabyss.mobzy.ecs.components.MobType
-import com.mineinabyss.mobzy.ecs.components.deathLoot
-import com.mineinabyss.mobzy.debug
-import com.mineinabyss.mobzy.ecs.systems.SystemManager
+import com.mineinabyss.mobzy.ecs.components.minecraft.EntityComponent
+import com.mineinabyss.mobzy.ecs.components.minecraft.deathLoot
+import com.mineinabyss.mobzy.ecs.components.model
+import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
+import com.mineinabyss.mobzy.ecs.systems.addComponent
 import com.mineinabyss.mobzy.registration.MobTypes
 import net.minecraft.server.v1_16_R1.*
 import org.bukkit.Bukkit
@@ -31,6 +33,7 @@ typealias AnyCustomMob = CustomMob<*>
  * immutable and not unique to this specific entity.
  */
 interface CustomMob<E : Mob> {
+    val mobzyId: Int
     // ========== Useful properties ===============
     val nmsEntity: EntityInsentient
     @Suppress("UNCHECKED_CAST")
@@ -41,12 +44,18 @@ interface CustomMob<E : Mob> {
     val locX get() = entity.location.x
     val locY get() = entity.location.y
     val locZ get() = entity.location.z
-    private val world: World get() = entity.world.toNMS()
+    private val nmsWorld: World get() = entity.world.toNMS()
     private val location: Location get() = entity.location
     val navigation get() = Navigation(nmsEntity.navigation, nmsEntity)
     val killer: EntityHuman? get() = nmsEntity.killer
 
     val scoreboardDisplayNameMZ: ChatMessage get() = ChatMessage(type.name.split('_').joinToString(" ") { it.capitalize() })
+
+    var target
+        get() = nmsEntity.goalTarget?.living
+        set(value) {
+            nmsEntity.goalTarget = value?.toNMS<NMSEntityInsentient>()
+        }
 
     // ========== Things to be implemented ==========
     val soundAmbient: String? get() = null
@@ -75,17 +84,28 @@ interface CustomMob<E : Mob> {
         entity.addScoreboardTag(type.name)
         SystemManager.runOn(this)
 
+        addComponent(EntityComponent(this))
+        type.behaviors.forEach {(_, component) -> //TODO unify these into one
+            addComponent(component)
+        }
+        type.staticComponents.forEach {(_, component) ->
+            addComponent(component)
+        }
+        type.components.forEach { (_, component) ->
+            addComponent(component.copy())
+        }
+        EntityCreatedEvent(mobzyId).callEvent()
+
+
         //create an item based on model ID in head slot if entity will be using itself for the model
-        entity.equipment!!.helmet = type.modelItemStack
+        type.model?.apply { entity.equipment!!.helmet = modelItemStack }
         entity.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
     }
 
     fun dieCM(damageSource: DamageSource?) {
         if (!dead) {
             dead = true
-//            killedMZ = true
             val killer = killer
-            debug("&c${type.name} died at coords ${locX.toInt()} ${locY.toInt()} ${locZ.toInt()}".color())
             if (killScore >= 0 && killer != null) killer.a(nmsEntity, killScore, damageSource)
             // this line causes the entity to send a statistics update on death (we don't want this as it causes a NPE exception and crash)
 //            killer?.a_(nmsEntity);
@@ -93,13 +113,13 @@ interface CustomMob<E : Mob> {
             if (entity.isSleeping) nmsEntity.entityWakeup()
 
             if (!nmsEntity.world.isClientSide) {
-                if (world.gameRules.getBoolean(GameRules.DO_MOB_LOOT) && killer != null) {
+                if (nmsWorld.gameRules.getBoolean(GameRules.DO_MOB_LOOT) && killer != null) {
                     dropItems(killer.bukkitEntity)
                 } else CraftEventFactory.callEntityDeathEvent(nmsEntity)
             }
             nmsEntity.combatTracker.g() //resets combat tracker
 
-            world.broadcastEntityEffect(nmsEntity, 3.toByte())
+            nmsWorld.broadcastEntityEffect(nmsEntity, 3.toByte())
             nmsEntity.pose = EntityPose.DYING
             //TODO add PlaceHolderAPI support
             type.deathLoot?.deathCommands?.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it) }

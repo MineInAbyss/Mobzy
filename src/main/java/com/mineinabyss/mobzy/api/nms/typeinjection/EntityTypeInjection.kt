@@ -53,7 +53,7 @@ fun Location.spawnEntity(type: NMSEntityType<*>): BukkitEntity? {
             CreatureSpawnEvent.SpawnReason.CUSTOM) // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
 
     //Call a method after the entity has been spawned and things like location have been determined
-    if (nmsEntity is AfterSpawnBehaviour) (nmsEntity as AfterSpawnBehaviour).afterSpawn()
+    if (nmsEntity is AfterSpawnBehaviour) (nmsEntity as AfterSpawnBehaviour).afterSpawn() //TODO probably remove or fit into ecs
 
     return nmsEntity?.bukkitEntity // convert to a Bukkit entity
 }

@@ -2,17 +2,22 @@ package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.pathfindergoals.PathfinderGoal
-import org.bukkit.entity.LivingEntity
+import com.mineinabyss.mobzy.ecs.components.Model
+import org.bukkit.entity.Mob
 
-class WalkingAnimationGoal(val mob: LivingEntity, private val modelID: Int) : PathfinderGoal() {
-    private val model
-        get() = mob.equipment!!.helmet!!
+class WalkingAnimationGoal(
+        val mob: Mob,
+        private val model: Model
+) : PathfinderGoal() {
+    private var helmet
+        get() = mob.equipment?.helmet
+        set(value) {
+            mob.equipment?.helmet = value
+        }
 
-    override fun shouldExecute(): Boolean {
-        val velocity = mob.velocity
-        //play animation when model is not hit model
-        return model.itemMeta!!.customModelData != modelID + 2 && !(velocity.x in -0.001..0.001 && velocity.z in -0.001..0.001)
-    }
+    //play animation when model is not hit model
+    override fun shouldExecute(): Boolean =
+            helmet?.itemMeta?.customModelData != model.hitId && mob.velocity.lengthSquared() > 0.01
 
     override fun shouldKeepExecuting(): Boolean = shouldExecute()
 
@@ -20,16 +25,15 @@ class WalkingAnimationGoal(val mob: LivingEntity, private val modelID: Int) : Pa
     }
 
     override fun reset() {
-        if (model.itemMeta!!.customModelData != modelID + 2)
-            mob.equipment!!.helmet = model.editItemMeta {
-                setCustomModelData(modelID)
+        if (helmet?.itemMeta?.customModelData != model.hitId)
+            helmet = helmet?.editItemMeta {
+                setCustomModelData(model.id)
             }
-
     }
 
     override fun execute() {
-        mob.equipment!!.helmet = model.editItemMeta {
-            setCustomModelData(modelID + 1)
+        helmet = helmet?.editItemMeta {
+            setCustomModelData(model.walkId)
         }
     }
 }

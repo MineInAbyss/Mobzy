@@ -9,7 +9,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
-import com.mineinabyss.mobzy.ecs.components.MobType
+import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.mobs.AnyCustomMob

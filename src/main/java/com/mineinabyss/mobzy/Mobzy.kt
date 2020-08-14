@@ -4,18 +4,16 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
+import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.mobzy.api.isCustomMob
-import com.mineinabyss.mobzy.ecs.components.Temptable
-import com.mineinabyss.mobzy.ecs.components.temptItems
-import com.mineinabyss.mobzy.ecs.systems.PathfinderAttachSystem
-import com.mineinabyss.mobzy.ecs.systems.SystemManager
 import com.mineinabyss.mobzy.listener.MobListener
-import com.mineinabyss.mobzy.pathfinders.TemptGoal
+import com.mineinabyss.mobzy.registration.MobzyECSRegistry
 import com.mineinabyss.mobzy.registration.MobzyRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.flags.StringFlag
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
+import kotlinx.serialization.ImplicitReflectionSerializer
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.time.ExperimentalTime
@@ -85,24 +83,21 @@ class Mobzy : JavaPlugin() {
         })
     }
 
+    @ExperimentalCommandDSL
+    @ImplicitReflectionSerializer
     @ExperimentalTime
     override fun onEnable() {
         //Plugin startup logic
         logger.info("On enable has been called")
         saveDefaultConfig()
         reloadConfig()
-        MobzyRegistry
 
+        MobzyECSRegistry.register()
+        MobzyRegistry //TODO more specific name
 
-        SystemManager.registerSystem(PathfinderAttachSystem)
-        PathfinderAttachSystem.add(Temptable::class) {
-            val items = type.temptItems!!.items
-            TemptGoal(this, items)
-        }
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)
-//        server.pluginManager.registerEvents(GuiListener(this), this)
 
         //Register commands
         MobzyCommands

@@ -23,7 +23,7 @@ class DiveOnTargetAttackGoal(
     private var bashVelX = 0.0
     private var bashVelZ = 0.0
 
-    override fun shouldExecute() = target != null
+    override fun shouldExecute() = mob.target != null
 
     override fun execute() = when (currentAction) {
         Action.FLY -> prepareDive()
@@ -31,7 +31,7 @@ class DiveOnTargetAttackGoal(
         Action.BASH -> bash()
     }
 
-    override fun shouldKeepExecuting() = target != null
+    override fun shouldKeepExecuting() = mob.target != null
 
     override fun reset() {
         bashLeft = bashDuration
@@ -40,7 +40,7 @@ class DiveOnTargetAttackGoal(
     }
 
     private fun prepareDive() {
-        val target = target ?: return
+        val target = mob.target ?: return
         entity.lookAtPitchLock(target)
 
         //if arrived to dive
@@ -56,7 +56,7 @@ class DiveOnTargetAttackGoal(
     }
 
     private fun beginDive() {
-        val target = target ?: return
+        val target = mob.target ?: return
         entity.lookAtPitchLock(target)
         val targetLoc = target.location
         if (entity.distanceSqrTo(target) < 2 || entity.velocity.y == 0.0 || mob.locY <= target.location.y + 1.0) {
@@ -72,7 +72,7 @@ class DiveOnTargetAttackGoal(
     private fun bash() {
         entity.lookAt(mob.locX + bashVelX, mob.locZ + bashVelZ)
         entity.velocity = entity.velocity.setX(bashVelX).setZ(bashVelZ)
-        if (bashLeft-- <= 0 || target == null || entity.distanceSqrTo(target!!) < 2 || entity.velocity.x == 0.0 || entity.velocity.z == 0.0) {
+        if (bashLeft-- <= 0 || mob.target == null || entity.distanceSqrTo(mob.target!!) < 2 || entity.velocity.x == 0.0 || entity.velocity.z == 0.0) {
             currentAction = Action.FLY
             bashLeft = bashDuration
         }

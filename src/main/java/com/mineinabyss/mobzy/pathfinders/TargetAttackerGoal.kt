@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.mobzy.api.nms.aliases.living
-import com.mineinabyss.mobzy.ecs.components.attributes
+import com.mineinabyss.mobzy.ecs.components.minecraft.attributes
 import com.mineinabyss.mobzy.mobs.AnyCustomMob
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
@@ -26,6 +26,6 @@ class TargetAttackerGoal(
     }
 
     override fun reset() {
-        target = null
+        mob.target = null
     }
 }

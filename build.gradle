@@ -23,12 +23,13 @@ allprojects {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         maven { url 'https://erethon.de/repo/' } //HeadLib
         maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
-        maven { url 'https://jitpack.io' } //JitPack
         maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
         maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+        maven { url 'https://papermc.io/repo/repository/maven-public/' }
         maven githubPackage.invoke("MineInAbyss/Idofront")
         maven githubPackage.invoke("MineInAbyss/Guiy")
         maven githubPackage.invoke("MineInAbyss/KotlinSpice")
+        maven { url 'https://jitpack.io' } //JitPack
         mavenLocal()
     }
 
@@ -43,21 +44,23 @@ java {
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:$server_version" //Spigot
+    compileOnly "com.destroystokyo.paper:paper-api:$server_version"
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
+
     compileOnly "de.erethon:headlib:3.0.2"
-    compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2" //WorldGuard
+    compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"
     compileOnly "com.comphenix.protocol:ProtocolLib:4.5.0"
     compileOnly "com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721"
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
     compileOnly "org.hexworks.amethyst:amethyst.core-jvm:2020.0.1-PREVIEW"
-
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "com.derongan.minecraft:guiy:0.1.0-alpha.7"
     implementation "com.mineinabyss:idofront:0.2.+"
     implementation "com.mineinabyss:idofront-annotation:0.2.+"
     kapt "com.mineinabyss:idofront-processor:0.2.+"
     implementation "net.onedaybeard.bitvector:bitvector-jvm:0.1.4"
+    implementation 'com.zaxxer:SparseBitSet:1.1'
+    implementation 'org.clapper:javautil:3.2.0'
     compileOnly project(":processor")
     kapt project(":processor")
 }

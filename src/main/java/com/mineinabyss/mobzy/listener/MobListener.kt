@@ -7,14 +7,15 @@ import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.nms.aliases.NMSPlayer
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.toMobzy
+import com.mineinabyss.mobzy.ecs.components.Model
+import com.mineinabyss.mobzy.ecs.components.model
 import com.mineinabyss.mobzy.mobs.AnyCustomMob
-import com.mineinabyss.mobzy.mobs.behaviours.HitBehaviour
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Statistic
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
@@ -48,23 +49,24 @@ object MobListener : Listener {
      * @param e the event
      */
     @EventHandler(ignoreCancelled = true)
-    fun onHit(e: EntityDamageEvent) {
-        val entity = (e.entity as CraftEntity).handle
-        if (entity is HitBehaviour) { //change the model to its hit version
-            val modelID = (entity as AnyCustomMob).type.model
-            val ee = (entity.bukkitEntity as LivingEntity).equipment ?: return
-            ee.helmet = ee.helmet?.editItemMeta {
-                setCustomModelData(modelID + 2)
-            }
-
-            //in 5 ticks change the model back to the non hit version
-            Bukkit.getScheduler().runTaskLater(mobzy, Runnable {
-                if (!entity.bukkitEntity.isDead)
-                    ee.helmet = ee.helmet?.editItemMeta {
-                        setCustomModelData(modelID)
-                    }
-            }, 7)
+    fun onHit(e: EntityDamageEvent) { //TODO convert to proper system
+        val mob = e.entity.toMobzy() ?: return
+        val model = mob.type.model ?: return
+        model.hitId ?: return
+        
+        //change the model to its hit version
+        val equipment = mob.entity.equipment ?: return
+        equipment.helmet = equipment.helmet?.editItemMeta {
+            setCustomModelData(model.hitId)
         }
+
+        //in 5 ticks change the model back to the non hit version
+        Bukkit.getScheduler().runTaskLater(mobzy, Runnable {
+            if (!mob.entity.isDead)
+                equipment.helmet = equipment.helmet?.editItemMeta {
+                    setCustomModelData(model.id)
+                }
+        }, 7)
     }
 
     /**
@@ -78,7 +80,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                entity.equipment?.helmet = MobTypes[entity].modelItemStack
+                MobTypes[entity].model?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {

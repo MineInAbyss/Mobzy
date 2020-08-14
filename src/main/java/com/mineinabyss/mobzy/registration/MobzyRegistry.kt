@@ -4,9 +4,9 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.nms.typeinjection.*
-import com.mineinabyss.mobzy.ecs.components.MobAttributes
-import com.mineinabyss.mobzy.ecs.components.MobType
-import com.mineinabyss.mobzy.ecs.components.attributes
+import com.mineinabyss.mobzy.ecs.components.minecraft.MobAttributes
+import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.ecs.components.minecraft.attributes
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
