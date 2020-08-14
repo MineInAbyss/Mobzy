@@ -82,10 +82,10 @@ interface CustomMob<E : Mob> {
     fun createFromBase() {
         entity.addScoreboardTag("customMob3")
         entity.addScoreboardTag(type.name)
-        SystemManager.runOn(this)
 
+        //TODO unify these into one
         addComponent(EntityComponent(this))
-        type.behaviors.forEach {(_, component) -> //TODO unify these into one
+        type.behaviors.forEach {(_, component) ->
             addComponent(component)
         }
         type.staticComponents.forEach {(_, component) ->

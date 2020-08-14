@@ -2,12 +2,12 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.*
-import com.mineinabyss.mobzy.Mobzy.Companion.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.entity.creatureType
 import com.mineinabyss.mobzy.api.nms.entity.keyName
+import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.sk89q.worldedit.bukkit.BukkitAdapter

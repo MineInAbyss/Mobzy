@@ -19,7 +19,11 @@ object Engine {
     }
 
     //TODO use archetypes instead
-    val registeredSystems = mutableSetOf<TickingSystem>()
+    private val registeredSystems = mutableSetOf<TickingSystem>()
+
+    fun addSystem(system: TickingSystem) = registeredSystems.add(system)
+
+    fun addSystems(vararg systems: TickingSystem) = registeredSystems.addAll(systems)
 
     val components = mutableMapOf<KClass<out MobzyComponent>, SparseArrayList<MobzyComponent>>()
     val bitsets = mutableMapOf<KClass<out MobzyComponent>, BitVector>()

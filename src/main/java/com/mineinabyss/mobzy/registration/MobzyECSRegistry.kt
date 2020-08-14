@@ -3,9 +3,9 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.ecs.behaviors.TemptBehavior
-import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.MobzyComponent
 import com.mineinabyss.mobzy.ecs.components.Model
+import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.SerializableComponent
 import com.mineinabyss.mobzy.ecs.components.minecraft.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.minecraft.EntityComponent
@@ -29,18 +29,19 @@ internal object MobzyECSRegistry : Listener {
     }
 
     @ImplicitReflectionSerializer
-    fun register(){
+    fun register() {
         registerSystems()
         registerComponentSerialization()
     }
 
-    fun registerSystems() {
-        Engine.registeredSystems += WalkingAnimationSystem
-        Engine.registeredSystems += TemptSystem
+    private fun registerSystems() {
+        Engine.addSystems(
+                WalkingAnimationSystem, TemptSystem
+        )
     }
 
     @ImplicitReflectionSerializer
-    fun registerComponentSerialization() {
+    private fun registerComponentSerialization() {
         //TODO annotate serializable components to register this automatically
         MobTypeConfigs.addSerializerModule(SerializersModule {
             polymorphic<MobzyComponent> {
