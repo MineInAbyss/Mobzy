@@ -1,12 +1,10 @@
 package com.mineinabyss.mobzy.registration
 
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.ecs.behaviors.TemptBehavior
-import com.mineinabyss.mobzy.ecs.components.MobzyComponent
-import com.mineinabyss.mobzy.ecs.components.Model
-import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
-import com.mineinabyss.mobzy.ecs.components.SerializableComponent
+import com.mineinabyss.mobzy.ecs.components.*
 import com.mineinabyss.mobzy.ecs.components.minecraft.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.minecraft.EntityComponent
 import com.mineinabyss.mobzy.ecs.components.minecraft.MobAttributes
@@ -23,8 +21,10 @@ internal object MobzyECSRegistry : Listener {
     @EventHandler
     fun attachPathfindersOnEntityCreatedEvent(event: EntityCreatedEvent) {
         val mob = Engine.get<EntityComponent>(event.id)?.entity ?: return
-        mob.type.behaviors.forEach { (priority, component) ->
-            mob.nmsEntity.addPathfinderGoal(priority, component.createPathfinder(mob))
+        val pathfinders = Engine.get<Pathfinders>(event.id)?.pathfinders ?: return
+        pathfinders.forEach { (priority, component) ->
+            mob.toNMS().addPathfinderGoal(priority, component.createPathfinder(mob))
+            Engine.addComponent(event.id, component)
         }
     }
 

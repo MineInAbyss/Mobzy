@@ -1,6 +1,9 @@
 package com.mineinabyss.mobzy.pathfinders.hostile
 
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
+import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
+import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import org.bukkit.Sound
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld

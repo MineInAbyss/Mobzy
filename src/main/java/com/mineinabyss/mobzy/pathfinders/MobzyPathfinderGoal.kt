@@ -19,7 +19,7 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500) : Pathfinde
     protected val entity: LivingEntity by lazy { mob.nmsEntity.bukkitEntity as LivingEntity }
     protected val nmsEntity: EntityInsentient by lazy { mob.nmsEntity }
     protected val moveController: ControllerMove get() = nmsEntity.controllerMove
-    protected val navigation by lazy { mob.navigation }
+    protected val navigation by lazy { mob.nmsEntity.navigation }
 //    protected var target
 //        get() = nmsEntity.goalTarget?.living
 //        set(value) {

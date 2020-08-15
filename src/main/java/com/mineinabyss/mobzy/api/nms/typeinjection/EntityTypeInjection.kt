@@ -4,6 +4,7 @@ import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.mobs.behaviours.AfterSpawnBehaviour
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type

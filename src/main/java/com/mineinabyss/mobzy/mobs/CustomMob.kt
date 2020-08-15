@@ -4,7 +4,6 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.living
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.pathfindergoals.Navigation
 import com.mineinabyss.mobzy.ecs.components.minecraft.EntityComponent
 import com.mineinabyss.mobzy.ecs.components.minecraft.deathLoot
 import com.mineinabyss.mobzy.ecs.components.model
@@ -46,7 +45,6 @@ interface CustomMob<E : Mob> {
     val locZ get() = entity.location.z
     private val nmsWorld: World get() = entity.world.toNMS()
     private val location: Location get() = entity.location
-    val navigation get() = Navigation(nmsEntity.navigation, nmsEntity)
     val killer: EntityHuman? get() = nmsEntity.killer
 
     val scoreboardDisplayNameMZ: ChatMessage get() = ChatMessage(type.name.split('_').joinToString(" ") { it.capitalize() })
@@ -84,10 +82,7 @@ interface CustomMob<E : Mob> {
         entity.addScoreboardTag(type.name)
 
         //TODO unify these into one
-        addComponent(EntityComponent(this))
-        type.behaviors.forEach {(_, component) ->
-            addComponent(component)
-        }
+        addComponent(EntityComponent(entity))
         type.staticComponents.forEach {(_, component) ->
             addComponent(component)
         }
@@ -95,11 +90,6 @@ interface CustomMob<E : Mob> {
             addComponent(component.copy())
         }
         EntityCreatedEvent(mobzyId).callEvent()
-
-
-        //create an item based on model ID in head slot if entity will be using itself for the model
-        type.model?.apply { entity.equipment!!.helmet = modelItemStack }
-        entity.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
     }
 
     fun dieCM(damageSource: DamageSource?) {

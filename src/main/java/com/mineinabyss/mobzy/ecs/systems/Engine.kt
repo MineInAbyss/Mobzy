@@ -68,9 +68,12 @@ object Engine {
     fun getNextId() = ++currId
 
     fun addEntity() = getNextId()
+
+    fun addComponent(id: Int, component: MobzyComponent) {
+        components.getOrPut(component::class, { SparseArrayList() })[id] = component
+        bitsets.getOrPut(component::class, { bitsOf() }).set(id)
+    }
+
 }
 
-fun AnyCustomMob.addComponent(component: MobzyComponent) {
-    components.getOrPut(component::class, { SparseArrayList() })[mobzyId] = component
-    bitsets.getOrPut(component::class, { bitsOf() }).set(mobzyId)
-}
+fun AnyCustomMob.addComponent(component: MobzyComponent) = Engine.addComponent(mobzyId, component)

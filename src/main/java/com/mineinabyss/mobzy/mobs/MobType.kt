@@ -22,7 +22,6 @@ data class MobType(
         @SerialName("name") private val _name: String? = null,
         @SerialName("staticComponents") private val _staticComponents: Set<MobzyComponent> = setOf(),
         @SerialName("components") private val _components: Set<SerializableComponent> = setOf(),
-        val behaviors: Map<Int, PathfinderComponent> = mapOf(),
         val creatureType: EnumCreatureType,
         val parentClass: String,
         val isAdult: Boolean = true) {

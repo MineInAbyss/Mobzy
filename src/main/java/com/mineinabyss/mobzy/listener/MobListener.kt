@@ -9,7 +9,10 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSPlayer
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.Model
+import com.mineinabyss.mobzy.ecs.components.minecraft.EntityComponent
 import com.mineinabyss.mobzy.ecs.components.model
+import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
+import com.mineinabyss.mobzy.ecs.systems.Engine
 import com.mineinabyss.mobzy.mobs.AnyCustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
@@ -26,6 +29,8 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.world.ChunkLoadEvent
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 object MobListener : Listener {
     /**
@@ -53,7 +58,7 @@ object MobListener : Listener {
         val mob = e.entity.toMobzy() ?: return
         val model = mob.type.model ?: return
         model.hitId ?: return
-        
+
         //change the model to its hit version
         val equipment = mob.entity.equipment ?: return
         equipment.helmet = equipment.helmet?.editItemMeta {
@@ -67,6 +72,16 @@ object MobListener : Listener {
                     setCustomModelData(model.id)
                 }
         }, 7)
+    }
+
+    @EventHandler
+    fun addModelOnEntityCreate(e: EntityCreatedEvent) {
+        val model = Engine.get<Model>(e.id) ?: return
+        val entity = Engine.get<EntityComponent>(e.id)?.entity ?: return
+
+        //create an item based on model ID in head slot if entity will be using itself for the model
+        entity.equipment?.helmet = model.modelItemStack
+        entity.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
     }
 
     /**
