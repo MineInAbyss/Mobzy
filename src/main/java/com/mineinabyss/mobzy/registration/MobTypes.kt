@@ -3,15 +3,22 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.entity.typeName
-import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.registration.MobTypes.persistentTypes
+import com.mineinabyss.mobzy.registration.MobTypes.types
 import org.bukkit.entity.Mob
 
+/**
+ * Manages registered [MobType]s and accessing them via name, bukkit entity, etc...
+ *
+ * @property types A map of [MobType]s registered with the plugin.
+ * @property persistentTypes A map of types similar to [types], which persists (command) reloads. Useful for other
+ * plugins which register types via code and can't re-register them easily.
+ */
 object MobTypes {
     private val types: MutableMap<String, MobType> = mutableMapOf()
-
-    //TODO explanation
-    private val hardcodedTypes: MutableMap<String, MobType> = mutableMapOf()
+    private val persistentTypes: MutableMap<String, MobType> = mutableMapOf()
 
     operator fun get(name: String): MobType = types[name.toEntityTypeName()]
             ?: error("Mob template for $name not found")
@@ -34,19 +41,21 @@ object MobTypes {
                 ?: error("Template was accessed but not registered in any mob configuration"))
     }
 
-    internal fun registerTemplates(templates: Map<String, MobType>) {
-        this.types += templates
+    /** Registers [MobType]s with the plugin. These will be cleared after a command reload is triggered. */
+    internal fun registerTypes(types: Map<String, MobType>) {
+        this.types += types
     }
 
-    fun registerPersistentTemplate(mob: String, type: MobType) {
+    /** Registers persistent [MobType]s with the plugin which do not get cleared after a command reload is triggered. */
+    fun registerPersistentType(mob: String, type: MobType) {
         val entityName = mob.toEntityTypeName()
         types[entityName] = type
-        hardcodedTypes[entityName] = type
+        persistentTypes[entityName] = type
     }
 
-    /** Clears all stored [types], but not [hardcodedTypes] */
+    /** Clears all stored [types], but not [persistentTypes] */
     internal fun reset() {
         types.clear()
-        types += hardcodedTypes
+        types += persistentTypes
     }
 }

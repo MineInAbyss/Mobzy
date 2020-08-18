@@ -16,7 +16,6 @@ import org.bukkit.entity.Creature
 @GenerateFromBase(base = MobBase::class, createFor = [EntityMonster::class])
 class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMonster(world, type) {
     override fun createPathfinders() {
-//        type.model?.let { addPathfinderGoal(0, WalkingAnimationGoal(entity, it)) } //TODO ECS!
         addPathfinderGoal(2, MeleeAttackGoal(entity as Creature, attackSpeed = 1.0, seeThroughWalls = false))
         addPathfinderGoal(3, PathfinderGoalFloat(this))
         addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))

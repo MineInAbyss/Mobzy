@@ -19,6 +19,7 @@ import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -133,7 +134,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")
-                        mobzy.registerSpawnTask()
+                        if (enabled) SpawnTask.startTask()
                     }
                 }
             }

@@ -17,14 +17,14 @@ class DeathLoot(
         val drops: List<MobDrop> = listOf()
 ) : MobzyComponent
 
-fun CustomMob.expToDrop(): Int {
-    val minExp = deathLoot?.minExp
-    val maxExp = deathLoot?.maxExp
-    return when { //TODO move into system
-        minExp == null || maxExp == null -> nmsEntity.expToDrop
+val CustomMob.deathLoot get() = get<DeathLoot>()
+
+fun DeathLoot.expToDrop(): Int? {
+    val minExp = minExp
+    val maxExp = maxExp
+    return when {
+        minExp == null || maxExp == null -> null
         maxExp <= minExp -> minExp
         else -> Random.nextInt(minExp, maxExp)
     }
 }
-
-val CustomMob.deathLoot get() = get<DeathLoot>()

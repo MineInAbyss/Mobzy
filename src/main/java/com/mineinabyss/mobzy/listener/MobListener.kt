@@ -54,7 +54,7 @@ object MobListener : Listener {
      * @param e the event
      */
     @EventHandler(ignoreCancelled = true)
-    fun onHit(e: EntityDamageEvent) { //TODO convert to proper system
+    fun onHit(e: EntityDamageEvent) {
         val mob = e.entity.toMobzy() ?: return
         val model = mob.type.model ?: return
         model.hitId ?: return

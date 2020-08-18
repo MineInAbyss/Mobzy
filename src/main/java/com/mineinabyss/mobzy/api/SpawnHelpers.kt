@@ -12,6 +12,6 @@ import org.bukkit.Location
 fun Location.spawnMobzyMob(name: String) = spawnEntity(MobzyTypeRegistry[name])
 
 fun registerPersistentTemplate(mob: String, type: MobType): MobType {
-    MobTypes.registerPersistentTemplate(mob, type)
+    MobTypes.registerPersistentType(mob, type)
     return type
 }

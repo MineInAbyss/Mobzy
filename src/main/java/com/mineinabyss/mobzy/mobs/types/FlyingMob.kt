@@ -16,11 +16,10 @@ import net.minecraft.server.v1_16_R1.*
 @GenerateFromBase(base = MobBase::class, createFor = [EntityFlying::class])
 class FlyingMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFlying(world, type) {
     override fun createPathfinders() {
-        entity.persistentDataContainer
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, FlyDamageTargetGoal(this))
         addPathfinderGoal(5, IdleFlyGoal(this))
-        addPathfinderGoal(1, TargetAttackerGoal(this, 100.0))//TODO look at target selectors
+        addPathfinderGoal(1, TargetAttackerGoal(this, 100.0)) //TODO should be a target selector instead
         addTargetSelector(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
     }
 

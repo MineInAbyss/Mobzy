@@ -9,13 +9,20 @@ import net.minecraft.server.v1_16_R1.NavigationAbstract
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Mob
 
-//TODO document
-
+/** Whether the entity has finished navigating to its destination */
 val NavigationAbstract.doneNavigating get() = m()
-val NavigationAbstract.inProgress get() = n()
-fun NavigationAbstract.moveToPosition(x: Double, y: Double, z: Double, speed: Double) = a(x, y, z, speed)
-fun NavigationAbstract.moveToEntity(entity: Entity, speed: Double) = a(entity.toNMS(), speed)
-fun NavigationAbstract.setSpeed(speed: Double) = a(speed)
-fun NavigationAbstract.stopNavigation() = o()
 
-val Mob.navigation get() = toNMS<NMSEntityInsentient>().navigation
+/** Whether navigation is currently in progress */
+val NavigationAbstract.inProgress get() = n()
+
+/** Moves an entity to the position defined at [x], [y], [z], with a specified [speed] */
+fun NavigationAbstract.moveToPosition(x: Double, y: Double, z: Double, speed: Double) = a(x, y, z, speed)
+
+/** Moves to [entity], with a specified [speed]*/
+fun NavigationAbstract.moveToEntity(entity: Entity, speed: Double) = a(entity.toNMS(), speed)
+
+/** Sets a speed multiplier with which to navigate */
+fun NavigationAbstract.setSpeed(speed: Double) = a(speed)
+
+/** Stops the current navigation */
+fun NavigationAbstract.stopNavigation() = o()

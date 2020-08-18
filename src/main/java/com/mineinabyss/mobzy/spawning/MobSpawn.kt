@@ -167,7 +167,7 @@ data class MobSpawn(
             if (it > maxLocalGroup * playerCount) return -1.0
         }
         creatureTypeCounts[entityType.creatureType.toString()]?.let {
-            if (it > MobzyConfig.getMobCap(entityType.creatureType) * playerCount) return -1.0
+            if (it > MobzyConfig.getCreatureTypeCap(entityType.creatureType) * playerCount) return -1.0
         }
 
         //TODO count number of entities around this spawn and prevent it depending on maxLocalGroup

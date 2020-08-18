@@ -40,7 +40,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
 
     override fun die(damagesource: DamageSource) = (this as CustomMob).die(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
-    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
+    override fun getExpValue(entityhuman: EntityHuman): Int = deathLoot?.expToDrop() ?: this.expToDrop
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
@@ -79,6 +79,6 @@ fun CustomMob.dropItems(killer: HumanEntity) {
     val fire = heldItem.enchantments[Enchantment.FIRE_ASPECT] ?: 0 > 0
     CraftEventFactory.callEntityDeathEvent(nmsEntity, deathLoot?.drops?.toList()?.map { it.chooseDrop(looting, fire) }
             ?: listOf())
-    nmsEntity.expToDrop = expToDrop()
+    deathLoot?.expToDrop()?.let { nmsEntity.expToDrop = it }
     dropExp()
 }

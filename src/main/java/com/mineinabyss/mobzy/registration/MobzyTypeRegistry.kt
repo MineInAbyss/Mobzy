@@ -63,7 +63,7 @@ object MobzyTypeRegistry {
         val attributes = type.get<MobAttributes>() ?: MobAttributes()
         val injected: NMSEntityType<Entity> = (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
                 .builderForCreatureType(type.creatureType)
-                .withSize(attributes.width, attributes.height) //TODO do this thru component
+                .withSize(attributes.width, attributes.height)
                 .apply {
                     if (attributes.fireImmune) withFireImmunity()
                 }

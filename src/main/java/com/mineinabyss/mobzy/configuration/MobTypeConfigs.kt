@@ -6,7 +6,6 @@ import com.mineinabyss.mobzy.MobzyAddon
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
-import com.mineinabyss.mobzy.registration.toEntityTypeName
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -36,7 +35,7 @@ object MobTypeConfigs {
             val name = file.nameWithoutExtension
             val type = formatYaml.parse(MobType.serializer(), file.readText())
             MobzyTypeRegistry.registerMob(name, type)
-            MobTypes.registerTemplates(mapOf(name to type))
+            MobTypes.registerTypes(mapOf(name to type))
         }
     }
 }

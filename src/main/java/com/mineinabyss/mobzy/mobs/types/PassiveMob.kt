@@ -12,7 +12,6 @@ import net.minecraft.server.v1_16_R1.*
 @GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
 class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
     override fun createPathfinders() {
-        super.initPathfinder()
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
         addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))

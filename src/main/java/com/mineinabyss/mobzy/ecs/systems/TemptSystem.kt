@@ -8,7 +8,6 @@ import com.mineinabyss.mobzy.api.helpers.entity.lookAt
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
-import com.mineinabyss.mobzy.api.pathfindergoals.navigation
 import com.mineinabyss.mobzy.ecs.pathfinders.TemptBehavior
 import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import org.bukkit.entity.Player
@@ -27,6 +26,6 @@ object TemptSystem : TickingSystem(interval = 40) {
         mob.lookAt(target)
 
         val dist = mob.distanceSqrTo(target)
-        if (dist in 1.0..(temptBehavior.range * temptBehavior.range)) mob.navigation.moveToEntity(target, temptBehavior.speed)
+        if (dist in 1.0..(temptBehavior.range * temptBehavior.range)) mob.toNMS().navigation.moveToEntity(target, temptBehavior.speed)
     }
 }

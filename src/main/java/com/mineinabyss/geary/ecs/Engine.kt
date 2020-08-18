@@ -35,7 +35,7 @@ object Engine {
     fun getComponentFor(kClass: ComponentClass, id: Int) = components[kClass]?.get(id)
     fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false
 
-    inline fun <reified T : MobzyComponent> get(id: Int): T? = getComponentFor(T::class, id) as? T //TODO unsure if this is null-safe
+    inline fun <reified T : MobzyComponent> get(id: Int): T? = getComponentFor(T::class, id) as? T
     inline fun <reified T : MobzyComponent> has(id: Int) = hasComponentFor(T::class, id)
 
     fun addComponent(id: Int, component: MobzyComponent) {

@@ -4,6 +4,8 @@ import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
+import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
 import net.minecraft.server.v1_16_R1.*
@@ -21,7 +23,7 @@ fun <T : NMSEntity> NMSEntityType<T>.registerEntityType(key: String): NMSEntityT
 /**
  * Injects an entity into the server
  *
- * Originally from [paper forms](https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293)
+ * Originally from [paper forums](https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293)
  */
 fun NMSEntityTypeBuilder.injectType(key: String, extendFrom: String): NMSEntityType<Entity> { //from https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293
     @Suppress("UNCHECKED_CAST") val dataTypes = NMSDataConverterRegistry.getDataFixer()
@@ -35,6 +37,8 @@ fun NMSEntityTypeBuilder.injectType(key: String, extendFrom: String): NMSEntityT
 
 /**
  * Spawns entity at specified Location
+ *
+ * Originally from [paper forums](https://papermc.io/forums/t/register-and-spawn-a-custom-entity-on-1-13-x/293)
  *
  * @param type The type of entity to spawn *
  * @return Reference to the spawned bukkit Entity
@@ -50,6 +54,8 @@ fun Location.spawnEntity(type: NMSEntityType<*>): BukkitEntity? {
             false,
             false,
             CreatureSpawnEvent.SpawnReason.CUSTOM) // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
+
+    (nmsEntity as? CustomMob)?.run { EntityCreatedEvent(mobzyId).callEvent() }
 
     return nmsEntity?.bukkitEntity // convert to a Bukkit entity
 }

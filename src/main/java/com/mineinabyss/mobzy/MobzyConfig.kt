@@ -9,13 +9,16 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
-import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
+import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.okkero.skedule.schedule
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R1.EntityLiving
 import net.minecraft.server.v1_16_R1.EnumCreatureType
@@ -33,7 +36,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
      * @property playerGroupRadius the radius around which players will count mobs towards the local mob cap
      * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
-     * @property mobCaps A map of mobs to the maximum number of that mob to spawn per player online TODO this might actually be mob type caps
+     * @property creatureTypeCaps Per-player mob caps for spawning of [NMSCreatureType]s on the server.
      */
     @Serializable
     class Data(
@@ -44,7 +47,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
             var maxCommandSpawns: Int = 50,
             var playerGroupRadius: Double = 128.0,
             var spawnTaskDelay: Long = 100,
-            var mobCaps: MutableMap<String, Int> = hashMapOf()
+            var creatureTypeCaps: MutableMap<String, Int> = hashMapOf()
     )
 
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
@@ -53,7 +56,10 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
 
     init {
         //first tick only finishes when all plugins are loaded, which is when we activate addons
-        Bukkit.getServer().scheduler.runTaskLater(mobzy, Runnable { activateAddons() }, 1L)
+        mobzy.schedule {
+            waitFor(1)
+            activateAddons()
+        }
     }
 
     override fun save() {
@@ -65,7 +71,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
      */
-    fun getMobCap(creatureType: NMSCreatureType): Int = mobCaps[creatureType.toString()]
+    fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = creatureTypeCaps[creatureType.toString()]
             ?: error("could not find mob cap for $creatureType")
 
     override fun reload(): ReloadScope.() -> Unit = {
@@ -94,7 +100,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
         MobzyTypeRegistry.injectDefaultAttributes()
-        mobzy.registerSpawnTask()
+        SpawnTask.startTask()
 
         reloadExistingEntities()
 

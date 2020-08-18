@@ -33,7 +33,8 @@ class Mobzy : JavaPlugin() {
 
         MobzyECSRegistry.register()
         MobzyPacketInterception.registerPacketInterceptors()
-        MobzyTypeRegistry //TODO more specific name
+        MobzyTypeRegistry //instantiate singleton
+        SpawnTask.startTask()
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)
@@ -41,20 +42,6 @@ class Mobzy : JavaPlugin() {
 
         //Register commands
         MobzyCommands
-    }
-
-    private var currentTask: SpawnTask? = null
-
-    fun registerSpawnTask() {
-        if (MobzyConfig.doMobSpawns) {
-            if (currentTask == null) {
-                currentTask = SpawnTask()
-                currentTask?.runTaskTimer(this, 0, MobzyConfig.spawnTaskDelay)
-            }
-        } else {
-            currentTask?.cancel()
-            currentTask = null
-        }
     }
 
     override fun onDisable() { // Plugin shutdown logic

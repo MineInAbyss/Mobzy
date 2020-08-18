@@ -51,6 +51,7 @@ internal object MobzyECSRegistry : Listener {
                 subclass<DeathLoot>()
                 subclass<Model>()
                 subclass<TemptBehavior>()
+                subclass<Pathfinders>()
             }
             polymorphic<CopyableComponent> {
             }

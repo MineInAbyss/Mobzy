@@ -68,7 +68,6 @@ interface CustomMob {
         entity.addScoreboardTag("customMob3")
         entity.addScoreboardTag(type.name)
 
-        //TODO unify these into one
         addComponent(MobComponent(entity))
         type.staticComponents.forEach { (_, component) ->
             addComponent(component)
@@ -76,7 +75,6 @@ interface CustomMob {
         type.components.forEach { (_, component) ->
             addComponent(component.copy())
         }
-        EntityCreatedEvent(mobzyId).callEvent()
     }
 
     @Suppress("UNREACHABLE_CODE")
