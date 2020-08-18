@@ -12,9 +12,9 @@ import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.configuration.SpawnConfig
-import com.mineinabyss.mobzy.mobs.AnyCustomMob
+import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.MobTypes
-import com.mineinabyss.mobzy.registration.MobzyRegistry
+import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R1.EntityLiving
@@ -93,13 +93,13 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
 //        registeredAddons.forEach { it.initializeMobs() }
         registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
-        MobzyRegistry.injectDefaultAttributes()
+        MobzyTypeRegistry.injectDefaultAttributes()
         mobzy.registerSpawnTask()
 
         reloadExistingEntities()
 
         logSuccess("Registered addons: $registeredAddons")
-        logSuccess("Loaded types: ${MobzyRegistry.typeNames}")
+        logSuccess("Loaded types: ${MobzyTypeRegistry.typeNames}")
     }
 
     /**
@@ -126,7 +126,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         Bukkit.getServer().worlds.forEach { world ->
             world.entities.filter {
                 if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
-                it.scoreboardTags.contains("customMob3") && it.toNMS() !is AnyCustomMob
+                it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
             }.forEach {
                 val replacement = it.location.spawnEntity(it.toNMSEntityTypeViaScoreboardTags())?.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()
@@ -139,5 +139,5 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         logSuccess("Reloaded $num custom entities")
     }
 
-    private fun Entity.toNMSEntityTypeViaScoreboardTags(): NMSEntityType<*> = MobzyRegistry[scoreboardTags.first { MobzyRegistry.contains(it) }]
+    private fun Entity.toNMSEntityTypeViaScoreboardTags(): NMSEntityType<*> = MobzyTypeRegistry[scoreboardTags.first { MobzyTypeRegistry.contains(it) }]
 }

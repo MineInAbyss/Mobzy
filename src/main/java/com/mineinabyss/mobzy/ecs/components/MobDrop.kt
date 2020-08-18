@@ -42,12 +42,12 @@ data class MobDrop(
      * @return The amount of items to be dropped, or null if the drop does not succeed
      * TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.
      */
-    fun chooseDrop(lootingLevel: Int = 0, fire: Int = 0): ItemStack? {
+    fun chooseDrop(lootingLevel: Int, fire: Boolean): ItemStack? {
         val lootingPercent = lootingLevel / 100.0
         val lootingMaxAmount: Int = if (dropChance >= 0.5) (maxAmount + lootingLevel * Random.nextDouble()).roundToInt() else maxAmount
         val lootingDropChance = if (dropChance >= 0.10) dropChance * (10.0 + lootingLevel) / 10.0 else dropChance + lootingPercent
         return if (Random.nextDouble() < lootingDropChance) {
-            val drop = if (fire > 0 && cooked != null) cooked.toItemStack() else item.toItemStack()
+            val drop = if (fire && cooked != null) cooked.toItemStack() else item.toItemStack()
             drop.amount = if (lootingMaxAmount <= minAmount) minAmount else Random.nextInt(minAmount, lootingMaxAmount)
             drop
         } else null

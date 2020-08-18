@@ -1,14 +1,16 @@
 package com.mineinabyss.mobzy.ecs.systems
 
+import com.mineinabyss.geary.ecs.Engine
+import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.Model
-import com.mineinabyss.mobzy.ecs.components.minecraft.EntityComponent
+import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import net.minecraft.server.v1_16_R1.EnumItemSlot
 import net.minecraft.server.v1_16_R1.Vec3D
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack
 
 object WalkingAnimationSystem : TickingSystem(interval = 10) {
-    override fun tick() = Engine.runFor<Model, EntityComponent> { model, (mob) ->
+    override fun tick() = Engine.runFor<Model, MobComponent> { model, (mob) ->
         val headItem = mob.toNMS().getEquipment(EnumItemSlot.HEAD)
         val meta = CraftItemStack.getItemMeta(headItem)
         val modelId = meta.customModelData

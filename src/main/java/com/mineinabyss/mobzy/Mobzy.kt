@@ -4,7 +4,7 @@ import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyECSRegistry
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
-import com.mineinabyss.mobzy.registration.MobzyRegistry
+import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import kotlinx.serialization.ImplicitReflectionSerializer
@@ -33,7 +33,7 @@ class Mobzy : JavaPlugin() {
 
         MobzyECSRegistry.register()
         MobzyPacketInterception.registerPacketInterceptors()
-        MobzyRegistry //TODO more specific name
+        MobzyTypeRegistry //TODO more specific name
 
         //Register events
         server.pluginManager.registerEvents(MobListener, this)

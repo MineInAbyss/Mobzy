@@ -8,7 +8,6 @@ import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.toEntityTypeName
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.entity.typeName
-import com.mineinabyss.mobzy.mobs.AnyCustomMob
 import org.bukkit.entity.Entity
 
 /** Whether an entity is a renamed mob registered with Mobzy. */
@@ -18,7 +17,7 @@ val Entity.isRenamed get() = if (!isCustomMob || customName == null) false else 
 fun Entity.toMobzy() = toNMS().toMobzy()
 
 /** Converts [NMSEntity] to [CustomMob]. */
-fun NMSEntity.toMobzy() = this as? AnyCustomMob
+fun NMSEntity.toMobzy() = this as? CustomMob
 
 /** @return Whether the mob is of type of the given [typeName]. */
 fun Entity.isOfType(typeName: String) = this.typeName == typeName.toEntityTypeName()
@@ -27,7 +26,7 @@ fun Entity.isOfType(typeName: String) = this.typeName == typeName.toEntityTypeNa
 val Entity.isCustomMob get() = toNMS().isCustomMob
 
 /** Whether this is a custom mob registered with Mobzy. */
-val NMSEntity.isCustomMob get() = this is AnyCustomMob
+val NMSEntity.isCustomMob get() = this is CustomMob
 
 /** A custom mob's [MobTemplate] that is registered with Mobzy. */
 //val Entity.template: MobTemplate get() = toMobzy().template

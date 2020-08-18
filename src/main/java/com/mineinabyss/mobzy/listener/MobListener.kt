@@ -5,15 +5,15 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
-import com.mineinabyss.mobzy.api.nms.aliases.NMSPlayer
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.Model
-import com.mineinabyss.mobzy.ecs.components.minecraft.EntityComponent
+import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import com.mineinabyss.mobzy.ecs.components.model
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
-import com.mineinabyss.mobzy.ecs.systems.Engine
-import com.mineinabyss.mobzy.mobs.AnyCustomMob
+import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
+import com.mineinabyss.geary.ecs.Engine
+import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
 import org.bukkit.Bukkit
@@ -77,7 +77,7 @@ object MobListener : Listener {
     @EventHandler
     fun addModelOnEntityCreate(e: EntityCreatedEvent) {
         val model = Engine.get<Model>(e.id) ?: return
-        val entity = Engine.get<EntityComponent>(e.id)?.entity ?: return
+        val entity = Engine.get<MobComponent>(e.id)?.mob ?: return
 
         //create an item based on model ID in head slot if entity will be using itself for the model
         entity.equipment?.helmet = model.modelItemStack
@@ -121,12 +121,12 @@ object MobListener : Listener {
             val trace = player.world.rayTrace(player.eyeLocation, player.location.direction, 3.0, FluidCollisionMode.ALWAYS, true, 0.0) { entity: Entity -> entity != player }
             if (trace != null && trace.hitEntity != null) {
                 val hit = trace.hitEntity!!.toNMS()
-                if (hit !is AnyCustomMob) return
+                if (hit !is CustomMob) return
                 if (e.leftClicked) {
                     e.isCancelled = true
-                    player.toNMS<NMSPlayer>().attack(hit)
+                    player.toNMS().attack(hit)
                 } else {
-                    (hit as AnyCustomMob).onRightClick(player)
+                    EntityRightClickEvent(hit).callEvent()
                 }
             }
         }

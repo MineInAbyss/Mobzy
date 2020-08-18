@@ -6,20 +6,20 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.minecraft.MobAttributes
 import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.ecs.components.minecraft.attributes
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import net.minecraft.server.v1_16_R1.*
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import kotlin.reflect.KClass
 
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobType]
  * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
  */
 @Suppress("ObjectPropertyName")
-object MobzyRegistry {
+object MobzyTypeRegistry {
     val typeNames get() = _types.keys.toList()
 
     private val _types: MutableMap<String, NMSEntityType<*>> = mutableMapOf()
@@ -55,13 +55,13 @@ object MobzyRegistry {
      * Registers a new entity with the server with extra parameters for width, height, and the function for creating the
      * entity.
      *
-     * @see injectNewEntity
+     * @see injectType
      */
     fun registerMob(name: String, type: MobType): EntityTypes<*> {
-        val init = creatureBases[type.parentClass] ?: error("Not a valid parent class: ${type.parentClass}")
+        val init = mobBaseClasses[type.baseClass] ?: error("Not a valid parent class: ${type.baseClass}")
         val mobID = name.toEntityTypeName()
-        val attributes = type.attributes ?: MobAttributes()
-        val injected: NMSEntityType<Entity> = (NMSEntityTypeFactory<Entity> { type, world -> init(type, world) })
+        val attributes = type.get<MobAttributes>() ?: MobAttributes()
+        val injected: NMSEntityType<Entity> = (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
                 .builderForCreatureType(type.creatureType)
                 .withSize(attributes.width, attributes.height) //TODO do this thru component
                 .apply {
@@ -74,11 +74,15 @@ object MobzyRegistry {
         return injected
     }
 
-    val creatureBases = mutableMapOf<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>(
+    private val mobBaseClasses = mutableMapOf<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>(
             "mobzy:flying" to ::FlyingMob, //TODO use proper keys
             "mobzy:hostile" to ::HostileMob,
             "mobzy:passive" to ::PassiveMob
     )
+
+    fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {
+        mobBaseClasses += classes
+    }
 }
 
 internal fun String.toEntityTypeName() = toLowerCase().replace(" ", "_")

@@ -5,9 +5,6 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
-import com.mineinabyss.mobzy.ecs.components.model
-import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.pathfinders.WalkingAnimationGoal
 import com.mineinabyss.mobzy.pathfinders.hostile.MeleeAttackGoal
 import net.minecraft.server.v1_16_R1.*
 import org.bukkit.entity.Creature
@@ -33,7 +30,7 @@ class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMonster(w
     override fun tick() = super.tick().also { if (!world.isClientSide && world.difficulty == EnumDifficulty.PEACEFUL) die() }
 
     init {
-        createFromBase()
+        initMob()
         addScoreboardTag("hostileMob")
         entity.removeWhenFarAway = true
         attributeMap

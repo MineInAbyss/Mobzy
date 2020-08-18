@@ -4,7 +4,11 @@ import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
+import com.mineinabyss.mobzy.ecs.components.ItemThrowing
+import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
+import net.minecraft.server.v1_16_R1.EntityProjectileThrowable
+import net.minecraft.server.v1_16_R1.EntitySnowball
 import org.bukkit.Sound
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack
@@ -19,7 +23,8 @@ import kotlin.random.Random
  * @param cooldown How long to wait between firing at the target.
  */
 class ThrowItemsGoal(
-        override val mob: ItemThrowable,
+        override val mob: CustomMob,
+        val throwing: ItemThrowing,
         val minChaseRad: Double,
         val minThrowRad: Double,
         //TODO val accuracy: Double,
@@ -36,7 +41,7 @@ class ThrowItemsGoal(
     override fun shouldKeepExecuting() = shouldExecute() && !navigation.doneNavigating
 
     override fun init() {
-        navigation.moveToEntity(mob.target!!, 1.0)
+        mob.target?.let { navigation.moveToEntity(it, 1.0) }
     }
 
     override fun reset() {
@@ -59,15 +64,14 @@ class ThrowItemsGoal(
     /** Throws the mob's defined item at the [target]*/
     fun throwItem(target: LivingEntity) {
         val world = entity.location.world ?: return
-        val projectile = mob.createThrownEntity()
+        val projectile = EntitySnowball(nmsEntity.world, nmsEntity) //TODO some way to create different types of projectiles
         val targetLoc = target.eyeLocation
         val dX = targetLoc.x - mob.locX
         val dY = targetLoc.y - mob.locY - 0.4
         val dZ = targetLoc.z - mob.locZ
         world.playSound(entity.location, Sound.ENTITY_SNOW_GOLEM_SHOOT, 1.0f, 1.0f / (Random.nextDouble(0.8, 1.2).toFloat()))
         projectile.shoot(dX, dY, dZ, 1.6f, 12.0f)
-        if (mob.itemToThrow != null)
-            projectile.item = CraftItemStack.asNMSCopy(mob.itemToThrow)
+        projectile.item = CraftItemStack.asNMSCopy(throwing.itemToThrow.toItemStack())
         (world as CraftWorld).handle.addEntity(projectile)
     }
 }

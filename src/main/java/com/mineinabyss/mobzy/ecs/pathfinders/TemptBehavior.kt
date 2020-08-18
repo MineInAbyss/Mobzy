@@ -1,6 +1,6 @@
-package com.mineinabyss.mobzy.ecs.behaviors
+package com.mineinabyss.mobzy.ecs.pathfinders
 
-import com.mineinabyss.mobzy.ecs.components.MobzyComponent
+import com.mineinabyss.geary.ecs.MobzyComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material

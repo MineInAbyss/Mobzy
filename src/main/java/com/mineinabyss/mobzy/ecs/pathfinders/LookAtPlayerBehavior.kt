@@ -1,9 +1,7 @@
-package com.mineinabyss.mobzy.ecs.behaviors
+package com.mineinabyss.mobzy.ecs.pathfinders
 
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.goalwrappers.LookAtPlayerGoal
 import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
-import com.mineinabyss.mobzy.mobs.CustomMob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Mob

@@ -5,12 +5,10 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
-import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.pathfinders.TargetAttackerGoal
 import com.mineinabyss.mobzy.pathfinders.flying.FlyDamageTargetGoal
 import com.mineinabyss.mobzy.pathfinders.flying.IdleFlyGoal
 import net.minecraft.server.v1_16_R1.*
-import org.bukkit.entity.Flying
 
 /**
  * Lots of code taken from the EntityGhast class for flying mobs
@@ -27,7 +25,7 @@ class FlyingMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFlying(wor
     }
 
     init {
-        createFromBase()
+        initMob()
         addScoreboardTag("flyingMob")
         entity.removeWhenFarAway = true
         moveController = ControllerMoveFlying(this, 20, true) /*MZControllerMoveFlying(this)*/

@@ -1,18 +1,18 @@
 package com.mineinabyss.mobzy.pathfinders
 
-import com.mineinabyss.mobzy.api.nms.aliases.living
+import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.minecraft.attributes
-import com.mineinabyss.mobzy.mobs.AnyCustomMob
+import com.mineinabyss.mobzy.mobs.CustomMob
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
 class TargetAttackerGoal(
-        override val mob: AnyCustomMob,
-        private val range: Double = mob.type.attributes?.followRange ?: 0.0
+        override val mob: CustomMob,
+        private val range: Double = mob.attributes?.followRange ?: 0.0
 ) : MobzyPathfinderGoal() {
     private lateinit var playerDamager: Player
     override fun shouldExecute(): Boolean {
-        val damager = (nmsEntity.lastDamager ?: return false).living
+        val damager = (nmsEntity.lastDamager ?: return false).toBukkit()
         if (damager !is Player) return false
         playerDamager = damager
         return shouldKeepExecuting()

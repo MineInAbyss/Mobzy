@@ -13,7 +13,7 @@ class FlyDamageTargetGoal(override val mob: FlyingMob) : MobzyPathfinderGoal() {
     override fun execute() {
         restartCooldown()
         val target = mob.target ?: return
-        val attackDamage: Double = mob.type.attributes?.attackDamage ?: return
+        val attackDamage: Double = mob.attributes?.attackDamage ?: return
         //if within range, harm
         if (entity.canReach(target)) target.damage(attackDamage, entity)
     }

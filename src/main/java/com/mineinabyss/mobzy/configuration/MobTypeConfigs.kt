@@ -5,7 +5,7 @@ import com.charleskorn.kaml.YamlConfiguration
 import com.mineinabyss.mobzy.MobzyAddon
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
-import com.mineinabyss.mobzy.registration.MobzyRegistry
+import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.registration.toEntityTypeName
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
@@ -33,9 +33,9 @@ object MobTypeConfigs {
 
     fun registerTypes(mobzyAddon: MobzyAddon) {
         mobzyAddon.mobConfigDir.walk().filter { it.isFile }.forEach { file ->
-            val name = file.nameWithoutExtension.toEntityTypeName()
+            val name = file.nameWithoutExtension
             val type = formatYaml.parse(MobType.serializer(), file.readText())
-            MobzyRegistry.registerMob(name, type)
+            MobzyTypeRegistry.registerMob(name, type)
             MobTypes.registerTemplates(mapOf(name to type))
         }
     }

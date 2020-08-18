@@ -24,7 +24,11 @@ fun Mob.toNMS(): NMSEntityInsentient = (this as CraftMob).handle
 fun Creature.toNMS(): NMSEntityCreature = (this as CraftCreature).handle
 fun Player.toNMS(): NMSPlayer = (this as CraftPlayer).handle
 
-val NMSEntityLiving.living get() = this.bukkitEntity as LivingEntity //TODO move
+fun NMSEntity.toBukkit() = bukkitEntity as BukkitEntity
+fun NMSEntityLiving.toBukkit() = bukkitEntity as LivingEntity
+fun NMSEntityInsentient.toBukkit() = bukkitEntity as Mob
+fun NMSEntityCreature.toBukkit() = bukkitEntity as Creature
+fun NMSPlayer.toBukkit() = bukkitEntity as Player
 
 /** Converts to an NMS entity casted to a specified type */
 @Suppress("UNCHECKED_CAST")

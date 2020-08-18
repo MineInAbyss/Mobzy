@@ -4,7 +4,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.entity.typeName
 import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.mobs.AnyCustomMob
+import com.mineinabyss.mobzy.mobs.CustomMob
 import org.bukkit.entity.Mob
 
 object MobTypes {
@@ -20,7 +20,7 @@ object MobTypes {
     operator fun get(type: NMSEntityType<*>): MobType = get(type.typeName)
 
     /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
-    operator fun get(customMob: AnyCustomMob): MobType = get(customMob.entity.typeName)
+    operator fun get(customMob: CustomMob): MobType = get(customMob.entity.typeName)
 
     /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
     operator fun get(entity: Mob): MobType = get(entity.typeName)

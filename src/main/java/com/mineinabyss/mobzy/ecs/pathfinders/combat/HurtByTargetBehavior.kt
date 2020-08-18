@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.ecs.behaviors.combat
+package com.mineinabyss.mobzy.ecs.pathfinders.combat
 
 import com.mineinabyss.mobzy.api.nms.goalwrappers.HurtByTargetGoal
 import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
