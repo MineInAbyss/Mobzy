@@ -1,6 +1,5 @@
 package com.mieninabyss.mobzy.processor
 
-import me.eugeniomarletti.kotlin.metadata.jvm.internalName
 import java.io.File
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.MirroredTypeException
@@ -24,7 +23,7 @@ fun getTypeMirrors(block: () -> Unit): MutableList<out TypeMirror>? = try {
 }
 
 fun TypeElement.readSource(): List<String> {
-    val path = internalName.replace(',', '/')
+    val path = qualifiedName.toString().replace('.', '/')
     val ext = ".kt"
     return File("src/main/java/$path$ext").readLines()
 }

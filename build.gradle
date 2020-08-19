@@ -50,9 +50,9 @@ dependencies {
 
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
     implementation "com.derongan.minecraft:guiy:0.1.0-alpha.7"
-    implementation "com.mineinabyss:idofront:0.2.+"
-    implementation "com.mineinabyss:idofront-annotation:0.2.+"
-    kapt "com.mineinabyss:idofront-processor:0.2.+"
+    implementation "com.mineinabyss:idofront:0.3.+"
+    implementation "com.mineinabyss:idofront-annotation:0.3.+"
+    kapt "com.mineinabyss:idofront-processor:0.3.+"
 
     compileOnly "de.erethon:headlib:3.0.2"
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"

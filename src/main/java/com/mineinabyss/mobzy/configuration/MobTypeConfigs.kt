@@ -6,34 +6,34 @@ import com.mineinabyss.mobzy.MobzyAddon
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.modules.SerialModule
+import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
 
 object MobTypeConfigs {
-    private var module = SerializersModule { }
+    private var module = EmptySerializersModule
 
-    @UnstableDefault
     val format by lazy {
-        Json(
-                context = module,
-                configuration = JsonConfiguration(encodeDefaults = false, useArrayPolymorphism = true)
-        )
+        Json {
+            serializersModule = module
+            useArrayPolymorphism = true
+            encodeDefaults = false
+        }
     }
 
-    val formatYaml by lazy { Yaml(context = module, configuration = YamlConfiguration(encodeDefaults = false)) }
+    val formatYaml by lazy {
+        Yaml(serializersModule = module, configuration = YamlConfiguration(encodeDefaults = false))
+    }
 
-    fun addSerializerModule(module: SerialModule) {
+    fun addSerializerModule(module: SerializersModule) {
         this.module += module
     }
 
     fun registerTypes(mobzyAddon: MobzyAddon) {
         mobzyAddon.mobConfigDir.walk().filter { it.isFile }.forEach { file ->
             val name = file.nameWithoutExtension
-            val type = formatYaml.parse(MobType.serializer(), file.readText())
+            val type = formatYaml.decodeFromString(MobType.serializer(), file.readText())
             MobzyTypeRegistry.registerMob(name, type)
             MobTypes.registerTypes(mapOf(name to type))
         }

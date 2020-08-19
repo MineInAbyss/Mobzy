@@ -30,8 +30,8 @@ import kotlin.time.ExperimentalTime
 @ExperimentalCommandDSL
 object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
-        command("mobzy", "mz") {
-            command("configinfo", "cfginfo", desc = "Information about the current state of the plugin")?.action {
+        ("mobzy" / "mz") {
+            ("configinfo" / "cfginfo")(desc = "Information about the current state of the plugin")?.action {
                 sender.info(("""
                             LOG OF CURRENTLY REGISTERED STUFF:
                             Spawn configs: ${MobzyConfig.spawnCfgs}
@@ -39,7 +39,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             Registered EntityTypes: ${MobzyTypeRegistry.typeNames}""".trimIndent()))
             }
 
-            command("reload", "rl", desc = "Reloads the configuration files")?.action {
+            ("reload" / "rl")(desc = "Reloads the configuration files")?.action {
                 MobzyConfig.reload(sender)
             }
 
@@ -80,16 +80,16 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     )
                 }
 
-                command("remove", "rm", desc = "Removes mobs")?.playerAction {
+                ("remove" / "rm")(desc = "Removes mobs")?.playerAction {
                     removeOrInfo(false)
                 }
 
-                command("info", "i", desc = "Lists how many mobs are around you")?.playerAction {
+                ("info" / "i")(desc = "Lists how many mobs are around you")?.playerAction {
                     removeOrInfo(true)
                 }
             }
 
-            command("spawn", "s", desc = "Spawns a custom mob") {
+            ("spawn" / "s")(desc = "Spawns a custom mob") {
                 val mobName by optionArg(options = MobzyTypeRegistry.typeNames) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
@@ -103,7 +103,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     for (i in 1..cappedSpawns) player.location.spawnMobzyMob(mobName)
                 }
             }
-            command("debug") {
+            "debug" {
                 command("spawnregion")?.playerAction {
                     player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
                 }
@@ -118,11 +118,11 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
             }
 
-            command("list", "l", desc = "Lists all custom mob types")?.action {
+            ("list" / "l")(desc = "Lists all custom mob types")?.action {
                 sender.success("All registered types:\n${MobzyTypeRegistry.typeNames}")
             }
 
-            command("config", desc = "Configuration options") {
+            "config"(desc = "Configuration options") {
                 command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
                     val enabled by booleanArg()
 

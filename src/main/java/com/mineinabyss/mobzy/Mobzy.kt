@@ -7,7 +7,6 @@ import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import kotlinx.serialization.ImplicitReflectionSerializer
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.time.ExperimentalTime
 
@@ -23,7 +22,6 @@ class Mobzy : JavaPlugin() {
     }
 
     @ExperimentalCommandDSL
-    @ImplicitReflectionSerializer
     @ExperimentalTime
     override fun onEnable() {
         //Plugin startup logic
