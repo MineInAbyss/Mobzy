@@ -6,7 +6,6 @@ import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.addComponent
 import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
-import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import net.minecraft.server.v1_16_R1.ChatMessage
 import net.minecraft.server.v1_16_R1.EntityHuman
 import net.minecraft.server.v1_16_R1.EntityInsentient
@@ -69,12 +68,7 @@ interface CustomMob {
         entity.addScoreboardTag(type.name)
 
         addComponent(MobComponent(entity))
-        type.staticComponents.forEach { (_, component) ->
-            addComponent(component)
-        }
-        type.components.forEach { (_, component) ->
-            addComponent(component.copy())
-        }
+        type.instantiateComponents().forEach { addComponent(it) }
     }
 
     @Suppress("UNREACHABLE_CODE")

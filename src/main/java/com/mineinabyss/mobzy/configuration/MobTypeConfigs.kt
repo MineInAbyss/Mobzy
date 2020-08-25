@@ -22,7 +22,7 @@ object MobTypeConfigs {
         }
     }
 
-    val formatYaml by lazy {
+    val yamlFormat by lazy {
         Yaml(serializersModule = module, configuration = YamlConfiguration(encodeDefaults = false))
     }
 
@@ -33,7 +33,7 @@ object MobTypeConfigs {
     fun registerTypes(mobzyAddon: MobzyAddon) {
         mobzyAddon.mobConfigDir.walk().filter { it.isFile }.forEach { file ->
             val name = file.nameWithoutExtension
-            val type = formatYaml.decodeFromString(MobType.serializer(), file.readText())
+            val type = yamlFormat.decodeFromString(MobType.serializer(), file.readText())
             MobzyTypeRegistry.registerMob(name, type)
             MobTypes.registerTypes(mapOf(name to type))
         }

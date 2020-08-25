@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.listener
 
+import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
@@ -12,7 +13,6 @@ import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import com.mineinabyss.mobzy.ecs.components.model
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
@@ -56,7 +56,7 @@ object MobListener : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onHit(e: EntityDamageEvent) {
         val mob = e.entity.toMobzy() ?: return
-        val model = mob.type.model ?: return
+        val model = mob.model ?: return
         model.hitId ?: return
 
         //change the model to its hit version
@@ -95,7 +95,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                MobTypes[entity].model?.apply { entity.equipment?.helmet = modelItemStack }
+                MobTypes[entity].get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {

@@ -1,4 +1,8 @@
 pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url 'https://dl.bintray.com/kotlin/kotlinx' }
+    }
     plugins {
         id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
         id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"

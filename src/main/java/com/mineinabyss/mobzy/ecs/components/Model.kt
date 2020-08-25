@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.ecs.components
 
-import com.mineinabyss.geary.ecs.CopyableComponent
+import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.mobs.CustomMob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material
@@ -16,8 +16,7 @@ data class Model(
         val walkIdOffset: Int? = 1,
         val hitIdOffset: Int? = 2,
         val isAdult: Boolean = true
-) : CopyableComponent {
-    override val copy = { copy() }
+) : MobzyComponent {
     val walkId = walkIdOffset?.plus(id)
     val hitId = hitIdOffset?.plus(id)
     val modelItemStack
@@ -26,4 +25,4 @@ data class Model(
         }
 }
 
-val MobType.model get() = get<Model>()
+val CustomMob.model get() = get<Model>()

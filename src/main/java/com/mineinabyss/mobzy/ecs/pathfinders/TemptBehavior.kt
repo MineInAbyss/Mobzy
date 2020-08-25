@@ -7,8 +7,8 @@ import org.bukkit.Material
 
 @Serializable
 @SerialName("mobzy:behavior.tempt")
-class TemptBehavior(
+data class TemptBehavior(
         val items: List<Material>,
         val speed: Double = 1.0,
-        val range: Double = 8.0
-): MobzyComponent
+        val range: Double = 8.0,
+) : MobzyComponent

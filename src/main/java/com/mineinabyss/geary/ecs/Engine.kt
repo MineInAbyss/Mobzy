@@ -1,8 +1,8 @@
 package com.mineinabyss.geary.ecs
 
 import com.mineinabyss.geary.ecs.systems.TickingSystem
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import com.mineinabyss.mobzy.mobzy
+import com.zaxxer.sparsebits.SparseBitSet
 import net.onedaybeard.bitvector.BitVector
 import net.onedaybeard.bitvector.bitsOf
 import org.bukkit.Bukkit
@@ -10,6 +10,7 @@ import org.clapper.util.misc.SparseArrayList
 import kotlin.reflect.KClass
 
 typealias ComponentClass = KClass<out MobzyComponent>
+
 object Engine {
     init {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(mobzy, {
@@ -76,3 +77,13 @@ object Engine {
         }
     }
 }
+
+inline fun SparseBitSet.forEachBit(block: (Int) -> Unit) {
+    var i = 0
+    while (i >= 0) {
+        i = nextSetBit(i + 1)
+        block(i)
+    }
+}
+
+
