@@ -34,10 +34,11 @@ object Engine {
 
     fun addSystems(vararg systems: TickingSystem) = registeredSystems.addAll(systems)
 
+    //TODO get a more memory efficient list, right now this is literally just an ArrayList that auto expands
     private val components = mutableMapOf<ComponentClass, SparseArrayList<MobzyComponent>>()
     private val bitsets = mutableMapOf<ComponentClass, BitVector>()
 
-    fun getComponentFor(kClass: ComponentClass, id: Int) = components[kClass]?.get(id)
+    fun getComponentFor(kClass: ComponentClass, id: Int) = runCatching { components[kClass]?.get(id) }.getOrNull()
     fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false
 
     inline fun <reified T : MobzyComponent> get(id: Int): T? = getComponentFor(T::class, id) as? T
@@ -51,10 +52,6 @@ object Engine {
     fun getBitsMatching(vararg components: ComponentClass): BitVector? {
         return components.map { (bitsets[it] ?: return null).copy() }
                 .reduce { a, b -> a.and(b).let { a } }
-    }
-
-    fun getComponentForId(component: ComponentClass, id: Int): MobzyComponent? {
-        return components[component]?.get(id)
     }
 
     //TODO might be a smarter way of storing these as an implicit list within a larger list of entities eventually
@@ -72,7 +69,7 @@ object Engine {
     //TODO support component families with infix functions
     inline fun runFor(vararg components: KClass<out MobzyComponent>, run: (List<MobzyComponent>) -> Unit) {
         getBitsMatching(*components)?.forEachBit { index ->
-            components.map { getComponentForId(it, index) ?: return@forEachBit }.apply(run)
+            components.map { getComponentFor(it, index) ?: return@forEachBit }.apply(run)
         }
     }
 
@@ -80,7 +77,7 @@ object Engine {
     inline fun <reified T : MobzyComponent> runFor(run: (T) -> Unit) {
         val tClass = T::class
         getBitsMatching(tClass)?.forEachBit { index ->
-            (getComponentForId(tClass, index) as? T)?.apply(run)
+            (getComponentFor(tClass, index) as? T)?.apply(run)
         }
     }
 
@@ -88,7 +85,7 @@ object Engine {
         val tClass = T::class
         val t2Class = T2::class
         getBitsMatching(tClass, t2Class)?.forEachBit { index ->
-            run(getComponentForId(tClass, index) as T, getComponentForId(t2Class, index) as T2)
+            run(getComponentFor(tClass, index) as T, getComponentFor(t2Class, index) as T2)
         }
     }
 }

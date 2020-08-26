@@ -1,19 +1,29 @@
-package com.mineinabyss.mobzy.pathfinders
+package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
-import com.mineinabyss.mobzy.ecs.components.minecraft.attributes
-import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.components.attributes
+import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
+@Serializable
+@SerialName("mobzy:target.attacker")
+class TargetAttacker(
+        private val range: Double? = null
+) : PathfinderComponent {
+    override fun build(mob: Mob) = TargetAttackerGoal(mob, range ?: mob.attributes?.followRange ?: 0.0)
+}
+
 class TargetAttackerGoal(
-        override val mob: CustomMob,
-        private val range: Double = mob.attributes?.followRange ?: 0.0
-) : MobzyPathfinderGoal() {
-    init {
-        setType(Type.TARGET)
-    }
+        override val mob: Mob,
+        private val range: Double
+) : MobzyPathfinderGoal(type = Type.TARGET) {
     private lateinit var playerDamager: Player
+
     override fun shouldExecute(): Boolean {
         val damager = (nmsEntity.lastDamager ?: return false).toBukkit()
         if (damager !is Player) return false

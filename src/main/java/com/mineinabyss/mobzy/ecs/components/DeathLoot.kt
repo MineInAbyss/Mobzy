@@ -1,8 +1,6 @@
-package com.mineinabyss.mobzy.ecs.components.minecraft
+package com.mineinabyss.mobzy.ecs.components
 
 import com.mineinabyss.geary.ecs.MobzyComponent
-import com.mineinabyss.mobzy.ecs.components.MobDrop
-import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.mobs.CustomMob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -4,7 +4,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.nms.typeinjection.*
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobAttributes
+import com.mineinabyss.mobzy.ecs.components.MobAttributes
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
@@ -42,6 +42,7 @@ object MobzyTypeRegistry {
 
             val modifiers: Field = Field::class.java.getDeclaredField("modifiers")
             modifiers.isAccessible = true
+            //NOTE: removing final modifier doesn't work beyond Java 11
             modifiers.setInt(mapField, mapField.modifiers and Modifier.FINAL.inv())
 
             @Suppress("UNCHECKED_CAST")

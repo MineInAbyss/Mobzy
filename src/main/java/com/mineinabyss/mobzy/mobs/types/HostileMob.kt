@@ -5,9 +5,8 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
-import com.mineinabyss.mobzy.pathfinders.hostile.MeleeAttackGoal
+import com.mineinabyss.mobzy.ecs.goals.minecraft.MeleeAttackBehavior
 import net.minecraft.server.v1_16_R2.*
-import org.bukkit.entity.Creature
 
 
 /**
@@ -16,7 +15,7 @@ import org.bukkit.entity.Creature
 @GenerateFromBase(base = MobBase::class, createFor = [EntityMonster::class])
 open class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMonster(world, type) {
     override fun createPathfinders() {
-        addPathfinderGoal(2, MeleeAttackGoal(entity as Creature, attackSpeed = 1.0, seeThroughWalls = false))
+        addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false).build(entity))
         addPathfinderGoal(3, PathfinderGoalFloat(this))
         addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
         addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 8.0f))

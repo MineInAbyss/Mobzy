@@ -4,8 +4,10 @@ import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.ecs.components.minecraft.deathLoot
-import com.mineinabyss.mobzy.ecs.components.minecraft.expToDrop
+import com.mineinabyss.mobzy.ecs.components.Sounds
+import com.mineinabyss.mobzy.ecs.components.deathLoot
+import com.mineinabyss.mobzy.ecs.components.expToDrop
+import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
@@ -19,7 +21,7 @@ import org.bukkit.entity.Mob
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override val entity: Mob get() = super.entity
     final override val mobzyId: Int = Engine.getNextId()
-    final override val type: MobType = MobTypes[this as CustomMob]
+    final override val type: MobType = MobTypes[this]
 
     //implementation of properties from CustomMob
     final override var dead: Boolean
@@ -44,10 +46,10 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
     override fun getExpValue(entityhuman: EntityHuman): Int = deathLoot?.expToDrop() ?: this.expToDrop
 
-    override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
-    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
-    override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
-    override fun playBlockStepSound() = makeSound(soundStep)
+    override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(get<Sounds>()?.ambient) }
+    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { get<Sounds>()?.hurt }
+    override fun getSoundDeath(): SoundEffect? = null.also { get<Sounds>()?.death }
+    override fun playBlockStepSound() = makeSound(get<Sounds>()?.step)
 }
 
 fun CustomMob.die(damageSource: DamageSource?) {

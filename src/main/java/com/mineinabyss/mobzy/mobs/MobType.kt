@@ -9,7 +9,6 @@ import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import net.minecraft.server.v1_16_R2.EnumCreatureType
 import kotlin.reflect.KClass
 
@@ -23,18 +22,14 @@ data class MobType(
         @SerialName("name") private val _name: String? = null,
         @SerialName("staticComponents") private val _staticComponents: MutableSet<MobzyComponent> = mutableSetOf(),
         @SerialName("components") private val _components: Set<CopyableComponent> = setOf(),
-        val pathfinders: Map<Int, PathfinderComponent>? = null) {
+        val goals: Map<Double, PathfinderComponent>? = null) {
     init {
-        if (pathfinders != null) _staticComponents += Pathfinders(pathfinders)
+        if (goals != null) _staticComponents += Pathfinders(goals) //TODO GOAP
     }
 
     val name by lazy { _name ?: MobTypes.getNameForTemplate(this) }
-
-    @Transient
-    val components: Map<KClass<out CopyableComponent>, CopyableComponent> = _components.associateBy { it::class }
-
-    @Transient
-    val staticComponents: Map<KClass<out MobzyComponent>, MobzyComponent> = _staticComponents.associateBy { it::class }
+    val components: Map<KClass<out CopyableComponent>, CopyableComponent> by lazy { _components.associateBy { it::class } }
+    val staticComponents: Map<KClass<out MobzyComponent>, MobzyComponent> by lazy { _staticComponents.associateBy { it::class } }
     val nmsType: NMSEntityType<*> by lazy { MobzyTypeRegistry[name] }
 
     inline fun <reified T : MobzyComponent> get(): T? = staticComponents[T::class] as? T

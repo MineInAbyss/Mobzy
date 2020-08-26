@@ -8,17 +8,16 @@ import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
-import com.mineinabyss.mobzy.ecs.components.Model
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
-import com.mineinabyss.mobzy.ecs.components.model
+import com.mineinabyss.mobzy.ecs.components.*
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
-import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
+import org.bukkit.Material
 import org.bukkit.Statistic
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -26,6 +25,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.world.ChunkLoadEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
@@ -73,14 +73,39 @@ object MobListener : Listener {
 
     @EventHandler
     fun addModelOnEntityCreate(e: EntityCreatedEvent) {
-        val model = Engine.get<Model>(e.id) ?: return
         val entity = Engine.get<MobComponent>(e.id)?.mob ?: return
+
+        Engine.get<IncreasedWaterSpeed>(e.id)?.let { (level) ->
+            entity.equipment?.apply {
+                boots = ItemStack(Material.STONE).editItemMeta {
+                    isUnbreakable = true
+                    addEnchant(Enchantment.DEPTH_STRIDER, level, true)
+                }
+            }
+        }
+        Engine.get<Equipment>(e.id)?.let { equipment ->
+            entity.equipment?.apply {
+                equipment.helmet?.toItemStack()?.let { helmet = it }
+                equipment.chestplate?.toItemStack()?.let { chestplate = it }
+                equipment.leggings?.toItemStack()?.let { leggings = it }
+                equipment.boots?.toItemStack()?.let { boots = it }
+            }
+        }
+
+        val model = Engine.get<Model>(e.id) ?: return
 
         if (model.small) (entity as? Ageable)?.setBaby()
 
         //create an item based on model ID in head slot if entity will be using itself for the model
         entity.equipment?.helmet = model.modelItemStack
         entity.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
+    }
+
+    @EventHandler
+    fun rideOnRightClick(event: EntityRightClickEvent) {
+        val (player, mob) = event
+        if (mob.has<Rideable>())
+            mob.addPassenger(player)
     }
 
     /**
@@ -119,13 +144,13 @@ object MobListener : Listener {
         if (e.leftClicked || e.rightClicked) {
             val trace = player.world.rayTrace(player.eyeLocation, player.location.direction, 3.0, FluidCollisionMode.ALWAYS, true, 0.0) { entity: Entity -> entity != player }
             if (trace != null && trace.hitEntity != null) {
-                val hit = trace.hitEntity!!.toNMS()
-                if (hit !is CustomMob) return
+                val hit = trace.hitEntity!!
+                if (hit !is Mob) return
                 if (e.leftClicked) {
                     e.isCancelled = true
-                    player.toNMS().attack(hit)
+                    player.toNMS().attack(hit.toNMS())
                 } else {
-                    EntityRightClickEvent(hit).callEvent()
+                    EntityRightClickEvent(player, hit).callEvent()
                 }
             }
         }

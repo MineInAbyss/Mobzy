@@ -3,8 +3,8 @@ package com.mineinabyss.mobzy.ecs.systems
 import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.Model
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import net.minecraft.server.v1_16_R2.EnumItemSlot
 import net.minecraft.server.v1_16_R2.Vec3D
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack

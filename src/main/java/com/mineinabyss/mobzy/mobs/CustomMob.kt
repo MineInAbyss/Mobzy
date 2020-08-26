@@ -4,8 +4,8 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.addComponent
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import net.minecraft.server.v1_16_R2.ChatMessage
 import net.minecraft.server.v1_16_R2.EntityHuman
 import net.minecraft.server.v1_16_R2.EntityInsentient
@@ -31,9 +31,6 @@ interface CustomMob {
 
     val type: MobType
 
-    val locX get() = entity.location.x
-    val locY get() = entity.location.y
-    val locZ get() = entity.location.z
     val killer: EntityHuman? get() = nmsEntity.killer
 
     val scoreboardDisplayNameMZ: ChatMessage get() = ChatMessage(type.name.split('_').joinToString(" ") { it.capitalize() })
@@ -45,10 +42,6 @@ interface CustomMob {
         }
 
     // ========== Things to be implemented ==========
-    val soundAmbient: String? get() = null
-    val soundHurt: String? get() = null
-    val soundDeath: String? get() = null
-    val soundStep: String? get() = null
     var dead: Boolean
     val killScore: Int
 
