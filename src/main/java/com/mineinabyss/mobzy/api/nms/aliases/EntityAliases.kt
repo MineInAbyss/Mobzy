@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.api.nms.aliases
 
-import net.minecraft.server.v1_16_R1.*
+import net.minecraft.server.v1_16_R2.*
 
 
 typealias NMSEntityLiving = EntityLiving

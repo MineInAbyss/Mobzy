@@ -9,28 +9,30 @@ import com.mineinabyss.mobzy.ecs.components.minecraft.expToDrop
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
-import net.minecraft.server.v1_16_R1.*
+import net.minecraft.server.v1_16_R2.*
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_16_R1.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_16_R2.event.CraftEventFactory
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.HumanEntity
+import org.bukkit.entity.Mob
 
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
-    override val mobzyId: Int = Engine.getNextId()
-    override val type: MobType = MobTypes[this as CustomMob]
+    final override val entity: Mob get() = super.entity
+    final override val mobzyId: Int = Engine.getNextId()
+    final override val type: MobType = MobTypes[this as CustomMob]
 
     //implementation of properties from CustomMob
-    override var dead: Boolean
+    final override var dead: Boolean
         get() = killed
         set(value) {
             killed = value
         }
-    override val nmsEntity: EntityInsentient get() = this
+    final override val nmsEntity: EntityInsentient get() = this
 
-    override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime
-    override val killScore: Int = aV
+    final override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime
+    final override val killScore: Int = 0 //TODO was aV, update
 
-    override fun dropExp() = dropExperience()
+    final override fun dropExp() = dropExperience()
 
     //overriding NMS methods
     override fun initPathfinder() = createPathfinders()
@@ -45,7 +47,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
     override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
-    override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
+    override fun playBlockStepSound() = makeSound(soundStep)
 }
 
 fun CustomMob.die(damageSource: DamageSource?) {

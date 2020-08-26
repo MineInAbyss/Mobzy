@@ -1,14 +1,14 @@
 package com.mineinabyss.mobzy.ecs.components.minecraft
 
+import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributes
 import com.mineinabyss.mobzy.api.nms.typeinjection.set
-import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.mobs.CustomMob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R1.GenericAttributes
+import net.minecraft.server.v1_16_R2.GenericAttributes
 
 @Serializable
 @SerialName("mobzy:attributes")

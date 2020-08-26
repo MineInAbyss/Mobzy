@@ -3,11 +3,9 @@
  */
 package com.mineinabyss.mobzy.api.pathfindergoals
 
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import net.minecraft.server.v1_16_R1.NavigationAbstract
+import net.minecraft.server.v1_16_R2.NavigationAbstract
 import org.bukkit.entity.Entity
-import org.bukkit.entity.Mob
 
 /** Whether the entity has finished navigating to its destination */
 val NavigationAbstract.doneNavigating get() = m()

@@ -7,11 +7,10 @@ import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.ItemThrowing
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
-import net.minecraft.server.v1_16_R1.EntityProjectileThrowable
-import net.minecraft.server.v1_16_R1.EntitySnowball
+import net.minecraft.server.v1_16_R2.EntitySnowball
 import org.bukkit.Sound
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_16_R2.CraftWorld
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 import org.bukkit.entity.LivingEntity
 import kotlin.math.min
 import kotlin.random.Random

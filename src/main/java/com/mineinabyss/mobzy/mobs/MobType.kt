@@ -10,7 +10,7 @@ import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import net.minecraft.server.v1_16_R1.EnumCreatureType
+import net.minecraft.server.v1_16_R2.EnumCreatureType
 import kotlin.reflect.KClass
 
 /**

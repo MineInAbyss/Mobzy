@@ -3,10 +3,7 @@ package com.mineinabyss.mobzy
 import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.mobs.CustomMob
-import net.minecraft.server.v1_16_R1.EntityLiving
 import org.bukkit.Chunk
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity
-import org.bukkit.entity.Entity
 
 fun <T> T.debugVal(message: String = ""): T = debug("$message $this").let { this }
 

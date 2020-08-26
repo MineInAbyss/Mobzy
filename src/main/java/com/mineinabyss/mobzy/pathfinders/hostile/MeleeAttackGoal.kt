@@ -2,9 +2,9 @@ package com.mineinabyss.mobzy.pathfinders.hostile
 
 import com.mineinabyss.mobzy.api.helpers.entity.reachDistance
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import net.minecraft.server.v1_16_R1.EntityCreature
-import net.minecraft.server.v1_16_R1.EntityLiving
-import net.minecraft.server.v1_16_R1.PathfinderGoalMeleeAttack
+import net.minecraft.server.v1_16_R2.EntityCreature
+import net.minecraft.server.v1_16_R2.EntityLiving
+import net.minecraft.server.v1_16_R2.PathfinderGoalMeleeAttack
 import org.bukkit.entity.Creature
 
 class MeleeAttackGoal(

@@ -4,13 +4,13 @@ import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
-import net.minecraft.server.v1_16_R1.*
+import net.minecraft.server.v1_16_R2.*
 
 /**
  * Originally based off EntityPig
  */
 @GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
-class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
+open class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
     override fun createPathfinders() {
         addPathfinderGoal(1, PathfinderGoalFloat(this))
         addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
@@ -20,7 +20,7 @@ class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(wo
         addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 6.0f))
     }
 
-    override fun createChild(entityageable: EntityAgeable): EntityAgeable? = null
+    override fun createChild(p0: WorldServer?, p1: EntityAgeable?): EntityAgeable? = null
 
     init {
         initMob()

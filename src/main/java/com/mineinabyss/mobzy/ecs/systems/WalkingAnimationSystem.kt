@@ -5,9 +5,9 @@ import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.Model
 import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
-import net.minecraft.server.v1_16_R1.EnumItemSlot
-import net.minecraft.server.v1_16_R1.Vec3D
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack
+import net.minecraft.server.v1_16_R2.EnumItemSlot
+import net.minecraft.server.v1_16_R2.Vec3D
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 
 object WalkingAnimationSystem : TickingSystem(interval = 10) {
     override fun tick() = Engine.runFor<Model, MobComponent> { model, (mob) ->
@@ -23,5 +23,7 @@ object WalkingAnimationSystem : TickingSystem(interval = 10) {
         }
     }
 
-    private val Vec3D.lengthSqr get() = x * x + y * y + z * z
 }
+
+//TODO move
+val Vec3D.lengthSqr get() = x * x + y * y + z * z

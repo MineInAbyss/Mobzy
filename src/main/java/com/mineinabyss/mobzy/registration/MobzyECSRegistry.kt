@@ -1,17 +1,17 @@
 package com.mineinabyss.mobzy.registration
 
+import com.mineinabyss.geary.ecs.Engine
+import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
-import com.mineinabyss.mobzy.ecs.pathfinders.TemptBehavior
-import com.mineinabyss.mobzy.ecs.components.*
+import com.mineinabyss.mobzy.ecs.components.Model
+import com.mineinabyss.mobzy.ecs.components.Pathfinders
 import com.mineinabyss.mobzy.ecs.components.minecraft.DeathLoot
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import com.mineinabyss.mobzy.ecs.components.minecraft.MobAttributes
+import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
-import com.mineinabyss.geary.ecs.Engine
-import com.mineinabyss.geary.ecs.MobzyComponent
-import com.mineinabyss.geary.ecs.CopyableComponent
+import com.mineinabyss.mobzy.ecs.pathfinders.TemptBehavior
 import com.mineinabyss.mobzy.ecs.systems.TemptSystem
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import kotlinx.serialization.ImplicitReflectionSerializer
@@ -25,7 +25,7 @@ internal object MobzyECSRegistry : Listener {
         val mob = Engine.get<MobComponent>(event.id)?.mob ?: return
         val pathfinders = Engine.get<Pathfinders>(event.id)?.pathfinders ?: return
         pathfinders.forEach { (priority, component) ->
-            mob.toNMS().addPathfinderGoal(priority, component.createPathfinder(mob))
+            mob.toNMS().addPathfinderGoal(priority, component.build(mob))
             Engine.addComponent(event.id, component)
         }
     }
@@ -52,10 +52,6 @@ internal object MobzyECSRegistry : Listener {
                 subclass<Model>()
                 subclass<TemptBehavior>()
                 subclass<Pathfinders>()
-            }
-            polymorphic<CopyableComponent> {
-            }
-            polymorphic<PathfinderComponent> {
             }
         })
     }

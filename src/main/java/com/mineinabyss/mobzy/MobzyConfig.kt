@@ -18,11 +18,10 @@ import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.okkero.skedule.schedule
-import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R1.EntityLiving
-import net.minecraft.server.v1_16_R1.EnumCreatureType
-import net.minecraft.server.v1_16_R1.NBTTagCompound
+import net.minecraft.server.v1_16_R2.EntityLiving
+import net.minecraft.server.v1_16_R2.EnumCreatureType
+import net.minecraft.server.v1_16_R2.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 

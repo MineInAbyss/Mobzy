@@ -8,11 +8,14 @@ import com.mineinabyss.mobzy.ecs.components.minecraft.MobAttributes
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
+import com.mineinabyss.mobzy.mobs.types.NPC
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
-import net.minecraft.server.v1_16_R1.*
+import net.minecraft.server.v1_16_R2.AttributeDefaults
+import net.minecraft.server.v1_16_R2.AttributeProvider
+import net.minecraft.server.v1_16_R2.Entity
+import net.minecraft.server.v1_16_R2.EntityTypes
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import kotlin.reflect.KClass
 
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobType]
@@ -77,7 +80,8 @@ object MobzyTypeRegistry {
     private val mobBaseClasses = mutableMapOf<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>(
             "mobzy:flying" to ::FlyingMob, //TODO use proper keys
             "mobzy:hostile" to ::HostileMob,
-            "mobzy:passive" to ::PassiveMob
+            "mobzy:passive" to ::PassiveMob,
+            "mobzy:npc" to ::NPC
     )
 
     fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {

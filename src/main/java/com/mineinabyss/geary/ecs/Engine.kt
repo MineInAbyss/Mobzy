@@ -1,15 +1,16 @@
 package com.mineinabyss.geary.ecs
 
 import com.mineinabyss.geary.ecs.systems.TickingSystem
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import com.mineinabyss.mobzy.mobzy
 import net.onedaybeard.bitvector.BitVector
 import net.onedaybeard.bitvector.bitsOf
 import org.bukkit.Bukkit
 import org.clapper.util.misc.SparseArrayList
+import java.util.*
 import kotlin.reflect.KClass
 
 typealias ComponentClass = KClass<out MobzyComponent>
+
 object Engine {
     init {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(mobzy, {
@@ -19,7 +20,11 @@ object Engine {
 
     private var currId = 0
 
-    fun getNextId() = ++currId
+    //TODO there's likely a more performant option
+    private val removedEntities = Stack<Int>()
+
+    @Synchronized
+    fun getNextId(): Int = if (removedEntities.isNotEmpty()) removedEntities.pop() ?: ++currId else ++currId
 
     //TODO use archetypes instead
     //TODO system for reusing deleted entities
@@ -52,12 +57,23 @@ object Engine {
         return components[component]?.get(id)
     }
 
+    //TODO might be a smarter way of storing these as an implicit list within a larger list of entities eventually
+    fun removeEntity(id: Int) {
+        bitsets.mapNotNull { (kclass, bitset) ->
+            if (bitset[id]) {
+                bitset[id] = false
+                components[kclass]
+            } else
+                null
+        }.forEach { it[id] = null }
+        removedEntities.push(id)
+    }
+
     //TODO support component families with infix functions
     inline fun runFor(vararg components: KClass<out MobzyComponent>, run: (List<MobzyComponent>) -> Unit) {
         getBitsMatching(*components)?.forEachBit { index ->
             components.map { getComponentForId(it, index) ?: return@forEachBit }.apply(run)
         }
-        0b1 and 0b1
     }
 
     //TODO clean up and expand for more parameters

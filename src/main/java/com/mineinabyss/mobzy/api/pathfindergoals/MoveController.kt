@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.api.pathfindergoals
 
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import net.minecraft.server.v1_16_R1.ControllerMove
+import net.minecraft.server.v1_16_R2.ControllerMove
 import org.bukkit.entity.Mob
 
 abstract class MoveController(mob: Mob) : ControllerMove(mob.toNMS<NMSEntityInsentient>()) {

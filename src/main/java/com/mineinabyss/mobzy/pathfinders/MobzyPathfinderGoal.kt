@@ -1,14 +1,16 @@
 package com.mineinabyss.mobzy.pathfinders
 
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.api.nms.aliases.NMSPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.PathfinderGoal
 import com.mineinabyss.mobzy.ecs.components.minecraft.attributes
 import com.mineinabyss.mobzy.mobs.CustomMob
-import net.minecraft.server.v1_16_R1.ControllerMove
-import net.minecraft.server.v1_16_R1.EntityInsentient
+import net.minecraft.server.v1_16_R2.ControllerMove
+import net.minecraft.server.v1_16_R2.EntityInsentient
 import org.bukkit.GameMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import java.util.*
 
 abstract class MobzyPathfinderGoal(private val cooldown: Long = 500) : PathfinderGoal() {
     abstract val mob: CustomMob
@@ -44,3 +46,4 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500) : Pathfinde
                     player.gameMode != GameMode.CREATIVE &&
                     mob.entity.distanceSqrTo(player) < range
 }
+fun NMSPathfinderGoal.setType(type: net.minecraft.server.v1_16_R2.PathfinderGoal.Type) = a(EnumSet.of(type))

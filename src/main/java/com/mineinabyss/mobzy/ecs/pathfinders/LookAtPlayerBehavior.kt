@@ -12,5 +12,5 @@ data class LookAtPlayerBehavior(
         val radius: Float,
         val startChance: Float = 0.02f
 ) : PathfinderComponent {
-    override fun createPathfinder(mob: Mob) = LookAtPlayerGoal(mob, radius, startChance)
+    override fun build(mob: Mob) = LookAtPlayerGoal(mob, radius, startChance)
 }

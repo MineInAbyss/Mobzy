@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.api.pathfindergoals
 
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
-import net.minecraft.server.v1_16_R1.PathfinderGoal
-import net.minecraft.server.v1_16_R1.PathfinderGoalTarget
+import net.minecraft.server.v1_16_R2.PathfinderGoal
+import net.minecraft.server.v1_16_R2.PathfinderGoalTarget
 
 
 fun NMSEntityInsentient.addPathfinderGoal(priority: Int, goal: PathfinderGoal) = goalSelector.a(priority, goal)

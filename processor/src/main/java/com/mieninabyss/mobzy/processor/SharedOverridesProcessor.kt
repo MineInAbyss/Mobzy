@@ -5,8 +5,8 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.classinspector.elements.ElementsClassInspector
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.specs.toTypeSpec
-import net.minecraft.server.v1_16_R1.EntityTypes
-import net.minecraft.server.v1_16_R1.World
+import net.minecraft.server.v1_16_R2.EntityTypes
+import net.minecraft.server.v1_16_R2.World
 import java.io.File
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion

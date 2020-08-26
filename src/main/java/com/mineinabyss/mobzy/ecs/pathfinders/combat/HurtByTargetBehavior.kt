@@ -10,6 +10,6 @@ import org.bukkit.entity.Mob
 @Serializable
 @SerialName("minecraft:behavior.hurt_by_target")
 class HurtByTargetBehavior : PathfinderComponent {
-    override fun createPathfinder(mob: Mob) =
+    override fun build(mob: Mob) =
             HurtByTargetGoal(mob as? Creature ?: error("Mob bust be a creature"))
 }

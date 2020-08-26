@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.listener
 
+import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.items.editItemMeta
@@ -12,17 +13,13 @@ import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import com.mineinabyss.mobzy.ecs.components.model
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Statistic
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Mob
-import org.bukkit.entity.NPC
+import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
@@ -78,6 +75,8 @@ object MobListener : Listener {
     fun addModelOnEntityCreate(e: EntityCreatedEvent) {
         val model = Engine.get<Model>(e.id) ?: return
         val entity = Engine.get<MobComponent>(e.id)?.mob ?: return
+
+        if (model.small) (entity as? Ageable)?.setBaby()
 
         //create an item based on model ID in head slot if entity will be using itself for the model
         entity.equipment?.helmet = model.modelItemStack

@@ -10,6 +10,9 @@ class TargetAttackerGoal(
         override val mob: CustomMob,
         private val range: Double = mob.attributes?.followRange ?: 0.0
 ) : MobzyPathfinderGoal() {
+    init {
+        setType(Type.TARGET)
+    }
     private lateinit var playerDamager: Player
     override fun shouldExecute(): Boolean {
         val damager = (nmsEntity.lastDamager ?: return false).toBukkit()

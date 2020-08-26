@@ -6,10 +6,9 @@ import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.addComponent
 import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
-import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
-import net.minecraft.server.v1_16_R1.ChatMessage
-import net.minecraft.server.v1_16_R1.EntityHuman
-import net.minecraft.server.v1_16_R1.EntityInsentient
+import net.minecraft.server.v1_16_R2.ChatMessage
+import net.minecraft.server.v1_16_R2.EntityHuman
+import net.minecraft.server.v1_16_R2.EntityInsentient
 import org.bukkit.SoundCategory
 import kotlin.random.Random
 

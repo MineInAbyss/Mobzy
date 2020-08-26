@@ -18,7 +18,7 @@ object MobzyPacketInterception {
                 PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
             override fun onPacketSending(event: PacketEvent) {
                 if (Bukkit.getEntity(event.packet.uuiDs.read(0))?.isCustomMob == true)
-                    event.packet.integers.write(1, 101)
+                    event.packet.integers.write(1, 102)
             }
         })
 
