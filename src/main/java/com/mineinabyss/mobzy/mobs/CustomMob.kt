@@ -5,7 +5,9 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.MobComponent
+import com.mineinabyss.mobzy.ecs.components.Model
 import com.mineinabyss.mobzy.ecs.components.addComponent
+import com.mineinabyss.mobzy.ecs.components.get
 import net.minecraft.server.v1_16_R2.ChatMessage
 import net.minecraft.server.v1_16_R2.EntityHuman
 import net.minecraft.server.v1_16_R2.EntityInsentient
@@ -67,6 +69,7 @@ interface CustomMob {
         type.components.forEach { (_, component) ->
             addComponent(component.copy())
         }
+        if (get<Model>()?.small == true) entity.toNMS().isBaby = true
     }
 
     @Suppress("UNREACHABLE_CODE")

@@ -4,6 +4,7 @@ import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
+import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.ecs.components.*
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
@@ -26,8 +27,13 @@ internal object MobzyECSRegistry : Listener {
     @EventHandler
     fun attachPathfindersOnEntityCreatedEvent(event: EntityCreatedEvent) {
         val mob = Engine.get<MobComponent>(event.id)?.mob ?: return
-        val pathfinders = Engine.get<Pathfinders>(event.id)?.pathfinders ?: return
-        pathfinders.forEach { (priority, component) ->
+        val (targets, goals) = Engine.get<Pathfinders>(event.id) ?: return
+
+        targets?.forEach { (priority, component) ->
+            mob.toNMS().addTargetSelector(priority.toInt(), component.build(mob))
+            Engine.addComponent(event.id, component)
+        }
+        goals?.forEach { (priority, component) ->
             mob.toNMS().addPathfinderGoal(priority.toInt(), component.build(mob))
             Engine.addComponent(event.id, component)
         }

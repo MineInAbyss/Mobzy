@@ -1,14 +1,13 @@
 package com.mineinabyss.mobzy.api.pathfindergoals
 
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
-import net.minecraft.server.v1_16_R2.PathfinderGoal
-import net.minecraft.server.v1_16_R2.PathfinderGoalTarget
+import com.mineinabyss.mobzy.api.nms.aliases.NMSPathfinderGoal
 
 
-fun NMSEntityInsentient.addPathfinderGoal(priority: Int, goal: PathfinderGoal) = goalSelector.a(priority, goal)
+fun NMSEntityInsentient.addPathfinderGoal(priority: Int, goal: NMSPathfinderGoal) = goalSelector.a(priority, goal)
 
-fun NMSEntityInsentient.removePathfinderGoal(goal: PathfinderGoal) = goalSelector.a(goal)
+fun NMSEntityInsentient.removePathfinderGoal(goal: NMSPathfinderGoal) = goalSelector.a(goal)
 
-fun NMSEntityInsentient.addTargetSelector(priority: Int, goal: PathfinderGoalTarget) = targetSelector.a(priority, goal)
+fun NMSEntityInsentient.addTargetSelector(priority: Int, goal: NMSPathfinderGoal) = targetSelector.a(priority, goal)
 
-fun NMSEntityInsentient.removeTargetSelector(goal: PathfinderGoalTarget) = targetSelector.a(goal)
+fun NMSEntityInsentient.removeTargetSelector(goal: NMSPathfinderGoal) = targetSelector.a(goal)

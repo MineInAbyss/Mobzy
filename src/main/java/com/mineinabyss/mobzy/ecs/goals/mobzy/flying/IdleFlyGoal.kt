@@ -1,15 +1,16 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
-import com.mineinabyss.mobzy.api.helpers.entity.lookAt
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.pathfindergoals.moveTo
 import com.mineinabyss.mobzy.component1
 import com.mineinabyss.mobzy.component2
 import com.mineinabyss.mobzy.component3
 import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.systems.lengthSqr
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.ControllerMove
 import org.bukkit.Location
 import org.bukkit.entity.Mob
 import kotlin.random.Random
@@ -29,13 +30,13 @@ open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 1
     override fun shouldKeepExecuting(): Boolean {
         val targetLoc = targetLoc ?: return false
         val dist = mob.distanceSqrTo(targetLoc)
-        return mob.target == null && dist in 1.0..2000.0
+        return mob.target == null && dist in 1.0..2000.0 && !mob.isStuck
     }
 
     override fun init() {
         val (x, y, z) = mob.location
         val dx = x + Random.nextInt(-16, 16)
-        val dy = y + Random.nextInt(-16, 12) //make it more likely to fly down
+        val dy = y + Random.nextInt(-16, 8) //make it more likely to fly down
         val dz = z + Random.nextInt(-16, 16)
         val loc = Location(mob.world, dx, dy, dz)
         if (!loc.block.isPassable) return
@@ -45,11 +46,10 @@ open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 1
 
     override fun executeWhenCooledDown() {
         restartCooldown()
-        val targetLoc = targetLoc ?: return
-        mob.lookAt(targetLoc)
-        moveController.moveTo(targetLoc.x, targetLoc.y, targetLoc.z, 1.0)
+        val (x, y, z) = targetLoc ?: return
+//        mob.lookAt(x, y, z)
+        moveController.moveTo(x, y, z, 1.0)
     }
 }
 
-//TODO move
-fun ControllerMove.moveTo(x: Double, y: Double, z: Double, speed: Double) = a(x, y, z, speed)
+val Mob.isStuck get() = toNMS().mot.lengthSqr < 0.0001

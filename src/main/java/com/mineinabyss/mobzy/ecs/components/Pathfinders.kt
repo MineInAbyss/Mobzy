@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("mobzy:pathfinders")
 data class Pathfinders(
-        val pathfinders: Map<Double, PathfinderComponent> = mapOf()
+        val targets: Map<Double, PathfinderComponent>? = null,
+        val goals: Map<Double, PathfinderComponent>? = null
 ): MobzyComponent

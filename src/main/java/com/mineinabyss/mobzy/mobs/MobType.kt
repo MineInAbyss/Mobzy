@@ -22,9 +22,11 @@ data class MobType(
         @SerialName("name") private val _name: String? = null,
         @SerialName("staticComponents") private val _staticComponents: MutableSet<MobzyComponent> = mutableSetOf(),
         @SerialName("components") private val _components: Set<CopyableComponent> = setOf(),
+        val targets: Map<Double, PathfinderComponent>? = null,
         val goals: Map<Double, PathfinderComponent>? = null) {
     init {
-        if (goals != null) _staticComponents += Pathfinders(goals) //TODO GOAP
+        if (targets != null || goals != null)
+            _staticComponents += Pathfinders(targets, goals) //TODO GOAP
     }
 
     val name by lazy { _name ?: MobTypes.getNameForTemplate(this) }

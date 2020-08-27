@@ -18,7 +18,10 @@ import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
 import org.bukkit.Statistic
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.*
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
+import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
@@ -93,8 +96,6 @@ object MobListener : Listener {
         }
 
         val model = Engine.get<Model>(e.id) ?: return
-
-        if (model.small) (entity as? Ageable)?.setBaby()
 
         //create an item based on model ID in head slot if entity will be using itself for the model
         entity.equipment?.helmet = model.modelItemStack

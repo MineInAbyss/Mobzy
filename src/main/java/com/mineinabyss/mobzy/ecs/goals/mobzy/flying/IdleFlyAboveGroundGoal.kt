@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 
+import com.mineinabyss.mobzy.api.pathfindergoals.moveTo
 import com.mineinabyss.mobzy.component1
 import com.mineinabyss.mobzy.component2
 import com.mineinabyss.mobzy.component3
@@ -31,7 +32,7 @@ class IdleFlyAboveGroundGoal(
     override fun init() {
         val (x, y, z) = mob.location
         val dx = x + Random.nextDouble(-radius, radius)
-        val dy = y + Random.nextDouble(-radius / 4, radius) //make it more likely to fly down
+        val dy = y + Random.nextDouble(-radius, radius / 2) //make it more likely to fly down
         val dz = z + Random.nextDouble(-radius, radius)
         val loc = Location(mob.world, dx, dy, dz)
         if (!loc.clone().add(0.0, -maxHeight, 0.0).block.type.isSolid) {
@@ -40,7 +41,7 @@ class IdleFlyAboveGroundGoal(
         }
         if (y > 16) { //keep mobs from going down and killing themselves
             targetLoc = loc
-            moveController.a(x, y, z, 1.0) //TODO make a wrapper for the controller and figure out the difference between it and navigation
+            moveController.moveTo(x, y, z, 1.0) //TODO make a wrapper for the controller and figure out the difference between it and navigation
         }
     }
 }

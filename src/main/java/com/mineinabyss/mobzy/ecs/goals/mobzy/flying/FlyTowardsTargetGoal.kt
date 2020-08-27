@@ -1,6 +1,10 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 
 import com.mineinabyss.mobzy.api.helpers.entity.lookAt
+import com.mineinabyss.mobzy.api.pathfindergoals.moveTo
+import com.mineinabyss.mobzy.component1
+import com.mineinabyss.mobzy.component2
+import com.mineinabyss.mobzy.component3
 import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
@@ -13,20 +17,22 @@ class FlyTowardsTargetBehavior : PathfinderComponent {
     override fun build(mob: Mob) = FlyTowardsTargetGoal(mob)
 }
 
-class FlyTowardsTargetGoal(override val mob: Mob) : MobzyPathfinderGoal() {
+class FlyTowardsTargetGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 10, type = Type.MOVE) {
     override fun shouldExecute(): Boolean = (mob.target != null)
 
-    override fun shouldKeepExecuting(): Boolean = mob.target != null
+    override fun shouldKeepExecuting(): Boolean = shouldExecute()
 
-    override fun execute() {
+    override fun executeWhenCooledDown() {
+        restartCooldown()
         val target = mob.target ?: return
         mob.lookAt(target)
 
-        val targetLoc = target.location
-        moveController.a(targetLoc.x, targetLoc.y, targetLoc.z, 1.0) //TODO change to wrapper
+        val (x, y, z) = target.eyeLocation
 
         //aim slightly higher when below target to fix getting stuck
-        if (targetLoc.y > mob.location.y)
-            moveController.a(targetLoc.x, mob.location.y + 1, targetLoc.z, 1.0)
+        if (y > mob.location.y)
+            moveController.moveTo(x, mob.location.y + 1, z, 1.0)
+        else
+            moveController.moveTo(x, y, z, 1.0)
     }
 }

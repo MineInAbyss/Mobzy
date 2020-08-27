@@ -21,7 +21,7 @@ import org.bukkit.entity.Mob
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override val entity: Mob get() = super.entity
     final override val mobzyId: Int = Engine.getNextId()
-    final override val type: MobType = MobTypes[this]
+    final override val type: MobType = MobTypes[this as CustomMob]
 
     //implementation of properties from CustomMob
     final override var dead: Boolean

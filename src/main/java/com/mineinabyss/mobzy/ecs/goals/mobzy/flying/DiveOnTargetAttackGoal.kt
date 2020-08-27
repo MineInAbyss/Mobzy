@@ -46,7 +46,7 @@ class DiveOnTargetAttackGoal(
         private val startDiveHeightRange: Double = 2.0,
         private val bashVelMultiplier: Double = 0.6,
         private val bashDuration: Double = 30.0
-) : MobzyPathfinderGoal() {
+) : MobzyPathfinderGoal(type = Type.MOVE) {
     private var currentAction = Action.FLY
     private var diveHeight: Double = pickDiveHeight()
     private var bashLeft = bashDuration

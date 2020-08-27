@@ -12,7 +12,7 @@ import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 object WalkingAnimationSystem : TickingSystem(interval = 10) {
     override fun tick() = Engine.runFor<Model, MobComponent> { model, (mob) ->
         val headItem = mob.toNMS().getEquipment(EnumItemSlot.HEAD)
-        val meta = CraftItemStack.getItemMeta(headItem)
+        val meta = CraftItemStack.getItemMeta(headItem) ?: return@runFor
         val modelId = meta.customModelData
         if (modelId != model.hitId) {
             if (mob.toNMS().mot.lengthSqr > 0.007) {
