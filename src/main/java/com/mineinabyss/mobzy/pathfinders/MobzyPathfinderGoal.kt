@@ -55,7 +55,7 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, type: Type?
                     !player.isDead &&
                     player.gameMode != GameMode.SPECTATOR &&
                     player.gameMode != GameMode.CREATIVE &&
-                    mob.distanceSqrTo(player) < range
+                    mob.distanceSqrTo(player) < range * range
 }
 
 fun NMSPathfinderGoal.setType(type: net.minecraft.server.v1_16_R2.PathfinderGoal.Type) = a(EnumSet.of(type))

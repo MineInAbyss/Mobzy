@@ -12,6 +12,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Mob
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.random.Random
 
 @Serializable
@@ -76,7 +77,7 @@ class DiveOnTargetAttackGoal(
         //if arrived to dive
         //TODO dont make so many location instances
         val diveTarget = target.location.add(0.0, diveHeight, 0.0)
-        if (diveTarget.distance(target.location) < startDiveDistance && abs(mob.location.y - diveTarget.y) < startDiveHeightRange) {
+        if (mob.distanceSqrTo(diveTarget) < startDiveDistance.pow(2) && abs(mob.location.y - diveTarget.y) < startDiveHeightRange) {
             diveHeight = pickDiveHeight()
             currentAction = Action.DIVE
             return
