@@ -15,7 +15,7 @@ data class Model(
         val material: Material = Material.DIAMOND_SWORD,
         val walkIdOffset: Int? = 1,
         val hitIdOffset: Int? = 2,
-        val isAdult: Boolean = true
+        val small: Boolean = false
 ) : MobzyComponent {
     val walkId = walkIdOffset?.plus(id)
     val hitId = hitIdOffset?.plus(id)

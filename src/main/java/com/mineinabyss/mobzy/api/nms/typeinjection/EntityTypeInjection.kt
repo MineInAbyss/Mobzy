@@ -8,9 +8,9 @@ import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
-import net.minecraft.server.v1_16_R1.*
+import net.minecraft.server.v1_16_R2.*
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_16_R2.CraftWorld
 import org.bukkit.event.entity.CreatureSpawnEvent
 
 typealias NMSRegistry<T> = IRegistry<T>

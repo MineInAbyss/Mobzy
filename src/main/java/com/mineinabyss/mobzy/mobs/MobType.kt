@@ -10,9 +10,8 @@ import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.builtins.SetSerializer
-import net.minecraft.server.v1_16_R1.EnumCreatureType
+import net.minecraft.server.v1_16_R2.EnumCreatureType
 import kotlin.reflect.KClass
 
 /**
@@ -25,9 +24,11 @@ data class MobType(
         @SerialName("name") private val _name: String? = null,
         @SerialName("staticComponents") private val _staticComponents: MutableSet<MobzyComponent> = mutableSetOf(),
         @SerialName("components") private val _components: Set<MobzyComponent> = setOf(),
-        val pathfinders: Map<Int, PathfinderComponent>? = null) {
+        val targets: Map<Double, PathfinderComponent>? = null,
+        val goals: Map<Double, PathfinderComponent>? = null) {
     init {
-        if (pathfinders != null) _staticComponents += Pathfinders(pathfinders)
+        if (targets != null || goals != null)
+            _staticComponents += Pathfinders(targets, goals) //TODO GOAP
     }
 
     val name by lazy { _name ?: MobTypes.getNameForTemplate(this) }

@@ -3,7 +3,10 @@ package com.mineinabyss.mobzy.api.nms.typeinjection
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mojang.datafixers.DataFixer
-import net.minecraft.server.v1_16_R1.*
+import net.minecraft.server.v1_16_R2.DataConverterRegistry
+import net.minecraft.server.v1_16_R2.Entity
+import net.minecraft.server.v1_16_R2.EntityTypes
+import net.minecraft.server.v1_16_R2.EnumCreatureType
 
 fun <T : NMSEntity> EntityTypes.Builder<T>.build(name: String): NMSEntityType<T> = a(name)
 

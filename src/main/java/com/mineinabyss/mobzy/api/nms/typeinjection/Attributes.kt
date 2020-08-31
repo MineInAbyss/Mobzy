@@ -2,8 +2,8 @@ package com.mineinabyss.mobzy.api.nms.typeinjection
 
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityLiving
-import net.minecraft.server.v1_16_R1.AttributeBase
-import net.minecraft.server.v1_16_R1.AttributeProvider
+import net.minecraft.server.v1_16_R2.AttributeBase
+import net.minecraft.server.v1_16_R2.AttributeProvider
 
 typealias NMSAttributeProvider = AttributeProvider
 typealias NMSAttributeBuilder = AttributeProvider.Builder

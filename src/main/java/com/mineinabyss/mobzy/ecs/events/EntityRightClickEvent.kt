@@ -1,12 +1,14 @@
 package com.mineinabyss.mobzy.ecs.events
 
-import com.mineinabyss.mobzy.mobs.CustomMob
+import org.bukkit.entity.Mob
+import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 data class EntityRightClickEvent(
-        val mob: CustomMob
-): Event() {
+        val player: Player,
+        val mob: Mob
+) : Event() {
     override fun getHandlers() = handlerList
 
     companion object {

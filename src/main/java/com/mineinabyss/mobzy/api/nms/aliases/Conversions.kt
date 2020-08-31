@@ -1,10 +1,13 @@
 package com.mineinabyss.mobzy.api.nms.aliases
 
-import net.minecraft.server.v1_16_R1.Entity
-import net.minecraft.server.v1_16_R1.World
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_16_R1.entity.*
-import org.bukkit.entity.*
+import net.minecraft.server.v1_16_R2.Entity
+import net.minecraft.server.v1_16_R2.World
+import org.bukkit.craftbukkit.v1_16_R2.CraftWorld
+import org.bukkit.craftbukkit.v1_16_R2.entity.*
+import org.bukkit.entity.Creature
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
+import org.bukkit.entity.Player
 
 typealias BukkitWorld = org.bukkit.World
 typealias NMSWorld = World
