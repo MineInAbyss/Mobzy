@@ -5,6 +5,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import net.minecraft.server.v1_16_R2.EntityAgeable
 import net.minecraft.server.v1_16_R2.EntityAnimal
+import net.minecraft.server.v1_16_R2.WorldServer
 
 /**
  * Originally based off EntityPig

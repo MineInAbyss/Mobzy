@@ -2,8 +2,8 @@ package com.mineinabyss.mobzy.ai
 
 import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.Model
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
 import org.bukkit.entity.Entity
 import kotlin.reflect.KProperty
 
@@ -51,7 +51,7 @@ fun postconditions(init: PostConditionBuilder.() -> Unit){
 @Suppress("UNREACHABLE_CODE")
 fun createConditionTest(){
     conditions {
-        Model::isAdult setTo true
+        Model::small setTo true
         Model::id < 0
         Model::id setTo 0
         from<Model> {
@@ -64,7 +64,7 @@ fun createConditionTest(){
             val target: Entity = TODO()
             mob.distanceSqrTo(target)
         }
-        Model::isAdult becomes true
+        Model::small becomes true
 
     }
 }

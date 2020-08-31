@@ -34,11 +34,8 @@ data class MobType(
     val name by lazy { _name ?: MobTypes.getNameForTemplate(this) }
 
     //TODO this is the safest and cleanest way to deepcopy. Check how this performs vs deepcopy's reflection method.
-    @Transient
-    val components: String = MobTypeConfigs.yamlFormat.encodeToString(componentSerializer, _components)
-
-    @Transient
-    val staticComponents: Map<KClass<out MobzyComponent>, MobzyComponent> = _staticComponents.associateBy { it::class }
+    val components: String by lazy { MobTypeConfigs.yamlFormat.encodeToString(componentSerializer, _components) }
+    val staticComponents: Map<KClass<out MobzyComponent>, MobzyComponent> by lazy { _staticComponents.associateBy { it::class } }
     val nmsType: NMSEntityType<*> by lazy { MobzyTypeRegistry[name] }
 
     inline fun <reified T : MobzyComponent> get(): T? = staticComponents[T::class] as? T

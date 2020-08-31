@@ -6,15 +6,10 @@ import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
+import com.mineinabyss.mobzy.ecs.components.*
 import com.mineinabyss.mobzy.ecs.components.Model
 import com.mineinabyss.mobzy.ecs.components.Pathfinders
-import com.mineinabyss.mobzy.ecs.components.minecraft.DeathLoot
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobAttributes
-import com.mineinabyss.mobzy.ecs.components.minecraft.MobComponent
-import com.mineinabyss.mobzy.ecs.components.*
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
-import com.mineinabyss.mobzy.ecs.pathfinders.TemptBehavior
-import com.mineinabyss.mobzy.ecs.systems.TemptSystem
 import com.mineinabyss.mobzy.ecs.goals.minecraft.AvoidPlayerBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LeapAtTargetBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.MeleeAttackBehavior
@@ -60,36 +55,35 @@ internal object MobzyECSRegistry : Listener {
     private fun registerComponentSerialization() {
         //TODO annotate serializable components to register this automatically
         MobTypeConfigs.addSerializerModule(SerializersModule {
-            polymorphic<MobzyComponent> {
-                subclass<Model>()
-                subclass<Pathfinders>()
-                subclass<Equipment>()
-                subclass<IncreasedWaterSpeed>()
-                subclass<Sounds>()
+            polymorphic(MobzyComponent::class) {
+                subclass(Model::class, Model.serializer())
+                subclass(Pathfinders::class, Pathfinders.serializer())
+                subclass(Equipment::class, Equipment.serializer())
+                subclass(IncreasedWaterSpeed::class, IncreasedWaterSpeed.serializer())
+                subclass(Sounds::class, Sounds.serializer())
 
-                subclass<MobAttributes>()
-                subclass<DeathLoot>()
-                subclass<Rideable>()
+                subclass(MobAttributes::class, MobAttributes.serializer())
+                subclass(DeathLoot::class, DeathLoot.serializer())
+                subclass(Rideable::class, Rideable.serializer())
             }
-            polymorphic<PathfinderComponent> {
-                subclass<TemptBehavior>()
-                subclass<AvoidPlayerBehavior>()
-                subclass<LeapAtTargetBehavior>()
-                subclass<MeleeAttackBehavior>()
+            polymorphic(PathfinderComponent::class) {
+                subclass(TemptBehavior::class, TemptBehavior.serializer())
+                subclass(AvoidPlayerBehavior::class, AvoidPlayerBehavior.serializer())
+                subclass(LeapAtTargetBehavior::class, LeapAtTargetBehavior.serializer())
+                subclass(MeleeAttackBehavior::class, MeleeAttackBehavior.serializer())
 
-                subclass<TargetAttacker>()
-                subclass<ThrowItemsBehavior>()
+                subclass(TargetAttacker::class, TargetAttacker.serializer())
+                subclass(ThrowItemsBehavior::class, ThrowItemsBehavior.serializer())
 
-                subclass<DiveOnTargetBehavior>()
-                subclass<FlyDamageTargetBehavior>()
-                subclass<FlyTowardsTargetBehavior>()
-                subclass<IdleFlyAboveGroundBehavior>()
-                subclass<IdleFlyBehavior>()
+                subclass(DiveOnTargetBehavior::class, DiveOnTargetBehavior.serializer())
+                subclass(FlyDamageTargetBehavior::class, FlyDamageTargetBehavior.serializer())
+                subclass(FlyTowardsTargetBehavior::class, FlyTowardsTargetBehavior.serializer())
+                subclass(IdleFlyAboveGroundBehavior::class, IdleFlyAboveGroundBehavior.serializer())
+                subclass(IdleFlyBehavior::class, IdleFlyBehavior.serializer())
 
-                //TODO move into TargetComponent
-                subclass<TargetNearbyPlayer>()
-                subclass<TargetDamager>()
-                subclass<TargetAttacker>()
+                subclass(TargetNearbyPlayer::class, TargetNearbyPlayer.serializer())
+                subclass(TargetDamager::class, TargetDamager.serializer())
+                subclass(TargetAttacker::class, TargetAttacker.serializer())
             }
         })
     }
