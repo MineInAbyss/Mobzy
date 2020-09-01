@@ -8,7 +8,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlin.kapt'
-    id 'io.github.0ffz.github-packages' version '1.0.3'
+    id 'io.github.0ffz.github-packages' version '1.0.5'
 }
 
 allprojects {
@@ -47,7 +47,7 @@ dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:$server_version"
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
 
-    compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
+    compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version-5"
     implementation "com.derongan.minecraft:guiy:0.1.0-alpha.7"
     implementation "com.mineinabyss:idofront:0.3.+"
     implementation "com.mineinabyss:idofront-annotation:0.3.+"
@@ -77,6 +77,12 @@ shadowJar {
     relocate 'com.derongan.minecraft.guiy', "${project.group}.${project.name}.guiy".toLowerCase()
     relocate 'com.mineinabyss.idofront', "${project.group}.${project.name}.idofront".toLowerCase()
 
+    dependencies {
+        exclude(dependency('org.jetbrains.kotlin:kotlin-stdlib:.*'))
+        exclude(dependency('org.jetbrains.kotlin:kotlin-stdlib-jdk7:.*'))
+        exclude(dependency('org.jetbrains.kotlin:kotlin-stdlib-jdk8:.*'))
+    }
+
     minimize {
         exclude(dependency('de.erethon:headlib:3.0.2'))
         exclude(dependency('com.github.WesJD.AnvilGUI:anvilgui:5e3ab1f721'))
@@ -100,7 +106,7 @@ if (project.hasProperty("plugin_path") && plugin_path) {
 
 publishing {
     repositories {
-        maven githubPackage.invoke("MineInAbyss/Mobzy")
+        maven githubPackagePublish.invoke("MineInAbyss/Mobzy")
     }
     publications {
         gpr(MavenPublication) {
