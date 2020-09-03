@@ -1,14 +1,14 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
+import com.mineinabyss.idofront.destructure.component1
+import com.mineinabyss.idofront.destructure.component2
+import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
-import com.mineinabyss.mobzy.component1
-import com.mineinabyss.mobzy.component2
-import com.mineinabyss.mobzy.component3
 import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName

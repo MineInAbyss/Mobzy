@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -104,16 +105,28 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
             }
             "debug" {
-                command("spawnregion")?.playerAction {
+                "components"{
+                    val type by stringArg()
+                    action {
+                        Engine.bitsets.forEach { (t, u) ->
+                            if(t.simpleName == type) {
+                                var sum = 0
+                                u.forEachBit { sum++ }
+                                sender.info("$sum entities with that component")
+                            }
+                        }
+                    }
+                }
+                "spawnregion"()?.playerAction {
                     player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
                 }
-                command("snapshot")?.playerAction {
+                "snapshot"()?.playerAction {
                     val snapshot = player.location.chunk.chunkSnapshot
                     val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }
                     val z = (player.location.blockZ % 16).let { if (it < 0) it + 16 else it }
                     player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
                 }
-                command("nearbyuuid")?.playerAction {
+                "nearbyuuid"()?.playerAction {
                     player.info(player.getNearbyEntities(5.0, 5.0, 5.0).first().uniqueId.toString())
                 }
             }

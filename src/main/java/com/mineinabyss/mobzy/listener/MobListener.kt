@@ -1,8 +1,10 @@
 package com.mineinabyss.mobzy.listener
 
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
+import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
@@ -11,7 +13,6 @@ import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.*
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
-import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
 import org.bukkit.Bukkit
@@ -130,6 +131,13 @@ object MobListener : Listener {
         }
     }
 
+    @EventHandler
+    fun onEntityRemove(e: EntityRemoveFromWorldEvent){
+        e.entity.toMobzy()?.let {
+            Engine.removeEntity(it.mobzyId)
+        }
+    }
+
     /*@EventHandler
     fun onDamage(e: EntityDamageEvent){
         if(e.entity.isCustomMob && e.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK)
@@ -152,7 +160,7 @@ object MobListener : Listener {
                     e.isCancelled = true
                     player.toNMS().attack(hit.toNMS())
                 } else {
-                    EntityRightClickEvent(player, hit).callEvent()
+                    EntityRightClickEvent(player, hit).call()
                 }
             }
         }

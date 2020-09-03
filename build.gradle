@@ -46,12 +46,13 @@ java {
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:$server_version"
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version-5"
     implementation "com.derongan.minecraft:guiy:0.1.0-alpha.7"
-    implementation "com.mineinabyss:idofront:0.3.+"
-    implementation "com.mineinabyss:idofront-annotation:0.3.+"
-    kapt "com.mineinabyss:idofront-processor:0.3.+"
+    implementation "com.mineinabyss:idofront:0.3.24"
+    compileOnly "com.mineinabyss:idofront-annotation:0.3.24"
+    kapt "com.mineinabyss:idofront-processor:0.3.24"
 
     compileOnly "de.erethon:headlib:3.0.2"
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"
@@ -76,12 +77,6 @@ shadowJar {
 
     relocate 'com.derongan.minecraft.guiy', "${project.group}.${project.name}.guiy".toLowerCase()
     relocate 'com.mineinabyss.idofront', "${project.group}.${project.name}.idofront".toLowerCase()
-
-    dependencies {
-        exclude(dependency('org.jetbrains.kotlin:kotlin-stdlib:.*'))
-        exclude(dependency('org.jetbrains.kotlin:kotlin-stdlib-jdk7:.*'))
-        exclude(dependency('org.jetbrains.kotlin:kotlin-stdlib-jdk8:.*'))
-    }
 
     minimize {
         exclude(dependency('de.erethon:headlib:3.0.2'))

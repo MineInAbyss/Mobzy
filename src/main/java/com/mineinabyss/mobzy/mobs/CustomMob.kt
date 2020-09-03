@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.mobs
 
+import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
@@ -8,6 +9,7 @@ import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.Model
 import com.mineinabyss.mobzy.ecs.components.addComponent
 import com.mineinabyss.mobzy.ecs.components.get
+import com.mineinabyss.mobzy.ecs.events.EntityLoadedEvent
 import net.minecraft.server.v1_16_R2.ChatMessage
 import net.minecraft.server.v1_16_R2.EntityHuman
 import net.minecraft.server.v1_16_R2.EntityInsentient
@@ -64,6 +66,7 @@ interface CustomMob {
 
         addComponent(MobComponent(entity))
         type.instantiateComponents().forEach { addComponent(it) }
+        EntityLoadedEvent(mobzyId).call()
 
         if (get<Model>()?.small == true) entity.toNMS().isBaby = true
     }

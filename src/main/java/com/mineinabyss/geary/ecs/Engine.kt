@@ -37,7 +37,7 @@ object Engine {
 
     //TODO get a more memory efficient list, right now this is literally just an ArrayList that auto expands
     private val components = mutableMapOf<ComponentClass, SparseArrayList<MobzyComponent>>()
-    private val bitsets = mutableMapOf<ComponentClass, BitVector>()
+    internal val bitsets = mutableMapOf<ComponentClass, BitVector>()
 
     fun getComponentFor(kClass: ComponentClass, id: Int) = runCatching { components[kClass]?.get(id) }.getOrNull()
     fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false

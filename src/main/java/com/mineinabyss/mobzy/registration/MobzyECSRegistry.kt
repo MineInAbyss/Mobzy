@@ -9,7 +9,7 @@ import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.ecs.components.*
 import com.mineinabyss.mobzy.ecs.components.Model
 import com.mineinabyss.mobzy.ecs.components.Pathfinders
-import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
+import com.mineinabyss.mobzy.ecs.events.EntityLoadedEvent
 import com.mineinabyss.mobzy.ecs.goals.minecraft.AvoidPlayerBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LeapAtTargetBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.MeleeAttackBehavior
@@ -27,7 +27,7 @@ import org.bukkit.event.Listener
 
 internal object MobzyECSRegistry : Listener {
     @EventHandler
-    fun attachPathfindersOnEntityCreatedEvent(event: EntityCreatedEvent) {
+    fun attachPathfindersOnEntityLoadedEvent(event: EntityLoadedEvent) {
         val mob = Engine.get<MobComponent>(event.id)?.mob ?: return
         val (targets, goals) = Engine.get<Pathfinders>(event.id) ?: return
 

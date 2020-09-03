@@ -4,8 +4,6 @@ import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.mobs.CustomMob
 import org.bukkit.Chunk
-import org.bukkit.Location
-import org.bukkit.util.Vector
 
 fun <T> T.debugVal(message: String = ""): T = debug("$message $this").let { this }
 
@@ -23,12 +21,3 @@ val List<Chunk>.customMobs get() = flatMap { it.customMobs }
 
 /** A list of all the [CustomMob]s in this chunk. */
 val Chunk.customMobs get() = entities.filter { it.isCustomMob }
-
-//TODO move into idofront
-operator fun Location.component1(): Double = x
-operator fun Location.component2(): Double = y
-operator fun Location.component3(): Double = z
-
-operator fun Vector.component1(): Double = x
-operator fun Vector.component2(): Double = y
-operator fun Vector.component3(): Double = z

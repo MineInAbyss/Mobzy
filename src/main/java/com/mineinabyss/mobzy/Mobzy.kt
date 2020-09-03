@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
+import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyECSRegistry
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
@@ -35,8 +36,10 @@ class Mobzy : JavaPlugin() {
         SpawnTask.startTask()
 
         //Register events
-        server.pluginManager.registerEvents(MobListener, this)
-        server.pluginManager.registerEvents(MobzyECSRegistry, this)
+        registerEvents(
+                MobListener,
+                MobzyECSRegistry
+        )
 
         //Register commands
         MobzyCommands
