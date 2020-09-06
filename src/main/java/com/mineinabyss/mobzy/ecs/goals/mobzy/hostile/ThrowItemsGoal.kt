@@ -9,7 +9,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
-import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

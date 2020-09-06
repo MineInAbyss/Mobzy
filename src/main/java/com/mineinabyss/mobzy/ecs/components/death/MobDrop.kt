@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.ecs.components
+package com.mineinabyss.mobzy.ecs.components.death
 
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.recpies.addCookingRecipes

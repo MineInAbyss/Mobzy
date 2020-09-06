@@ -6,7 +6,7 @@ import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.helpers.entity.lookAt
 import com.mineinabyss.mobzy.api.helpers.entity.lookAtPitchLock
-import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

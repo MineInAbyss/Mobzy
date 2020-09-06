@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.ai
 import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.ecs.components.MobComponent
-import com.mineinabyss.mobzy.ecs.components.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import org.bukkit.entity.Entity
 import kotlin.reflect.KProperty
 

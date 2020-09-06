@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.ecs.components
+package com.mineinabyss.mobzy.ecs.components.ambient
 
 import com.mineinabyss.geary.ecs.MobzyComponent
 import kotlinx.serialization.SerialName

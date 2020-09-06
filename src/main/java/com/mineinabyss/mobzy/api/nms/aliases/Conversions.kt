@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.mineinabyss.mobzy.api.nms.aliases
 
 import net.minecraft.server.v1_16_R2.Entity
@@ -12,8 +14,8 @@ import org.bukkit.entity.Player
 typealias BukkitWorld = org.bukkit.World
 typealias NMSWorld = World
 
-fun BukkitWorld.toNMS(): NMSWorld = (this as CraftWorld).handle
-fun NMSWorld.toBukkit(): BukkitWorld = this.world
+inline fun BukkitWorld.toNMS(): NMSWorld = (this as CraftWorld).handle
+inline fun NMSWorld.toBukkit(): BukkitWorld = this.world
 
 
 typealias BukkitEntity = org.bukkit.entity.Entity
@@ -21,19 +23,19 @@ typealias NMSEntity = Entity
 
 //common conversions
 /** Converts a Bukkit entity to an NMS entity */
-fun BukkitEntity.toNMS(): NMSEntity = (this as CraftEntity).handle
-fun LivingEntity.toNMS(): NMSEntityLiving = (this as CraftLivingEntity).handle
-fun Mob.toNMS(): NMSEntityInsentient = (this as CraftMob).handle
-fun Creature.toNMS(): NMSEntityCreature = (this as CraftCreature).handle
-fun Player.toNMS(): NMSPlayer = (this as CraftPlayer).handle
+inline fun BukkitEntity.toNMS(): NMSEntity = (this as CraftEntity).handle
+inline fun LivingEntity.toNMS(): NMSEntityLiving = (this as CraftLivingEntity).handle
+inline fun Mob.toNMS(): NMSEntityInsentient = (this as CraftMob).handle
+inline fun Creature.toNMS(): NMSEntityCreature = (this as CraftCreature).handle
+inline fun Player.toNMS(): NMSPlayer = (this as CraftPlayer).handle
 
-fun NMSEntity.toBukkit() = bukkitEntity as BukkitEntity
-fun NMSEntityLiving.toBukkit() = bukkitEntity as LivingEntity
-fun NMSEntityInsentient.toBukkit() = bukkitEntity as Mob
-fun NMSEntityCreature.toBukkit() = bukkitEntity as Creature
-fun NMSPlayer.toBukkit() = bukkitEntity as Player
+inline fun NMSEntity.toBukkit() = bukkitEntity as BukkitEntity
+inline fun NMSEntityLiving.toBukkit() = bukkitEntity as LivingEntity
+inline fun NMSEntityInsentient.toBukkit() = bukkitEntity as Mob
+inline fun NMSEntityCreature.toBukkit() = bukkitEntity as Creature
+inline fun NMSPlayer.toBukkit() = bukkitEntity as Player
 
 /** Converts to an NMS entity casted to a specified type */
 @Suppress("UNCHECKED_CAST")
 @JvmName("toNMSWithCast")
-fun <T : NMSEntity> org.bukkit.entity.Entity.toNMS(): T = (this as CraftEntity).handle as T
+inline fun <T : NMSEntity> org.bukkit.entity.Entity.toNMS(): T = (this as CraftEntity).handle as T

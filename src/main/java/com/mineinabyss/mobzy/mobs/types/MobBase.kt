@@ -4,9 +4,9 @@ import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.ecs.components.Sounds
-import com.mineinabyss.mobzy.ecs.components.deathLoot
-import com.mineinabyss.mobzy.ecs.components.expToDrop
+import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
+import com.mineinabyss.mobzy.ecs.components.death.deathLoot
+import com.mineinabyss.mobzy.ecs.components.death.expToDrop
 import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType

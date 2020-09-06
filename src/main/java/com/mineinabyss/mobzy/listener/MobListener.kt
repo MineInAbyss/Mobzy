@@ -10,7 +10,13 @@ import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
-import com.mineinabyss.mobzy.ecs.components.*
+import com.mineinabyss.mobzy.ecs.components.MobComponent
+import com.mineinabyss.mobzy.ecs.components.has
+import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
+import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
+import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.model
+import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
 import com.mineinabyss.mobzy.mobzy

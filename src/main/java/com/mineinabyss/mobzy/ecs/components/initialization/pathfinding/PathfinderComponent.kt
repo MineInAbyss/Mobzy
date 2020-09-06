@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.ecs.components
+package com.mineinabyss.mobzy.ecs.components.initialization.pathfinding
 
 import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.api.nms.aliases.NMSPathfinderGoal

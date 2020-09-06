@@ -1,6 +1,7 @@
-package com.mineinabyss.mobzy.ecs.components
+package com.mineinabyss.mobzy.ecs.components.death
 
 import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.mobs.CustomMob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

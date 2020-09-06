@@ -3,8 +3,8 @@ package com.mineinabyss.mobzy.mobs
 import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs
-import com.mineinabyss.mobzy.ecs.components.PathfinderComponent
-import com.mineinabyss.mobzy.ecs.components.Pathfinders
+import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import kotlinx.serialization.PolymorphicSerializer

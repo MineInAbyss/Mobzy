@@ -4,7 +4,7 @@ import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.nms.aliases.NMSPathfinderGoal
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.PathfinderGoal
-import com.mineinabyss.mobzy.ecs.components.attributes
+import com.mineinabyss.mobzy.ecs.components.initialization.attributes
 import net.minecraft.server.v1_16_R2.ControllerMove
 import net.minecraft.server.v1_16_R2.EntityInsentient
 import org.bukkit.GameMode
