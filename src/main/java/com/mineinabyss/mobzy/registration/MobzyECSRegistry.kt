@@ -29,6 +29,7 @@ import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetNearbyPla
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -63,34 +64,34 @@ internal object MobzyECSRegistry : Listener {
         //TODO annotate serializable components to register this automatically
         MobTypeConfigs.addSerializerModule(SerializersModule {
             polymorphic(MobzyComponent::class) {
-                subclass(Model::class, Model.serializer())
-                subclass(Pathfinders::class, Pathfinders.serializer())
-                subclass(Equipment::class, Equipment.serializer())
-                subclass(IncreasedWaterSpeed::class, IncreasedWaterSpeed.serializer())
-                subclass(Sounds::class, Sounds.serializer())
+                subclass(Model.serializer())
+                subclass(Pathfinders.serializer())
+                subclass(Equipment.serializer())
+                subclass(IncreasedWaterSpeed.serializer())
+                subclass(Sounds.serializer())
 
-                subclass(MobAttributes::class, MobAttributes.serializer())
-                subclass(DeathLoot::class, DeathLoot.serializer())
-                subclass(Rideable::class, Rideable.serializer())
+                subclass(MobAttributes.serializer())
+                subclass(DeathLoot.serializer())
+                subclass(Rideable.serializer())
             }
             polymorphic(PathfinderComponent::class) {
-                subclass(TemptBehavior::class, TemptBehavior.serializer())
-                subclass(AvoidPlayerBehavior::class, AvoidPlayerBehavior.serializer())
-                subclass(LeapAtTargetBehavior::class, LeapAtTargetBehavior.serializer())
-                subclass(MeleeAttackBehavior::class, MeleeAttackBehavior.serializer())
+                subclass(TemptBehavior.serializer())
+                subclass(AvoidPlayerBehavior.serializer())
+                subclass(LeapAtTargetBehavior.serializer())
+                subclass(MeleeAttackBehavior.serializer())
 
-                subclass(TargetAttacker::class, TargetAttacker.serializer())
-                subclass(ThrowItemsBehavior::class, ThrowItemsBehavior.serializer())
+                subclass(TargetAttacker.serializer())
+                subclass(ThrowItemsBehavior.serializer())
 
-                subclass(DiveOnTargetBehavior::class, DiveOnTargetBehavior.serializer())
-                subclass(FlyDamageTargetBehavior::class, FlyDamageTargetBehavior.serializer())
-                subclass(FlyTowardsTargetBehavior::class, FlyTowardsTargetBehavior.serializer())
-                subclass(IdleFlyAboveGroundBehavior::class, IdleFlyAboveGroundBehavior.serializer())
-                subclass(IdleFlyBehavior::class, IdleFlyBehavior.serializer())
+                subclass(DiveOnTargetBehavior.serializer())
+                subclass(FlyDamageTargetBehavior.serializer())
+                subclass(FlyTowardsTargetBehavior.serializer())
+                subclass(IdleFlyAboveGroundBehavior.serializer())
+                subclass(IdleFlyBehavior.serializer())
 
-                subclass(TargetNearbyPlayer::class, TargetNearbyPlayer.serializer())
-                subclass(TargetDamager::class, TargetDamager.serializer())
-                subclass(TargetAttacker::class, TargetAttacker.serializer())
+                subclass(TargetNearbyPlayer.serializer())
+                subclass(TargetDamager.serializer())
+                subclass(TargetAttacker.serializer())
             }
         })
     }
