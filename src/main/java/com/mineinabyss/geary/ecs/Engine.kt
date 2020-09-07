@@ -50,10 +50,14 @@ object Engine {
     inline fun <reified T : MobzyComponent> get(id: Int): T? = getComponentFor(T::class, id) as? T
     inline fun <reified T : MobzyComponent> has(id: Int) = hasComponentFor(T::class, id)
 
-    fun addComponent(id: Int, component: MobzyComponent) {
+    fun <T: MobzyComponent> addComponent(id: Int, component: T): T {
         components.getOrPut(component::class, { SparseArrayList() })[id] = component
         bitsets.getOrPut(component::class, { bitsOf() }).set(id)
+        return component
     }
+
+    inline fun <reified T: MobzyComponent> getOrDefault(id: Int, component: () -> T): T =
+            get<T>(id) ?: addComponent(id, component())
 
     fun getBitsMatching(vararg components: ComponentClass, andNot: Array<out ComponentClass> = emptyArray()): BitVector? {
         val allowed = components.map { (bitsets[it] ?: return null).copy() }

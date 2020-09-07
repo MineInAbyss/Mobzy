@@ -1,13 +1,13 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.geary.ecs.Engine
+import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.deathLoot
 import com.mineinabyss.mobzy.ecs.components.death.expToDrop
-import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
@@ -20,7 +20,7 @@ import org.bukkit.entity.Mob
 
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override val entity: Mob get() = super.entity
-    final override val mobzyId: Int = Engine.getNextId()
+    final override val gearyId: Int = Engine.getNextId()
     final override val type: MobType = MobTypes[this as CustomMob]
 
     //implementation of properties from CustomMob

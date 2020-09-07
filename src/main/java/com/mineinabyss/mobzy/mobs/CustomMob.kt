@@ -1,15 +1,16 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.Engine
+import com.mineinabyss.geary.ecs.GearyEntity
+import com.mineinabyss.geary.ecs.components.addComponent
+import com.mineinabyss.geary.ecs.components.addComponents
+import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.MobComponent
-import com.mineinabyss.mobzy.ecs.components.addComponent
-import com.mineinabyss.mobzy.ecs.components.addComponents
-import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.events.EntityLoadedEvent
 import com.mineinabyss.mobzy.ecs.store.decodeComponents
@@ -27,8 +28,8 @@ import kotlin.random.Random
  * @property type This entity types's [MobType] describing information about entities of this time. It is
  * immutable and not unique to this specific entity.
  */
-interface CustomMob {
-    val mobzyId: Int
+interface CustomMob : GearyEntity {
+    override val gearyId: Int
 
     // ========== Useful properties ===============
     val nmsEntity: EntityInsentient
@@ -57,7 +58,7 @@ interface CustomMob {
     fun lastDamageByPlayerTime(): Int
 
     fun saveMobNBT(nbttagcompound: NMSDataContainer) {
-        entity.persistentDataContainer.encodeComponents(Engine.getComponentsFor(mobzyId).filter { it.persist })
+        entity.persistentDataContainer.encodeComponents(Engine.getComponentsFor(gearyId).filter { it.persist })
     }
 
     fun loadMobNBT(nbttagcompound: NMSDataContainer) {
@@ -78,7 +79,7 @@ interface CustomMob {
         addComponent(MobComponent(entity))
         val existingComponents = entity.persistentDataContainer.decodeComponents()
         addComponents(type.instantiateComponents(existingComponents))
-        EntityLoadedEvent(mobzyId).call()
+        EntityLoadedEvent(gearyId).call()
 
         if (get<Model>()?.small == true) entity.toNMS().isBaby = true
     }
