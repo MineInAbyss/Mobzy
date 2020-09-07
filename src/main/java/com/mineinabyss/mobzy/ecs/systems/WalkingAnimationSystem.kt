@@ -9,7 +9,7 @@ import net.minecraft.server.v1_16_R2.EnumItemSlot
 import net.minecraft.server.v1_16_R2.Vec3D
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 
-object WalkingAnimationSystem : TickingSystem(interval = 1) {
+object WalkingAnimationSystem : TickingSystem(interval = 10) {
     override fun tick() = Engine.runFor<Model, MobComponent> { model, (mob) ->
         val headItem = mob.toNMS().getEquipment(EnumItemSlot.HEAD)
         val meta = CraftItemStack.getItemMeta(headItem) ?: return@runFor

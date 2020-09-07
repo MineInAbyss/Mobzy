@@ -55,9 +55,13 @@ object Engine {
         bitsets.getOrPut(component::class, { bitsOf() }).set(id)
     }
 
-    fun getBitsMatching(vararg components: ComponentClass): BitVector? {
-        return components.map { (bitsets[it] ?: return null).copy() }
+    fun getBitsMatching(vararg components: ComponentClass, andNot: Array<out ComponentClass> = emptyArray()): BitVector? {
+        val allowed = components.map { (bitsets[it] ?: return null).copy() }
                 .reduce { a, b -> a.and(b).let { a } }
+        return if (andNot.isEmpty())
+            allowed
+        else andNot.map { (bitsets[it] ?: return null).copy() }
+                .fold(allowed) { a, b -> a.andNot(b).let { a } }
     }
 
     //TODO might be a smarter way of storing these as an implicit list within a larger list of entities eventually
@@ -73,24 +77,24 @@ object Engine {
     }
 
     //TODO support component families with infix functions
-    inline fun runFor(vararg components: KClass<out MobzyComponent>, run: (List<MobzyComponent>) -> Unit) {
-        getBitsMatching(*components)?.forEachBit { index ->
+    inline fun runFor(vararg components: ComponentClass, andNot: Array<out ComponentClass> = emptyArray(), run: (List<MobzyComponent>) -> Unit) {
+        getBitsMatching(*components, andNot = andNot)?.forEachBit { index ->
             components.map { getComponentFor(it, index) ?: return@forEachBit }.apply(run)
         }
     }
 
     //TODO clean up and expand for more parameters
-    inline fun <reified T : MobzyComponent> runFor(run: (T) -> Unit) {
+    inline fun <reified T : MobzyComponent> runFor(vararg andNot: ComponentClass = emptyArray(), run: (T) -> Unit) {
         val tClass = T::class
-        getBitsMatching(tClass)?.forEachBit { index ->
+        getBitsMatching(tClass, andNot = andNot)?.forEachBit { index ->
             (getComponentFor(tClass, index) as? T)?.apply(run)
         }
     }
 
-    inline fun <reified T : MobzyComponent, reified T2 : MobzyComponent> runFor(run: (T, T2) -> Unit) {
+    inline fun <reified T : MobzyComponent, reified T2 : MobzyComponent> runFor(vararg andNot: ComponentClass = emptyArray(), run: (T, T2) -> Unit) {
         val tClass = T::class
         val t2Class = T2::class
-        getBitsMatching(tClass, t2Class)?.forEachBit { index ->
+        getBitsMatching(tClass, t2Class, andNot = andNot)?.forEachBit { index ->
             run(getComponentFor(tClass, index) as T, getComponentFor(t2Class, index) as T2)
         }
     }
