@@ -10,4 +10,4 @@ class Equipment(
         val chestplate: SerializableItemStack? = null,
         val leggings: SerializableItemStack? = null,
         val boots: SerializableItemStack? = null
-) : MobzyComponent
+) : MobzyComponent()

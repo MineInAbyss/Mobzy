@@ -10,7 +10,7 @@ import kotlinx.serialization.Transient
 data class Goals(
         val actions: Set<Action>,
         val goals: Set<Action>,
-) : MobzyComponent {
+) : MobzyComponent() {
     @Transient
     var executingPlan: Action? = null
 

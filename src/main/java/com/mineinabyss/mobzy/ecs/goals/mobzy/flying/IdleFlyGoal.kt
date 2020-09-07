@@ -17,7 +17,7 @@ import kotlin.random.Random
 
 @Serializable
 @SerialName("mobzy:behavior.idle_fly")
-class IdleFlyBehavior : PathfinderComponent {
+class IdleFlyBehavior : PathfinderComponent() {
     override fun build(mob: Mob) = IdleFlyGoal(mob)
 }
 

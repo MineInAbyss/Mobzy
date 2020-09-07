@@ -33,7 +33,7 @@ class ThrowItemsBehavior(
         val minChaseRad: Double = 0.0,
         val minThrowRad: Double = 7.0,
         val cooldown: Long = 3000L
-) : PathfinderComponent {
+) : PathfinderComponent() {
     @Transient
     val item = _item.toItemStack()
 

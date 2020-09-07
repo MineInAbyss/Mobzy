@@ -16,7 +16,7 @@ class MeleeAttackBehavior(
         private val attackSpeed: Double = 1.0,
         private val seeThroughWalls: Boolean,
         private val range: Double? = null
-) : PathfinderComponent {
+) : PathfinderComponent() {
     override fun build(mob: Mob) = MeleeAttackGoal(mob as Creature)
 
     inner class MeleeAttackGoal(

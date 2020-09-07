@@ -39,6 +39,11 @@ object Engine {
     private val components = mutableMapOf<ComponentClass, SparseArrayList<MobzyComponent>>()
     internal val bitsets = mutableMapOf<ComponentClass, BitVector>()
 
+    fun getComponentsFor(id: Int) = components.mapNotNull { (_, value) -> value[id] }
+    fun addComponentsFor(id: Int, components: Set<MobzyComponent>) = components.forEach {
+        addComponent(id, it)
+    }
+
     fun getComponentFor(kClass: ComponentClass, id: Int) = runCatching { components[kClass]?.get(id) }.getOrNull()
     fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false
 

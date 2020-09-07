@@ -17,7 +17,7 @@ data class Model(
         val walkIdOffset: Int? = 1,
         val hitIdOffset: Int? = 2,
         val small: Boolean = false
-) : MobzyComponent {
+) : MobzyComponent() {
     val walkId = walkIdOffset?.plus(id)
     val hitId = hitIdOffset?.plus(id)
     val modelItemStack

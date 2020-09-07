@@ -6,6 +6,8 @@ import com.mineinabyss.mobzy.MobzyAddon
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
@@ -13,6 +15,14 @@ import kotlinx.serialization.modules.plus
 
 object MobTypeConfigs {
     private var module = EmptySerializersModule
+
+    @ExperimentalSerializationApi
+    val cborFormat by lazy {
+        Cbor {
+            serializersModule = module
+            encodeDefaults = false
+        }
+    }
 
     val format by lazy {
         Json {

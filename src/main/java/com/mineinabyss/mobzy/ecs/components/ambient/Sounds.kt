@@ -11,4 +11,4 @@ class Sounds(
         val death: String? = null,
         val hurt: String? = null,
         val step: String? = null
-) : MobzyComponent
+) : MobzyComponent()

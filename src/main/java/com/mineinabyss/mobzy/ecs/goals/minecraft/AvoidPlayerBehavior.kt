@@ -15,7 +15,7 @@ class AvoidPlayerBehavior(
         val radius: Float = 8f,
         val speed: Double = 1.0,
         val sprintSpeed: Double = 1.0
-) : PathfinderComponent {
+) : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalAvoidTarget(
             (mob as Creature).toNMS(),
             EntityHuman::class.java, //TODO map of strings to NMS classes

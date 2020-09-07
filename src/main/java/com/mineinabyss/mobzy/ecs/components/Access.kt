@@ -7,6 +7,7 @@ import com.mineinabyss.mobzy.mobs.CustomMob
 import org.bukkit.entity.Mob
 
 fun CustomMob.addComponent(component: MobzyComponent) = Engine.addComponent(mobzyId, component)
+fun CustomMob.addComponents(components: Set<MobzyComponent>) = Engine.addComponentsFor(mobzyId, components)
 
 inline fun <reified T : MobzyComponent> CustomMob.get(): T? = Engine.get(mobzyId)
 

@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityTargetEvent
 @SerialName("mobzy:target.attacker")
 class TargetAttacker(
         private val range: Double? = null
-) : PathfinderComponent {
+) : PathfinderComponent() {
     override fun build(mob: Mob) = TargetAttackerGoal(mob, range ?: mob.attributes?.followRange ?: 0.0)
 }
 

@@ -13,7 +13,7 @@ import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("mobzy:behavior.fly_towards_target")
-class FlyTowardsTargetBehavior : PathfinderComponent {
+class FlyTowardsTargetBehavior : PathfinderComponent() {
     override fun build(mob: Mob) = FlyTowardsTargetGoal(mob)
 }
 

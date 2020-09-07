@@ -27,6 +27,7 @@ allprojects {
         maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
         maven { url 'https://papermc.io/repo/repository/maven-public/' }
         maven { url 'http://nexus.okkero.com/repository/maven-releases/' }
+        maven { url 'https://dl.bintray.com/kotlin/kotlinx' }
         maven githubPackage.invoke("MineInAbyss/Idofront")
         maven githubPackage.invoke("MineInAbyss/Guiy")
         maven githubPackage.invoke("MineInAbyss/KotlinSpice")
@@ -49,6 +50,7 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version-5"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.0-RC"
     implementation "com.derongan.minecraft:guiy:0.1.0-alpha.7"
     implementation "com.mineinabyss:idofront:0.3.24"
     compileOnly "com.mineinabyss:idofront-annotation:0.3.24"

@@ -10,6 +10,6 @@ import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("minecraft:target.damager")
-class TargetDamager : PathfinderComponent { //TODO serializable ignore: Set<Class<*>>
+class TargetDamager : PathfinderComponent() { //TODO serializable ignore: Set<Class<*>>
     override fun build(mob: Mob) = PathfinderGoalHurtByTarget((mob as Creature).toNMS())
 }

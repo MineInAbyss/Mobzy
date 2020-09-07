@@ -14,7 +14,7 @@ class DeathLoot(
         val maxExp: Int? = null,
         val deathCommands: List<String> = listOf(),
         val drops: List<MobDrop> = listOf()
-) : MobzyComponent
+) : MobzyComponent()
 
 val CustomMob.deathLoot get() = get<DeathLoot>()
 

@@ -11,6 +11,6 @@ import org.bukkit.entity.Mob
 @SerialName("minecraft:behavior.leap_at_target")
 class LeapAtTargetBehavior(
         val jumpHeight: Float = 0.6f
-): PathfinderComponent {
+): PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalLeapAtTarget(mob.toNMS(), jumpHeight)
 }

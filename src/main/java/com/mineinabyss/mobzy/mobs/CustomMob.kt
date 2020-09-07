@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.mobs
 
+import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
@@ -7,9 +8,12 @@ import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.addComponent
+import com.mineinabyss.mobzy.ecs.components.addComponents
 import com.mineinabyss.mobzy.ecs.components.get
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.events.EntityLoadedEvent
+import com.mineinabyss.mobzy.ecs.store.decodeComponents
+import com.mineinabyss.mobzy.ecs.store.encodeComponents
 import net.minecraft.server.v1_16_R2.ChatMessage
 import net.minecraft.server.v1_16_R2.EntityHuman
 import net.minecraft.server.v1_16_R2.EntityInsentient
@@ -51,8 +55,15 @@ interface CustomMob {
 
     fun createPathfinders()
     fun lastDamageByPlayerTime(): Int
-    fun saveMobNBT(nbttagcompound: NMSDataContainer) = Unit
-    fun loadMobNBT(nbttagcompound: NMSDataContainer) = Unit
+
+    fun saveMobNBT(nbttagcompound: NMSDataContainer) {
+        entity.persistentDataContainer.encodeComponents(Engine.getComponentsFor(mobzyId).filter { it.persist })
+    }
+
+    fun loadMobNBT(nbttagcompound: NMSDataContainer) {
+        addComponents(entity.persistentDataContainer.decodeComponents())
+    }
+
     fun dropExp()
 
     // ========== Pre-written behaviour ============
@@ -65,7 +76,8 @@ interface CustomMob {
         entity.addScoreboardTag(type.name)
 
         addComponent(MobComponent(entity))
-        type.instantiateComponents().forEach { addComponent(it) }
+        val existingComponents = entity.persistentDataContainer.decodeComponents()
+        addComponents(type.instantiateComponents(existingComponents))
         EntityLoadedEvent(mobzyId).call()
 
         if (get<Model>()?.small == true) entity.toNMS().isBaby = true

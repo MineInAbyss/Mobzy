@@ -16,7 +16,7 @@ import kotlin.random.Random
 class IdleFlyAboveGroundBehavior(
         private val maxHeight: Double = 4.0,
         private val radius: Double = 5.0
-) : PathfinderComponent {
+) : PathfinderComponent() {
     override fun build(mob: Mob) = IdleFlyAboveGroundGoal(
             mob,
             maxHeight,

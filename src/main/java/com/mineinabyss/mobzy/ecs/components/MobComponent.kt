@@ -5,4 +5,4 @@ import org.bukkit.entity.Mob
 
 data class MobComponent(
         val mob: Mob
-) : MobzyComponent
+) : MobzyComponent()

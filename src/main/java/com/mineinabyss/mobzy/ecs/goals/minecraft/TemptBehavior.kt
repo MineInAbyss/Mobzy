@@ -18,7 +18,7 @@ class TemptBehavior(
         val items: List<Material>,
         val speed: Double = 1.0,
         val losesInterest: Boolean = false
-) : PathfinderComponent {
+) : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalTempt(
             (mob as Creature).toNMS(),
             speed,

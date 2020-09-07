@@ -13,6 +13,6 @@ import org.bukkit.entity.Mob
 data class LookAtPlayerBehavior(
         val radius: Float,
         val startChance: Float = 0.02f
-) : PathfinderComponent {
+) : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalLookAtPlayer(mob.toNMS(), NMSPlayer::class.java, radius, startChance)
 }

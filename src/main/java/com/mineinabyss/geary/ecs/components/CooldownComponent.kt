@@ -3,7 +3,7 @@ package com.mineinabyss.geary.ecs.components
 import com.mineinabyss.geary.ecs.MobzyComponent
 import org.bukkit.Bukkit
 
-abstract class CooldownComponent : MobzyComponent {
+abstract class CooldownComponent : MobzyComponent() {
     abstract val ticks: Int
     private var cooldownStart: Int = 0
     val cooledDown get() = System.currentTimeMillis() - ticks

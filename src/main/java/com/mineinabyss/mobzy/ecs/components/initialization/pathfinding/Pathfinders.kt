@@ -10,4 +10,4 @@ import kotlinx.serialization.Serializable
 data class Pathfinders(
         val targets: Map<Double, PathfinderComponent>? = null,
         val goals: Map<Double, PathfinderComponent>? = null
-): MobzyComponent
+): MobzyComponent()

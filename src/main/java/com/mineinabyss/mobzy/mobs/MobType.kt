@@ -42,8 +42,10 @@ data class MobType(
 
     inline fun <reified T : MobzyComponent> has() = staticComponents.containsKey(T::class)
 
-    fun instantiateComponents() =
-            MobTypeConfigs.yamlFormat.decodeFromString(componentSerializer, components) + staticComponents.values
+    fun instantiateComponents(existingComponents: Set<MobzyComponent> = emptySet()): Set<MobzyComponent> =
+            MobTypeConfigs.yamlFormat.decodeFromString(componentSerializer, components).apply {
+                forEach { it.persist = true }
+            } + existingComponents + staticComponents.values
 
     companion object {
         private val componentSerializer = SetSerializer(PolymorphicSerializer(MobzyComponent::class))

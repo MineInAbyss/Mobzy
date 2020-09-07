@@ -10,6 +10,6 @@ import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("minecraft:target.nearby_player")
-class TargetNearbyPlayer : PathfinderComponent {
+class TargetNearbyPlayer : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalNearestAttackableTarget(mob.toNMS(), EntityHuman::class.java, true)
 }

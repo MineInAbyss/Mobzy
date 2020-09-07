@@ -25,7 +25,7 @@ class DiveOnTargetBehavior(
         private val startDiveHeightRange: Double = 2.0,
         private val bashVelMultiplier: Double = 0.6,
         private val bashDuration: Double = 30.0
-) : PathfinderComponent {
+) : PathfinderComponent() {
     override fun build(mob: Mob) = DiveOnTargetAttackGoal(
             mob,
             diveVelocity,

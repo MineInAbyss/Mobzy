@@ -9,6 +9,6 @@ import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("minecraft:behavior.float")
-class FloatBehavior : PathfinderComponent {
+class FloatBehavior : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalFloat(mob.toNMS())
 }
