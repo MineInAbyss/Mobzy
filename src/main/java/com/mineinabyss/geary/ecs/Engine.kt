@@ -50,21 +50,23 @@ object Engine {
     inline fun <reified T : MobzyComponent> get(id: Int): T? = getComponentFor(T::class, id) as? T
     inline fun <reified T : MobzyComponent> has(id: Int) = hasComponentFor(T::class, id)
 
-    fun <T: MobzyComponent> addComponent(id: Int, component: T): T {
+    fun <T : MobzyComponent> addComponent(id: Int, component: T): T {
         components.getOrPut(component::class, { SparseArrayList() })[id] = component
         bitsets.getOrPut(component::class, { bitsOf() }).set(id)
         return component
     }
 
-    inline fun <reified T: MobzyComponent> getOrDefault(id: Int, component: () -> T): T =
+    inline fun <reified T : MobzyComponent> getOrDefault(id: Int, component: () -> T): T =
             get<T>(id) ?: addComponent(id, component())
 
     fun getBitsMatching(vararg components: ComponentClass, andNot: Array<out ComponentClass> = emptyArray()): BitVector? {
-        val allowed = components.map { (bitsets[it] ?: return null).copy() }
+        val allowed = components
+                .mapTo(mutableListOf()) { (bitsets[it] ?: return null) }
+                .also { list -> list[0] = list[0].copy() } //only copy the first bitset, all further operations only mutate it
                 .reduce { a, b -> a.and(b).let { a } }
         return if (andNot.isEmpty())
             allowed
-        else andNot.map { (bitsets[it] ?: return null).copy() }
+        else andNot.mapNotNull { (bitsets[it]) }
                 .fold(allowed) { a, b -> a.andNot(b).let { a } }
     }
 
