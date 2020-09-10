@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.ecs.store
 
+import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.mobzy.configuration.MobTypeConfigs.cborFormat
 import com.mineinabyss.mobzy.mobzy
@@ -22,6 +23,7 @@ inline fun <reified T : MobzyComponent> PersistentDataContainer.decode(serialize
 }
 
 fun PersistentDataContainer.encodeComponents(components: List<MobzyComponent>) {
+    isGearyEntity = true
     //remove all currently present keys, since removing a component should be reflected here as well
     keys.filter { it.namespace == "gearyecs" }.forEach { remove(it) }
 
@@ -31,17 +33,28 @@ fun PersistentDataContainer.encodeComponents(components: List<MobzyComponent>) {
         val serializer = cborFormat.serializersModule.getPolymorphic(MobzyComponent::class, value)
                 ?: return@forEach //TODO error?
         @Suppress("DEPRECATION") //we really want this to be a unique key!
-        this[NamespacedKey("gearyecs", serializer.descriptor.serialName), PersistentDataType.BYTE_ARRAY] =
+        this[NamespacedKey("gearyecs", serializer.descriptor.serialName.toMCKey()), PersistentDataType.BYTE_ARRAY] =
                 cborFormat.encodeToByteArray(serializer, value)
     }
 }
 
+fun String.toMCKey() = replace(":", "_")
+fun String.toSerialKey() = replace("_", ":")
+
 fun PersistentDataContainer.decodeComponents(): Set<MobzyComponent> {
     //key is serialname, we find all the valid ones registered in our module and use those serializers to deserialize
     return keys.mapNotNull { key ->
-        val serializer = cborFormat.serializersModule.getPolymorphic(MobzyComponent::class, key.key)
+        val serializer = cborFormat.serializersModule.getPolymorphic(MobzyComponent::class, key.key.toSerialKey())
                 ?: return@mapNotNull null
         val encoded = this[key, PersistentDataType.BYTE_ARRAY] ?: return@mapNotNull null
         cborFormat.decodeFromByteArray(serializer, encoded)
     }.toSet()
 }
+
+var PersistentDataContainer.isGearyEntity
+    get() = has(Engine.componentsKey, PersistentDataType.BYTE)
+    set(value) =
+        if (value)
+            set(Engine.componentsKey, PersistentDataType.BYTE, 1) //TODO are there any empty keys?
+        else
+            remove(Engine.componentsKey)

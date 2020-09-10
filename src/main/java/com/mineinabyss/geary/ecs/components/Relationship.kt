@@ -38,8 +38,14 @@ fun GearyEntity.removeChild(child: GearyEntity) {
 }
 
 fun GearyEntity.removeChildren(vararg children: GearyEntity) {
-    get<Children>()?.ids?.removeAll(children)
     children.forEach { it.unsafeParent = null }
+    get<Children>()?.ids?.removeAll(children)
+}
+
+fun GearyEntity.clearChildren() {
+    val ids = get<Children>()?.ids ?: return
+    ids.forEach { it.unsafeParent = null }
+    ids.clear()
 }
 
 
@@ -60,7 +66,7 @@ private var GearyEntity.unsafeParent
 /** Set an entity's parent. Also adds/removes this child from the parent. */
 var GearyEntity.parent
     get() = get<Parent>()?.id
-    set (parent) {
+    set(parent) {
         this.parent?.unsafeRemoveChild(this)
         parent?.addChild(this)
     }

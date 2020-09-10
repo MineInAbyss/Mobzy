@@ -2,6 +2,9 @@ package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.looty.ecs.components.Screaming
+import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
+import com.mineinabyss.looty.ecs.systems.ScreamingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
@@ -56,7 +59,9 @@ internal object MobzyECSRegistry : Listener {
 
     private fun registerSystems() {
         Engine.addSystems(
-                WalkingAnimationSystem
+                WalkingAnimationSystem,
+                ItemTrackerSystem,
+                ScreamingSystem
         )
     }
 
@@ -73,6 +78,8 @@ internal object MobzyECSRegistry : Listener {
                 subclass(MobAttributes.serializer())
                 subclass(DeathLoot.serializer())
                 subclass(Rideable.serializer())
+
+                subclass(Screaming.serializer())
             }
             polymorphic(PathfinderComponent::class) {
                 subclass(TemptBehavior.serializer())

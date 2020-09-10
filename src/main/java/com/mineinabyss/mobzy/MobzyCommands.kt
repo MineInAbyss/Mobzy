@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -9,7 +8,6 @@ import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
-import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isOfType
@@ -21,7 +19,6 @@ import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -32,14 +29,6 @@ import kotlin.time.ExperimentalTime
 object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
-            ("configinfo" / "cfginfo")(desc = "Information about the current state of the plugin")?.action {
-                sender.info(("""
-                            LOG OF CURRENTLY REGISTERED STUFF:
-                            Spawn configs: ${MobzyConfig.spawnCfgs}
-                            Registered addons: ${MobzyConfig.registeredAddons}
-                            Registered EntityTypes: ${MobzyTypeRegistry.typeNames}""".trimIndent()))
-            }
-
             ("reload" / "rl")(desc = "Reloads the configuration files")?.action {
                 MobzyConfig.reload(sender)
             }
@@ -104,31 +93,9 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     for (i in 1..cappedSpawns) player.location.spawnMobzyMob(mobName)
                 }
             }
+
             "debug" {
-                "components"{
-                    val type by stringArg()
-                    action {
-                        Engine.bitsets.forEach { (t, u) ->
-                            if(t.simpleName == type) {
-                                var sum = 0
-                                u.forEachBit { sum++ }
-                                sender.info("$sum entities with that component")
-                            }
-                        }
-                    }
-                }
-                "spawnregion"()?.playerAction {
-                    player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
-                }
-                "snapshot"()?.playerAction {
-                    val snapshot = player.location.chunk.chunkSnapshot
-                    val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }
-                    val z = (player.location.blockZ % 16).let { if (it < 0) it + 16 else it }
-                    player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
-                }
-                "nearbyuuid"()?.playerAction {
-                    player.info(player.getNearbyEntities(5.0, 5.0, 5.0).first().uniqueId.toString())
-                }
+                createDebugCommands()
             }
 
             ("list" / "l")(desc = "Lists all custom mob types")?.action {

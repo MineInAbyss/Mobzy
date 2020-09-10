@@ -1,11 +1,14 @@
 package com.mineinabyss.geary.ecs
 
+import com.mineinabyss.geary.ecs.components.parent
+import com.mineinabyss.geary.ecs.components.removeChildren
 import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.mobzy.mobzy
 import com.zaxxer.sparsebits.SparseBitSet
 import net.onedaybeard.bitvector.BitVector
 import net.onedaybeard.bitvector.bitsOf
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.clapper.util.misc.SparseArrayList
 import java.util.*
 import kotlin.reflect.KClass
@@ -13,6 +16,8 @@ import kotlin.reflect.KClass
 typealias ComponentClass = KClass<out MobzyComponent>
 
 object Engine {
+    val componentsKey = NamespacedKey("geary", "components")
+
     init {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(mobzy, {
             registeredSystems.filter { it.interval == 1 || Bukkit.getCurrentTick() % it.interval == 0 }.forEach(TickingSystem::tick)
@@ -27,6 +32,8 @@ object Engine {
     @Synchronized
     fun getNextId(): Int = if (removedEntities.isNotEmpty()) removedEntities.pop() ?: ++currId else ++currId
 
+    inline fun entity(run: GearyEntity.() -> Unit): GearyEntity = geary(getNextId(), run)
+
     //TODO use archetypes instead
     //TODO system for reusing deleted entities
     private val registeredSystems = mutableSetOf<TickingSystem>()
@@ -39,7 +46,7 @@ object Engine {
     private val components = mutableMapOf<ComponentClass, SparseArrayList<MobzyComponent>>()
     internal val bitsets = mutableMapOf<ComponentClass, BitVector>()
 
-    fun getComponentsFor(id: Int) = components.mapNotNull { (_, value) -> value[id] }
+    fun getComponentsFor(id: Int) = components.mapNotNull { (_, value) -> value.getOrNull(id) }
     fun addComponentsFor(id: Int, components: Set<MobzyComponent>) = components.forEach {
         addComponent(id, it)
     }
@@ -72,6 +79,13 @@ object Engine {
 
     //TODO might be a smarter way of storing these as an implicit list within a larger list of entities eventually
     fun removeEntity(id: Int) {
+        //clear itself from parent and children
+        geary(id){
+            parent = null
+            removeChildren()
+        }
+
+        //clear all components
         bitsets.mapNotNull { (kclass, bitset) ->
             if (bitset[id]) {
                 bitset[id] = false
@@ -79,29 +93,31 @@ object Engine {
             } else
                 null
         }.forEach { it[id] = null }
+
+        //add current id into queue for reuse
         removedEntities.push(id)
     }
 
     //TODO support component families with infix functions
-    inline fun runFor(vararg components: ComponentClass, andNot: Array<out ComponentClass> = emptyArray(), run: (List<MobzyComponent>) -> Unit) {
+    inline fun runFor(vararg components: ComponentClass, andNot: Array<out ComponentClass> = emptyArray(), run: GearyEntity.(List<MobzyComponent>) -> Unit) {
         getBitsMatching(*components, andNot = andNot)?.forEachBit { index ->
-            components.map { getComponentFor(it, index) ?: return@forEachBit }.apply(run)
+            geary(index).run(components.map { getComponentFor(it, index) ?: return@forEachBit })
         }
     }
 
     //TODO clean up and expand for more parameters
-    inline fun <reified T : MobzyComponent> runFor(vararg andNot: ComponentClass = emptyArray(), run: (T) -> Unit) {
+    inline fun <reified T : MobzyComponent> runFor(vararg andNot: ComponentClass = emptyArray(), run: GearyEntity.(T) -> Unit) {
         val tClass = T::class
         getBitsMatching(tClass, andNot = andNot)?.forEachBit { index ->
-            (getComponentFor(tClass, index) as? T)?.apply(run)
+            geary(index).run(getComponentFor(tClass, index) as T)
         }
     }
 
-    inline fun <reified T : MobzyComponent, reified T2 : MobzyComponent> runFor(vararg andNot: ComponentClass = emptyArray(), run: (T, T2) -> Unit) {
+    inline fun <reified T : MobzyComponent, reified T2 : MobzyComponent> runFor(vararg andNot: ComponentClass = emptyArray(), run: GearyEntity.(T, T2) -> Unit) {
         val tClass = T::class
         val t2Class = T2::class
         getBitsMatching(tClass, t2Class, andNot = andNot)?.forEachBit { index ->
-            run(getComponentFor(tClass, index) as T, getComponentFor(t2Class, index) as T2)
+            geary(index).run(getComponentFor(tClass, index) as T, getComponentFor(t2Class, index) as T2)
         }
     }
 }
