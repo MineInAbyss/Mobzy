@@ -2,7 +2,10 @@ package com.mineinabyss.geary.ecs
 
 import com.mineinabyss.geary.ecs.components.parent
 import com.mineinabyss.geary.ecs.components.removeChildren
+import com.mineinabyss.geary.ecs.components.with
 import com.mineinabyss.geary.ecs.systems.TickingSystem
+import com.mineinabyss.looty.ecs.components.PlayerComponent
+import com.mineinabyss.mobzy.ecs.BukkitEntityAccess
 import com.mineinabyss.mobzy.mobzy
 import com.zaxxer.sparsebits.SparseBitSet
 import net.onedaybeard.bitvector.BitVector
@@ -46,16 +49,24 @@ object Engine {
     private val components = mutableMapOf<ComponentClass, SparseArrayList<MobzyComponent>>()
     internal val bitsets = mutableMapOf<ComponentClass, BitVector>()
 
-    fun getComponentsFor(id: Int) = components.mapNotNull { (_, value) -> value.getOrNull(id) }
+    fun getComponentsFor(id: Int) = components.mapNotNullTo(mutableSetOf()) { (_, value) -> value.getOrNull(id) }
     fun addComponentsFor(id: Int, components: Set<MobzyComponent>) = components.forEach {
         addComponent(id, it)
     }
 
     fun getComponentFor(kClass: ComponentClass, id: Int) = runCatching { components[kClass]?.get(id) }.getOrNull()
     fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false
+    fun removeComponentFor(kClass: ComponentClass, id: Int) {
+        val bitset = bitsets[kClass] ?: return
+        if (bitset[id]) {
+            bitset[id] = false
+            components[kClass]?.set(id, null)
+        }
+    }
 
-    inline fun <reified T : MobzyComponent> get(id: Int): T? = getComponentFor(T::class, id) as? T
+    inline fun <reified T : MobzyComponent> getFor(id: Int): T? = getComponentFor(T::class, id) as? T
     inline fun <reified T : MobzyComponent> has(id: Int) = hasComponentFor(T::class, id)
+    inline fun <reified T : MobzyComponent> removeComponentFor(id: Int) = removeComponentFor(T::class, id)
 
     fun <T : MobzyComponent> addComponent(id: Int, component: T): T {
         components.getOrPut(component::class, { SparseArrayList() })[id] = component
@@ -64,7 +75,7 @@ object Engine {
     }
 
     inline fun <reified T : MobzyComponent> getOrDefault(id: Int, component: () -> T): T =
-            get<T>(id) ?: addComponent(id, component())
+            getFor<T>(id) ?: addComponent(id, component())
 
     fun getBitsMatching(vararg components: ComponentClass, andNot: Array<out ComponentClass> = emptyArray()): BitVector? {
         val allowed = components
@@ -76,11 +87,14 @@ object Engine {
         else andNot.mapNotNull { (bitsets[it]) }
                 .fold(allowed) { a, b -> a.andNot(b).let { a } }
     }
-
     //TODO might be a smarter way of storing these as an implicit list within a larger list of entities eventually
     fun removeEntity(id: Int) {
         //clear itself from parent and children
-        geary(id){
+        geary(id) {
+            with<PlayerComponent> { (player) ->
+                BukkitEntityAccess.removeEntity(player)
+            } //TODO might be better to move elsewhere, also handle for all bukkit entities
+
             parent = null
             removeChildren()
         }

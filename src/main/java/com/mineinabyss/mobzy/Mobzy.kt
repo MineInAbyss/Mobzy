@@ -1,13 +1,17 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.systems.PlayerJoinLeaveListener
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
+import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
+import com.mineinabyss.mobzy.ecs.BukkitEntityAccess
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyECSRegistry
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.SpawnTask
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.time.ExperimentalTime
 
@@ -38,11 +42,18 @@ class Mobzy : JavaPlugin() {
         //Register events
         registerEvents(
                 MobListener,
-                MobzyECSRegistry
+                MobzyECSRegistry,
+                ItemTrackerSystem,
+                PlayerJoinLeaveListener
         )
 
         //Register commands
         MobzyCommands
+
+        //Register all players with teh ECS
+        Bukkit.getOnlinePlayers().forEach { player ->
+            BukkitEntityAccess.registerPlayer(player)
+        }
     }
 
     override fun onDisable() { // Plugin shutdown logic

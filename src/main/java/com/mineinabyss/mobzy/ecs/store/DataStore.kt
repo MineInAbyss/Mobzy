@@ -22,7 +22,7 @@ inline fun <reified T : MobzyComponent> PersistentDataContainer.decode(serialize
     return cborFormat.decodeFromByteArray(serializer, encoded)
 }
 
-fun PersistentDataContainer.encodeComponents(components: List<MobzyComponent>) {
+fun PersistentDataContainer.encodeComponents(components: Collection<MobzyComponent>) {
     isGearyEntity = true
     //remove all currently present keys, since removing a component should be reflected here as well
     keys.filter { it.namespace == "gearyecs" }.forEach { remove(it) }

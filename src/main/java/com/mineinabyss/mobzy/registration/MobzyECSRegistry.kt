@@ -39,8 +39,8 @@ import org.bukkit.event.Listener
 internal object MobzyECSRegistry : Listener {
     @EventHandler
     fun attachPathfindersOnEntityLoadedEvent(event: EntityLoadedEvent) {
-        val mob = Engine.get<MobComponent>(event.id)?.mob ?: return
-        val (targets, goals) = Engine.get<Pathfinders>(event.id) ?: return
+        val mob = Engine.getFor<MobComponent>(event.id)?.mob ?: return
+        val (targets, goals) = Engine.getFor<Pathfinders>(event.id) ?: return
 
         targets?.forEach { (priority, component) ->
             mob.toNMS().addTargetSelector(priority.toInt(), component.build(mob))

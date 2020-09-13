@@ -4,6 +4,8 @@ interface GearyEntity {
     val gearyId: Int
 }
 
+fun GearyEntity.remove() = Engine.removeEntity(gearyId)
+
 class GearyEntityWrapper(override val gearyId: Int) : GearyEntity
 
 inline fun geary(id: Int, run: GearyEntity.() -> Unit): GearyEntity =

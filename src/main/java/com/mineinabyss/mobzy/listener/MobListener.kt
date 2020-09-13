@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.listener
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.mineinabyss.geary.ecs.Engine
-import com.mineinabyss.geary.ecs.components.has
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
@@ -19,6 +18,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.model
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
+import com.mineinabyss.mobzy.ecs.has
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobTypes
 import org.bukkit.Bukkit
@@ -84,9 +84,9 @@ object MobListener : Listener {
 
     @EventHandler
     fun addModelOnEntityCreate(e: EntityCreatedEvent) {
-        val entity = Engine.get<MobComponent>(e.id)?.mob ?: return
+        val entity = Engine.getFor<MobComponent>(e.id)?.mob ?: return
 
-        Engine.get<IncreasedWaterSpeed>(e.id)?.let { (level) ->
+        Engine.getFor<IncreasedWaterSpeed>(e.id)?.let { (level) ->
             entity.equipment?.apply {
                 boots = ItemStack(Material.STONE).editItemMeta {
                     isUnbreakable = true
@@ -94,7 +94,7 @@ object MobListener : Listener {
                 }
             }
         }
-        Engine.get<Equipment>(e.id)?.let { equipment ->
+        Engine.getFor<Equipment>(e.id)?.let { equipment ->
             entity.equipment?.apply {
                 equipment.helmet?.toItemStack()?.let { helmet = it }
                 equipment.chestplate?.toItemStack()?.let { chestplate = it }
@@ -103,7 +103,7 @@ object MobListener : Listener {
             }
         }
 
-        val model = Engine.get<Model>(e.id) ?: return
+        val model = Engine.getFor<Model>(e.id) ?: return
 
         //create an item based on model ID in head slot if entity will be using itself for the model
         entity.equipment?.helmet = model.modelItemStack

@@ -1,13 +1,14 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.Engine
-import com.mineinabyss.geary.ecs.components.addComponent
+import com.mineinabyss.geary.ecs.components.addComponents
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.stringArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.looty.ecs.components.Inventory
+import com.mineinabyss.looty.ecs.components.PlayerComponent
 import com.mineinabyss.looty.ecs.components.Screaming
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.store.encodeComponents
@@ -28,7 +29,7 @@ internal fun Command.createDebugCommands() {
     "registerself" {
         playerAction {
             Engine.entity {
-                addComponent(Inventory(player.uniqueId))
+                addComponents(setOf(PlayerComponent(player.uniqueId), Inventory()))
             }
         }
     }
@@ -36,7 +37,7 @@ internal fun Command.createDebugCommands() {
         playerAction {
             player.inventory.itemInMainHand.apply {
                 itemMeta = itemMeta.apply {
-                    persistentDataContainer.encodeComponents(listOf(Screaming()))
+                    persistentDataContainer.encodeComponents(setOf(Screaming()))
                 }
             }
         }
