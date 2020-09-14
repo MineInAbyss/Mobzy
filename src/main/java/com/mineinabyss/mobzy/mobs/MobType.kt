@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.registration.MobTypes
@@ -34,7 +34,7 @@ data class MobType(
     val name by lazy { _name ?: MobTypes.getNameForTemplate(this) }
 
     //TODO this is the safest and cleanest way to deepcopy. Check how this performs vs deepcopy's reflection method.
-    val components: String by lazy { MobTypeConfigs.yamlFormat.encodeToString(componentSerializer, _components) }
+    val components: String by lazy { Formats.yamlFormat.encodeToString(componentSerializer, _components) }
     val staticComponents: Map<KClass<out MobzyComponent>, MobzyComponent> by lazy { _staticComponents.associateBy { it::class } }
     val nmsType: NMSEntityType<*> by lazy { MobzyTypeRegistry[name] }
 
@@ -43,7 +43,7 @@ data class MobType(
     inline fun <reified T : MobzyComponent> has() = staticComponents.containsKey(T::class)
 
     fun instantiateComponents(existingComponents: Set<MobzyComponent> = emptySet()): Set<MobzyComponent> =
-            MobTypeConfigs.yamlFormat.decodeFromString(componentSerializer, components).apply {
+            Formats.yamlFormat.decodeFromString(componentSerializer, components).apply {
                 forEach { it.persist = true }
             } + existingComponents + staticComponents.values
 

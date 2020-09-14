@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS

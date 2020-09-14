@@ -1,14 +1,18 @@
 package com.mineinabyss.geary.ecs
 
+import com.mineinabyss.geary.ecs.engine.Engine
+
 interface GearyEntity {
     val gearyId: Int
+
+    operator fun component1() = gearyId
 }
 
-fun GearyEntity.remove() = Engine.removeEntity(gearyId)
+fun GearyEntity.remove() = Engine.removeEntity(this)
 
-class GearyEntityWrapper(override val gearyId: Int) : GearyEntity
+class BoxedEntityID(override val gearyId: Int) : GearyEntity
 
 inline fun geary(id: Int, run: GearyEntity.() -> Unit): GearyEntity =
-        GearyEntityWrapper(id).apply(run)
+        BoxedEntityID(id).apply(run)
 
-inline fun geary(id: Int): GearyEntity = GearyEntityWrapper(id)
+inline fun geary(id: Int): GearyEntity = BoxedEntityID(id)

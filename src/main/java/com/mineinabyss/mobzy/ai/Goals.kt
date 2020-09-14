@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.ai
 
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.engine.forEach
 import com.mineinabyss.geary.ecs.systems.TickingSystem
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -32,13 +33,13 @@ data class Goals(
 }
 
 class GoalManagerSystem : TickingSystem() {
-    override fun tick() = Engine.runFor<Goals> { goalComponent ->
+    override fun tick() = Engine.forEach<Goals> { goalComponent ->
         goalComponent.executingPlan?.let { plan ->
             plan.tick()
-            return@runFor
+            return@forEach
         }
         val (actions, goals) = goalComponent
-        goals.forEach { goal ->
+        for (goal in goals) {
             val openNodes = sortedSetOf(goal)
             val closedNodes = sortedSetOf<Action>()
 
@@ -48,7 +49,7 @@ class GoalManagerSystem : TickingSystem() {
                 closedNodes.add(action)
                 if (action.conditionsMet()) {
                     goalComponent.executingPlan = action
-                    return@forEach
+                    continue
                 }
 
                 actions.childrenOf(action)

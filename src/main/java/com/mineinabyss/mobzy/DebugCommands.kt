@@ -1,12 +1,15 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.components.addComponents
+import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.engine.EngineImpl
+import com.mineinabyss.geary.ecs.engine.entity
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.stringArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.idofront.plugin.getService
 import com.mineinabyss.looty.ecs.components.Inventory
 import com.mineinabyss.looty.ecs.components.PlayerComponent
 import com.mineinabyss.looty.ecs.components.Screaming
@@ -46,7 +49,7 @@ internal fun Command.createDebugCommands() {
     "components"{
         val type by stringArg()
         action {
-            Engine.bitsets.forEach { (t, u) ->
+            (getService<Engine>() as EngineImpl).bitsets.forEach { (t, u) ->
                 if (t.simpleName == type) {
                     var sum = 0
                     u.forEachBit { sum++ }
@@ -65,7 +68,7 @@ internal fun Command.createDebugCommands() {
         "checkcache" {
             playerAction {
                 inventoryCache.forEach { item ->
-                    sender.info(when(player.toNMS().inventory.contents.contains(item)){
+                    sender.info(when (player.toNMS().inventory.contents.contains(item)) {
                         true -> "${item.name} in inventory"
                         false -> "${item.name} no longer in inventory"
                     })

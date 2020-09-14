@@ -1,14 +1,16 @@
 package com.mineinabyss.mobzy.registration
 
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.components.addComponent
+import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.looty.ecs.components.Screaming
 import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
 import com.mineinabyss.looty.ecs.systems.ScreamingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
-import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
@@ -19,7 +21,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.ecs.events.EntityLoadedEvent
+import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
 import com.mineinabyss.mobzy.ecs.goals.minecraft.AvoidPlayerBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LeapAtTargetBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.MeleeAttackBehavior
@@ -38,17 +40,19 @@ import org.bukkit.event.Listener
 
 internal object MobzyECSRegistry : Listener {
     @EventHandler
-    fun attachPathfindersOnEntityLoadedEvent(event: EntityLoadedEvent) {
-        val mob = Engine.getFor<MobComponent>(event.id)?.mob ?: return
-        val (targets, goals) = Engine.getFor<Pathfinders>(event.id) ?: return
+    fun attachPathfindersOnEntityLoadedEvent(event: MobLoadEvent) {
+        val (entity) = event
+        val (mob) = entity.get<MobComponent>() ?: return
+        val (targets, goals) = entity.get<Pathfinders>() ?: return
 
         targets?.forEach { (priority, component) ->
             mob.toNMS().addTargetSelector(priority.toInt(), component.build(mob))
-            Engine.addComponent(event.id, component)
+
+            entity.addComponent(component)
         }
         goals?.forEach { (priority, component) ->
             mob.toNMS().addPathfinderGoal(priority.toInt(), component.build(mob))
-            Engine.addComponent(event.id, component)
+            entity.addComponent(component)
         }
     }
 
@@ -67,7 +71,7 @@ internal object MobzyECSRegistry : Listener {
 
     private fun registerComponentSerialization() {
         //TODO annotate serializable components to register this automatically
-        MobTypeConfigs.addSerializerModule(SerializersModule {
+        Formats.addSerializerModule(SerializersModule {
             polymorphic(MobzyComponent::class) {
                 subclass(Model.serializer())
                 subclass(Pathfinders.serializer())

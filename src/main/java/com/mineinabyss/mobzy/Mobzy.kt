@@ -1,8 +1,11 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.engine.EngineImpl
 import com.mineinabyss.geary.ecs.systems.PlayerJoinLeaveListener
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
+import com.mineinabyss.idofront.plugin.registerService
 import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
 import com.mineinabyss.mobzy.ecs.BukkitEntityAccess
 import com.mineinabyss.mobzy.listener.MobListener
@@ -39,12 +42,15 @@ class Mobzy : JavaPlugin() {
         MobzyTypeRegistry //instantiate singleton
         SpawnTask.startTask()
 
+        registerService<Engine>(EngineImpl())
+
         //Register events
         registerEvents(
                 MobListener,
                 MobzyECSRegistry,
                 ItemTrackerSystem,
-                PlayerJoinLeaveListener
+                PlayerJoinLeaveListener,
+                BukkitEntityAccess,
         )
 
         //Register commands

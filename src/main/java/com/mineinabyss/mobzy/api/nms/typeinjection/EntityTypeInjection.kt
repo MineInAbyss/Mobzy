@@ -5,7 +5,7 @@ import com.mineinabyss.idofront.messaging.logWarn
 import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.ecs.events.EntityCreatedEvent
+import com.mineinabyss.mobzy.ecs.events.MobSpawnEvent
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mojang.datafixers.DataFixUtils
 import com.mojang.datafixers.types.Type
@@ -56,7 +56,7 @@ fun Location.spawnEntity(type: NMSEntityType<*>): BukkitEntity? {
             false,
             CreatureSpawnEvent.SpawnReason.CUSTOM) // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
 
-    (nmsEntity as? CustomMob)?.run { EntityCreatedEvent(gearyId).call() }
+    (nmsEntity as? CustomMob)?.run { MobSpawnEvent(this).call() }
 
     return nmsEntity?.bukkitEntity // convert to a Bukkit entity
 }

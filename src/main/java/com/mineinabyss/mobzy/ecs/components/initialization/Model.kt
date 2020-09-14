@@ -1,9 +1,7 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
 import com.mineinabyss.geary.ecs.MobzyComponent
-import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.mobzy.mobs.CustomMob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material
@@ -25,5 +23,3 @@ data class Model(
             setCustomModelData(id)
         }
 }
-
-val CustomMob.model get() = get<Model>()

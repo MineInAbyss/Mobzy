@@ -5,7 +5,7 @@ import com.mineinabyss.idofront.serialization.SerializableItemStack
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Equipment(
+data class Equipment(
         val helmet: SerializableItemStack? = null,
         val chestplate: SerializableItemStack? = null,
         val leggings: SerializableItemStack? = null,

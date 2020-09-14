@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.ecs.store
 
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.MobzyComponent
-import com.mineinabyss.mobzy.configuration.MobTypeConfigs.cborFormat
+import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.serialization.Formats.cborFormat
 import com.mineinabyss.mobzy.mobzy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer

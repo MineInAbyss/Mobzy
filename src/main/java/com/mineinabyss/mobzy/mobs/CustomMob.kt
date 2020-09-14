@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.geary.ecs.Engine
 import com.mineinabyss.geary.ecs.GearyEntity
 import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.addComponents
 import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
@@ -12,7 +12,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
-import com.mineinabyss.mobzy.ecs.events.EntityLoadedEvent
+import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
 import com.mineinabyss.mobzy.ecs.store.decodeComponents
 import com.mineinabyss.mobzy.ecs.store.encodeComponents
 import net.minecraft.server.v1_16_R2.ChatMessage
@@ -79,7 +79,7 @@ interface CustomMob : GearyEntity {
         addComponent(MobComponent(entity))
         val existingComponents = entity.persistentDataContainer.decodeComponents()
         addComponents(type.instantiateComponents(existingComponents))
-        EntityLoadedEvent(gearyId).call()
+        MobLoadEvent(this).call()
 
         if (get<Model>()?.small == true) entity.toNMS().isBaby = true
     }
