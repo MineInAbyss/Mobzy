@@ -37,12 +37,13 @@ class Mobzy : JavaPlugin() {
         saveDefaultConfig()
         reloadConfig()
 
+        registerService<Engine>(EngineImpl())
+
         MobzyECSRegistry.register()
         MobzyPacketInterception.registerPacketInterceptors()
         MobzyTypeRegistry //instantiate singleton
         SpawnTask.startTask()
 
-        registerService<Engine>(EngineImpl())
 
         //Register events
         registerEvents(

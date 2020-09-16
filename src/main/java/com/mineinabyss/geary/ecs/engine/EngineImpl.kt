@@ -25,9 +25,15 @@ class EngineImpl : Engine {
         //tick all systems every interval ticks
         mobzy.schedule {
             repeating(1)
-            val currTick = Bukkit.getCurrentTick()
-            registeredSystems.filter { currTick % it.interval == 0 }
-                    .forEach(TickingSystem::tick)
+            //TODO support suspending functions for systems
+            // perhaps async support in the future
+            while (true) {
+                val currTick = Bukkit.getCurrentTick()
+                registeredSystems
+                        .filter { currTick % it.interval == 0 }
+                        .forEach(TickingSystem::tick)
+                yield()
+            }
         }
     }
 
