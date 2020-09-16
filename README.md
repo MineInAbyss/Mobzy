@@ -2,6 +2,7 @@
 
 ![CI](https://github.com/MineInAbyss/Mobzy/workflows/Java%20CI/badge.svg)
 
+## :exclamation: Most development is currently on the [ecs-dev](https://github.com/MineInAbyss/Mobzy/tree/ecs-dev) branch :exclamation:
 ### Overview
 
 This is a plugin for Spigot/Paper 1.15.2, which allows custom entities to registered with the Minecraft server. It works more specifically for the purpose of loading  entities with custom models, but provides many classes for avoiding NMS classes when making pathfinders, registering entities, and creating them.
