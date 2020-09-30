@@ -54,7 +54,7 @@ dependencies {
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version-5"
+    compileOnly "org.cultofclang.minecraft:kotlinspice:$kotlin_version+"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.0-RC"
     implementation "com.derongan.minecraft:guiy:0.1.0-alpha.7"
     implementation "com.mineinabyss:idofront:0.3.24"

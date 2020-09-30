@@ -1,7 +1,7 @@
 package com.mineinabyss.geary.ecs.engine
 
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.geary.ecs.components.parent
 import com.mineinabyss.geary.ecs.components.removeChildren
 import com.mineinabyss.geary.ecs.events.EntityRemovedEvent
@@ -17,7 +17,7 @@ import org.clapper.util.misc.SparseArrayList
 import java.util.*
 import kotlin.reflect.KClass
 
-typealias ComponentClass = KClass<out MobzyComponent>
+typealias ComponentClass = KClass<out GearyComponent>
 
 
 class EngineImpl : Engine {
@@ -49,17 +49,15 @@ class EngineImpl : Engine {
     @Synchronized
     override fun getNextId(): Int = if (removedEntities.isNotEmpty()) removedEntities.pop() ?: ++currId else ++currId
 
-
     override fun addSystem(system: TickingSystem) = registeredSystems.add(system)
 
-
     //TODO get a more memory efficient list, right now this is literally just an ArrayList that auto expands
-    private val components = mutableMapOf<ComponentClass, SparseArrayList<MobzyComponent>>()
+    private val components = mutableMapOf<ComponentClass, SparseArrayList<GearyComponent>>()
     internal val bitsets = mutableMapOf<ComponentClass, BitVector>()
 
     override fun getComponentsFor(id: Int) = components.mapNotNullTo(mutableSetOf()) { (_, value) -> value.getOrNull(id) }
 
-    override fun getComponentFor(kClass: ComponentClass, id: Int) = runCatching { components[kClass]?.get(id) }.getOrNull()
+    override fun getComponentFor(kClass: ComponentClass, id: Int): GearyComponent? = runCatching { components[kClass]?.get(id) }.getOrNull()
     override fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false
     override fun removeComponentFor(kClass: ComponentClass, id: Int) {
         val bitset = bitsets[kClass] ?: return
@@ -69,7 +67,7 @@ class EngineImpl : Engine {
         }
     }
 
-    override fun <T : MobzyComponent> addComponentFor(id: Int, component: T): T {
+    override fun <T : GearyComponent> addComponentFor(id: Int, component: T): T {
         components.getOrPut(component::class, { SparseArrayList() })[id] = component
         bitsets.getOrPut(component::class, { bitsOf() }).set(id)
         return component

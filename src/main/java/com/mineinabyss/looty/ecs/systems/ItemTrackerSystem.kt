@@ -13,6 +13,7 @@ import com.mineinabyss.looty.ecs.components.Held
 import com.mineinabyss.looty.ecs.components.Inventory
 import com.mineinabyss.looty.ecs.components.PlayerComponent
 import com.mineinabyss.mobzy.ecs.geary
+import com.mineinabyss.mobzy.ecs.get
 import com.mineinabyss.mobzy.ecs.store.decodeComponents
 import com.mineinabyss.mobzy.ecs.store.encodeComponents
 import com.mineinabyss.mobzy.ecs.store.isGearyEntity
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.inventory.ItemStack
@@ -39,8 +41,7 @@ import kotlin.collections.set
  */
 object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
     override fun tick() = Engine.forEach<PlayerComponent, Inventory> { (player), inventoryComponent ->
-        //TODO remove all held components from all items just in case
-
+        //TODO make children use an engine too, then easily remove all held components
         updateAndSaveItems(player, inventoryComponent)
 
         //Add a held component to currently held item
@@ -57,7 +58,7 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
     fun GearyEntity.updateAndSaveItems(player: Player, inventoryComponent: Inventory) {
         val oldCache = inventoryComponent.itemCache.toMutableMap()
         val newCache = mutableMapOf<Int, Pair<ItemStack, GearyEntity>>()
-
+        val heldSlot = player.inventory.heldItemSlot
         //TODO prevent issues with children and id changes
         player.inventory.forEachIndexed { i, item ->
             if (item == null || !item.hasItemMeta()) return@forEachIndexed
@@ -85,6 +86,8 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
                     entity
                 }
             }
+            //TODO custom item config system
+            if (i != heldSlot) itemEntity.removeComponent<Held>()
 
             //save the new encoded components to the actual item meta, and place them into the new cache
             //TODO dont save if no changes found
@@ -92,7 +95,7 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
             newCache[i] = item to itemEntity
         }
         oldCache.values.forEach {
-            Engine.removeEntity(it.second)
+            it.second.remove()
         }
 
         inventoryComponent.itemCache = newCache
@@ -100,11 +103,35 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
 
     @EventHandler
     fun itemMoveEvent(e: InventoryClickEvent) {
-        e.whoClicked.info("""
+        val cursor = e.cursor //ADD: the item that was put into the slot
+        val currItem = e.currentItem //REMOVE: the item that was clicked and its slot
+
+        val player = e.whoClicked
+        val inventory = player.get<Inventory>() ?: return
+
+        player.info("""
             Cursor: ${e.cursor}
             CurrentItem: ${e.currentItem}
             Slot: ${e.slot}
         """.trimIndent())
+
+        //shift clicking still considers cursor null and we don't know the location being put into TODO try to see if we can find it
+        if (e.isShiftClick) return
+
+        //TODO if both cursor and currItem aren't null, we try to swap them instead of removing
+        if (cursor == null) { //remove if cursor had nothing
+            inventory.entityAt(e.slot)?.remove()
+            inventory.itemCache.remove(e.slot)
+
+        } else { //add otherwise
+            val meta = cursor.itemMeta
+            if (!meta.persistentDataContainer.isGearyEntity) return
+
+            val entity = Engine.entity {
+                addComponents(meta.persistentDataContainer.decodeComponents())
+            }
+            inventory.itemCache[e.slot] = cursor to entity
+        }
     }
 
     /** Immediately adds a held component to the currently held item. */
@@ -153,4 +180,17 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
     }
 
     //TODO dropping items should serialize them and instantly remove from inv
+    /**
+     * There's no way of knowing which slot an item was in when dropped, so the most reliable way of ensuring nothing
+     * funky happens is recalculating everything. Try and improve on this later!
+     */
+    @EventHandler
+    fun onDropItem(e: PlayerDropItemEvent) {
+        val (player) = e
+        geary(player) {
+            with<Inventory> {
+                updateAndSaveItems(player, it)
+            }
+        }
+    }
 }

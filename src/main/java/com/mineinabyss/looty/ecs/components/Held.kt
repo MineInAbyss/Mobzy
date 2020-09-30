@@ -1,5 +1,5 @@
 package com.mineinabyss.looty.ecs.components
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 
-class Held: MobzyComponent()
+class Held: GearyComponent()

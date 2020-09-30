@@ -1,12 +1,13 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.ecs.components.with
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.ecs.components.death.deathLoot
+import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.death.expToDrop
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
@@ -44,7 +45,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
 
     override fun die(damagesource: DamageSource) = (this as CustomMob).die(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
-    override fun getExpValue(entityhuman: EntityHuman): Int = deathLoot?.expToDrop() ?: this.expToDrop
+    override fun getExpValue(entityhuman: EntityHuman): Int = get<DeathLoot>()?.expToDrop() ?: this.expToDrop
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(get<Sounds>()?.ambient) }
     override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { get<Sounds>()?.hurt }
@@ -73,7 +74,7 @@ fun CustomMob.die(damageSource: DamageSource?) {
         nmsWorld.broadcastEntityEffect(nmsEntity, 3.toByte())
         nmsEntity.pose = EntityPose.DYING
         //TODO add PlaceHolderAPI support
-        deathLoot?.deathCommands?.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it) }
+        get<DeathLoot>()?.deathCommands?.forEach { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it) }
     }
 }
 
@@ -81,8 +82,9 @@ fun CustomMob.dropItems(killer: HumanEntity) {
     val heldItem = killer.inventory.itemInMainHand
     val looting = heldItem.enchantments[Enchantment.LOOT_BONUS_MOBS] ?: 0
     val fire = heldItem.enchantments[Enchantment.FIRE_ASPECT] ?: 0 > 0
-    CraftEventFactory.callEntityDeathEvent(nmsEntity, deathLoot?.drops?.toList()?.map { it.chooseDrop(looting, fire) }
-            ?: listOf())
-    deathLoot?.expToDrop()?.let { nmsEntity.expToDrop = it }
+    with<DeathLoot> { deathLoot ->
+        CraftEventFactory.callEntityDeathEvent(nmsEntity, deathLoot.drops.toList().map { it.chooseDrop(looting, fire) })
+        deathLoot.expToDrop()?.let { nmsEntity.expToDrop = it }
+    }
     dropExp()
 }

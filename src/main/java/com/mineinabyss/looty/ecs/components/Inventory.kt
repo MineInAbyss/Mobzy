@@ -1,15 +1,16 @@
 package com.mineinabyss.looty.ecs.components
 
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.MobzyComponent
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.bukkit.inventory.ItemStack
 
 @Serializable
-class Inventory : MobzyComponent() {
+class Inventory : GearyComponent() {
+    //TODO modify methods here
     @Transient
-    internal var itemCache = mutableMapOf<Int, Pair<ItemStack, GearyEntity>>()
+    var itemCache = mutableMapOf<Int, Pair<ItemStack, GearyEntity>>()
 
     operator fun component1() = itemCache
 

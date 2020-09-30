@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ai
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.engine.forEach
 import com.mineinabyss.geary.ecs.systems.TickingSystem
@@ -11,7 +11,7 @@ import kotlinx.serialization.Transient
 data class Goals(
         val actions: Set<Action>,
         val goals: Set<Action>,
-) : MobzyComponent() {
+) : GearyComponent() {
     @Transient
     var executingPlan: Action? = null
 

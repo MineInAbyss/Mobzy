@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import kotlinx.serialization.Serializable
 
@@ -10,4 +10,4 @@ data class Equipment(
         val chestplate: SerializableItemStack? = null,
         val leggings: SerializableItemStack? = null,
         val boots: SerializableItemStack? = null
-) : MobzyComponent()
+) : GearyComponent()

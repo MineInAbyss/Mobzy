@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.idofront.items.editItemMeta
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -15,7 +15,7 @@ data class Model(
         val walkIdOffset: Int? = 1,
         val hitIdOffset: Int? = 2,
         val small: Boolean = false
-) : MobzyComponent() {
+) : GearyComponent() {
     val walkId = walkIdOffset?.plus(id)
     val hitId = hitIdOffset?.plus(id)
     val modelItemStack

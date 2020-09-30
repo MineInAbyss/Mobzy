@@ -2,11 +2,11 @@ package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.engine.EngineImpl
-import com.mineinabyss.geary.ecs.systems.PlayerJoinLeaveListener
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.idofront.plugin.registerService
-import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
+import com.mineinabyss.looty.ecs.config.LootyAddon
+import com.mineinabyss.mobzy.api.registerAddonWithMobzy
 import com.mineinabyss.mobzy.ecs.BukkitEntityAccess
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyECSRegistry
@@ -16,12 +16,13 @@ import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
 import kotlin.time.ExperimentalTime
 
 /** Gets [Mobzy] via Bukkit once, then sends that reference back afterwards */
 val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
 
-class Mobzy : JavaPlugin() {
+class Mobzy : JavaPlugin(), MobzyAddon, LootyAddon {
 
     override fun onLoad() {
         logger.info("On load has been called")
@@ -49,9 +50,9 @@ class Mobzy : JavaPlugin() {
         registerEvents(
                 MobListener,
                 MobzyECSRegistry,
-                ItemTrackerSystem,
-                PlayerJoinLeaveListener,
-                BukkitEntityAccess,
+//                ItemTrackerSystem,
+//                PlayerJoinLeaveListener,
+//                BukkitEntityAccess,
         )
 
         //Register commands
@@ -61,7 +62,14 @@ class Mobzy : JavaPlugin() {
         Bukkit.getOnlinePlayers().forEach { player ->
             BukkitEntityAccess.registerPlayer(player)
         }
+
+        registerAddonWithMobzy()
+//        registerAddonWithLooty()
     }
+
+    override val mobConfigDir = File(dataFolder, "mobs")
+    override val relicsDir = File(dataFolder, "relics")
+    override val spawnConfig = File(dataFolder, "spawns.yml")
 
     override fun onDisable() { // Plugin shutdown logic
         super.onDisable()

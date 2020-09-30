@@ -1,8 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.death
 
-import com.mineinabyss.geary.ecs.MobzyComponent
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.geary.ecs.GearyComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
@@ -14,9 +12,7 @@ class DeathLoot(
         val maxExp: Int? = null,
         val deathCommands: List<String> = listOf(),
         val drops: List<MobDrop> = listOf()
-) : MobzyComponent()
-
-val CustomMob.deathLoot get() = get<DeathLoot>()
+) : GearyComponent()
 
 fun DeathLoot.expToDrop(): Int? {
     val minExp = minExp

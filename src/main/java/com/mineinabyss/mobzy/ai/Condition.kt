@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ai
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
@@ -11,7 +11,7 @@ class Condition {
 }
 
 class ConditionBuilder {
-    fun <T: MobzyComponent> from(component: T.() -> Unit){
+    fun <T: GearyComponent> from(component: T.() -> Unit){
 
     }
     infix fun <T> KProperty<T>.setTo(value: T){
@@ -23,7 +23,7 @@ class ConditionBuilder {
     }
 }
 class PostConditionBuilder {
-    fun <T: MobzyComponent> own(component: T.() -> Unit){
+    fun <T: GearyComponent> own(component: T.() -> Unit){
 
     }
     infix fun <T> KProperty<T>.becomes(value: T){

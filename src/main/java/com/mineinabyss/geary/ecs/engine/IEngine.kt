@@ -1,7 +1,7 @@
 package com.mineinabyss.geary.ecs.engine
 
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.geary.ecs.geary
 import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.idofront.plugin.getService
@@ -17,11 +17,11 @@ interface Engine {
 
     fun addSystem(system: TickingSystem): Boolean
 
-    fun getComponentsFor(id: Int): MutableSet<MobzyComponent>
-    fun getComponentFor(kClass: ComponentClass, id: Int): MobzyComponent?
+    fun getComponentsFor(id: Int): MutableSet<GearyComponent>
+    fun getComponentFor(kClass: ComponentClass, id: Int): GearyComponent?
     fun hasComponentFor(kClass: ComponentClass, id: Int): Boolean
     fun removeComponentFor(kClass: ComponentClass, id: Int)
-    fun <T : MobzyComponent> addComponentFor(id: Int, component: T): T
+    fun <T : GearyComponent> addComponentFor(id: Int, component: T): T
 
     fun removeEntity(id: GearyEntity)
 
@@ -30,7 +30,7 @@ interface Engine {
 
     //some helpers
     fun addSystems(vararg systems: TickingSystem) = systems.forEach { addSystem(it) }
-    fun addComponentsFor(id: Int, components: Set<MobzyComponent>) = components.forEach { addComponentFor(id, it) }
+    fun addComponentsFor(id: Int, components: Set<GearyComponent>) = components.forEach { addComponentFor(id, it) }
 }
 
 inline fun Engine.entity(run: GearyEntity.() -> Unit): GearyEntity = geary(getNextId(), run)

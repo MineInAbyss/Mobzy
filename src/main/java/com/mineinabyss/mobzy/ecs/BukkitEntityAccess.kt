@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.ecs
 
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.MobzyComponent
 import com.mineinabyss.geary.ecs.components.addComponents
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.components.has
@@ -62,8 +62,9 @@ object BukkitEntityAccess: Listener {
 }
 
 fun geary(entity: Entity): GearyEntity? = entity.toMobzy() ?: BukkitEntityAccess.getEntity(entity)
+inline fun geary(entity: Entity, run: GearyEntity.() -> Unit): GearyEntity? = (entity.toMobzy() ?: BukkitEntityAccess.getEntity(entity))?.apply(run)
 
 //TODO add the rest of the GearyEntity operations here
-inline fun <reified T : MobzyComponent> Entity.get(): T? = geary(this)?.get()
+inline fun <reified T : GearyComponent> Entity.get(): T? = geary(this)?.get()
 
-inline fun <reified T : MobzyComponent> Entity.has(): Boolean = geary(this)?.has<T>() ?: false
+inline fun <reified T : GearyComponent> Entity.has(): Boolean = geary(this)?.has<T>() ?: false

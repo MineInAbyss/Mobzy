@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.ambient
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,4 +11,4 @@ class Sounds(
         val death: String? = null,
         val hurt: String? = null,
         val step: String? = null
-) : MobzyComponent()
+) : GearyComponent()

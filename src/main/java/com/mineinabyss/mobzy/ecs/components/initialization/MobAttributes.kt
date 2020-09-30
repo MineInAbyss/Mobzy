@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributes
 import com.mineinabyss.mobzy.api.nms.typeinjection.set
@@ -29,7 +29,7 @@ data class MobAttributes(
         val maxHealth: Double? = null,
         val movementSpeed: Double? = 0.25,
         val spawnReinforcements: Double? = null
-) : MobzyComponent() {
+) : GearyComponent() {
 
     fun toNMSBuilder(): NMSAttributeBuilder = NMSAttributes.forEntityInsentient()
             .set(GenericAttributes.ARMOR, armor)

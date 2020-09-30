@@ -1,6 +1,6 @@
 package com.mineinabyss.looty.ecs.components
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.idofront.serialization.UUIDSerializer
 import kotlinx.serialization.Serializable
 import org.bukkit.Bukkit
@@ -10,7 +10,7 @@ import java.util.*
 class PlayerComponent(
         @Serializable(with = UUIDSerializer::class)
         val uuid: UUID
-) : MobzyComponent() {
+) : GearyComponent() {
     val player get() = Bukkit.getPlayer(uuid) ?: error("UUID is not a player")
 
     operator fun component1() = player

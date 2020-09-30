@@ -1,13 +1,12 @@
 package com.mineinabyss.mobzy.registration
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.serialization.Formats
+import com.mineinabyss.looty.ecs.components.PotionComponent
 import com.mineinabyss.looty.ecs.components.Screaming
-import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
-import com.mineinabyss.looty.ecs.systems.ScreamingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
@@ -64,15 +63,16 @@ internal object MobzyECSRegistry : Listener {
     private fun registerSystems() {
         Engine.addSystems(
                 WalkingAnimationSystem,
-                ItemTrackerSystem,
-                ScreamingSystem
+//                ItemTrackerSystem,
+//                ScreamingSystem, //TODO split up
+//                PotionEffectSystem
         )
     }
 
     private fun registerComponentSerialization() {
         //TODO annotate serializable components to register this automatically
         Formats.addSerializerModule(SerializersModule {
-            polymorphic(MobzyComponent::class) {
+            polymorphic(GearyComponent::class) {
                 subclass(Model.serializer())
                 subclass(Pathfinders.serializer())
                 subclass(Equipment.serializer())
@@ -84,6 +84,7 @@ internal object MobzyECSRegistry : Listener {
                 subclass(Rideable.serializer())
 
                 subclass(Screaming.serializer())
+                subclass(PotionComponent.serializer())
             }
             polymorphic(PathfinderComponent::class) {
                 subclass(TemptBehavior.serializer())

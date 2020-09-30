@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.geary.ecs.MobzyComponent
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
@@ -22,8 +22,8 @@ data class MobType(
         val baseClass: String,
         val creatureType: EnumCreatureType,
         @SerialName("name") private val _name: String? = null,
-        @SerialName("staticComponents") private val _staticComponents: MutableSet<MobzyComponent> = mutableSetOf(),
-        @SerialName("components") private val _components: Set<MobzyComponent> = setOf(),
+        @SerialName("staticComponents") private val _staticComponents: MutableSet<GearyComponent> = mutableSetOf(),
+        @SerialName("components") private val _components: Set<GearyComponent> = setOf(),
         val targets: Map<Double, PathfinderComponent>? = null,
         val goals: Map<Double, PathfinderComponent>? = null) {
     init {
@@ -35,19 +35,19 @@ data class MobType(
 
     //TODO this is the safest and cleanest way to deepcopy. Check how this performs vs deepcopy's reflection method.
     val components: String by lazy { Formats.yamlFormat.encodeToString(componentSerializer, _components) }
-    val staticComponents: Map<KClass<out MobzyComponent>, MobzyComponent> by lazy { _staticComponents.associateBy { it::class } }
+    val staticComponents: Map<KClass<out GearyComponent>, GearyComponent> by lazy { _staticComponents.associateBy { it::class } }
     val nmsType: NMSEntityType<*> by lazy { MobzyTypeRegistry[name] }
 
-    inline fun <reified T : MobzyComponent> get(): T? = staticComponents[T::class] as? T
+    inline fun <reified T : GearyComponent> get(): T? = staticComponents[T::class] as? T
 
-    inline fun <reified T : MobzyComponent> has() = staticComponents.containsKey(T::class)
+    inline fun <reified T : GearyComponent> has() = staticComponents.containsKey(T::class)
 
-    fun instantiateComponents(existingComponents: Set<MobzyComponent> = emptySet()): Set<MobzyComponent> =
+    fun instantiateComponents(existingComponents: Set<GearyComponent> = emptySet()): Set<GearyComponent> =
             Formats.yamlFormat.decodeFromString(componentSerializer, components).apply {
                 forEach { it.persist = true }
             } + existingComponents + staticComponents.values
 
     companion object {
-        private val componentSerializer = SetSerializer(PolymorphicSerializer(MobzyComponent::class))
+        private val componentSerializer = SetSerializer(PolymorphicSerializer(GearyComponent::class))
     }
 }

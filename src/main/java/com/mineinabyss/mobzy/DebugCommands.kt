@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.components.addComponents
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.engine.EngineImpl
@@ -12,6 +13,7 @@ import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.getService
 import com.mineinabyss.looty.ecs.components.Inventory
 import com.mineinabyss.looty.ecs.components.PlayerComponent
+import com.mineinabyss.looty.ecs.components.PotionComponent
 import com.mineinabyss.looty.ecs.components.Screaming
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.store.encodeComponents
@@ -36,14 +38,21 @@ internal fun Command.createDebugCommands() {
             }
         }
     }
-    "screamingitem" {
+    fun Command.components(vararg components: GearyComponent) {
         playerAction {
             player.inventory.itemInMainHand.apply {
                 itemMeta = itemMeta.apply {
-                    persistentDataContainer.encodeComponents(setOf(Screaming()))
+                    persistentDataContainer.encodeComponents(components.toSet())
                 }
             }
         }
+    }
+
+    "screamingitem" {
+        components(Screaming())
+    }
+    "speeditem" {
+        components(PotionComponent("SPEED", 2))
     }
 
     "components"{

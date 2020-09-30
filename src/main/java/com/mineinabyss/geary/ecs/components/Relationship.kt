@@ -1,14 +1,14 @@
 package com.mineinabyss.geary.ecs.components
 
+import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.MobzyComponent
 import kotlinx.serialization.Serializable
 
 //TODO document and maybe split into two files
 @Serializable
 class Children(
         internal val ids: MutableSet<GearyEntity> = mutableSetOf()
-) : MobzyComponent()
+) : GearyComponent()
 
 val GearyEntity.children
     get(): Set<GearyEntity> = get<Children>()?.ids?.toSet() ?: emptySet()
@@ -50,9 +50,9 @@ fun GearyEntity.clearChildren() {
 
 
 @Serializable
-class Parent(
+data class Parent(
         internal var id: GearyEntity?
-) : MobzyComponent()
+) : GearyComponent()
 
 /** Update child's parent without recursion. */
 private var GearyEntity.unsafeParent
