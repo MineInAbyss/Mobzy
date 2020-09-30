@@ -19,6 +19,7 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
+        maven { url 'https://repo.codemc.io/repository/nms/' }
         maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         maven { url 'https://erethon.de/repo/' } //HeadLib
