@@ -4,7 +4,7 @@ import com.mineinabyss.geary.ecs.GearyEntity
 import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.addComponents
 import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.components.getComponents
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
@@ -58,7 +58,7 @@ interface CustomMob : GearyEntity {
     fun lastDamageByPlayerTime(): Int
 
     fun saveMobNBT(nbttagcompound: NMSDataContainer) {
-        entity.persistentDataContainer.encodeComponents(Engine.getComponentsFor(gearyId).filter { it.persist })
+        entity.persistentDataContainer.encodeComponents(getComponents().filter { it.persist })
     }
 
     fun loadMobNBT(nbttagcompound: NMSDataContainer) {

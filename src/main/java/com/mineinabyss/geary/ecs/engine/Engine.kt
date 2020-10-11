@@ -17,7 +17,7 @@ interface Engine {
 
     fun addSystem(system: TickingSystem): Boolean
 
-    fun getComponentsFor(id: Int): MutableSet<GearyComponent>
+    fun getComponentsFor(id: Int): Set<GearyComponent>
     fun getComponentFor(kClass: ComponentClass, id: Int): GearyComponent?
     fun hasComponentFor(kClass: ComponentClass, id: Int): Boolean
     fun removeComponentFor(kClass: ComponentClass, id: Int)

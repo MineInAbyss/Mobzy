@@ -55,7 +55,7 @@ class EngineImpl : Engine {
     private val components = mutableMapOf<ComponentClass, SparseArrayList<GearyComponent>>()
     internal val bitsets = mutableMapOf<ComponentClass, BitVector>()
 
-    override fun getComponentsFor(id: Int) = components.mapNotNullTo(mutableSetOf()) { (_, value) -> value.getOrNull(id) }
+    override fun getComponentsFor(id: Int): Set<GearyComponent> = components.mapNotNullTo(mutableSetOf()) { (_, value) -> value.getOrNull(id) }
 
     override fun getComponentFor(kClass: ComponentClass, id: Int): GearyComponent? = runCatching { components[kClass]?.get(id) }.getOrNull()
     override fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false

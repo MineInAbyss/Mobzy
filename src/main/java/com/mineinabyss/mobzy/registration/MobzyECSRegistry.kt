@@ -7,6 +7,9 @@ import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.looty.ecs.components.PotionComponent
 import com.mineinabyss.looty.ecs.components.Screaming
+import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
+import com.mineinabyss.looty.ecs.systems.PotionEffectSystem
+import com.mineinabyss.looty.ecs.systems.ScreamingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
@@ -63,9 +66,9 @@ internal object MobzyECSRegistry : Listener {
     private fun registerSystems() {
         Engine.addSystems(
                 WalkingAnimationSystem,
-//                ItemTrackerSystem,
-//                ScreamingSystem, //TODO split up
-//                PotionEffectSystem
+                ItemTrackerSystem,
+                ScreamingSystem, //TODO split up
+                PotionEffectSystem
         )
     }
 

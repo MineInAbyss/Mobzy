@@ -11,7 +11,7 @@ import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.getService
-import com.mineinabyss.looty.ecs.components.Inventory
+import com.mineinabyss.looty.ecs.components.ChildItemCache
 import com.mineinabyss.looty.ecs.components.PlayerComponent
 import com.mineinabyss.looty.ecs.components.PotionComponent
 import com.mineinabyss.looty.ecs.components.Screaming
@@ -34,7 +34,7 @@ internal fun Command.createDebugCommands() {
     "registerself" {
         playerAction {
             Engine.entity {
-                addComponents(setOf(PlayerComponent(player.uniqueId), Inventory()))
+                addComponents(setOf(PlayerComponent(player.uniqueId), ChildItemCache()))
             }
         }
     }

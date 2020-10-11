@@ -9,22 +9,24 @@ import com.mineinabyss.geary.ecs.remove
 import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.messaging.info
+import com.mineinabyss.looty.ecs.components.ChildItemCache
 import com.mineinabyss.looty.ecs.components.Held
-import com.mineinabyss.looty.ecs.components.Inventory
+import com.mineinabyss.looty.ecs.components.ItemEntity
 import com.mineinabyss.looty.ecs.components.PlayerComponent
 import com.mineinabyss.mobzy.ecs.geary
 import com.mineinabyss.mobzy.ecs.get
 import com.mineinabyss.mobzy.ecs.store.decodeComponents
 import com.mineinabyss.mobzy.ecs.store.encodeComponents
 import com.mineinabyss.mobzy.ecs.store.isGearyEntity
-import org.bukkit.entity.Player
+import com.mineinabyss.mobzy.ecs.with
+import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
 import kotlin.collections.set
 
 /**
@@ -40,49 +42,44 @@ import kotlin.collections.set
  * - All valid items get re-serialized TODO in the future there should be some form of dirty tag so we aren't unnecessarily serializing things
  */
 object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
-    override fun tick() = Engine.forEach<PlayerComponent, Inventory> { (player), inventoryComponent ->
+    override fun tick() = Engine.forEach<PlayerComponent, ChildItemCache> { (player), inventoryComponent ->
         //TODO make children use an engine too, then easily remove all held components
-        updateAndSaveItems(player, inventoryComponent)
+        inventoryComponent.updateAndSaveItems(player.inventory, this)
 
         //Add a held component to currently held item
-        inventoryComponent.entityAt(player.inventory.heldItemSlot)?.addComponent(Held())
+        inventoryComponent[player.inventory.heldItemSlot]?.entity?.addComponent(Held())
     }
 
-    fun Inventory.unregisterAll() {
-        itemCache.values.forEach { (_, entity) ->
-            entity.remove()
-        }
-        itemCache.clear()
-    }
-
-    fun GearyEntity.updateAndSaveItems(player: Player, inventoryComponent: Inventory) {
-        val oldCache = inventoryComponent.itemCache.toMutableMap()
-        val newCache = mutableMapOf<Int, Pair<ItemStack, GearyEntity>>()
-        val heldSlot = player.inventory.heldItemSlot
+    fun ChildItemCache.updateAndSaveItems(inventory: PlayerInventory, gearyEntity: GearyEntity) {
+        val oldCache = toMutableMap()
+        val newCache = mutableMapOf<Int, ItemEntity>()
+        val heldSlot = inventory.heldItemSlot
         //TODO prevent issues with children and id changes
-        player.inventory.forEachIndexed { i, item ->
+
+        inventory.forEachIndexed { i, item ->
             if (item == null || !item.hasItemMeta()) return@forEachIndexed
             val meta = item.itemMeta
             val container = meta.persistentDataContainer
-            if (!container.isGearyEntity) return //TODO perhaps some way of knowing this without cloning the ItemMeta
+            if (!container.isGearyEntity) return@forEachIndexed //TODO perhaps some way of knowing this without cloning the ItemMeta
 
             //if the items match exactly, encode components
-            val itemEntity: GearyEntity = if (item == oldCache[i]?.first) {
-                val entity = oldCache[i]!!.second
+            val cachedItemEntity = oldCache[i]
+            val itemEntity: GearyEntity = if (item == cachedItemEntity?.item) {
+                val entity = cachedItemEntity.entity
                 oldCache.remove(i)
-                container.encodeComponents(Engine.getComponentsFor(entity.gearyId))
+                container.encodeComponents(entity.getComponents())
                 entity
             } else {
                 //if our old list of items still contains an item equal to this, simply update the indices
-                oldCache.entries.find { it.value.first == item }?.let {
-                    val entity = it.value.second
-                    oldCache.remove(it.key)
-                    entity
-                } ?: run { //if we didn't find an equal item, this must be a new one
-                    val entity = Engine.entity new@{
+                val equivalent = oldCache.entries.find { it.value.item == item }
+                if (equivalent != null) {
+                    oldCache.remove(equivalent.key)
+                    equivalent.value.entity
+                } else { //if we didn't find an equal item, this must be a new one
+                    val entity = Engine.entity new@{ //TODO do we need new@?
                         addComponents(container.decodeComponents())
                     }
-                    addChild(entity)
+                    gearyEntity.addChild(entity)
                     entity
                 }
             }
@@ -92,13 +89,13 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
             //save the new encoded components to the actual item meta, and place them into the new cache
             //TODO dont save if no changes found
             item.itemMeta = meta
-            newCache[i] = item to itemEntity
+            newCache[i] = ItemEntity(item, itemEntity)
         }
         oldCache.values.forEach {
-            it.second.remove()
+            it.entity.remove()
         }
 
-        inventoryComponent.itemCache = newCache
+        update(newCache)
     }
 
     @EventHandler
@@ -107,7 +104,7 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
         val currItem = e.currentItem //REMOVE: the item that was clicked and its slot
 
         val player = e.whoClicked
-        val inventory = player.get<Inventory>() ?: return
+        val inventory = player.get<ChildItemCache>() ?: return
 
         player.info("""
             Cursor: ${e.cursor}
@@ -119,18 +116,18 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
         if (e.isShiftClick) return
 
         //TODO if both cursor and currItem aren't null, we try to swap them instead of removing
-        if (cursor == null) { //remove if cursor had nothing
-            inventory.entityAt(e.slot)?.remove()
-            inventory.itemCache.remove(e.slot)
-
-        } else { //add otherwise
+        if (cursor == null || cursor.type == Material.AIR) { //remove if cursor had nothing
+            inventory.remove(e.slot)
+        } else if(cursor.hasItemMeta()) { //otherwise, cursor into cache
             val meta = cursor.itemMeta
             if (!meta.persistentDataContainer.isGearyEntity) return
 
             val entity = Engine.entity {
                 addComponents(meta.persistentDataContainer.decodeComponents())
             }
-            inventory.itemCache[e.slot] = cursor to entity
+            //TODO adding child should be done within inv
+            geary(player)?.addChild(entity)
+            inventory[e.slot] = ItemEntity(cursor, entity)
         }
     }
 
@@ -143,40 +140,23 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
         val player = e.player
         val prevSlot = e.previousSlot
         val newSlot = e.newSlot
-        geary(player)?.get<Inventory>()?.swapHeldComponent(prevSlot, newSlot)
+        player.get<ChildItemCache>()?.swapHeldComponent(prevSlot, newSlot)
     }
 
-    fun Inventory.swapHeldComponent(removeFrom: Int, addTo: Int) {
-        entityAt(removeFrom)?.removeComponent<Held>()
-        entityAt(addTo)?.addComponent(Held())
-    }
-
-    fun Inventory.swapSlotCache(first: Int, second: Int) {
-        val firstCache = itemCache[first]
-        val secondCache = itemCache[second]
-
-        if (firstCache == null)
-            itemCache.remove(second)
-        else
-            itemCache[second] = firstCache
-        if (secondCache == null)
-            itemCache.remove(first)
-        else
-            itemCache[first] = secondCache
-    }
+    private const val offHandSlot = 40 //TODO is there a version safe way of getting this slot via enum or something?
 
     @EventHandler
-    fun onSwapItems(e: PlayerSwapHandItemsEvent) {
+    fun onSwapOffhand(e: PlayerSwapHandItemsEvent) {
         val (player) = e
-        val inventory = geary(player)?.get<Inventory>() ?: return
+        player.with<ChildItemCache> { inventory ->
+            val mainHandSlot = player.inventory.heldItemSlot
 
-        val mainHandSlot = player.inventory.heldItemSlot
-        val offHandSlot = 40 //TODO is there a version safe way of getting this slot via enum or something?
+            inventory.swapSlotCache(mainHandSlot, offHandSlot)
 
-        inventory.swapSlotCache(mainHandSlot, offHandSlot)
+            //we always want to remove from offhand and add into main hand
+            inventory.swapHeldComponent(removeFrom = offHandSlot, addTo = mainHandSlot)
+        }
 
-        //we always want to remove from offhand and add into main hand
-        inventory.swapHeldComponent(removeFrom = offHandSlot, addTo = mainHandSlot)
     }
 
     //TODO dropping items should serialize them and instantly remove from inv
@@ -188,8 +168,8 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
     fun onDropItem(e: PlayerDropItemEvent) {
         val (player) = e
         geary(player) {
-            with<Inventory> {
-                updateAndSaveItems(player, it)
+            with<ChildItemCache> {
+                it.updateAndSaveItems(player.inventory, this)
             }
         }
     }

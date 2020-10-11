@@ -16,6 +16,8 @@ inline fun <reified T : GearyComponent> GearyEntity.getOrAdd(component: () -> T)
 
 inline fun <reified T : GearyComponent> GearyEntity.get(): T? = Engine.getComponentFor(T::class, gearyId) as? T
 
+inline fun GearyEntity.getComponents(): Set<GearyComponent> = Engine.getComponentsFor(gearyId)
+
 inline fun <reified T : GearyComponent> GearyEntity.with(let: (T) -> Unit) = get<T>()?.let(let)
 
 inline fun <reified T : GearyComponent> GearyEntity.has() = Engine.hasComponentFor(T::class, gearyId)
