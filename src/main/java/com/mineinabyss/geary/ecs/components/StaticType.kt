@@ -4,6 +4,6 @@ import com.mineinabyss.geary.ecs.GearyComponent
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Type(
+class StaticType(
         val name: String
 ) : GearyComponent()

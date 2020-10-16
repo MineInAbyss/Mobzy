@@ -9,12 +9,11 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
-import com.mineinabyss.mobzy.configuration.MobTypeConfigs
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.okkero.skedule.schedule
@@ -78,7 +77,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
 
         //We don't clear MobzyTypes since those will only ever change if an addon's code was changed which is impossible
         // to see during a soft reload like this.
-        MobTypes.reset()
+        MobzyTypes.reset()
         spawnCfgs.clear()
         unregisterSpawns()
 
@@ -118,7 +117,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * Loads [MobType]s for an addon
      */
     private fun MobzyAddon.loadMobTypes() {
-        MobTypeConfigs.registerTypes(this)
+        MobzyTypes.registerTypes(this)
     }
 
     /**

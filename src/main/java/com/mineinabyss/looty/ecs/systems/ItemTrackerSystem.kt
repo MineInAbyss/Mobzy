@@ -11,7 +11,7 @@ import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.looty.ecs.components.ChildItemCache
 import com.mineinabyss.looty.ecs.components.Held
-import com.mineinabyss.looty.ecs.components.ItemEntity
+import com.mineinabyss.looty.ecs.components.LootyEntity
 import com.mineinabyss.looty.ecs.components.PlayerComponent
 import com.mineinabyss.mobzy.ecs.geary
 import com.mineinabyss.mobzy.ecs.get
@@ -47,12 +47,12 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
         inventoryComponent.updateAndSaveItems(player.inventory, this)
 
         //Add a held component to currently held item
-        inventoryComponent[player.inventory.heldItemSlot]?.entity?.addComponent(Held())
+        inventoryComponent[player.inventory.heldItemSlot]?.addComponent(Held())
     }
 
     fun ChildItemCache.updateAndSaveItems(inventory: PlayerInventory, gearyEntity: GearyEntity) {
         val oldCache = toMutableMap()
-        val newCache = mutableMapOf<Int, ItemEntity>()
+        val newCache = mutableMapOf<Int, LootyEntity>()
         val heldSlot = inventory.heldItemSlot
         //TODO prevent issues with children and id changes
 
@@ -65,16 +65,15 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
             //if the items match exactly, encode components
             val cachedItemEntity = oldCache[i]
             val itemEntity: GearyEntity = if (item == cachedItemEntity?.item) {
-                val entity = cachedItemEntity.entity
                 oldCache.remove(i)
-                container.encodeComponents(entity.getComponents())
-                entity
+                container.encodeComponents(cachedItemEntity.getComponents())
+                cachedItemEntity
             } else {
                 //if our old list of items still contains an item equal to this, simply update the indices
                 val equivalent = oldCache.entries.find { it.value.item == item }
                 if (equivalent != null) {
                     oldCache.remove(equivalent.key)
-                    equivalent.value.entity
+                    equivalent.value
                 } else { //if we didn't find an equal item, this must be a new one
                     val entity = Engine.entity new@{ //TODO do we need new@?
                         addComponents(container.decodeComponents())
@@ -89,10 +88,10 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
             //save the new encoded components to the actual item meta, and place them into the new cache
             //TODO dont save if no changes found
             item.itemMeta = meta
-            newCache[i] = ItemEntity(item, itemEntity)
+            newCache[i] = LootyEntity(item, itemEntity)
         }
         oldCache.values.forEach {
-            it.entity.remove()
+            it.remove()
         }
 
         update(newCache)
@@ -127,7 +126,7 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
             }
             //TODO adding child should be done within inv
             geary(player)?.addChild(entity)
-            inventory[e.slot] = ItemEntity(cursor, entity)
+            inventory[e.slot] = LootyEntity(cursor, entity)
         }
     }
 

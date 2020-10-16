@@ -1,9 +1,8 @@
 package com.mineinabyss.looty.ecs.config
 
 import com.mineinabyss.geary.ecs.serialization.Formats
-import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.registration.MobTypes
-import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.mobzy
+import com.okkero.skedule.schedule
 
 
 object LootyConfig {
@@ -11,13 +10,21 @@ object LootyConfig {
 
     fun registerAddon(addon: LootyAddon) = addons.add(addon)
 
-    fun reload() {
+    init {
+        //first tick only finishes when all plugins are loaded, which is when we activate addons
+        mobzy.schedule {
+            waitFor(1)
+            activateAddons()
+        }
+    }
+
+    private fun activateAddons() {
+        LootyTypes.reset()
         for (addon in addons) {
             addon.relicsDir.walk().filter { it.isFile }.forEach { file ->
                 val name = file.nameWithoutExtension
-                val type = Formats.yamlFormat.decodeFromString(MobType.serializer(), file.readText())
-                MobzyTypeRegistry.registerMob(name, type)
-                MobTypes.registerTypes(mapOf(name to type))
+                val type = Formats.yamlFormat.decodeFromString(LootyType.serializer(), file.readText())
+                LootyTypes.registerType(name, type) //TODO namespaces
             }
         }
     }

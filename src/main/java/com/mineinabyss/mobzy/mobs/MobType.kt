@@ -1,18 +1,16 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyComponent
-import com.mineinabyss.geary.ecs.serialization.Formats
+import com.mineinabyss.geary.ecs.GearyEntity
+import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
-import com.mineinabyss.mobzy.registration.MobTypes
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
-import kotlinx.serialization.PolymorphicSerializer
-import kotlinx.serialization.SerialName
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.Transient
 import net.minecraft.server.v1_16_R2.EnumCreatureType
-import kotlin.reflect.KClass
 
 /**
  * A class which stores information on mobs that can be deserialized from the config.
@@ -21,33 +19,19 @@ import kotlin.reflect.KClass
 data class MobType(
         val baseClass: String,
         val creatureType: EnumCreatureType,
-        @SerialName("name") private val _name: String? = null,
-        @SerialName("staticComponents") private val _staticComponents: MutableSet<GearyComponent> = mutableSetOf(),
-        @SerialName("components") private val _components: Set<GearyComponent> = setOf(),
         val targets: Map<Double, PathfinderComponent>? = null,
-        val goals: Map<Double, PathfinderComponent>? = null) {
-    init {
+        val goals: Map<Double, PathfinderComponent>? = null): GearyEntityType() {
+    override fun MutableSet<GearyComponent>.additionalComponents() {
         if (targets != null || goals != null)
-            _staticComponents += Pathfinders(targets, goals) //TODO GOAP
+            add(Pathfinders(targets, goals))
     }
 
-    val name by lazy { _name ?: MobTypes.getNameForTemplate(this) }
+    @Transient
+    override val types = MobzyTypes
 
-    //TODO this is the safest and cleanest way to deepcopy. Check how this performs vs deepcopy's reflection method.
-    val components: String by lazy { Formats.yamlFormat.encodeToString(componentSerializer, _components) }
-    val staticComponents: Map<KClass<out GearyComponent>, GearyComponent> by lazy { _staticComponents.associateBy { it::class } }
+    override fun instantiate(): GearyEntity {
+        TODO("Possibly move instantiation of new entities here")
+    }
+
     val nmsType: NMSEntityType<*> by lazy { MobzyTypeRegistry[name] }
-
-    inline fun <reified T : GearyComponent> get(): T? = staticComponents[T::class] as? T
-
-    inline fun <reified T : GearyComponent> has() = staticComponents.containsKey(T::class)
-
-    fun instantiateComponents(existingComponents: Set<GearyComponent> = emptySet()): Set<GearyComponent> =
-            Formats.yamlFormat.decodeFromString(componentSerializer, components).apply {
-                forEach { it.persist = true }
-            } + existingComponents + staticComponents.values
-
-    companion object {
-        private val componentSerializer = SetSerializer(PolymorphicSerializer(GearyComponent::class))
-    }
 }

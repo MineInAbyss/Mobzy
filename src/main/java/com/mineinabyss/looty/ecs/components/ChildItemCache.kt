@@ -12,30 +12,30 @@ import org.bukkit.inventory.ItemStack
 @Serializable
 class ChildItemCache(
         @Transient
-        private val _itemCache: MutableMap<Int, ItemEntity> = mutableMapOf()
-) : GearyComponent(), Map<Int, ItemEntity> by _itemCache {
-    operator fun set(index: Int, entity: ItemEntity) {
+        private val _itemCache: MutableMap<Int, LootyEntity> = mutableMapOf()
+) : GearyComponent(), Map<Int, LootyEntity> by _itemCache {
+    operator fun set(index: Int, entity: LootyEntity) {
         _itemCache[index] = entity
     }
 
     fun clear() {
-        _itemCache.values.forEach { it.entity.remove() }
+        _itemCache.values.forEach { it.remove() }
         _itemCache.clear()
     }
 
-    internal fun update(newCache: MutableMap<Int, ItemEntity>) {
+    internal fun update(newCache: MutableMap<Int, LootyEntity>) {
         _itemCache.clear()
         _itemCache += newCache
     }
 
     fun remove(index: Int){
-        get(index)?.entity?.remove()
+        get(index)?.remove()
         _itemCache -= index
     }
 
     fun swapHeldComponent(removeFrom: Int, addTo: Int) {
-        this[removeFrom]?.entity?.removeComponent<Held>()
-        this[addTo]?.entity?.addComponent(Held())
+        this[removeFrom]?.removeComponent<Held>()
+        this[addTo]?.addComponent(Held())
     }
 
     fun swapSlotCache(first: Int, second: Int) {
@@ -54,4 +54,5 @@ class ChildItemCache(
     }
 }
 
-data class ItemEntity(val item: ItemStack, val entity: GearyEntity)
+//TODO figure out how to store info on the ItemStack within the actual ECS.
+data class LootyEntity(override val gearyId: Int, val item: ItemStack): GearyEntity

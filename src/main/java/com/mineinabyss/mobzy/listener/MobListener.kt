@@ -22,7 +22,7 @@ import com.mineinabyss.mobzy.ecs.events.MobSpawnEvent
 import com.mineinabyss.mobzy.ecs.has
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.registration.MobTypes
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
@@ -141,7 +141,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                MobTypes[entity].get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
+                MobzyTypes.get(entity).get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {
