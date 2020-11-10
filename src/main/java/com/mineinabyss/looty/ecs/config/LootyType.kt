@@ -1,11 +1,14 @@
 package com.mineinabyss.looty.ecs.config
 
 import com.mineinabyss.geary.ecs.GearyComponent
+import com.mineinabyss.geary.ecs.components.StaticType
+import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.addComponents
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.looty.ecs.components.LootyEntity
+import com.mineinabyss.mobzy.ecs.store.encodeComponents
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -15,14 +18,19 @@ data class LootyType(
         private val _name: String? = null,
         private val _staticComponents: MutableSet<GearyComponent> = mutableSetOf(),
         private val _components: Set<GearyComponent> = setOf(),
-): GearyEntityType() {
+) : GearyEntityType() {
     @Transient
     override val types = LootyTypes
 
-    fun instantiateItemStack() = item.toItemStack()
-
-    override fun instantiate(): LootyEntity =
-        LootyEntity(Engine.getNextId(), instantiateItemStack()).apply {
-            addComponents(instantiateComponents())
+    fun instantiateItemStack() = item.toItemStack().apply {
+        itemMeta = itemMeta.apply {
+            persistentDataContainer.encodeComponents(instantiateComponents() + StaticType(name))
         }
+    }
+
+    override fun instantiate(): LootyEntity = //TODO should we even instantiate all this stuff right away?
+            LootyEntity(Engine.getNextId(), instantiateItemStack()).apply {
+                addComponent(StaticType(name))
+                addComponents(instantiateComponents())
+            }
 }

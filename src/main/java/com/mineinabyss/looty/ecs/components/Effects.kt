@@ -7,7 +7,7 @@ import kotlinx.serialization.Transient
 import org.bukkit.potion.PotionEffectType
 
 @Serializable
-@SerialName("mobzy:potioneffect")
+@SerialName("looty:potion")
 class PotionComponent (
         @SerialName("effect")
         private val _effect: String,

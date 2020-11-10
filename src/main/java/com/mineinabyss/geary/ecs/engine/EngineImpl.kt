@@ -2,6 +2,7 @@ package com.mineinabyss.geary.ecs.engine
 
 import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.GearyEntity
+import com.mineinabyss.geary.ecs.components.StaticType
 import com.mineinabyss.geary.ecs.components.parent
 import com.mineinabyss.geary.ecs.components.removeChildren
 import com.mineinabyss.geary.ecs.events.EntityRemovedEvent
@@ -57,7 +58,13 @@ class EngineImpl : Engine {
 
     override fun getComponentsFor(id: Int): Set<GearyComponent> = components.mapNotNullTo(mutableSetOf()) { (_, value) -> value.getOrNull(id) }
 
-    override fun getComponentFor(kClass: ComponentClass, id: Int): GearyComponent? = runCatching { components[kClass]?.get(id) }.getOrNull()
+    override fun getComponentFor(kClass: ComponentClass, id: Int): GearyComponent? = runCatching {
+        components[kClass]?.get(id)
+    }.getOrNull() ?: runCatching {
+        //tries finding a component in the static type if a StaticType component is present
+        (components[StaticType::class]?.get(id) as StaticType).getComponent(kClass)
+    }.getOrNull()
+
     override fun hasComponentFor(kClass: ComponentClass, id: Int) = bitsets[kClass]?.contains(id) ?: false
     override fun removeComponentFor(kClass: ComponentClass, id: Int) {
         val bitset = bitsets[kClass] ?: return

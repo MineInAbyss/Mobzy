@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.geary.ecs.GearyComponent
+import com.mineinabyss.geary.ecs.components.StaticType
 import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.engine.Engine
@@ -76,6 +77,8 @@ internal object MobzyECSRegistry : Listener {
         //TODO annotate serializable components to register this automatically
         Formats.addSerializerModule(SerializersModule {
             polymorphic(GearyComponent::class) {
+                subclass(StaticType.serializer())
+
                 subclass(Model.serializer())
                 subclass(Pathfinders.serializer())
                 subclass(Equipment.serializer())

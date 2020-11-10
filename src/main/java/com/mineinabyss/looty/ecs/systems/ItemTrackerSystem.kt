@@ -8,7 +8,6 @@ import com.mineinabyss.geary.ecs.engine.forEach
 import com.mineinabyss.geary.ecs.remove
 import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.idofront.destructure.component1
-import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.looty.ecs.components.ChildItemCache
 import com.mineinabyss.looty.ecs.components.Held
 import com.mineinabyss.looty.ecs.components.LootyEntity
@@ -88,7 +87,7 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
             //save the new encoded components to the actual item meta, and place them into the new cache
             //TODO dont save if no changes found
             item.itemMeta = meta
-            newCache[i] = LootyEntity(item, itemEntity)
+            newCache[i] = LootyEntity(itemEntity.gearyId, item)
         }
         oldCache.values.forEach {
             it.remove()
@@ -105,11 +104,11 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
         val player = e.whoClicked
         val inventory = player.get<ChildItemCache>() ?: return
 
-        player.info("""
-            Cursor: ${e.cursor}
-            CurrentItem: ${e.currentItem}
-            Slot: ${e.slot}
-        """.trimIndent())
+//        player.info("""
+//            Cursor: ${e.cursor}
+//            CurrentItem: ${e.currentItem}
+//            Slot: ${e.slot}
+//        """.trimIndent())
 
         //shift clicking still considers cursor null and we don't know the location being put into TODO try to see if we can find it
         if (e.isShiftClick) return
@@ -126,7 +125,7 @@ object ItemTrackerSystem : TickingSystem(interval = 100), Listener {
             }
             //TODO adding child should be done within inv
             geary(player)?.addChild(entity)
-            inventory[e.slot] = LootyEntity(cursor, entity)
+            inventory[e.slot] = LootyEntity(entity.gearyId, cursor)
         }
     }
 

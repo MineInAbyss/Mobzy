@@ -43,7 +43,7 @@ abstract class GearyEntityType {
     fun instantiateComponents(existingComponents: Set<GearyComponent> = emptySet()): Set<GearyComponent> =
             Formats.yamlFormat.decodeFromString(componentSerializer, serializedComponents).apply {
                 forEach { it.persist = true }
-            } + existingComponents + staticComponents
+            } + existingComponents// + staticComponents TODO incorporate into the types system
 
     /** Creates a new instance of this type's defined entity, which is registered with the [Engine] */
     abstract fun instantiate(): GearyEntity

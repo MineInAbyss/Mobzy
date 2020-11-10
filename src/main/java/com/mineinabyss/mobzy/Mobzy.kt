@@ -6,6 +6,7 @@ import com.mineinabyss.geary.ecs.systems.PlayerJoinLeaveListener
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.idofront.plugin.registerService
+import com.mineinabyss.looty.ecs.LootyCommands
 import com.mineinabyss.looty.ecs.config.LootyAddon
 import com.mineinabyss.looty.ecs.config.registerAddonWithLooty
 import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
@@ -60,6 +61,7 @@ class Mobzy : JavaPlugin(), MobzyAddon, LootyAddon {
 
         //Register commands
         MobzyCommands
+        LootyCommands
 
         //Register all players with teh ECS
         Bukkit.getOnlinePlayers().forEach { player ->
