@@ -1,4 +1,4 @@
-package com.mineinabyss.geary.ecs.systems
+package com.mineinabyss.mobzy.ecs.systems
 
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.mobzy.ecs.BukkitEntityAccess
