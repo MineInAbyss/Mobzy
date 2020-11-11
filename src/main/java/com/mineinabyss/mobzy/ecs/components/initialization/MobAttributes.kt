@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
 import com.mineinabyss.geary.ecs.GearyComponent
+import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributes
 import com.mineinabyss.mobzy.api.nms.typeinjection.set
-import com.mineinabyss.mobzy.ecs.get
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R2.GenericAttributes

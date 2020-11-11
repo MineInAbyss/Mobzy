@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.ecs.systems
 
+import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
 import com.mineinabyss.idofront.destructure.component1
-import com.mineinabyss.mobzy.ecs.BukkitEntityAccess
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent

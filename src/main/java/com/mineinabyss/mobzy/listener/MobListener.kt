@@ -4,6 +4,8 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.components.with
 import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.minecraft.components.MobComponent
+import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
@@ -12,14 +14,12 @@ import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
-import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
 import com.mineinabyss.mobzy.ecs.events.MobSpawnEvent
-import com.mineinabyss.mobzy.ecs.has
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyTypes

@@ -6,15 +6,10 @@ import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.serialization.Formats
-import com.mineinabyss.looty.ecs.components.PotionComponent
-import com.mineinabyss.looty.ecs.components.Screaming
-import com.mineinabyss.looty.ecs.systems.ItemTrackerSystem
-import com.mineinabyss.looty.ecs.systems.PotionEffectSystem
-import com.mineinabyss.looty.ecs.systems.ScreamingSystem
+import com.mineinabyss.geary.minecraft.components.MobComponent
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
-import com.mineinabyss.mobzy.ecs.components.MobComponent
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -66,10 +61,7 @@ internal object MobzyECSRegistry : Listener {
 
     private fun registerSystems() {
         Engine.addSystems(
-                WalkingAnimationSystem,
-                ItemTrackerSystem,
-                ScreamingSystem, //TODO split up
-                PotionEffectSystem
+                WalkingAnimationSystem
         )
     }
 
@@ -77,7 +69,7 @@ internal object MobzyECSRegistry : Listener {
         //TODO annotate serializable components to register this automatically
         Formats.addSerializerModule(SerializersModule {
             polymorphic(GearyComponent::class) {
-                subclass(StaticType.serializer())
+                subclass(StaticType.serializer()) //TODO move into Geary
 
                 subclass(Model.serializer())
                 subclass(Pathfinders.serializer())
@@ -88,9 +80,6 @@ internal object MobzyECSRegistry : Listener {
                 subclass(MobAttributes.serializer())
                 subclass(DeathLoot.serializer())
                 subclass(Rideable.serializer())
-
-                subclass(Screaming.serializer())
-                subclass(PotionComponent.serializer())
             }
             polymorphic(PathfinderComponent::class) {
                 subclass(TemptBehavior.serializer())
