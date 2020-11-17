@@ -13,6 +13,3 @@ commands:
     aliases: [mz, mobzy]
     description: The main mobzy command
     usage: /mobzy [sub command]
-  looty:
-    description: The main looty command
-    usage: /looty [sub command]

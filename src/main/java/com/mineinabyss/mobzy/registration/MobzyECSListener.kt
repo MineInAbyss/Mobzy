@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.registration
 
+import com.mineinabyss.geary.dsl.attachToGeary
 import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.components.StaticType
 import com.mineinabyss.geary.ecs.components.addComponent
@@ -7,6 +8,7 @@ import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.geary.minecraft.components.MobComponent
+import com.mineinabyss.mobzy.Mobzy
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
@@ -36,38 +38,14 @@ import kotlinx.serialization.modules.subclass
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-internal object MobzyECSRegistry : Listener {
-    @EventHandler
-    fun attachPathfindersOnEntityLoadedEvent(event: MobLoadEvent) {
-        val (entity) = event
-        val (mob) = entity.get<MobComponent>() ?: return
-        val (targets, goals) = entity.get<Pathfinders>() ?: return
-
-        targets?.forEach { (priority, component) ->
-            mob.toNMS().addTargetSelector(priority.toInt(), component.build(mob))
-
-            entity.addComponent(component)
-        }
-        goals?.forEach { (priority, component) ->
-            mob.toNMS().addPathfinderGoal(priority.toInt(), component.build(mob))
-            entity.addComponent(component)
-        }
-    }
-
-    fun register() {
-        registerSystems()
-        registerComponentSerialization()
-    }
-
-    private fun registerSystems() {
-        Engine.addSystems(
+fun Mobzy.attachToGeary() {
+    attachToGeary(
+            types = MobzyTypes
+    ) {
+        systems(
                 WalkingAnimationSystem
         )
-    }
-
-    private fun registerComponentSerialization() {
-        //TODO annotate serializable components to register this automatically
-        Formats.addSerializerModule(SerializersModule {
+        serializers {
             polymorphic(GearyComponent::class) {
                 subclass(StaticType.serializer()) //TODO move into Geary
 
@@ -100,6 +78,6 @@ internal object MobzyECSRegistry : Listener {
                 subclass(TargetDamager.serializer())
                 subclass(TargetAttacker.serializer())
             }
-        })
+        }
     }
 }

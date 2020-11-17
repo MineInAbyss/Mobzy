@@ -175,13 +175,12 @@ object MobListener : Listener {
             ) { entity -> entity != player }
 
             //if we hit a custom mob, attack or fire an event
-            trace?.hitEntity?.let { hit ->
-                if (hit !is CustomMob || hit !is Mob) return
+            trace?.hitEntity?.toMobzy()?.let { hit ->
                 if (e.leftClicked) {
                     e.isCancelled = true
-                    player.toNMS().attack(hit.toNMS())
+                    player.toNMS().attack(hit.nmsEntity)
                 } else {
-                    EntityRightClickEvent(player, hit).call()
+                    EntityRightClickEvent(player, hit.entity).call()
                 }
             }
         }

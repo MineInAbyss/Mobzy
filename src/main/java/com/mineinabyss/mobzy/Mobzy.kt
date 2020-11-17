@@ -4,12 +4,10 @@ import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
-import com.mineinabyss.mobzy.ecs.systems.PlayerJoinLeaveListener
+import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
+import com.mineinabyss.mobzy.ecs.listeners.PlayerJoinLeaveListener
 import com.mineinabyss.mobzy.listener.MobListener
-import com.mineinabyss.mobzy.registration.MobzyECSRegistry
-import com.mineinabyss.mobzy.registration.MobzyPacketInterception
-import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
-import com.mineinabyss.mobzy.registration.MobzyWorldguard
+import com.mineinabyss.mobzy.registration.*
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -37,8 +35,8 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         saveDefaultConfig()
         reloadConfig()
 
+        attachToGeary()
 
-        MobzyECSRegistry.register()
         MobzyPacketInterception.registerPacketInterceptors()
         MobzyTypeRegistry //instantiate singleton
         SpawnTask.startTask()
@@ -47,7 +45,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         //Register events
         registerEvents(
                 MobListener,
-                MobzyECSRegistry,
+                MobzyECSListener,
                 PlayerJoinLeaveListener,
                 BukkitEntityAccess,
         )
@@ -59,7 +57,6 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         Bukkit.getOnlinePlayers().forEach { player ->
             BukkitEntityAccess.registerPlayer(player)
         }
-
         registerAddonWithMobzy()
     }
 
