@@ -8,6 +8,11 @@ import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 
 internal fun Command.createDebugCommands() {
+    "pdc" {
+        playerAction {
+            sender.sendMessage(player.location.getNearbyEntities(5.0, 5.0, 5.0).first().persistentDataContainer.keys.toString())
+        }
+    }
     ("configinfo" / "cfginfo")(desc = "Information about the current state of the plugin")?.action {
         sender.info(("""
                             LOG OF CURRENTLY REGISTERED STUFF:

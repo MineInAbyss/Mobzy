@@ -39,9 +39,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 fun Mobzy.attachToGeary() {
-    attachToGeary(
-            types = MobzyTypes
-    ) {
+    attachToGeary(types = MobzyTypes) {
         systems(
                 WalkingAnimationSystem
         )

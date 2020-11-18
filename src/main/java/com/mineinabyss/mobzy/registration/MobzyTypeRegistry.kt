@@ -90,4 +90,5 @@ object MobzyTypeRegistry {
     }
 }
 
+//TODO try to reduce usage around code, should really only be done in one central place
 internal fun String.toEntityTypeName() = toLowerCase().replace(" ", "_")

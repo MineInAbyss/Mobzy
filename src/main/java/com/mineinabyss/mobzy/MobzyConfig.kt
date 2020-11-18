@@ -109,7 +109,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     /**
      * Loads a [SpawnConfig] for an addon
      *
-     * @param this@loadSpawns the addon registering it
+     * @receiver The addon registering it
      */
     private fun MobzyAddon.loadSpawns() = SpawnConfig(spawnConfig, this)
 

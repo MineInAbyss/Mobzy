@@ -5,6 +5,7 @@ import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.components.with
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.minecraft.components.MobComponent
+import com.mineinabyss.geary.minecraft.store.geary
 import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
@@ -141,7 +142,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                MobzyTypes.get(entity).get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
+                geary(entity)?.get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {

@@ -8,10 +8,10 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.entity.typeName
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.registration.MobzyTypes.types
+import com.mineinabyss.mobzy.mobzy
 import org.bukkit.entity.Mob
 
-object MobzyTypes: GearyEntityTypes<MobType>() {
+object MobzyTypes : GearyEntityTypes<MobType>(mobzy) {
     /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
     operator fun get(type: NMSEntityType<*>): MobType = get(type.typeName)
 
@@ -29,7 +29,7 @@ object MobzyTypes: GearyEntityTypes<MobType>() {
             val name = file.nameWithoutExtension
             val type = Formats.yamlFormat.decodeFromString(MobType.serializer(), file.readText())
             MobzyTypeRegistry.registerMob(name, type)
-            MobzyTypes.registerTypes(mapOf(name to type))
+            MobzyTypes.registerType(name, type)
         }
     }
 }

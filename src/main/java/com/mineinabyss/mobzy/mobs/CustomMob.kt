@@ -1,10 +1,7 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.addComponents
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.getComponents
+import com.mineinabyss.geary.ecs.components.*
 import com.mineinabyss.geary.minecraft.components.MobComponent
 import com.mineinabyss.geary.minecraft.store.decodeComponents
 import com.mineinabyss.geary.minecraft.store.encodeComponents
@@ -63,6 +60,9 @@ interface CustomMob : GearyEntity {
 
     fun loadMobNBT(nbttagcompound: NMSDataContainer) {
         addComponents(entity.persistentDataContainer.decodeComponents())
+        //TODO this will replace any components that might have been overridden/removed on purpose, and it won't do it
+        // immediately which could cause some confusion.
+//        addComponents(type.staticComponents)
     }
 
     fun dropExp()
@@ -89,8 +89,4 @@ interface CustomMob : GearyEntity {
         if (sound != null)
             entity.world.playSound(entity.location, sound, SoundCategory.NEUTRAL, 1f, (Random.nextDouble(1.0, 1.02).toFloat()))
     }
-
-    // ========== Helper methods ===================
-
-    fun randomSound(vararg sounds: String) = sounds.random()
 }
