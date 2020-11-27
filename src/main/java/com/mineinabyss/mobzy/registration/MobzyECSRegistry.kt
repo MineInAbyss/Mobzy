@@ -3,15 +3,8 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.geary.dsl.attachToGeary
 import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.components.StaticType
-import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.serialization.Formats
-import com.mineinabyss.geary.minecraft.components.MobComponent
 import com.mineinabyss.mobzy.Mobzy
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
-import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
+import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -21,7 +14,6 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
 import com.mineinabyss.mobzy.ecs.goals.minecraft.AvoidPlayerBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LeapAtTargetBehavior
 import com.mineinabyss.mobzy.ecs.goals.minecraft.MeleeAttackBehavior
@@ -32,17 +24,15 @@ import com.mineinabyss.mobzy.ecs.goals.targetselectors.TargetAttacker
 import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetDamager
 import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetNearbyPlayer
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
-import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 
 fun Mobzy.attachToGeary() {
     attachToGeary(types = MobzyTypes) {
         systems(
                 WalkingAnimationSystem
         )
+
         serializers {
             polymorphic(GearyComponent::class) {
                 subclass(StaticType.serializer()) //TODO move into Geary
@@ -76,6 +66,10 @@ fun Mobzy.attachToGeary() {
                 subclass(TargetDamager.serializer())
                 subclass(TargetAttacker.serializer())
             }
+        }
+
+        bukkitEntityAccess {
+            entityConversion { toMobzy() }
         }
     }
 }
