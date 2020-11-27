@@ -100,7 +100,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         MobzyTypeRegistry.injectDefaultAttributes()
         SpawnTask.startTask()
 
-        reloadExistingEntities()
+        fixEntitiesAfterReload()
 
         logSuccess("Registered addons: $registeredAddons")
         logSuccess("Loaded types: ${MobzyTypeRegistry.typeNames}")
@@ -121,27 +121,36 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     }
 
     /**
-     * Every loaded custom entity in the world stops relating to the CustomMob class heirarchy after reload, so we
-     * can't do something like customEntity instanceof CustomMob. Therefore, we "reload" those entities by deleting
-     * them and copying their NBT data to new entities
+     * Remove entities marked as a custom mob, but which are no longer considered an instance of CustomMob, and replace
+     * them with the equivalent custom mob, transferring over the data.
      */
-    private fun reloadExistingEntities() {
-        var num = 0
-        Bukkit.getServer().worlds.forEach { world ->
+    private fun fixEntitiesAfterReload() {
+        val num = Bukkit.getServer().worlds.forEach { world ->
             world.entities.filter {
-                if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
+                //in the future, when we have additional parts to an entity, we expect the entity to respawn them
+                // upon load. TODO figure out a proper system for this
+//                if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
+
+                //if this is a custom mob but the nms entity is no longer an instance of CustomMob (likely due to a reload)
                 it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
-            }.forEach {
-                val replacement = it.location.spawnEntity(it.toNMSEntityTypeViaScoreboardTags())?.toNMS<EntityLiving>()
+            }.onEach {
+                //spawn a replacement entity of the same type as defined in scoreboard tags
+                //TODO read this as StaticType from the PDC
+                val replacement = it.location.spawnEntity(it.entityTypeViaNBT)?.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()
-                it.toNMS<EntityLiving>().loadData(nbt) //.b copies over the entity's nbt data to the compound
+
+                //copies the entity nbt data to the compound
+                it.toNMS<EntityLiving>().loadData(nbt)
                 it.remove()
-                replacement?.save(nbt) //.a copies the nbt data to the new entity
-                num++
-            }
+
+                //writes this nbt data to the replacement entity
+                replacement?.saveData(nbt) //.a copies the nbt data to the new entity
+            }.count()
         }
         logSuccess("Reloaded $num custom entities")
     }
 
-    private fun Entity.toNMSEntityTypeViaScoreboardTags(): NMSEntityType<*> = MobzyTypeRegistry[scoreboardTags.first { MobzyTypeRegistry.contains(it) }]
+    /** The [NMSEntityType] as defined by mobzy via the mob's scoreboard tags. */
+    private val Entity.entityTypeViaNBT: NMSEntityType<*>
+        get() = MobzyTypeRegistry[scoreboardTags.first { MobzyTypeRegistry.contains(it) }]
 }

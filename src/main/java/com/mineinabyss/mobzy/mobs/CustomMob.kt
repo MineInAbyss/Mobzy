@@ -55,13 +55,17 @@ interface CustomMob : GearyEntity {
     fun lastDamageByPlayerTime(): Int
 
     fun saveMobNBT(nbttagcompound: NMSDataContainer) {
-        entity.persistentDataContainer.encodeComponents(getComponents().filter { it.persist })
+        //FIXME the rest of mobzy needs to be rewritten to actually make use of these components,
+        // we'll keep this disabled in the meantime to not read and write unnecessarily.
+//        entity.persistentDataContainer.encodeComponents(getComponents().filter { it.persist })
     }
 
     fun loadMobNBT(nbttagcompound: NMSDataContainer) {
-        addComponents(entity.persistentDataContainer.decodeComponents())
+        //same story here, no need to load stuff yet.
+//        addComponents(entity.persistentDataContainer.decodeComponents())
+
         //TODO this will replace any components that might have been overridden/removed on purpose, and it won't do it
-        // immediately which could cause some confusion.
+        // immediately which could cause some confusion. Decide on how we expect static components to work first!
 //        addComponents(type.staticComponents)
     }
 
@@ -73,7 +77,12 @@ interface CustomMob : GearyEntity {
      * identifier scoreboard tag
      */
     fun initMob() {
+        //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
+        // use the same system here.
         entity.addScoreboardTag("customMob3")
+
+        //save the entity type's name under scoreboard tags so we can identify this entity's type even if it's no longer
+        // considered an instance of CustomMob (ex. after a plugin reload).
         entity.addScoreboardTag(type.name)
 
         addComponent(MobComponent(entity))

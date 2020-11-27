@@ -40,8 +40,8 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     //overriding NMS methods
     override fun initPathfinder() = createPathfinders()
 
-    override fun saveData(nbttagcompound: NMSDataContainer) = super.saveData(nbttagcompound).also { loadMobNBT(nbttagcompound) }
-    override fun loadData(nbttagcompound: NMSDataContainer) = super.loadData(nbttagcompound).also { saveMobNBT(nbttagcompound) }
+    override fun saveData(nbttagcompound: NMSDataContainer) = super.saveData(nbttagcompound).also { saveMobNBT(nbttagcompound) }
+    override fun loadData(nbttagcompound: NMSDataContainer) = super.loadData(nbttagcompound).also { loadMobNBT(nbttagcompound) }
 
     override fun die(damagesource: DamageSource) = (this as CustomMob).die(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
@@ -53,6 +53,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun playBlockStepSound() = makeSound(get<Sounds>()?.step)
 }
 
+//TODO these should be part of a companion object that doesn't get copied over
 fun CustomMob.die(damageSource: DamageSource?) {
     val nmsWorld: World = entity.world.toNMS()
     if (!dead) {
