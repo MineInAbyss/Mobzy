@@ -22,7 +22,7 @@ data class MobType(
         val targets: Map<Double, PathfinderComponent>? = null,
         val goals: Map<Double, PathfinderComponent>? = null
 ) : GearyEntityType() {
-    override fun MutableSet<GearyComponent>.additionalStaticComponents() {
+    override fun MutableSet<GearyComponent>.addStaticComponents() {
         if (targets != null || goals != null)
             add(Pathfinders(targets, goals))
     }

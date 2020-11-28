@@ -88,6 +88,7 @@ interface CustomMob : GearyEntity {
         addComponent(MobComponent(entity))
         val existingComponents = entity.persistentDataContainer.decodeComponents()
         addComponents(type.instantiateComponents(existingComponents))
+
         MobLoadEvent(this).call()
 
         if (get<Model>()?.small == true) entity.toNMS().isBaby = true
