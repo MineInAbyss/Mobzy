@@ -6,10 +6,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.mobs.types.FlyingMob
-import com.mineinabyss.mobzy.mobs.types.HostileMob
-import com.mineinabyss.mobzy.mobs.types.NPC
-import com.mineinabyss.mobzy.mobs.types.PassiveMob
+import com.mineinabyss.mobzy.mobs.types.*
 import net.minecraft.server.v1_16_R2.AttributeDefaults
 import net.minecraft.server.v1_16_R2.AttributeProvider
 import net.minecraft.server.v1_16_R2.Entity
@@ -82,6 +79,7 @@ object MobzyTypeRegistry {
             "mobzy:flying" to ::FlyingMob, //TODO use proper keys
             "mobzy:hostile" to ::HostileMob,
             "mobzy:passive" to ::PassiveMob,
+            "mobzy:fish" to ::FishMob,
             "mobzy:npc" to ::NPC
     )
 

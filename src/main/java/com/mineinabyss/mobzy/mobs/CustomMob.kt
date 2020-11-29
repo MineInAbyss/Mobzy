@@ -1,21 +1,18 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.components.*
+import com.mineinabyss.geary.ecs.components.addComponent
+import com.mineinabyss.geary.ecs.components.addComponents
+import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.minecraft.components.MobComponent
 import com.mineinabyss.geary.minecraft.store.decodeComponents
-import com.mineinabyss.geary.minecraft.store.encodeComponents
 import com.mineinabyss.idofront.events.call
-import com.mineinabyss.mobzy.api.nms.aliases.NMSDataContainer
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityInsentient
-import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.nms.aliases.*
+import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
-import net.minecraft.server.v1_16_R2.ChatMessage
-import net.minecraft.server.v1_16_R2.EntityHuman
-import net.minecraft.server.v1_16_R2.EntityInsentient
 import org.bukkit.SoundCategory
+import org.bukkit.entity.HumanEntity
 import kotlin.random.Random
 
 /**
@@ -29,7 +26,7 @@ interface CustomMob : GearyEntity {
     override val gearyId: Int
 
     // ========== Useful properties ===============
-    val nmsEntity: EntityInsentient
+    val nmsEntity: NMSEntityInsentient
 
     @Suppress("UNCHECKED_CAST")
     val entity
@@ -37,9 +34,9 @@ interface CustomMob : GearyEntity {
 
     val type: MobType
 
-    val killer: EntityHuman? get() = nmsEntity.killer
+    val killer: NMSEntityHuman? get() = nmsEntity.killer
 
-    val scoreboardDisplayNameMZ: ChatMessage get() = ChatMessage(type.name.split('_').joinToString(" ") { it.capitalize() })
+    val scoreboardDisplayNameMZ: NMSChatMessage get() = NMSChatMessage(type.name.split('_').joinToString(" ") { it.capitalize() })
 
     var target
         get() = nmsEntity.goalTarget?.toBukkit()
@@ -52,24 +49,15 @@ interface CustomMob : GearyEntity {
     val killScore: Int
 
     fun createPathfinders()
+
     fun lastDamageByPlayerTime(): Int
 
-    fun saveMobNBT(nbttagcompound: NMSDataContainer) {
-        //FIXME the rest of mobzy needs to be rewritten to actually make use of these components,
-        // we'll keep this disabled in the meantime to not read and write unnecessarily.
-//        entity.persistentDataContainer.encodeComponents(getComponents().filter { it.persist })
-    }
-
-    fun loadMobNBT(nbttagcompound: NMSDataContainer) {
-        //same story here, no need to load stuff yet.
-//        addComponents(entity.persistentDataContainer.decodeComponents())
-
-        //TODO this will replace any components that might have been overridden/removed on purpose, and it won't do it
-        // immediately which could cause some confusion. Decide on how we expect static components to work first!
-//        addComponents(type.staticComponents)
-    }
+    fun saveMobNBT(nbttagcompound: NMSDataContainer)
+    fun loadMobNBT(nbttagcompound: NMSDataContainer)
 
     fun dropExp()
+
+    fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult
 
     // ========== Pre-written behaviour ============
     /**
@@ -94,9 +82,10 @@ interface CustomMob : GearyEntity {
         if (get<Model>()?.small == true) entity.toNMS().isBaby = true
     }
 
-    @Suppress("UNREACHABLE_CODE")
     fun makeSound(sound: String?) {
         if (sound != null)
             entity.world.playSound(entity.location, sound, SoundCategory.NEUTRAL, 1f, (Random.nextDouble(1.0, 1.02).toFloat()))
     }
+
+    fun makeSound(sound: Sounds.() -> String?) = makeSound(get<Sounds>()?.sound())
 }
