@@ -7,9 +7,11 @@ import com.mineinabyss.mobzy.api.registerAddonWithMobzy
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.listeners.PlayerJoinLeaveListener
 import com.mineinabyss.mobzy.listener.MobListener
-import com.mineinabyss.mobzy.registration.*
+import com.mineinabyss.mobzy.registration.MobzyPacketInterception
+import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.registration.MobzyWorldguard
+import com.mineinabyss.mobzy.registration.attachToGeary
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import kotlin.time.ExperimentalTime
@@ -41,7 +43,6 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         MobzyTypeRegistry //instantiate singleton
         SpawnTask.startTask()
 
-
         //Register events
         registerEvents(
                 MobListener,
@@ -53,10 +54,6 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         //Register commands
         MobzyCommands
 
-        //Register all players with teh ECS
-        Bukkit.getOnlinePlayers().forEach { player ->
-            BukkitEntityAccess.registerPlayer(player)
-        }
         registerAddonWithMobzy()
     }
 

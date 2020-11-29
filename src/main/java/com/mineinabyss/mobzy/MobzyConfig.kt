@@ -125,7 +125,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * them with the equivalent custom mob, transferring over the data.
      */
     private fun fixEntitiesAfterReload() {
-        val num = Bukkit.getServer().worlds.forEach { world ->
+        val num = Bukkit.getServer().worlds.map { world ->
             world.entities.filter {
                 //in the future, when we have additional parts to an entity, we expect the entity to respawn them
                 // upon load. TODO figure out a proper system for this
@@ -146,7 +146,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
                 //writes this nbt data to the replacement entity
                 replacement?.saveData(nbt) //.a copies the nbt data to the new entity
             }.count()
-        }
+        }.sum()
         logSuccess("Reloaded $num custom entities")
     }
 

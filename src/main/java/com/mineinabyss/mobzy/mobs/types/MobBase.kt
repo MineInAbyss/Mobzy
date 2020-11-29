@@ -48,9 +48,8 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun getExpValue(entityhuman: EntityHuman): Int = get<DeathLoot>()?.expToDrop() ?: this.expToDrop
 
     override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(get<Sounds>()?.ambient) }
-    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { get<Sounds>()?.hurt }
-    override fun getSoundDeath(): SoundEffect? = null.also { get<Sounds>()?.death }
-    override fun playBlockStepSound() = makeSound(get<Sounds>()?.step)
+    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(get<Sounds>()?.hurt) }
+    override fun getSoundDeath(): SoundEffect? = null.also { makeSound(get<Sounds>()?.death) }
 }
 
 //TODO these should be part of a companion object that doesn't get copied over
