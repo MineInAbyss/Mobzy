@@ -81,6 +81,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         spawnCfgs.clear()
         unregisterSpawns()
 
+        //TODO make attempt show a bit of stacktrace
         attempt("Reactivated all addons", "Failed to reactivate addons") {
             activateAddons()
         }

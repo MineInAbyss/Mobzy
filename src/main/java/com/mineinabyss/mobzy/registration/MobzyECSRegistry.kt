@@ -13,11 +13,9 @@ import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
+import com.mineinabyss.mobzy.ecs.components.interaction.AttackPotionEffects
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.ecs.goals.minecraft.AvoidPlayerBehavior
-import com.mineinabyss.mobzy.ecs.goals.minecraft.LeapAtTargetBehavior
-import com.mineinabyss.mobzy.ecs.goals.minecraft.MeleeAttackBehavior
-import com.mineinabyss.mobzy.ecs.goals.minecraft.TemptBehavior
+import com.mineinabyss.mobzy.ecs.goals.minecraft.*
 import com.mineinabyss.mobzy.ecs.goals.mobzy.flying.*
 import com.mineinabyss.mobzy.ecs.goals.mobzy.hostile.ThrowItemsBehavior
 import com.mineinabyss.mobzy.ecs.goals.targetselectors.TargetAttacker
@@ -46,14 +44,19 @@ fun Mobzy.attachToGeary() {
                 subclass(MobAttributes.serializer())
                 subclass(DeathLoot.serializer())
                 subclass(Rideable.serializer())
+
+                subclass(AttackPotionEffects.serializer())
             }
             polymorphic(PathfinderComponent::class) {
                 subclass(TemptBehavior.serializer())
                 subclass(AvoidPlayerBehavior.serializer())
+                subclass(LandStrollBehavior.serializer())
+                subclass(RandomLookAroundBehavior.serializer())
+                subclass(PanicOnHitBehavior.serializer())
+                subclass(FollowParentBehaviour.serializer())
+
                 subclass(LeapAtTargetBehavior.serializer())
                 subclass(MeleeAttackBehavior.serializer())
-
-                subclass(TargetAttacker.serializer())
                 subclass(ThrowItemsBehavior.serializer())
 
                 subclass(DiveOnTargetBehavior.serializer())

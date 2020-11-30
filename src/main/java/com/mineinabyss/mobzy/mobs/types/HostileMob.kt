@@ -1,12 +1,14 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mieninabyss.mobzy.processor.GenerateFromBase
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityHuman
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
-import com.mineinabyss.mobzy.ecs.goals.minecraft.MeleeAttackBehavior
-import net.minecraft.server.v1_16_R2.*
+import com.mineinabyss.mobzy.ecs.goals.minecraft.*
+import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetNearbyPlayer
+import net.minecraft.server.v1_16_R2.EntityMonster
 
 
 /**
@@ -15,17 +17,16 @@ import net.minecraft.server.v1_16_R2.*
 @GenerateFromBase(base = MobBase::class, createFor = [EntityMonster::class])
 open class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMonster(world, type) {
     override fun createPathfinders() {
-        addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false).build(entity))
-        addPathfinderGoal(3, PathfinderGoalFloat(this))
-        addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
-        addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 8.0f))
-        addPathfinderGoal(8, PathfinderGoalRandomLookaround(this))
+        addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false))
+        addPathfinderGoal(3, FloatBehavior())
+        addPathfinderGoal(7, LandStrollBehavior())
+        addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8.0f))
+        addPathfinderGoal(8, RandomLookAroundBehavior())
 
-        addTargetSelector(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
+        addTargetSelector(2, TargetNearbyPlayer())
     }
 
-    /** Removes entity if not in peaceful mode */
-    override fun tick() = super.tick().also { if (!world.isClientSide && world.difficulty == EnumDifficulty.PEACEFUL) die() }
+    //TODO make sure hostile mobs still get removed when difficulty is not peaceful without method here
 
     init {
         initMob()

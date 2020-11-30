@@ -14,7 +14,7 @@ import net.minecraft.server.v1_16_R2.EntityFlying
 @GenerateFromBase(base = MobBase::class, createFor = [EntityFlying::class])
 open class FlyingMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFlying(world, type) {
     override fun createPathfinders() {
-        addPathfinderGoal(1, FloatBehavior().build(entity))
+        addPathfinderGoal(1, FloatBehavior())
     }
 
     init {
