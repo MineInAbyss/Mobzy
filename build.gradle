@@ -19,20 +19,15 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url 'https://repo.codemc.io/repository/nms/' }
-        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url 'https://erethon.de/repo/' } //HeadLib
-        maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
-        maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
-        maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
         maven { url 'https://papermc.io/repo/repository/maven-public/' }
-        maven { url 'http://nexus.okkero.com/repository/maven-releases/' }
-        maven { url 'https://dl.bintray.com/kotlin/kotlinx' }
+        maven { url 'https://repo.codemc.io/repository/nms/' }
+        maven { url 'https://erethon.de/repo/' } //HeadLib
+        maven { url "https://repo.dmulloy2.net/nexus/repository/public/" } //ProtocolLib
+        maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+        maven { url 'http://nexus.okkero.com/repository/maven-releases/' } //Skedule
         maven githubPackage.invoke("MineInAbyss/Idofront")
         maven githubPackage.invoke("MineInAbyss/Guiy")
         maven githubPackage.invoke("MineInAbyss/KotlinSpice")
-        maven { url 'https://jitpack.io' } //JitPack
         mavenLocal()
     }
 
