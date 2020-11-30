@@ -54,6 +54,7 @@ fun Mobzy.attachToGeary() {
                 subclass(RandomLookAroundBehavior.serializer())
                 subclass(PanicOnHitBehavior.serializer())
                 subclass(FollowParentBehaviour.serializer())
+                subclass(FloatBehavior.serializer())
 
                 subclass(LeapAtTargetBehavior.serializer())
                 subclass(MeleeAttackBehavior.serializer())

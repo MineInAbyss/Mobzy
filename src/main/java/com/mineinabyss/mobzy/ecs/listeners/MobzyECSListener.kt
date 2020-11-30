@@ -3,7 +3,6 @@ package com.mineinabyss.mobzy.ecs.listeners
 import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.minecraft.components.MobComponent
-import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.geary.minecraft.store.with
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
@@ -36,11 +35,11 @@ object MobzyECSListener : Listener {
     }
 
     @EventHandler
-    fun onMobAttack(event: EntityDamageByEntityEvent){
+    fun onMobAttack(event: EntityDamageByEntityEvent) {
         val target = (event.entity as? LivingEntity) ?: return
         event.damager.with<AttackPotionEffects> { (effects, applyChance) ->
-            if(applyChance <= Random.nextDouble())
-            target.addPotionEffects(effects)
+            if (Random.nextDouble() <= applyChance)
+                target.addPotionEffects(effects)
         }
     }
 }
