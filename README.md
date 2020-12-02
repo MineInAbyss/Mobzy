@@ -4,30 +4,43 @@
 
 ### Overview
 
-Mobzy is a plugin for Spigot/Paper 1.16.2 which allows creating custom entities through an ECS (Entity Component System). It is currently under heavy development.
+Mobzy is a WIP Spigot/Paper plugin for creating custom NMS entities built on top of our own [Geary](https://github.com/MineInAbyss/Geary) Entity Component System (ECS). It makes coding complex entities simpler by breaking them down into many modular components. Mobzy then provides a configuration system for making custom entity types out of these components.
 
-It also handles injecting custom NMS entity types into the server, and packet interception to allow clients to see them. Some of these more general-use features may be placed into their own library eventually.
-
-### ECS Plans
-
-ECS code currently in this project will eventually be moved into another project, Geary, which will also support custom items.
-
-The project uses kotlinx.serialization for quick and easy serialization of components. This part of the project will eventually be delegated to Story, which will also allow components to be serialized seamlessly to entities.
-
-Currently, the ECS supports defining custom entity types with static components, as well as pathfinder goals (if they have a registered serializable wrapper class). The plan is to eventually implement a behaviour tree system that fits nicely with the ECS to replace pathfinder goals entirely.
-
-Some performance improvements (such as archetypes) may be added for the backend for systems iterating over entities, though compared to the cost of Bukkit's operations and Minecraft's poorly optimized entities, the current system is almost sufficient. 
+Mobzy also provides an API for injecting custom NMS entity types into the server, and packet interception to allow clients to see them. Some of these more general-use features may be moved into their own library eventually.
 
 ![Custom Mobs](https://media.discordapp.net/attachments/464678554681081856/625036159772524582/2019-09-21_19.39.27.png?width=1210&height=681)
 
-### Use
+## Features
 
-- We have [Github packages](https://github.com/MineInAbyss/Mobzy/packages) set up for use with gradle/maven, however the API isn't properly maintained yet. Many things will change as the ECS is being built.
-- There currently isn't a wiki explaining how to use things yet. We'll get one done once the plugin is properly released. You can ask about things in #plugin-dev on our [Discord](https://discord.gg/QXPCk2y).
+### Modular behaviours
 
-### Additional features
+ECS lets us split up many mob behaviours into individual components, making code easier to maintain and more reusable. More info can be found in [Geary's readme](https://github.com/MineInAbyss/Geary).
+
+### Config based
+
+Thanks to kotlinx.serialization our component are automatically serializable without reflection. This means all components can be read from a config file or stored in a mob's persistent data container. We then provide some extra options for adding pathfinder goals, or inheriting from different entity types. You can read more on the [Configuring Custom Entities](https://github.com/MineInAbyss/Mobzy/wiki/Configuring-Custom-Entities) wiki page.
+
+### NMS Wrappers
+
+Mobzy provides many serializable wrappers for pathfinders which can be used by other plugins to avoid going through NMS. We also provide some extension functions and typealiases to make dealing with NMS easier. We will likely put these into their own API later, with proper documentation. 
+
+### Other
 
 - Custom hitboxes (Minecraft normally lets the client handle that, so it wouldn't work on entity types it doesn't know).
-- A small pathfinder goal API, with some premade pathfinders for our own mobs.
-- Custom mob spawning system
-- Configuration for mob drops and spawn locations
+- Custom spawning system.
+- Annotation processor that makes extending any NMS entity as a custom mob simpler (will likely be rewritten as a compiler plugin once [ksp](https://github.com/google/ksp) is stable).
+- Many premade components, with more to come in the future.
+
+## Future plans
+
+### Goal Oriented Action Planners
+
+We would like to write our own AI system that uses GOAPs to create configurable emergent behaviour that fits nicely with Minecraft's existing pathfinder goal system.
+
+Essentially, you would be able to code actions with conditions and outcomes, then given a list of possible actions, the system will pathfind its way from a goal to some chain of actions whose conditions are met. These goals can then directly be added as pathfinder goals, ordered by priority.
+
+## Usage
+
+We have [Github packages](https://github.com/MineInAbyss/Mobzy/packages) set up for use with gradle/maven, however the API isn't properly maintained yet. Many things will change as the ECS is being built.
+
+We have started working on a [wiki](https://github.com/MineInAbyss/Mobzy/wiki) but it won't be complete for a while. You can ask us questions in `#plugin-dev` on our [Discord](https://discord.gg/QXPCk2y) server, or come help with development there!

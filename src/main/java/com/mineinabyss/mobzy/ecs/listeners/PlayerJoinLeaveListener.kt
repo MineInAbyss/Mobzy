@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 object PlayerJoinLeaveListener : Listener {
+    //TODO fire on reload
     @EventHandler
     fun onPlayerLogin(e: PlayerLoginEvent) {
         val (player) = e
