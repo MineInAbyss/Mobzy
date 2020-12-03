@@ -32,8 +32,8 @@ jobs:
 #          rev: 1.16.2
 #      - name: Install nms into m2
 #        run: mkdir -p $HOME/.m2/repository && cp -a nms-build/.m2/repository/. $HOME/.m2/repository
-#      - name: Grant execute permission for gradlew
-#        run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       - name: Publish artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
