@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.mobzy.Mobzy
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_REGIONS
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
@@ -30,12 +30,12 @@ object SpawnRegistry {
     fun findMobSpawn(spawn: String): MobSpawn =
             (regionSpawns[spawn.substring(0, spawn.indexOf(':'))]
                     ?: error("Could not find registered region for $spawn"))
-                    .getSpawnOfType(MobzyTypes[spawn.substring(spawn.indexOf(':') + 1)])
+                    .getSpawnOfType(MobzyTypeRegistry[spawn.substring(spawn.indexOf(':') + 1)])
 
     /** Takes a list of spawn region names and converts to a list of [MobSpawn]s from those regions */
     fun List<ProtectedRegion>.getMobSpawnsForRegions(): List<MobSpawn> = this
-            .filter { it.flags.containsKey(Mobzy.MZ_SPAWN_REGIONS) }
-            .flatMap { it.getFlag(Mobzy.MZ_SPAWN_REGIONS)!!.split(",") }
+            .filter { it.flags.containsKey(MZ_SPAWN_REGIONS) }
+            .flatMap { it.getFlag(MZ_SPAWN_REGIONS)!!.split(",") }
             //up to this point, gets a list of the names of spawn areas in this region
             .mapNotNull { regionSpawns[it]?.spawns }
             .flatten()

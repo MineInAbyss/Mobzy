@@ -1,60 +1,43 @@
 package com.mineinabyss.mobzy
 
-import com.charleskorn.kaml.Yaml
-import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.annotations.GenerateConfigExtensions
+import com.mineinabyss.idofront.config.IdofrontConfig
+import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.MobzyConfig.creatureTypes
-import com.mineinabyss.mobzy.MobzyConfig.debug
-import com.mineinabyss.mobzy.MobzyConfig.doMobSpawns
-import com.mineinabyss.mobzy.MobzyConfig.maxChunkSpawnRad
-import com.mineinabyss.mobzy.MobzyConfig.maxCommandSpawns
-import com.mineinabyss.mobzy.MobzyConfig.minChunkSpawnRad
-import com.mineinabyss.mobzy.MobzyConfig.mobCfgs
-import com.mineinabyss.mobzy.MobzyConfig.registeredAddons
-import com.mineinabyss.mobzy.MobzyConfig.spawnCfgs
-import com.mineinabyss.mobzy.MobzyConfig.spawnTaskDelay
-import com.mineinabyss.mobzy.api.spawnEntity
-import com.mineinabyss.mobzy.api.toEntityTypesViaScoreboardTags
-import com.mineinabyss.mobzy.configuration.MobConfiguration
-import com.mineinabyss.mobzy.configuration.SpawnConfiguration
+import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
+import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.registration.MobzyTemplates
+import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
+import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.okkero.skedule.schedule
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import net.minecraft.server.v1_15_R1.EntityLiving
-import net.minecraft.server.v1_15_R1.EnumCreatureType
-import net.minecraft.server.v1_15_R1.NBTTagCompound
+import net.minecraft.server.v1_16_R2.EntityLiving
+import net.minecraft.server.v1_16_R2.EnumCreatureType
+import net.minecraft.server.v1_16_R2.NBTTagCompound
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
-import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.entity.Entity
 
-/**
- * @property registeredAddons A list of [MobzyAddon]s that have been registered with the plugin.
- * @property spawnCfgs A list of [FileConfiguration]s used for defining mob spawning behaviour.
- * @property mobCfgs A list of [FileConfiguration]s used for defining mob attributes, such as drops.
- * @property creatureTypes A list of the types of creatures (currently everything from [EnumCreatureType].
- * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
- * @property spawnSearchRadius the radius around which players will count mobs towards the local mob cap
- * @property minChunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
- * @property maxChunkSpawnRad the maximum number of chunks away from the player in which a mob can spawn
- * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
- * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
- * @property doMobSpawns whether custom mob spawning enabled
- */
-object MobzyConfig {
-    lateinit var serialized: SerializedMobzyConfig; private set
-    val debug get() = serialized.debug
-    val doMobSpawns get() = serialized.doMobSpawns
-    val minChunkSpawnRad get() = serialized.minChunkSpawnRad
-    val maxChunkSpawnRad get() = serialized.maxChunkSpawnRad
-    val maxCommandSpawns get() = serialized.maxCommandSpawns
-    val playerGroupRadius get() = serialized.playerGroupRadius
-    val spawnTaskDelay get() = serialized.spawnTaskDelay
-
+@GenerateConfigExtensions
+object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) {
+    /**
+     * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
+     * @property doMobSpawns whether custom mob spawning enabled
+     * @property minChunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
+     * @property maxChunkSpawnRad the maximum number of chunks away from the player in which a mob can spawn
+     * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
+     * @property playerGroupRadius the radius around which players will count mobs towards the local mob cap
+     * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
+     * @property creatureTypeCaps Per-player mob caps for spawning of [NMSCreatureType]s on the server.
+     */
     @Serializable
-    data class SerializedMobzyConfig(
+    class Data(
             var debug: Boolean = false,
             var doMobSpawns: Boolean = false,
             var minChunkSpawnRad: Int = 3,
@@ -62,34 +45,23 @@ object MobzyConfig {
             var maxCommandSpawns: Int = 50,
             var playerGroupRadius: Double = 128.0,
             var spawnTaskDelay: Long = 100,
-            val mobCaps: MutableMap<String, Int> = hashMapOf()
+            var creatureTypeCaps: MutableMap<String, Int> = hashMapOf()
     )
 
-    @Transient
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
-
-    @Transient
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
-
-    @Transient
-    val spawnCfgs: MutableList<SpawnConfiguration> = mutableListOf()
-
-    @Transient
-    val mobCfgs: MutableList<MobConfiguration> = mutableListOf()
-
-    private fun loadSerializedValues() {
-        serialized = Yaml.default.parse(SerializedMobzyConfig.serializer(), mobzy.config.saveToString())
-    }
+    val spawnCfgs: MutableList<SpawnConfig> = mutableListOf()
 
     init {
-        loadSerializedValues()
         //first tick only finishes when all plugins are loaded, which is when we activate addons
-        Bukkit.getServer().scheduler.runTaskLater(mobzy, Runnable { activateAddons() }, 1L)
+        mobzy.schedule {
+            waitFor(1)
+            activateAddons()
+        }
     }
 
-    fun saveConfig() {
-        mobzy.config.loadFromString(Yaml.default.stringify(SerializedMobzyConfig.serializer(), serialized))
-        mobzy.saveConfig()
+    override fun save() {
+        super.save()
         spawnCfgs.forEach { it.save() }
     }
 
@@ -97,108 +69,89 @@ object MobzyConfig {
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
      */
-    fun getMobCap(creatureType: String): Int = serialized.mobCaps[creatureType]
+    fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = creatureTypeCaps[creatureType.toString()]
             ?: error("could not find mob cap for $creatureType")
 
-    /**
-     * Reloads the configurations stored in the plugin. Will re-serialize a new instance of MobzyConfig.
-     * Some things require a full plugin reload.
-     */
-    fun reload(sender: CommandSender = mobzy.server.consoleSender) {
-        val consoleSender = mobzy.server.consoleSender
-        fun attempt(success: String, fail: String, block: () -> Unit) {
-            try {
-                block()
-                sender.success(success)
-                if (sender != consoleSender) consoleSender.success(success)
-            } catch (e: Exception) {
-                sender.error(fail)
-                if (sender != consoleSender) consoleSender.error(fail)
-                e.printStackTrace()
-                return
-            }
-        }
-
+    override fun reload(): ReloadScope.() -> Unit = {
         logSuccess("Reloading mobzy config")
 
         //We don't clear MobzyTypes since those will only ever change if an addon's code was changed which is impossible
         // to see during a soft reload like this.
-        MobzyTemplates.clear()
+        MobzyTypes.reset()
         spawnCfgs.clear()
-        mobCfgs.clear()
         unregisterSpawns()
 
-        attempt("Loaded serialized config values", "Failed to load serialized config values") {
-            mobzy.reloadConfig()
-            loadSerializedValues()
-        }
-
-        attempt("Reactivated all addonsMobzy", "Failed to reactive addons") {
+        //TODO make attempt show a bit of stacktrace
+        attempt("Reactivated all addons", "Failed to reactivate addons") {
             activateAddons()
         }
 
         sender.success("Successfully reloaded config")
     }
 
-
     /**
      * Addons have registered themselves with the plugin at this point. We just need to parse their configs
      * and create everything they need for them.
      */
-    internal fun activateAddons() {
-        registeredAddons.forEach { loadMobCfg(it) }
-        registeredAddons.forEach { it.initializeMobs() }
-        registeredAddons.forEach { loadSpawnCfg(it) }
+    private fun activateAddons() {
+        registeredAddons.forEach { it.loadMobTypes() }
+//        registeredAddons.forEach { it.initializeMobs() }
+        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
-        MobzyTemplates.loadTemplatesFromConfig()
-        mobzy.registerSpawnTask()
+        MobzyTypeRegistry.injectDefaultAttributes()
+        SpawnTask.startTask()
 
-        reloadExistingEntities()
+        fixEntitiesAfterReload()
 
         logSuccess("Registered addons: $registeredAddons")
+        logSuccess("Loaded types: ${MobzyTypeRegistry.typeNames}")
     }
 
     /**
-     * Loads a [SpawnConfiguration] for an addon
+     * Loads a [SpawnConfig] for an addon
      *
-     * @param plugin the addon registering it
+     * @receiver The addon registering it
      */
-    fun loadSpawnCfg(plugin: MobzyAddon) {
-        val spawnCfg = SpawnConfiguration(plugin.spawnConfig, plugin)
-        spawnCfgs += spawnCfg
-//        SpawnRegistry += spawnCfg
+    private fun MobzyAddon.loadSpawns() = SpawnConfig(spawnConfig, this)
+
+    /**
+     * Loads [MobType]s for an addon
+     */
+    private fun MobzyAddon.loadMobTypes() {
+        MobzyTypes.registerTypes(this)
     }
 
     /**
-     * Loads a [MobConfiguration] for an addon
-     *
-     * @param plugin the addon registering it
+     * Remove entities marked as a custom mob, but which are no longer considered an instance of CustomMob, and replace
+     * them with the equivalent custom mob, transferring over the data.
      */
-    fun loadMobCfg(plugin: MobzyAddon) {
-        val mobCfg = MobConfiguration(plugin.mobConfig, plugin)
-        mobCfgs += mobCfg
-    }
-
-    /**
-     * Every loaded custom entity in the world stops relating to the CustomMob class heirarchy after reload, so we
-     * can't do something like customEntity instanceof CustomMob. Therefore, we "reload" those entities by deleting
-     * them and copying their NBT data to new entities
-     */
-    private fun reloadExistingEntities() {
-        var num = 0
-        Bukkit.getServer().worlds.forEach { world ->
+    private fun fixEntitiesAfterReload() {
+        val num = Bukkit.getServer().worlds.map { world ->
             world.entities.filter {
-                if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
+                //in the future, when we have additional parts to an entity, we expect the entity to respawn them
+                // upon load. TODO figure out a proper system for this
+//                if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
+
+                //if this is a custom mob but the nms entity is no longer an instance of CustomMob (likely due to a reload)
                 it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
-            }.forEach {
-                val replacement = it.location.spawnEntity(it.toEntityTypesViaScoreboardTags())!!.toNMS<EntityLiving>()
+            }.onEach {
+                //spawn a replacement entity of the same type as defined in scoreboard tags
+                //TODO read this as StaticType from the PDC
+                val replacement = it.location.spawnEntity(it.entityTypeViaNBT)?.toNMS<EntityLiving>()
                 val nbt = NBTTagCompound()
-                it.toNMS<EntityLiving>().b(nbt) //.b copies over the entity's nbt data to the compound
+
+                //copies the entity nbt data to the compound
+                it.toNMS<EntityLiving>().loadData(nbt)
                 it.remove()
-                replacement.a(nbt) //.a copies the nbt data to the new entity
-                num++
-            }
-        }
+
+                //writes this nbt data to the replacement entity
+                replacement?.saveData(nbt) //.a copies the nbt data to the new entity
+            }.count()
+        }.sum()
         logSuccess("Reloaded $num custom entities")
     }
+
+    /** The [NMSEntityType] as defined by mobzy via the mob's scoreboard tags. */
+    private val Entity.entityTypeViaNBT: NMSEntityType<*>
+        get() = MobzyTypeRegistry[scoreboardTags.first { MobzyTypeRegistry.contains(it) }]
 }

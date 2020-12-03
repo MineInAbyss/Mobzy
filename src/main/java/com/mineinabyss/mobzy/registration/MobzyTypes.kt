@@ -1,39 +1,35 @@
 package com.mineinabyss.mobzy.registration
 
-import com.mineinabyss.mobzy.mobs.MobTemplate
-import net.minecraft.server.v1_15_R1.Entity
-import net.minecraft.server.v1_15_R1.EntityTypes
-import net.minecraft.server.v1_15_R1.EnumCreatureType
-import net.minecraft.server.v1_15_R1.World
-import kotlin.collections.set
+import com.mineinabyss.geary.ecs.serialization.Formats
+import com.mineinabyss.geary.ecs.types.GearyEntityTypes
+import com.mineinabyss.mobzy.MobzyAddon
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.api.nms.entity.typeName
+import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.mobzy
+import org.bukkit.entity.Mob
 
-/**
- * @property types Used for getting a MobType from a String, which makes it easier to access from [MobTemplate]
- * @property templates A map of mob [EntityTypes.mobName]s to [MobTemplate]s.
- */
-@Suppress("ObjectPropertyName")
-object MobzyTypes {
-    val typeNames get() = _types.keys.toList()
+object MobzyTypes : GearyEntityTypes<MobType>(mobzy) {
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(type: NMSEntityType<*>): MobType = get(type.typeName)
 
-    private val _types: MutableMap<String, EntityTypes<*>> = mutableMapOf()
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(entity: NMSEntity): MobType = get(entity.entityType)
 
-    /** Gets a mob's [EntityTypes] from a String if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
-    operator fun get(name: String): EntityTypes<*> = _types[name.toEntityTypeName()] ?: error("Mob type ${name.toEntityTypeName()} not found, only know $typeNames")
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(customMob: CustomMob): MobType = get(customMob.entity.typeName)
 
-    operator fun contains(name: String) = _types.contains(name.toEntityTypeName())
+    /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
+    operator fun get(entity: Mob): MobType = get(entity.typeName)
 
-    /**
-     * Registers a new entity with the server with extra parameters for width, height, and the function for creating the
-     * entity.
-     *
-     * @see injectNewEntity
-     */
-    fun registerEntity(name: String, type: EnumCreatureType, width: Float, height: Float, func: (World) -> Entity): EntityTypes<*> {
-        val mobID = name.toEntityTypeName()
-        val injected: EntityTypes<*> = injectNewEntity(mobID, "zombie", bToa(EntityTypes.b { _, world -> func(world) }, type).c().a(width, height))
-        _types[mobID] = injected
-        return injected
+    fun registerTypes(mobzyAddon: MobzyAddon) {
+        mobzyAddon.mobConfigDir.walk().filter { it.isFile }.forEach { file ->
+            val name = file.nameWithoutExtension
+            val type = Formats.yamlFormat.decodeFromString(MobType.serializer(), file.readText())
+            MobzyTypeRegistry.registerMob(name, type)
+            MobzyTypes.registerType(name, type)
+        }
     }
 }
-
-internal fun String.toEntityTypeName() = toLowerCase().replace(" ", "_")

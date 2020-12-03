@@ -5,7 +5,7 @@ minChunkSpawnRad: 3
 maxChunkSpawnRad: 6
 maxCommandSpawns: 50
 spawnTaskDelay: 100
-mobCaps:
+creatureTypeCaps:
   CREATURE: 20
   MONSTER: 20
   WATER_CREATURE: 5

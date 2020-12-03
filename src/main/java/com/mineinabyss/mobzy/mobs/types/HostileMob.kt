@@ -1,75 +1,37 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalWalkingAnimation
-import com.mineinabyss.mobzy.pathfinders.hostile.PathfinderGoalMeleeAttackPitchLock
-import com.mineinabyss.mobzy.registration.MobzyTemplates
-import net.minecraft.server.v1_15_R1.*
+import com.mieninabyss.mobzy.processor.GenerateFromBase
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityHuman
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
+import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
+import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
+import com.mineinabyss.mobzy.ecs.goals.minecraft.*
+import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetNearbyPlayer
+import net.minecraft.server.v1_16_R2.EntityMonster
+
 
 /**
  * Lots of code taken from EntityZombie
  */
-abstract class HostileMob(world: World?, name: String) : EntityMonster(MobzyTemplates[name].type as EntityTypes<out EntityMonster>, world), CustomMob {
-
-    //implementation of properties from CustomMob
-    override var killedMZ: Boolean
-        get() = killed
-        set(value) {
-            killed = value
-        }
-    override val entity: EntityLiving
-        get() = this
-
-    override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime
-    override val killScore: Int = aW
-
-    //implementation of behaviours
-
+@GenerateFromBase(base = MobBase::class, createFor = [EntityMonster::class])
+open class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMonster(world, type) {
     override fun createPathfinders() {
-        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, template.model))
-        addPathfinderGoal(2, PathfinderGoalMeleeAttackPitchLock(this))
-        addPathfinderGoal(3, PathfinderGoalFloat(this))
-        addPathfinderGoal(7, PathfinderGoalRandomStrollLand(this, 1.0))
-        addPathfinderGoal(8, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 8.0))
-        addPathfinderGoal(8, PathfinderGoalRandomLookaround(this))
+        addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false))
+        addPathfinderGoal(3, FloatBehavior())
+        addPathfinderGoal(7, LandStrollBehavior())
+        addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8.0f))
+        addPathfinderGoal(8, RandomLookAroundBehavior())
 
-        addTargetSelector(2, PathfinderGoalNearestAttackableTarget(this, EntityHuman::class.java, true))
+        addTargetSelector(2, TargetNearbyPlayer())
     }
 
-    override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
-    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = Unit
-
-    override fun dropExp() = dropExperience()
-
-    //overriding NMS methods
-
-    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
-    override fun initPathfinder() = createPathfinders()
-
-    override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
-    override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
-
-    override fun die(damagesource: DamageSource) = dieCM(damagesource)
-    override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
-    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
-
-    override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
-    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
-    override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
-    override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
-//
-
-    //EntityMonster specific overriding
-
-    /**
-     * Removes entity if not in peaceful mode
-     */
-    override fun tick() = super.tick().also { if (!world.isClientSide && world.difficulty == EnumDifficulty.PEACEFUL) die() }
+    //TODO make sure hostile mobs still get removed when difficulty is not peaceful without method here
 
     init {
-        createFromBase()
+        initMob()
         addScoreboardTag("hostileMob")
-        living.removeWhenFarAway = true
+        entity.removeWhenFarAway = true
+        attributeMap
     }
 }

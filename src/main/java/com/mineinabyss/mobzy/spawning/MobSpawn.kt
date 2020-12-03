@@ -1,17 +1,17 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.mobzy.MobzyConfig
-import com.mineinabyss.mobzy.api.creatureType
-import com.mineinabyss.mobzy.api.keyName
-import com.mineinabyss.mobzy.api.spawnEntity
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.api.nms.entity.creatureType
+import com.mineinabyss.mobzy.api.nms.entity.keyName
+import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
+import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import net.minecraft.server.v1_15_R1.EntityTypes
+import net.minecraft.server.v1_16_R2.EntityTypes
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.util.Vector
@@ -124,7 +124,7 @@ data class MobSpawn(
     val blockWhitelist: List<Material> = +MobSpawn::_blockWhitelist ?: listOf()
 
     @Transient
-    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypes[it] } ?: EntityTypes.ZOMBIE
+    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypeRegistry[it] } ?: EntityTypes.ZOMBIE
 
     private val amountRange: IntRange get() = minAmount..maxAmount
     private val timeRange: LongRange get() = minTime..maxTime
@@ -167,7 +167,7 @@ data class MobSpawn(
             if (it > maxLocalGroup * playerCount) return -1.0
         }
         creatureTypeCounts[entityType.creatureType.toString()]?.let {
-            if (it > MobzyConfig.getMobCap(entityType.creatureType.toString()) * playerCount) return -1.0
+            if (it > MobzyConfig.getCreatureTypeCap(entityType.creatureType) * playerCount) return -1.0
         }
 
         //TODO count number of entities around this spawn and prevent it depending on maxLocalGroup

@@ -1,67 +1,31 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.mobzy.mobs.CustomMob
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalLookAtPlayerPitchLock
-import com.mineinabyss.mobzy.pathfinders.PathfinderGoalWalkingAnimation
-import com.mineinabyss.mobzy.registration.MobzyTemplates
-import net.minecraft.server.v1_15_R1.*
+import com.mieninabyss.mobzy.processor.GenerateFromBase
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
+import net.minecraft.server.v1_16_R2.EntityAgeable
+import net.minecraft.server.v1_16_R2.EntityAnimal
+import net.minecraft.server.v1_16_R2.WorldServer
 
 /**
  * Originally based off EntityPig
  */
-abstract class PassiveMob(world: World?, name: String) : EntityAnimal(MobzyTemplates[name].type as EntityTypes<out EntityAnimal>, world), CustomMob {
-    //implementation of properties from CustomMob
-    override var killedMZ: Boolean
-        get() = killed
-        set(value) {
-            killed = value
-        }
-    override val entity: EntityLiving get() = this
-    override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime //TODO I want a consistent fix for the ambiguity errors, this might be it
-    override val killScore: Int = aW
-
-    //implementation of behaviours
-
+@GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
+open class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
     override fun createPathfinders() {
-        addPathfinderGoal(0, PathfinderGoalWalkingAnimation(living, template.model))
-        addPathfinderGoal(1, PathfinderGoalFloat(this))
-        addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
-        addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
-        addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
-        addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
-        addPathfinderGoal(7, PathfinderGoalLookAtPlayerPitchLock(this, EntityTypes.PLAYER, 6.0, 0.02f))
+//        addPathfinderGoal(1, PathfinderGoalFloat(this))
+//        addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))
+//        addPathfinderGoal(3, PathfinderGoalBreed(this, 1.0))
+//        addPathfinderGoal(5, PathfinderGoalFollowParent(this, 1.1))
+//        addPathfinderGoal(6, PathfinderGoalRandomStrollLand(this, 1.0))
+//        addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 6.0f))
     }
 
-    override fun saveMobNBT(nbttagcompound: NBTTagCompound?) = Unit
-
-    override fun loadMobNBT(nbttagcompound: NBTTagCompound?) = Unit
-
-    override fun dropExp() = dropExperience()
-
-    //overriding NMS methods
-
-    override fun initAttributes() = super.initAttributes().also { setConfiguredAttributes() }
-    override fun initPathfinder() = createPathfinders()
-
-    override fun a(nbttagcompound: NBTTagCompound) = super.a(nbttagcompound).also { loadMobNBT(nbttagcompound) }
-    override fun b(nbttagcompound: NBTTagCompound) = super.b(nbttagcompound).also { saveMobNBT(nbttagcompound) }
-
-    override fun die(damagesource: DamageSource) = dieCM(damagesource)
-    override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
-    override fun getExpValue(entityhuman: EntityHuman): Int = expToDrop()
-
-    override fun getSoundAmbient(): SoundEffect? = null.also { makeSound(soundAmbient) }
-    override fun getSoundHurt(damagesource: DamageSource): SoundEffect? = null.also { makeSound(soundHurt) }
-    override fun getSoundDeath(): SoundEffect? = null.also { makeSound(soundDeath) }
-    override fun a(blockposition: BlockPosition, iblockdata: IBlockData) = makeSound(soundStep)
-
-    //EntityAnimal specific overriding
-
-    override fun createChild(entityageable: EntityAgeable): EntityAgeable? = null
+    override fun createChild(p0: WorldServer?, p1: EntityAgeable?): EntityAgeable? = null
 
     init {
-        createFromBase()
+        initMob()
         addScoreboardTag("passiveMob")
-        living.removeWhenFarAway = false
+        entity.removeWhenFarAway = false
     }
 }
