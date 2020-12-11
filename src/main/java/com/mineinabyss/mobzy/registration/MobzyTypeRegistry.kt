@@ -7,10 +7,8 @@ import com.mineinabyss.mobzy.api.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobs.types.*
-import net.minecraft.server.v1_16_R2.AttributeDefaults
-import net.minecraft.server.v1_16_R2.AttributeProvider
-import net.minecraft.server.v1_16_R2.Entity
-import net.minecraft.server.v1_16_R2.EntityTypes
+import com.mineinabyss.mobzy.mobs.types.NPC
+import net.minecraft.server.v1_16_R2.*
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
@@ -46,6 +44,26 @@ object MobzyTypeRegistry {
             val currentAttributes = HashMap(mapField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
             currentAttributes += customAttributes
             mapField.set(null, currentAttributes)
+//            var ipCache: MutableMap<EntityPose?, EntitySize?> = HashMap()
+//
+//            val universal = EntityHuman::class.java.getDeclaredField("b")
+//            universal.isAccessible = true
+//
+//            val poses = universal[null] as MutableMap<EntityPose?, EntitySize?>
+//
+//            if (poses !is HashMap) {
+//                for (pose in poses.keys) {
+//                    ipCache[pose] = poses[pose]
+//                }
+//                val unsafeField: Field = Unsafe::class.java.getDeclaredField("theUnsafe")
+//                unsafeField.isAccessible = true
+//                val unsafe: Unsafe = unsafeField[null] as Unsafe
+//                val staticFieldBase: Any = unsafe.staticFieldBase(universal)
+//                val staticFieldOffset: Long = unsafe.staticFieldOffset(universal)
+//                unsafe.putObject(staticFieldBase, staticFieldOffset, ipCache)
+//            } else {
+//                ipCache = poses
+//            }
         } catch (reason: Throwable) {
             reason.printStackTrace()
             error("Failed to inject custom attribute defaults")

@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
@@ -48,7 +47,6 @@ class Mobzy : JavaPlugin(), MobzyAddon {
                 MobListener,
                 MobzyECSListener,
                 PlayerJoinLeaveListener,
-                BukkitEntityAccess,
         )
 
         //Register commands
