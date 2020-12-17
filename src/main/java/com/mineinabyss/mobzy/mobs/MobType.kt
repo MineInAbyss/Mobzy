@@ -30,9 +30,5 @@ data class MobType(
     @Transient
     override val types = MobzyTypes
 
-    override fun instantiate(): GearyEntity {
-        TODO("Possibly move instantiation of new entities here")
-    }
-
     val nmsType: NMSEntityType<*> by lazy { MobzyTypeRegistry[name] }
 }

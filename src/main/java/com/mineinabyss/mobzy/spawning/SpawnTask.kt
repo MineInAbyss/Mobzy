@@ -14,7 +14,7 @@ import com.mineinabyss.mobzy.spawning.SpawnTask.toPlayerGroups
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.okkero.skedule.BukkitSchedulerController
 import com.okkero.skedule.CoroutineTask
-import com.okkero.skedule.SynchronizationContext
+import com.okkero.skedule.SynchronizationContext.*
 import com.okkero.skedule.schedule
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
@@ -64,6 +64,8 @@ inline fun <T> printMillis(name: String, block: () -> T): T {
 object SpawnTask {
     private var runningTask: CoroutineTask? = null
 
+    private val regionContainer = WorldGuard.getInstance().platform.regionContainer
+
     fun stopTask() {
         runningTask?.cancel()
         runningTask = null
@@ -89,16 +91,18 @@ object SpawnTask {
     }
 
     private suspend fun BukkitSchedulerController.runSpawnTask() {
-        switchContext(SynchronizationContext.SYNC)
+        switchContext(SYNC)
 
-        val container = WorldGuard.getInstance().platform.regionContainer
+        //TODO anything sync goes here
 
-        switchContext(SynchronizationContext.ASYNC)
+        switchContext(ASYNC)
+
+
         //STEP 1: Get mobs
         val onlinePlayers = Bukkit.getOnlinePlayers()
         if (onlinePlayers.isEmpty()) return
 
-        val customMobs = Bukkit.getServer().worlds.flatMap { world -> world.entities.filter { it.isCustomMob } }
+        val customMobs: List<Entity> = Bukkit.getServer().worlds.flatMap { world -> world.entities.filter { it.isCustomMob } }
 
         val entityTypeCounts: MutableMap<String, Int> = customMobs.toEntityTypeCounts()
 
@@ -119,7 +123,7 @@ object SpawnTask {
 
             //STEP 3: Calculate all mobs that can spawn in this area
             val validSpawns = WeightedDice(
-                    container.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions
+                    regionContainer.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions
                             .sorted()
                             .filterWhenOverlapFlag()
                             .getMobSpawnsForRegions()
@@ -135,10 +139,9 @@ object SpawnTask {
             creatureTypeCounts[spawn.creatureType] = creatureTypeCounts.getOrDefault(spawn.creatureType, 0) + spawn.spawns
 
             //spawn all the mobs we were planning to synchronously (since we can't spawn asynchronously)
-            Bukkit.getScheduler().runTask(mobzy, Runnable syncSpawnTask@{
-                if (!mobzy.isEnabled) return@syncSpawnTask
-                spawn.spawn()
-            })
+            mobzy.schedule(SYNC) {
+                if (mobzy.isEnabled) spawn.spawn()
+            }
         }
         debug("&d&l${creatureTypeCounts.values.sum()} mobs while spawning".color())
     }

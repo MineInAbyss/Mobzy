@@ -4,11 +4,13 @@ import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.components.with
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.mobzy.api.nms.aliases.*
+import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.death.expToDrop
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobzyTypes
+import net.minecraft.server.v1_16_R2.SoundEffect
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_16_R2.event.CraftEventFactory
 import org.bukkit.enchantments.Enchantment
@@ -21,11 +23,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override val type: MobType = MobzyTypes[this as CustomMob]
 
     //implementation of properties from CustomMob
-    final override var dead: Boolean
-        get() = killed
-        set(value) {
-            killed = value
-        }
+    final override var dead: Boolean by ::killed
     final override val nmsEntity: NMSEntityInsentient get() = this
 
     final override fun lastDamageByPlayerTime(): Int = lastDamageByPlayerTime
@@ -33,12 +31,12 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
 
     final override fun dropExp() = dropExperience()
 
-    //overriding NMS methods
+    //overriding NMS functions
     //TODO option to inherit pathfinders from a group
-    override fun initPathfinder() = createPathfinders()
+    final override fun initPathfinder() = createPathfinders()
     override fun createPathfinders() = super.initPathfinder()
 
-    override fun saveData(nbttagcompound: NMSDataContainer) = saveMobNBT(nbttagcompound)
+    final override fun saveData(nbttagcompound: NMSDataContainer) = saveMobNBT(nbttagcompound)
     override fun saveMobNBT(nbttagcompound: NMSDataContainer) {
         //FIXME the rest of mobzy needs to be rewritten to actually make use of these components,
         // we'll keep this disabled in the meantime to not read and write unnecessarily.
@@ -46,7 +44,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
         super.saveData(nbttagcompound)
     }
 
-    override fun loadData(nbttagcompound: NMSDataContainer) = loadMobNBT(nbttagcompound)
+    final override fun loadData(nbttagcompound: NMSDataContainer) = loadMobNBT(nbttagcompound)
     override fun loadMobNBT(nbttagcompound: NMSDataContainer) {
         //same story here, no need to load stuff yet.
 //        addComponents(entity.persistentDataContainer.decodeComponents())
@@ -57,7 +55,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
         super.loadData(nbttagcompound)
     }
 
-    override fun b(entityhuman: NMSEntityHuman, enumhand: NMSHand): NMSInteractionResult =
+    final override fun b(entityhuman: NMSEntityHuman, enumhand: NMSHand): NMSInteractionResult =
             onPlayerInteract(entityhuman.toBukkit(), enumhand)
 
     override fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult =
@@ -67,9 +65,12 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
     override fun getExpValue(entityhuman: NMSEntityHuman): Int = get<DeathLoot>()?.expToDrop() ?: this.expToDrop
 
-    override fun getSoundAmbient(): NMSSound? = null.also { makeSound { ambient } }
-    override fun getSoundHurt(damagesource: NMSDamageSource): NMSSound? = null.also { makeSound { hurt } }
-    override fun getSoundDeath(): NMSSound? = null.also { makeSound { death } }
+    override fun getSoundVolume(): Float = get<Sounds>()?.volume ?: super.getSoundVolume()
+    override fun getSoundAmbient(): NMSSound? = makeSound(super.getSoundAmbient()) { ambient }
+    override fun getSoundHurt(damagesource: NMSDamageSource): NMSSound? = makeSound(super.getSoundHurt(damagesource)) { hurt }
+    override fun getSoundDeath(): NMSSound? = makeSound(super.getSoundDeath()) { death }
+    override fun getSoundSplash(): NMSSound? = makeSound(super.getSoundSplash()) { splash }
+    override fun getSoundSwim(): NMSSound? = makeSound(super.getSoundSwim()) { swim }
 }
 
 //TODO these should be part of a companion object that doesn't get copied over

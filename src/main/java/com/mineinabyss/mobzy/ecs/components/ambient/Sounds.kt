@@ -7,7 +7,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("mobzy:sounds")
 class Sounds(
+        val volume: Float? = null,
         val ambient: String? = null,
         val death: String? = null,
         val hurt: String? = null,
+        val splash: String? = null,
+        val swim: String? = null,
 ) : GearyComponent()

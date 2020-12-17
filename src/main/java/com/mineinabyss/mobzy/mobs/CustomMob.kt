@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyEntity
 import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.addComponents
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.minecraft.components.MobComponent
 import com.mineinabyss.geary.minecraft.store.decodeComponents
@@ -13,6 +12,8 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
 import org.bukkit.SoundCategory
 import org.bukkit.entity.HumanEntity
+import org.bukkit.persistence.PersistentDataContainer
+import org.bukkit.persistence.PersistentDataHolder
 import kotlin.random.Random
 
 /**
@@ -22,7 +23,7 @@ import kotlin.random.Random
  * @property type This entity types's [MobType] describing information about entities of this time. It is
  * immutable and not unique to this specific entity.
  */
-interface CustomMob : GearyEntity {
+interface CustomMob : GearyEntity, PersistentDataHolder {
     override val gearyId: Int
 
     // ========== Useful properties ===============
@@ -31,6 +32,8 @@ interface CustomMob : GearyEntity {
     @Suppress("UNCHECKED_CAST")
     val entity
         get() = nmsEntity.toBukkit()
+
+    override fun getPersistentDataContainer(): PersistentDataContainer = entity.persistentDataContainer
 
     val type: MobType
 
@@ -73,9 +76,10 @@ interface CustomMob : GearyEntity {
         // considered an instance of CustomMob (ex. after a plugin reload).
         entity.addScoreboardTag(type.name)
 
+        //adding components from to this entity
+        type.decodeTo(this)
+        decodeComponents() //currently components written to this entity's PDC will override the ones defined in type
         addComponent(MobComponent(entity))
-        val existingComponents = entity.persistentDataContainer.decodeComponents()
-        addComponents(type.instantiateComponents(existingComponents))
 
         MobLoadEvent(this).call()
 
@@ -87,5 +91,8 @@ interface CustomMob : GearyEntity {
             entity.world.playSound(entity.location, sound, SoundCategory.NEUTRAL, 1f, (Random.nextDouble(1.0, 1.02).toFloat()))
     }
 
-    fun makeSound(sound: Sounds.() -> String?) = makeSound(get<Sounds>()?.sound())
+    /** Plays a sound effect at the mob's location and returns null */
+    fun makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
+        return makeSound(get<Sounds>()?.sound() ?: return default).let { null }
+    }
 }
