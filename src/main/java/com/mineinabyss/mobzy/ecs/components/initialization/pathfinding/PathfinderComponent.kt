@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 import org.bukkit.entity.Mob
 
 @Serializable
-abstract class PathfinderComponent : GearyComponent() {
+abstract class PathfinderComponent : GearyComponent {
     abstract fun build(mob: Mob): NMSPathfinderGoal
 }

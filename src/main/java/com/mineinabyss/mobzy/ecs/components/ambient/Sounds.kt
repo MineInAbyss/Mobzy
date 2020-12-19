@@ -13,4 +13,4 @@ class Sounds(
         val hurt: String? = null,
         val splash: String? = null,
         val swim: String? = null,
-) : GearyComponent()
+) : GearyComponent

@@ -29,7 +29,7 @@ data class MobAttributes(
         val maxHealth: Double? = null,
         val movementSpeed: Double? = 0.25,
         val spawnReinforcements: Double? = null
-) : GearyComponent() {
+) : GearyComponent {
 
     fun toNMSBuilder(): NMSAttributeBuilder = NMSAttributes.forEntityInsentient()
             .set(GenericAttributes.ARMOR, armor)

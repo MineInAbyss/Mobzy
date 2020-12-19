@@ -11,7 +11,7 @@ import kotlinx.serialization.Transient
 data class Goals(
         val actions: Set<Action>,
         val goals: Set<Action>,
-) : GearyComponent() {
+) : GearyComponent {
     @Transient
     var executingPlan: Action? = null
 

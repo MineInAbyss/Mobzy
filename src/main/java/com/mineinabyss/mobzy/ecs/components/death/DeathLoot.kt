@@ -12,7 +12,7 @@ class DeathLoot(
         val maxExp: Int? = null,
         val deathCommands: List<String> = listOf(),
         val drops: List<MobDrop> = listOf()
-) : GearyComponent()
+) : GearyComponent
 
 fun DeathLoot.expToDrop(): Int? {
     val minExp = minExp

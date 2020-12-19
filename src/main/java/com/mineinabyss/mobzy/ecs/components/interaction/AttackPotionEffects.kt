@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType
 data class AttackPotionEffects(
         val effects: List<@Serializable(with = PotionSerializer::class) PotionEffect>,
         val applyChance: Double = 1.0,
-) : GearyComponent()
+) : GearyComponent
 
 //TODO move into idofront
 object PotionSerializer : KSerializer<PotionEffect> {

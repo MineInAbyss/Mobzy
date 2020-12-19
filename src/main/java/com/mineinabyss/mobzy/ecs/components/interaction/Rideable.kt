@@ -6,4 +6,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("mobzy:rideable")
-class Rideable: GearyComponent()
+class Rideable: GearyComponent

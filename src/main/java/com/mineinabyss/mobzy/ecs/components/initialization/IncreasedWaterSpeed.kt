@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 @SerialName("mobzy:increased_water_speed")
 data class IncreasedWaterSpeed(
         val level: Int = 10
-): GearyComponent()
+): GearyComponent
