@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.geary.dsl.attachToGeary
 import com.mineinabyss.geary.ecs.GearyComponent
-import com.mineinabyss.geary.ecs.components.StaticType
 import com.mineinabyss.mobzy.Mobzy
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
@@ -33,8 +32,6 @@ fun Mobzy.attachToGeary() {
 
         serializers {
             polymorphic(GearyComponent::class) {
-                subclass(StaticType.serializer()) //TODO move into Geary
-
                 subclass(Model.serializer())
                 subclass(Pathfinders.serializer())
                 subclass(Equipment.serializer())

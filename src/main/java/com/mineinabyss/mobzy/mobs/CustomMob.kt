@@ -76,9 +76,8 @@ interface CustomMob : GearyEntity, PersistentDataHolder {
         // considered an instance of CustomMob (ex. after a plugin reload).
         entity.addScoreboardTag(type.name)
 
-        //adding components from to this entity
-        type.decodeTo(this)
-        decodeComponents() //currently components written to this entity's PDC will override the ones defined in type
+        //adding components from the type to this entity
+        decodeComponents()
         addComponent(MobComponent(entity))
 
         MobLoadEvent(this).call()

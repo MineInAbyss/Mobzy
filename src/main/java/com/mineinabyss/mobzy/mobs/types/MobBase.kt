@@ -9,8 +9,6 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.death.expToDrop
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.registration.MobzyTypes
-import net.minecraft.server.v1_16_R2.SoundEffect
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_16_R2.event.CraftEventFactory
 import org.bukkit.enchantments.Enchantment
@@ -20,7 +18,7 @@ import org.bukkit.entity.Mob
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override val entity: Mob get() = super.entity
     final override val gearyId: Int = Engine.getNextId()
-    final override val type: MobType = MobzyTypes[this as CustomMob]
+    final override val type: MobType = get<MobType>() ?: error("Could not find a mob type for entity")
 
     //implementation of properties from CustomMob
     final override var dead: Boolean by ::killed
