@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.mobs
 import com.mineinabyss.geary.ecs.GearyEntity
 import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.geary.minecraft.components.MobComponent
 import com.mineinabyss.geary.minecraft.store.decodeComponents
 import com.mineinabyss.idofront.events.call
@@ -68,17 +69,20 @@ interface CustomMob : GearyEntity, PersistentDataHolder {
      * identifier scoreboard tag
      */
     fun initMob() {
-        //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
-        // use the same system here.
-        entity.addScoreboardTag("customMob3")
 
         //save the entity type's name under scoreboard tags so we can identify this entity's type even if it's no longer
         // considered an instance of CustomMob (ex. after a plugin reload).
-        entity.addScoreboardTag(type.name)
 
+        //add type under the generic component since getting components doesn't
+        addComponent<GearyEntityType>(type)
         //adding components from the type to this entity
         decodeComponents()
         addComponent(MobComponent(entity))
+
+        //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
+        // use the same system here.
+        entity.addScoreboardTag("customMob3")
+        entity.addScoreboardTag(type.name)
 
         MobLoadEvent(this).call()
 
