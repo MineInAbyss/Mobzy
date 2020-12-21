@@ -26,7 +26,6 @@ import org.bukkit.entity.Entity
 
 @GenerateConfigExtensions
 object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) {
-    operator fun rangeTo(test: String) = {}
     /**
      * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
      * @property doMobSpawns whether custom mob spawning enabled
@@ -83,7 +82,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         unregisterSpawns()
 
         //TODO make attempt show a bit of stacktrace
-        attempt("Reactivated all addons", "Failed to reactivate addons") {
+        attempt("Reactivating all addons") {
             activateAddons()
         }
 

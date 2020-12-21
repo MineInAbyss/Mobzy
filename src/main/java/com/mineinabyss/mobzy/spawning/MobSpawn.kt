@@ -15,7 +15,6 @@ import net.minecraft.server.v1_16_R2.EntityTypes
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.util.Vector
-import kotlin.math.ceil
 import kotlin.math.sign
 import kotlin.random.Random
 import kotlin.reflect.KProperty1
@@ -194,34 +193,13 @@ data class MobSpawn(
 
     /**
      * Checks if there is enough space to spawn an entity in a given location without it suffocating
-     * TODO currently gives many false positives
      *
      * @param loc    the location to check
      * @param width  the width of the entity
      * @param height the height of the entity
      * @return whether it will spawn without suffocating
      */
-    private fun enoughSpace(loc: Location, width: Double, height: Double): Boolean {
-        //TODO convert triple while loop to idofront's pretty function for this
-        val checkRad = width / 2
-        var y = 0
-        while (y < ceil(height)) {
-            var x = -checkRad
-            while (x < checkRad) {
-                var z = -checkRad
-                while (z < checkRad) {
-                    val checkBlock = loc.clone().add(x, y.toDouble(), z).block
-                    if (checkBlock.type.isOccluding) {
-                        return false
-                    }
-                    z++
-                }
-                x++
-            }
-            y++
-        }
-        return true
-    }
+    private fun enoughSpace(loc: Location, width: Double, height: Double): Boolean = TODO("Check whether hitbox fits")
 
     /**
      * Gets a location to spawn in a mob given an original location and min/max radii around it

@@ -28,18 +28,6 @@ import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
-import kotlin.system.measureNanoTime
-
-//TODO move into idofront
-inline fun <T> printMillis(name: String, block: () -> T): T {
-    var result: T? = null
-    debug("$name took: ${
-        measureNanoTime {
-            result = block()
-        } / 1000000.0
-    } milliseconds")
-    return result!!
-}
 
 /**
  * An asynchronous repeating task that finds areas to spawn mobs in.
