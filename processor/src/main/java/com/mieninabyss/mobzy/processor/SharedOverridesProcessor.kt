@@ -61,7 +61,8 @@ class SharedOverridesProcessor : AbstractProcessor() {
         val fileName = "Mobzy${targetElement.simpleName}"
         val fileBuilder = FileSpec.builder(packageName, fileName)
 
-        val sourceLines = baseElement.readSource()
+        val generatedDirectory = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]!!
+        val sourceLines = baseElement.readSource(File(generatedDirectory))
 
         //create class
         val newClass = TypeSpec.classBuilder(fileName)
@@ -93,7 +94,6 @@ class SharedOverridesProcessor : AbstractProcessor() {
         outputLines.addAll(classLines + "}")
 
         //write file
-        val generatedDirectory = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]!!
         val writeTo = File(generatedDirectory, file.toUri().toString())
         writeTo.parentFile.mkdirs()
         writeTo.writeText(outputLines.joinToString(separator = "\n"))

@@ -89,7 +89,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
 
                 playerAction {
-                    val cappedSpawns = numOfSpawns.coerceAtMost(MobzyConfig.maxCommandSpawns)
+                    val cappedSpawns = numOfSpawns.coerceAtMost(MobzyConfig.data.maxCommandSpawns)
                     for (i in 1..cappedSpawns) player.location.spawnMobzyMob(mobName)
                 }
             }
@@ -109,8 +109,8 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
                     // be made private once that's done
                     action {
-                        if (MobzyConfig.doMobSpawns != enabled) {
-                            MobzyConfig.doMobSpawns = enabled
+                        if (MobzyConfig.data.doMobSpawns != enabled) {
+                            MobzyConfig.data.doMobSpawns = enabled
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")
@@ -137,7 +137,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     min = args[2].toInt()
                 } catch (e: NumberFormatException) {
                 }
-                return (min until MobzyConfig.maxCommandSpawns).asIterable()
+                return (min until MobzyConfig.data.maxCommandSpawns).asIterable()
                         .map { it.toString() }.filter { it.startsWith(min.toString()) }
             }
         if (subCommand in listOf("remove", "rm", "info", "i"))

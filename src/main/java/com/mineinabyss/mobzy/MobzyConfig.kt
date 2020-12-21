@@ -26,6 +26,7 @@ import org.bukkit.entity.Entity
 
 @GenerateConfigExtensions
 object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) {
+    operator fun rangeTo(test: String) = {}
     /**
      * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
      * @property doMobSpawns whether custom mob spawning enabled
@@ -69,7 +70,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
      */
-    fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = creatureTypeCaps[creatureType.toString()]
+    fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = data.creatureTypeCaps[creatureType.toString()]
             ?: error("could not find mob cap for $creatureType")
 
     override fun reload(): ReloadScope.() -> Unit = {

@@ -22,8 +22,9 @@ fun getTypeMirrors(block: () -> Unit): MutableList<out TypeMirror>? = try {
     e.typeMirrors
 }
 
-fun TypeElement.readSource(): List<String> {
+fun TypeElement.readSource(generatedDir: File): List<String> {
     val path = qualifiedName.toString().replace('.', '/')
     val ext = ".kt"
-    return File("src/main/java/$path$ext").readLines()
+    val root = generatedDir.parentFile.parentFile.parentFile.parentFile.parentFile
+    return File(root, "src/main/java/$path$ext").readLines()
 }

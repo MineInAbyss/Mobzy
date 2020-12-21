@@ -13,7 +13,7 @@ fun <T> T.debugVal(message: String = ""): T = debug("$message $this").let { this
  * @param message the message to be sent
  */
 fun debug(message: String, colorChar: Char? = null) {
-    if (MobzyConfig.debug) logInfo(message, colorChar)
+    if (MobzyConfig.data.debug) logInfo(message, colorChar)
 }
 
 /** A list of all the [CustomMob]s in these chunks. */

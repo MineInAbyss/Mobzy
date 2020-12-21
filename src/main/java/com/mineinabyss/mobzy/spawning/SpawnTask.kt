@@ -74,8 +74,8 @@ object SpawnTask {
     fun startTask() {
         if (runningTask != null) return
         runningTask = mobzy.schedule {
-            repeating(MobzyConfig.spawnTaskDelay)
-            while (MobzyConfig.doMobSpawns) {
+            repeating(MobzyConfig.data.spawnTaskDelay)
+            while (MobzyConfig.data.doMobSpawns) {
                 try {
                     runSpawnTask()
                 } catch (e: NoClassDefFoundError) {
@@ -154,11 +154,11 @@ object SpawnTask {
             //TODO proper min max y for 3d space
             for (i in 0..10) {
                 //get a random angle and distance, then find the side lengths of a triangle with hypotenuse length dist
-                val dist = (MobzyConfig.minChunkSpawnRad..MobzyConfig.maxChunkSpawnRad).random()
+                val dist = (MobzyConfig.data.minChunkSpawnRad..MobzyConfig.data.maxChunkSpawnRad).random()
                 val angle = Random.nextDouble(0.0, 2 * PI)
                 val newX = ceil(chunk.x + cos(angle) * dist)
                 val newZ = ceil(chunk.z + sin(angle) * dist)
-                if (none { distanceSquared(newX, newZ, it.location.chunk.x, it.location.chunk.z) < (MobzyConfig.minChunkSpawnRad * MobzyConfig.minChunkSpawnRad) }) {
+                if (none { distanceSquared(newX, newZ, it.location.chunk.x, it.location.chunk.z) < (MobzyConfig.data.minChunkSpawnRad * MobzyConfig.data.minChunkSpawnRad) }) {
                     val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())
                     if (!newChunk.isLoaded) continue
                     return ChunkSpawn(newChunk, 0, 255)
@@ -185,7 +185,7 @@ object SpawnTask {
     private fun Collection<Entity>.toPlayerGroups(): List<List<Entity>> = groupBy { it.world }
             .flatMap { (_, players) ->
                 players.dbScanCluster(
-                        maximumRadius = MobzyConfig.playerGroupRadius,
+                        maximumRadius = MobzyConfig.data.playerGroupRadius,
                         minPoints = 0,
                         xSelector = { it.location.x },
                         ySelector = { it.location.z }
