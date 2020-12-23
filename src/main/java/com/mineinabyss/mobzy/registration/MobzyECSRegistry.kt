@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.geary.dsl.attachToGeary
-import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.mobzy.Mobzy
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
@@ -30,20 +29,19 @@ fun Mobzy.attachToGeary() {
                 WalkingAnimationSystem
         )
 
+        components {
+            component(Model.serializer())
+            component(Pathfinders.serializer())
+            component(Equipment.serializer())
+            component(IncreasedWaterSpeed.serializer())
+            component(Sounds.serializer())
+            component(MobAttributes.serializer())
+            component(DeathLoot.serializer())
+            component(Rideable.serializer())
+            component(AttackPotionEffects.serializer())
+        }
+
         serializers {
-            polymorphic(GearyComponent::class) {
-                subclass(Model.serializer())
-                subclass(Pathfinders.serializer())
-                subclass(Equipment.serializer())
-                subclass(IncreasedWaterSpeed.serializer())
-                subclass(Sounds.serializer())
-
-                subclass(MobAttributes.serializer())
-                subclass(DeathLoot.serializer())
-                subclass(Rideable.serializer())
-
-                subclass(AttackPotionEffects.serializer())
-            }
             polymorphic(PathfinderComponent::class) {
                 subclass(TemptBehavior.serializer())
                 subclass(AvoidPlayerBehavior.serializer())
