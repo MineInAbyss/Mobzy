@@ -9,8 +9,8 @@ import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobs.types.*
 import com.mineinabyss.mobzy.mobs.types.NPC
 import net.minecraft.server.v1_16_R2.*
+import sun.misc.Unsafe
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobType]
@@ -32,38 +32,19 @@ object MobzyTypeRegistry {
 
     internal fun injectDefaultAttributes() {
         try {
-            val mapField: Field = AttributeDefaults::class.java.getDeclaredField("b")
-            mapField.isAccessible = true
-
-            val modifiers: Field = Field::class.java.getDeclaredField("modifiers")
-            modifiers.isAccessible = true
-            //NOTE: removing final modifier doesn't work beyond Java 11
-            modifiers.setInt(mapField, mapField.modifiers and Modifier.FINAL.inv())
+            val attributeDefaultsField = AttributeDefaults::class.java.getDeclaredField("b")
+            attributeDefaultsField.isAccessible = true
 
             @Suppress("UNCHECKED_CAST")
-            val currentAttributes = HashMap(mapField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
+            val currentAttributes = HashMap(attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
             currentAttributes += customAttributes
-            mapField.set(null, currentAttributes)
-//            var ipCache: MutableMap<EntityPose?, EntitySize?> = HashMap()
-//
-//            val universal = EntityHuman::class.java.getDeclaredField("b")
-//            universal.isAccessible = true
-//
-//            val poses = universal[null] as MutableMap<EntityPose?, EntitySize?>
-//
-//            if (poses !is HashMap) {
-//                for (pose in poses.keys) {
-//                    ipCache[pose] = poses[pose]
-//                }
-//                val unsafeField: Field = Unsafe::class.java.getDeclaredField("theUnsafe")
-//                unsafeField.isAccessible = true
-//                val unsafe: Unsafe = unsafeField[null] as Unsafe
-//                val staticFieldBase: Any = unsafe.staticFieldBase(universal)
-//                val staticFieldOffset: Long = unsafe.staticFieldOffset(universal)
-//                unsafe.putObject(staticFieldBase, staticFieldOffset, ipCache)
-//            } else {
-//                ipCache = poses
-//            }
+
+            val unsafeField: Field = Unsafe::class.java.getDeclaredField("theUnsafe")
+            unsafeField.isAccessible = true
+            val unsafe = unsafeField.get(null) as Unsafe
+            val staticFieldBase = unsafe.staticFieldBase(attributeDefaultsField)
+            val staticFieldOffset = unsafe.staticFieldOffset(attributeDefaultsField)
+            unsafe.putObject(staticFieldBase, staticFieldOffset, currentAttributes)
         } catch (reason: Throwable) {
             reason.printStackTrace()
             error("Failed to inject custom attribute defaults")
