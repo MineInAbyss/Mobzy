@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 @SerialName("mobzy:sounds")
 class Sounds(
         val volume: Float? = null,
+        val pitch: Double = 1.0,
+        val pitchRange: Double = 0.2,
         val ambient: String? = null,
         val death: String? = null,
         val hurt: String? = null,

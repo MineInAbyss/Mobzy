@@ -40,7 +40,9 @@ interface CustomMob : GearyEntity, PersistentDataHolder {
 
     val killer: NMSEntityHuman? get() = nmsEntity.killer
 
-    val scoreboardDisplayNameMZ: NMSChatMessage get() = NMSChatMessage(type.name.split('_').joinToString(" ") { it.capitalize() })
+    val scoreboardDisplayNameMZ: NMSChatMessage
+        get() = NMSChatMessage(
+            type.name.split('_').joinToString(" ") { it.capitalize() })
 
     var target
         get() = nmsEntity.goalTarget?.toBukkit()
@@ -90,12 +92,23 @@ interface CustomMob : GearyEntity, PersistentDataHolder {
     }
 
     fun makeSound(sound: String?) {
+        val sounds = get<Sounds>()
+        val volume = sounds?.volume ?: 1.0f
+        val pitch = sounds?.pitch ?: 1.0
+        val pitchRange = sounds?.pitchRange ?: 0.2
         if (sound != null)
-            entity.world.playSound(entity.location, sound, SoundCategory.NEUTRAL, 1f, (Random.nextDouble(1.0, 1.02).toFloat()))
+            entity.world.playSound(
+                entity.location,
+                sound,
+                SoundCategory.NEUTRAL,
+                volume,
+                (pitch + (Random.nextDouble(-pitchRange, pitchRange))).toFloat()
+            )
     }
 
     /** Plays a sound effect at the mob's location and returns null */
     fun makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
-        return makeSound(get<Sounds>()?.sound() ?: return default).let { null }
+        makeSound(get<Sounds>()?.sound() ?: return default)
+        return null
     }
 }
