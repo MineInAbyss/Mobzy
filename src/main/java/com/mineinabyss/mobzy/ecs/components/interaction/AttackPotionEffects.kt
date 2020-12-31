@@ -6,6 +6,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.potion.PotionEffect
 
+/**
+ * A component for applying potion effects when attacking.
+ *
+ * @param effects A list of effects to apply.
+ * @param applyChance A chance from 0 to 1 to apply those effects.
+ */
 @Serializable
 @SerialName("mobzy:potion_on_attack")
 data class AttackPotionEffects(

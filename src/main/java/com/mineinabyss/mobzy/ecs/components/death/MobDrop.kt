@@ -10,6 +10,21 @@ import org.bukkit.inventory.ItemStack
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
+/**
+ * A serializable class for defining an item a mob can drop. It acts as a sort of factory for [ItemStack]s that may
+ * define rarity, how many items to spawn, etc...
+ *
+ * Also allows defining a cooked version of the item that will automatically be registered when the class is created.
+ *
+ * @param item The item to be spawned.
+ * @param cooked The cooked version of this item.
+ * @param cookExp The amount of exp to drop when this item is cooked.
+ * @param cookTime How long it takes for this item to cook
+ * @param minAmount The minimum stack size of this item.
+ * @param maxAmount The maximum stack size of this item.
+ * @param dropChance A chance from 0 to 1 for this item to be dropped.
+ *
+ */
 @Serializable
 data class MobDrop(
         val item: SerializableItemStack,
@@ -38,10 +53,8 @@ data class MobDrop(
         }
     }
 
-    /**
-     * @return The amount of items to be dropped, or null if the drop does not succeed
-     * TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.
-     */
+    /** @return The amount of items to be dropped, or null if the drop does not succeed */
+    // TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.
     fun chooseDrop(lootingLevel: Int, fire: Boolean): ItemStack? {
         val lootingPercent = lootingLevel / 100.0
         val lootingMaxAmount: Int = if (dropChance >= 0.5) (maxAmount + lootingLevel * Random.nextDouble()).roundToInt() else maxAmount

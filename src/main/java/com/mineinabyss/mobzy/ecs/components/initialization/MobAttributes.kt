@@ -13,38 +13,38 @@ import org.bukkit.entity.Mob
 @Serializable
 @SerialName("mobzy:attributes")
 data class MobAttributes(
-        val width: Float = 0.7f,
-        val height: Float = 0.7f,
-        val fireImmune: Boolean = false,
-        val armor: Double? = null,
-        val armorToughness: Double? = null,
-        val attackDamage: Double? = null,
-        val attackKnockback: Double? = null,
-        val attackSpeed: Double? = null,
-        val flyingSpeed: Double? = null,
-        val followRange: Double? = null,
-        val jumpStrength: Double? = null,
-        val knockbackResistance: Double? = null,
-        val luck: Double? = null,
-        val maxHealth: Double? = null,
-        val movementSpeed: Double? = 0.25,
-        val spawnReinforcements: Double? = null
+    val width: Float = 0.7f,
+    val height: Float = 0.7f,
+    val fireImmune: Boolean = false,
+    val armor: Double? = null,
+    val armorToughness: Double? = null,
+    val attackDamage: Double? = null,
+    val attackKnockback: Double? = null,
+    val attackSpeed: Double? = null,
+    val flyingSpeed: Double? = null,
+    val followRange: Double? = null,
+    val jumpStrength: Double? = null,
+    val knockbackResistance: Double? = null,
+    val luck: Double? = null,
+    val maxHealth: Double? = null,
+    val movementSpeed: Double? = 0.25,
+    val spawnReinforcements: Double? = null
 ) : GearyComponent {
 
     fun toNMSBuilder(): NMSAttributeBuilder = NMSAttributes.forEntityInsentient()
-            .set(GenericAttributes.ARMOR, armor)
-            .set(GenericAttributes.ARMOR_TOUGHNESS, armorToughness)
-            .set(GenericAttributes.ATTACK_DAMAGE, attackDamage)
-            .set(GenericAttributes.ATTACK_KNOCKBACK, attackKnockback)
-            .set(GenericAttributes.ATTACK_SPEED, attackSpeed)
-            .set(GenericAttributes.FLYING_SPEED, flyingSpeed)
-            .set(GenericAttributes.FOLLOW_RANGE, followRange)
-            .set(GenericAttributes.JUMP_STRENGTH, jumpStrength)
-            .set(GenericAttributes.KNOCKBACK_RESISTANCE, knockbackResistance)
-            .set(GenericAttributes.LUCK, luck)
-            .set(GenericAttributes.MAX_HEALTH, maxHealth)
-            .set(GenericAttributes.MOVEMENT_SPEED, movementSpeed)
-            .set(GenericAttributes.SPAWN_REINFORCEMENTS, spawnReinforcements)
+        .set(GenericAttributes.ARMOR, armor)
+        .set(GenericAttributes.ARMOR_TOUGHNESS, armorToughness)
+        .set(GenericAttributes.ATTACK_DAMAGE, attackDamage)
+        .set(GenericAttributes.ATTACK_KNOCKBACK, attackKnockback)
+        .set(GenericAttributes.ATTACK_SPEED, attackSpeed)
+        .set(GenericAttributes.FLYING_SPEED, flyingSpeed)
+        .set(GenericAttributes.FOLLOW_RANGE, followRange)
+        .set(GenericAttributes.JUMP_STRENGTH, jumpStrength)
+        .set(GenericAttributes.KNOCKBACK_RESISTANCE, knockbackResistance)
+        .set(GenericAttributes.LUCK, luck)
+        .set(GenericAttributes.MAX_HEALTH, maxHealth)
+        .set(GenericAttributes.MOVEMENT_SPEED, movementSpeed)
+        .set(GenericAttributes.SPAWN_REINFORCEMENTS, spawnReinforcements)
 }
 
 val Mob.attributes get() = get<MobAttributes>()

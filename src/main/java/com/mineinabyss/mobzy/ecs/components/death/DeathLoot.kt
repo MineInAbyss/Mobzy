@@ -5,6 +5,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
+/**
+ * A component for loot that should drop on entity death.
+ *
+ * @param minExp The minimum amount of exp to drop.
+ * @param maxExp The maximum amount of exp to drop.
+ * @param deathCommands A list of commands to run.
+ * @param drops A list of [MobDrop]s to spawn.
+ */
 @Serializable
 @SerialName("mobzy:death_loot")
 class DeathLoot(
@@ -12,14 +20,13 @@ class DeathLoot(
         val maxExp: Int? = null,
         val deathCommands: List<String> = listOf(),
         val drops: List<MobDrop> = listOf()
-) : GearyComponent
-
-fun DeathLoot.expToDrop(): Int? {
-    val minExp = minExp
-    val maxExp = maxExp
-    return when {
-        minExp == null || maxExp == null -> null
-        maxExp <= minExp -> minExp
-        else -> Random.nextInt(minExp, maxExp)
+) : GearyComponent {
+    /** Helper function for randomly picking some amount of exp to drop. */
+    fun expToDrop(): Int? {
+        return when {
+            minExp == null || maxExp == null -> null
+            maxExp <= minExp -> minExp
+            else -> Random.nextInt(minExp, maxExp)
+        }
     }
 }
