@@ -62,7 +62,7 @@ fun createConditionTest(){
     postconditions {
         own<MobComponent> {
             val target: Entity = TODO()
-            mob.distanceSqrTo(target)
+            entity.distanceSqrTo(target)
         }
         Model::small becomes true
 

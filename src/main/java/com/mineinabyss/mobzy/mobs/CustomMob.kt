@@ -79,7 +79,7 @@ interface CustomMob : GearyEntity, PersistentDataHolder {
         addComponent<GearyEntityType>(type)
         //adding components from the type to this entity
         decodeComponents()
-        addComponent(MobComponent(entity))
+        addComponent(MobComponent(entity.uniqueId, entity))
 
         //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
         // use the same system here.

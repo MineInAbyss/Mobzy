@@ -21,9 +21,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
 import com.mineinabyss.mobzy.ecs.events.MobSpawnEvent
-import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
