@@ -7,6 +7,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlin.kapt'
     id 'io.github.0ffz.github-packages' version '1.2.0'
+    id "com.github.ben-manes.versions" version "0.36.0"
 }
 
 apply from: 'https://raw.githubusercontent.com/MineInAbyss/shared-gradle/master/common.gradle'
@@ -14,21 +15,10 @@ apply from: 'https://raw.githubusercontent.com/MineInAbyss/shared-gradle/master/
 allprojects {
     group = 'com.mineinabyss'
     version = plugin_version
-    if (project.hasProperty("buildNo")) version += ".$buildNo"
 
     repositories {
-        mavenCentral()
-        jcenter()
         maven { url 'https://papermc.io/repo/repository/maven-public/' }
         maven { url 'https://repo.codemc.io/repository/nms/' }
-        maven { url 'https://erethon.de/repo/' } //HeadLib
-        maven { url "https://repo.dmulloy2.net/nexus/repository/public/" } //ProtocolLib
-        maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
-        maven { url 'http://nexus.okkero.com/repository/maven-releases/' } //Skedule
-        maven githubPackage.invoke("MineInAbyss/Idofront")
-        maven githubPackage.invoke("MineInAbyss/Guiy")
-        maven githubPackage.invoke("MineInAbyss/KotlinSpice")
-        mavenLocal()
     }
 
     compileKotlin {
@@ -40,6 +30,19 @@ allprojects {
     compileTestKotlin { kotlinOptions { jvmTarget = "1.8" } }
 }
 
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'https://erethon.de/repo/' } //HeadLib
+    maven { url "https://repo.dmulloy2.net/nexus/repository/public/" } //ProtocolLib
+    maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
+    maven { url 'http://nexus.okkero.com/repository/maven-releases/' } //Skedule
+    maven githubPackage.invoke("MineInAbyss/Idofront")
+    maven githubPackage.invoke("MineInAbyss/Guiy")
+    maven githubPackage.invoke("MineInAbyss/KotlinSpice")
+    mavenLocal()
+}
+
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:$server_version"
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
@@ -49,10 +52,8 @@ dependencies {
     compileOnly "com.okkero.skedule:skedule"
     compileOnly "org.nield:kotlin-statistics"
 
-    implementation "com.mineinabyss:idofront:0.3.26"
-    compileOnly "com.mineinabyss:idofront-annotation:0.3.26"
+    implementation "com.mineinabyss:idofront:0.3.29"
     compileOnly "com.mineinabyss:geary"
-//    kapt "com.mineinabyss:idofront-processor:0.3.26"
 
     compileOnly "de.erethon:headlib:3.0.2"
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"

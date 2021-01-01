@@ -151,8 +151,8 @@ object SpawnTask {
                 val newX = ceil(chunk.x + cos(angle) * dist)
                 val newZ = ceil(chunk.z + sin(angle) * dist)
                 if (none {
-                        val chunk = it.location.chunk
-                        distanceSquared(newX, newZ, chunk.x, chunk.z) <
+                        val entityChunk = it.location.chunk
+                        distanceSquared(newX, newZ, entityChunk.x, entityChunk.z) <
                                 (MobzyConfig.data.minChunkSpawnRad * MobzyConfig.data.minChunkSpawnRad)
                     }) {
                     val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())

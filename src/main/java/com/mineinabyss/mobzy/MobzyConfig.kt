@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.idofront.annotations.GenerateConfigExtensions
 import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
@@ -24,7 +23,6 @@ import net.minecraft.server.v1_16_R2.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 
-@GenerateConfigExtensions
 object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) {
     /**
      * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
