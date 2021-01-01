@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.registration
 
 import com.comphenix.protocol.PacketType
-import com.comphenix.protocol.PacketType.Play.*
+import com.comphenix.protocol.PacketType.Play.Server
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
 import com.comphenix.protocol.events.ListenerPriority
@@ -24,11 +24,11 @@ object MobzyPacketInterception {
             }
             //pitch lock custom mobs
             onSend(
-                    //all these packets seem to be enough to cover all head rotations
-                    Server.ENTITY_LOOK,
-                    Server.REL_ENTITY_MOVE_LOOK,
-                    Server.LOOK_AT,
-                    Server.ENTITY_TELEPORT
+                //all these packets seem to be enough to cover all head rotations
+                Server.ENTITY_LOOK,
+                Server.REL_ENTITY_MOVE_LOOK,
+                Server.LOOK_AT,
+                Server.ENTITY_TELEPORT
             ) {
                 if (packet.getEntityModifier(this).read(0).isCustomMob) //check entity involved
                     packet.bytes.write(1, 0) //modify pitch to be zero
@@ -40,9 +40,9 @@ object MobzyPacketInterception {
 class ProtoKolManager(protocolManager: ProtocolManager, val plugin: Plugin) : ProtocolManager by protocolManager {
 
     fun ProtocolManager.onSend(
-            vararg packets: PacketType,
-            priority: ListenerPriority = ListenerPriority.NORMAL,
-            onSend: PacketEvent.() -> Unit
+        vararg packets: PacketType,
+        priority: ListenerPriority = ListenerPriority.NORMAL,
+        onSend: PacketEvent.() -> Unit
     ) {
         addPacketListener(object : PacketAdapter(plugin, priority, *packets) {
             override fun onPacketSending(event: PacketEvent) {
@@ -52,9 +52,9 @@ class ProtoKolManager(protocolManager: ProtocolManager, val plugin: Plugin) : Pr
     }
 
     fun ProtocolManager.onReceive(
-            vararg packets: PacketType,
-            priority: ListenerPriority = ListenerPriority.NORMAL,
-            onSend: PacketEvent.() -> Unit
+        vararg packets: PacketType,
+        priority: ListenerPriority = ListenerPriority.NORMAL,
+        onSend: PacketEvent.() -> Unit
     ) {
         addPacketListener(object : PacketAdapter(plugin, priority, *packets) {
             override fun onPacketReceiving(event: PacketEvent) {

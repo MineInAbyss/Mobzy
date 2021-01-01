@@ -44,24 +44,24 @@ import kotlin.reflect.jvm.isAccessible
  */
 @Serializable
 data class MobSpawn(
-        @SerialName("reuse") private val _reuse: String? = null,
-        @SerialName("mob") private val _entityTypeName: String? = null,
-        @SerialName("min-amount") private val _minAmount: Int? = null,
-        @SerialName("max-amount") private val _maxAmount: Int? = null,
-        @SerialName("radius") private val _radius: Double? = null,
-        @SerialName("priority") private val _basePriority: Double? = null,
-        @SerialName("min-time") private val _minTime: Long? = null,
-        @SerialName("max-time") private val _maxTime: Long? = null,
-        @SerialName("min-light") private val _minLight: Long? = null,
-        @SerialName("max-light") private val _maxLight: Long? = null,
-        @SerialName("min-y") private val _minY: Int? = null,
-        @SerialName("max-y") private val _maxY: Int? = null,
-        @SerialName("min-gap") private val _minGap: Int? = null,
-        @SerialName("max-gap") private val _maxGap: Int? = null,
-        @SerialName("max-local-group") private val _maxLocalGroup: Int? = null,
-        @SerialName("local-group-radius") private val _localGroupRadius: Double? = null,
-        @SerialName("spawn-pos") private val _spawnPos: SpawnPosition? = null,
-        @SerialName("block-whitelist") private val _blockWhitelist: List<Material>? = null
+    @SerialName("reuse") private val _reuse: String? = null,
+    @SerialName("mob") private val _entityTypeName: String? = null,
+    @SerialName("min-amount") private val _minAmount: Int? = null,
+    @SerialName("max-amount") private val _maxAmount: Int? = null,
+    @SerialName("radius") private val _radius: Double? = null,
+    @SerialName("priority") private val _basePriority: Double? = null,
+    @SerialName("min-time") private val _minTime: Long? = null,
+    @SerialName("max-time") private val _maxTime: Long? = null,
+    @SerialName("min-light") private val _minLight: Long? = null,
+    @SerialName("max-light") private val _maxLight: Long? = null,
+    @SerialName("min-y") private val _minY: Int? = null,
+    @SerialName("max-y") private val _maxY: Int? = null,
+    @SerialName("min-gap") private val _minGap: Int? = null,
+    @SerialName("max-gap") private val _maxGap: Int? = null,
+    @SerialName("max-local-group") private val _maxLocalGroup: Int? = null,
+    @SerialName("local-group-radius") private val _localGroupRadius: Double? = null,
+    @SerialName("spawn-pos") private val _spawnPos: SpawnPosition? = null,
+    @SerialName("block-whitelist") private val _blockWhitelist: List<Material>? = null
 ) {
 
     @Transient
@@ -149,7 +149,12 @@ data class MobSpawn(
 
     /** Gets the priority of this [MobSpawn]. If it is negative, the spawn should never succeed. The higher the
      * priority, the higher the chance of this spawn being picked. */
-    fun getPriority(spawnArea: SpawnArea, entityTypeCounts: Map<String, Int>, creatureTypeCounts: Map<String, Int>, playerCount: Int): Double {
+    fun getPriority(
+        spawnArea: SpawnArea,
+        entityTypeCounts: Map<String, Int>,
+        creatureTypeCounts: Map<String, Int>,
+        playerCount: Int
+    ): Double {
         if (spawnArea.gap !in gapRange) return -1.0
 
         val loc = spawnArea.getSpawnLocation(spawnPos)
@@ -159,7 +164,10 @@ data class MobSpawn(
 
         //eliminate impossible spawns
         if (time !in timeRange || lightLevel !in lightRange || loc.blockY !in yRange) return -1.0
-        if (blockWhitelist.isNotEmpty() && !blockWhitelist.contains(loc.clone().add(0.0, -1.0, 0.0).block.type)) return -1.0
+        if (blockWhitelist.isNotEmpty() && !blockWhitelist.contains(
+                loc.clone().add(0.0, -1.0, 0.0).block.type
+            )
+        ) return -1.0
 
         if (maxLocalGroup > 0) entityTypeCounts[entityType.keyName]?.let {
             //TODO probably rename maxLocalGroup to maxSpawnsPerPlayer
@@ -179,7 +187,8 @@ data class MobSpawn(
     }
 
     fun chooseSpawnAmount(): Int =
-            if (minAmount >= maxAmount) minAmount else (Math.random() * (maxAmount - minAmount + 1)).toInt() + minAmount
+        if (minAmount >= maxAmount) minAmount
+        else (Math.random() * (maxAmount - minAmount + 1)).toInt() + minAmount
 
     /**
      * Where we should look for a location to actually spawn mobs in when calling [spawn]

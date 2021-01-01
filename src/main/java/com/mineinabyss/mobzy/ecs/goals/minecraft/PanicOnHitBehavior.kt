@@ -12,10 +12,10 @@ import org.bukkit.entity.Mob
 @Serializable
 @SerialName("minecraft:behavior.panic_on_hit")
 class PanicOnHitBehavior(
-        private val speedModifier: Double = 1.0,
+    private val speedModifier: Double = 1.0,
 ) : PathfinderComponent() {
     override fun build(mob: Mob): NMSPathfinderGoal = PathfinderGoalPanic(
-            mob.toNMS<EntityCreature>(),
-            speedModifier
+        mob.toNMS<EntityCreature>(),
+        speedModifier
     )
 }

@@ -12,15 +12,15 @@ import org.bukkit.Material
  */
 @Serializable
 class SpawnRegion(
-        val name: String,
-        val icon: Material = Material.BEDROCK,
-        val spawns: List<MobSpawn> = listOf()
+    val name: String,
+    val icon: Material = Material.BEDROCK,
+    val spawns: List<MobSpawn> = listOf()
 ) {
     init {
         SpawnRegistry += this
     }
 
     fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns
-            .firstOrNull { it.entityType == type }
-            ?: error("Could not find ${type.typeName} from ${spawns.map { it.entityTypeName }}")
+        .firstOrNull { it.entityType == type }
+        ?: error("Could not find ${type.typeName} from ${spawns.map { it.entityTypeName }}")
 }

@@ -12,8 +12,8 @@ import org.bukkit.event.HandlerList
  * creation. As such, use this event for doing non-persistent things with the Entity.
  */
 data class MobLoadEvent(
-        val entity: GearyEntity
-): Event() {
+    val entity: GearyEntity
+) : Event() {
     override fun getHandlers() = handlerList
 
     companion object {

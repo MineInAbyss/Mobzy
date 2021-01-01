@@ -6,8 +6,8 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 data class EntityRightClickEvent(
-        val player: Player,
-        val mob: Mob
+    val player: Player,
+    val mob: Mob
 ) : Event() {
     override fun getHandlers() = handlerList
 

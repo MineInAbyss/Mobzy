@@ -165,12 +165,12 @@ object MobListener : Listener {
         if (e.leftClicked || e.rightClicked) {
             //shoot ray to simulate a left/right click, accounting for server-side custom mob hitboxes
             val trace = player.world.rayTrace(
-                    player.eyeLocation,
-                    player.location.direction,
-                    3.0,
-                    FluidCollisionMode.ALWAYS,
-                    true,
-                    0.0
+                player.eyeLocation,
+                player.location.direction,
+                3.0,
+                FluidCollisionMode.ALWAYS,
+                true,
+                0.0
             ) { entity -> entity != player }
 
             //if we hit a custom mob, attack or fire an event

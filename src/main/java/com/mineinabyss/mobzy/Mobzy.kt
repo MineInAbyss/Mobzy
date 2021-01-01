@@ -44,9 +44,9 @@ class Mobzy : JavaPlugin(), MobzyAddon {
 
         //Register events
         registerEvents(
-                MobListener,
-                MobzyECSListener,
-                PlayerJoinLeaveListener,
+            MobListener,
+            MobzyECSListener,
+            PlayerJoinLeaveListener,
         )
 
         //Register commands

@@ -12,5 +12,5 @@ import org.bukkit.entity.Mob
 @SerialName("minecraft:behavior.random_look_around")
 class RandomLookAroundBehavior : PathfinderComponent() {
     override fun build(mob: Mob): NMSPathfinderGoal =
-            PathfinderGoalRandomLookaround(mob.toNMS())
+        PathfinderGoalRandomLookaround(mob.toNMS())
 }

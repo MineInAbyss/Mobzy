@@ -9,8 +9,8 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class Goals(
-        val actions: Set<Action>,
-        val goals: Set<Action>,
+    val actions: Set<Action>,
+    val goals: Set<Action>,
 ) : GearyComponent {
     @Transient
     var executingPlan: Action? = null
@@ -53,11 +53,11 @@ class GoalManagerSystem : TickingSystem() {
                 }
 
                 actions.childrenOf(action)
-                        .filter { !closedNodes.contains(it) }
-                        .forEach {
-                            it.costInTree = action.costInTree + it.cost
-                            openNodes.add(it)
-                        }
+                    .filter { !closedNodes.contains(it) }
+                    .forEach {
+                        it.costInTree = action.costInTree + it.cost
+                        openNodes.add(it)
+                    }
             }
         }
     }

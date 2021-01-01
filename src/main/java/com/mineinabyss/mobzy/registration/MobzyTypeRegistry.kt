@@ -24,7 +24,7 @@ object MobzyTypeRegistry {
 
     /** Gets a mob's [EntityTypes] from a String if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
     operator fun get(name: String): NMSEntityType<*> = _types[name.toEntityTypeName()]
-            ?: error("Mob type ${name.toEntityTypeName()} not found, only know $typeNames")
+        ?: error("Mob type ${name.toEntityTypeName()} not found, only know $typeNames")
 
     operator fun contains(name: String) = _types.contains(name.toEntityTypeName())
 
@@ -36,7 +36,8 @@ object MobzyTypeRegistry {
             attributeDefaultsField.isAccessible = true
 
             @Suppress("UNCHECKED_CAST")
-            val currentAttributes = HashMap(attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
+            val currentAttributes =
+                HashMap(attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
             currentAttributes += customAttributes
 
             val unsafeField: Field = Unsafe::class.java.getDeclaredField("theUnsafe")
@@ -61,7 +62,8 @@ object MobzyTypeRegistry {
         val init = mobBaseClasses[type.baseClass] ?: error("Not a valid parent class: ${type.baseClass}")
         val mobID = name.toEntityTypeName()
         val attributes = type.get<MobAttributes>() ?: MobAttributes()
-        val injected: NMSEntityType<Entity> = (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
+        val injected: NMSEntityType<Entity> =
+            (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
                 .builderForCreatureType(type.creatureType)
                 .withSize(attributes.width, attributes.height)
                 .apply {
@@ -75,11 +77,11 @@ object MobzyTypeRegistry {
     }
 
     private val mobBaseClasses = mutableMapOf<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>(
-            "mobzy:flying" to ::FlyingMob, //TODO use proper keys
-            "mobzy:hostile" to ::HostileMob,
-            "mobzy:passive" to ::PassiveMob,
-            "mobzy:fish" to ::FishMob,
-            "mobzy:npc" to ::NPC
+        "mobzy:flying" to ::FlyingMob, //TODO use proper keys
+        "mobzy:hostile" to ::HostileMob,
+        "mobzy:passive" to ::PassiveMob,
+        "mobzy:fish" to ::FishMob,
+        "mobzy:npc" to ::NPC
     )
 
     fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {

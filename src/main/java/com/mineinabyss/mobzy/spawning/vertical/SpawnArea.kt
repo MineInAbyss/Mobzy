@@ -24,12 +24,12 @@ class SpawnArea(val top: Location, val bottom: Location) {
      * - If [SpawnPosition.OVERHANG], return [top]
      */
     fun getSpawnLocation(spawnPosition: SpawnPosition): Location =
-            when (spawnPosition) {
-                //pick some position between the bottom and top when spawn position is in air
-                SpawnPosition.AIR -> bottom.clone().apply { if(gap > 1) y = Random.nextInt(gap - 1).toDouble() }
-                SpawnPosition.GROUND -> bottom
-                SpawnPosition.OVERHANG -> top
-            }
+        when (spawnPosition) {
+            //pick some position between the bottom and top when spawn position is in air
+            SpawnPosition.AIR -> bottom.clone().apply { if (gap > 1) y = Random.nextInt(gap - 1).toDouble() }
+            SpawnPosition.GROUND -> bottom
+            SpawnPosition.OVERHANG -> top
+        }
 
     override fun toString(): String = "SpawnArea: " + bottom.blockY + ", " + top.blockY
 }

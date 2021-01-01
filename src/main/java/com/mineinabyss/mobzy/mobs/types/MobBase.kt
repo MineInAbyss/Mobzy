@@ -6,7 +6,6 @@ import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.mobzy.api.nms.aliases.*
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
-import com.mineinabyss.mobzy.ecs.components.death.expToDrop
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobzyTypes
@@ -19,7 +18,9 @@ import org.bukkit.entity.Mob
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override val entity: Mob get() = super.entity
     final override val gearyId: Int = Engine.getNextId()
+
     //we get the type via this mob's EntityTypes, later register the type with the ECS
+    @Suppress("USELESS_CAST")
     final override val type: MobType = MobzyTypes[this as CustomMob]
 
     //implementation of properties from CustomMob
@@ -56,10 +57,10 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     }
 
     final override fun b(entityhuman: NMSEntityHuman, enumhand: NMSHand): NMSInteractionResult =
-            onPlayerInteract(entityhuman.toBukkit(), enumhand)
+        onPlayerInteract(entityhuman.toBukkit(), enumhand)
 
     override fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult =
-            super.b(player.toNMS(), enumhand)
+        super.b(player.toNMS(), enumhand)
 
     override fun die(damagesource: NMSDamageSource) = (this as CustomMob).die(damagesource)
     override fun getScoreboardDisplayName() = scoreboardDisplayNameMZ
@@ -67,7 +68,9 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
 
     override fun getSoundVolume(): Float = get<Sounds>()?.volume ?: super.getSoundVolume()
     override fun getSoundAmbient(): NMSSound? = makeSound(super.getSoundAmbient()) { ambient }
-    override fun getSoundHurt(damagesource: NMSDamageSource): NMSSound? = makeSound(super.getSoundHurt(damagesource)) { hurt }
+    override fun getSoundHurt(damagesource: NMSDamageSource): NMSSound? =
+        makeSound(super.getSoundHurt(damagesource)) { hurt }
+
     override fun getSoundDeath(): NMSSound? = makeSound(super.getSoundDeath()) { death }
     override fun getSoundSplash(): NMSSound? = makeSound(super.getSoundSplash()) { splash }
     override fun getSoundSwim(): NMSSound? = makeSound(super.getSoundSwim()) { swim }

@@ -10,8 +10,8 @@ import org.bukkit.event.HandlerList
  * Use this to modify persistent things on the entity, and use [MobLoadEvent] for non-persistent things.
  */
 data class MobSpawnEvent(
-        val entity: GearyEntity
-): Event() {
+    val entity: GearyEntity
+) : Event() {
     override fun getHandlers() = handlerList
 
     companion object {

@@ -15,6 +15,6 @@ import org.bukkit.potion.PotionEffect
 @Serializable
 @SerialName("mobzy:potion_on_attack")
 data class AttackPotionEffects(
-        val effects: List<@Serializable(with = PotionEffectSerializer::class) PotionEffect>,
-        val applyChance: Double = 1.0,
+    val effects: List<@Serializable(with = PotionEffectSerializer::class) PotionEffect>,
+    val applyChance: Double = 1.0,
 ) : GearyComponent

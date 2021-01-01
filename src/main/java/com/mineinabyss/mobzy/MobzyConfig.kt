@@ -38,14 +38,14 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      */
     @Serializable
     class Data(
-            var debug: Boolean = false,
-            var doMobSpawns: Boolean = false,
-            var minChunkSpawnRad: Int = 3,
-            var maxChunkSpawnRad: Int = 7,
-            var maxCommandSpawns: Int = 50,
-            var playerGroupRadius: Double = 128.0,
-            var spawnTaskDelay: Long = 100,
-            var creatureTypeCaps: MutableMap<String, Int> = hashMapOf()
+        var debug: Boolean = false,
+        var doMobSpawns: Boolean = false,
+        var minChunkSpawnRad: Int = 3,
+        var maxChunkSpawnRad: Int = 7,
+        var maxCommandSpawns: Int = 50,
+        var playerGroupRadius: Double = 128.0,
+        var spawnTaskDelay: Long = 100,
+        var creatureTypeCaps: MutableMap<String, Int> = hashMapOf()
     )
 
     val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
@@ -70,7 +70,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @return The mob cap for that mob in config.
      */
     fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = data.creatureTypeCaps[creatureType.toString()]
-            ?: error("could not find mob cap for $creatureType")
+        ?: error("could not find mob cap for $creatureType")
 
     override fun reload(): ReloadScope.() -> Unit = {
         logSuccess("Reloading mobzy config")

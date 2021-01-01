@@ -12,12 +12,12 @@ import org.bukkit.entity.Mob
 @Serializable
 @SerialName("minecraft:behavior.land_stroll")
 class LandStrollBehavior(
-        private val speedModifier: Double = 1.0,
-        private val frequency: Float = 0.001f
-): PathfinderComponent() {
+    private val speedModifier: Double = 1.0,
+    private val frequency: Float = 0.001f
+) : PathfinderComponent() {
     override fun build(mob: Mob): NMSPathfinderGoal = PathfinderGoalRandomStrollLand(
-            mob.toNMS<EntityCreature>(),
-            speedModifier,
-            frequency
+        mob.toNMS<EntityCreature>(),
+        speedModifier,
+        frequency
     )
 }

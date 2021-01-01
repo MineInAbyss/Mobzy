@@ -14,20 +14,20 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:behavior.idle_fly_above_ground")
 class IdleFlyAboveGroundBehavior(
-        private val maxHeight: Double = 4.0,
-        private val radius: Double = 5.0
+    private val maxHeight: Double = 4.0,
+    private val radius: Double = 5.0
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = IdleFlyAboveGroundGoal(
-            mob,
-            maxHeight,
-            radius
+        mob,
+        maxHeight,
+        radius
     )
 }
 
 class IdleFlyAboveGroundGoal(
-        mob: Mob,
-        private val maxHeight: Double = 4.0,
-        private val radius: Double = 5.0
+    mob: Mob,
+    private val maxHeight: Double = 4.0,
+    private val radius: Double = 5.0
 ) : IdleFlyGoal(mob) {
     override fun init() {
         val (x, y, z) = mob.location
@@ -41,7 +41,8 @@ class IdleFlyAboveGroundGoal(
         }
         if (y > 16) { //keep mobs from going down and killing themselves
             targetLoc = loc
-            moveController.moveTo(x, y, z, 1.0) //TODO make a wrapper for the controller and figure out the difference between it and navigation
+            //TODO make a wrapper for the controller and figure out the difference between it and navigation
+            moveController.moveTo(x, y, z, 1.0)
         }
     }
 }

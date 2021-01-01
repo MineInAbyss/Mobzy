@@ -13,14 +13,14 @@ import org.bukkit.event.entity.EntityTargetEvent
 @Serializable
 @SerialName("mobzy:target.attacker")
 class TargetAttacker(
-        private val range: Double? = null
+    private val range: Double? = null
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = TargetAttackerGoal(mob, range ?: mob.attributes?.followRange ?: 0.0)
 }
 
 class TargetAttackerGoal(
-        override val mob: Mob,
-        private val range: Double
+    override val mob: Mob,
+    private val range: Double
 ) : MobzyPathfinderGoal(type = Type.TARGET) {
     private lateinit var playerDamager: Player
 
@@ -34,8 +34,11 @@ class TargetAttackerGoal(
     override fun shouldKeepExecuting(): Boolean = isPlayerValidTarget(playerDamager, range)
 
     override fun init() {
-        nmsEntity.setGoalTarget(nmsEntity.lastDamager ?: return,
-                EntityTargetEvent.TargetReason.TARGET_ATTACKED_NEARBY_ENTITY, true)
+        nmsEntity.setGoalTarget(
+            nmsEntity.lastDamager ?: return,
+            EntityTargetEvent.TargetReason.TARGET_ATTACKED_NEARBY_ENTITY,
+            true
+        )
     }
 
     override fun reset() {

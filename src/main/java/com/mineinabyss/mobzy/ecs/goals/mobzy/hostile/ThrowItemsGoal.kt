@@ -28,22 +28,22 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-        @SerialName("item") private val _item: SerializableItemStack,
-        val damage: Float,
-        val minChaseRad: Double = 0.0,
-        val minThrowRad: Double = 7.0,
-        val cooldown: Long = 3000L
+    @SerialName("item") private val _item: SerializableItemStack,
+    val damage: Float,
+    val minChaseRad: Double = 0.0,
+    val minThrowRad: Double = 7.0,
+    val cooldown: Long = 3000L
 ) : PathfinderComponent() {
     @Transient
     val item = _item.toItemStack()
 
     override fun build(mob: Mob) = ThrowItemsGoal(
-            (mob as Creature),
-            item,
-            damage,
-            minChaseRad,
-            minThrowRad,
-            cooldown
+        (mob as Creature),
+        item,
+        damage,
+        minChaseRad,
+        minThrowRad,
+        cooldown
     )
 }
 
@@ -54,13 +54,13 @@ class ThrowItemsBehavior(
  * @param cooldown How long to wait between firing at the target.
  */
 class ThrowItemsGoal(
-        override val mob: Creature,
-        private val item: ItemStack,
-        private val damage: Float,
-        private val minChaseRad: Double,
-        private val minThrowRad: Double,
-        //TODO val accuracy: Double,
-        cooldown: Long = 3000L
+    override val mob: Creature,
+    private val item: ItemStack,
+    private val damage: Float,
+    private val minChaseRad: Double,
+    private val minThrowRad: Double,
+    //TODO val accuracy: Double,
+    cooldown: Long = 3000L
 ) : MobzyPathfinderGoal(cooldown = cooldown) {
     private var distance = 0.0
 
@@ -99,7 +99,8 @@ class ThrowItemsGoal(
         val location = mob.eyeLocation
         val (x, y, z) = location
 
-        val projectile = DamagingThrownItem(item, damage, nmsEntity.world, nmsEntity) //TODO some way to create different types of projectiles
+        //TODO some way to create different types of projectiles
+        val projectile = DamagingThrownItem(item, damage, nmsEntity.world, nmsEntity)
         projectile.setPosition(x, y + mob.eyeHeight * 2, z) //seems eyeHeight is wrong here
 
         val targetLoc = target.eyeLocation
@@ -107,17 +108,22 @@ class ThrowItemsGoal(
         val dY = targetLoc.y - y - 0.4
         val dZ = targetLoc.z - z
 
-        world.playSound(mob.location, Sound.ENTITY_SNOW_GOLEM_SHOOT, 1.0f, 1.0f / (Random.nextDouble(0.8, 1.2).toFloat()))
+        world.playSound(
+            mob.location,
+            Sound.ENTITY_SNOW_GOLEM_SHOOT,
+            1.0f,
+            1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
+        )
         projectile.shoot(dX, dY, dZ, 1.6f, 12.0f)
         world.toNMS().addEntity(projectile)
     }
 }
 
 class DamagingThrownItem(
-        item: ItemStack,
-        val damage: Float,
-        world: World?,
-        thrower: EntityLiving
+    item: ItemStack,
+    val damage: Float,
+    world: World?,
+    thrower: EntityLiving
 ) : EntitySnowball(world, thrower) {
     init {
         this.item = CraftItemStack.asNMSCopy(item)

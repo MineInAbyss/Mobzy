@@ -3,7 +3,6 @@ package com.mineinabyss.mobzy.api.helpers.entity
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 
-
 fun Entity.lookAt(x: Double, y: Double, z: Double) {
     val dirBetweenLocations = org.bukkit.util.Vector(x, y, z).subtract(location.toVector())
     val location = location

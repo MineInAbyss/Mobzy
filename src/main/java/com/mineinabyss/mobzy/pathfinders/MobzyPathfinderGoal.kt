@@ -51,11 +51,11 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, type: Type?
     open fun executeWhenCooledDown() = Unit
 
     fun isPlayerValidTarget(player: Player, range: Double = mob.attributes?.followRange ?: 0.0) =
-            !player.isInvulnerable &&
-                    !player.isDead &&
-                    player.gameMode != GameMode.SPECTATOR &&
-                    player.gameMode != GameMode.CREATIVE &&
-                    mob.distanceSqrTo(player) < range * range
+        !player.isInvulnerable &&
+                !player.isDead &&
+                player.gameMode != GameMode.SPECTATOR &&
+                player.gameMode != GameMode.CREATIVE &&
+                mob.distanceSqrTo(player) < range * range
 }
 
 fun NMSPathfinderGoal.setType(type: net.minecraft.server.v1_16_R2.PathfinderGoal.Type) = a(EnumSet.of(type))

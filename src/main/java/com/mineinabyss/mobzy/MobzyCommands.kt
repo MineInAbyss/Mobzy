@@ -35,7 +35,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
             commandGroup {
                 val entityType by stringArg()
-                val radius by intArg() { default = 0 }
+                val radius by intArg { default = 0 }
 
                 fun PlayerAction.removeOrInfo(isInfo: Boolean) {
                     val worlds = mobzy.server.worlds
@@ -46,27 +46,31 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         val tags = entity.scoreboardTags
                         val nmsEntity = entity.toNMS()
                         if (entity.isCustomMob && when (entityType) {
-                                    "all" -> !entity.isRenamed && !entity.scoreboardTags.contains("npc")
-                                    "named" -> entity.isRenamed
-                                    "npc" -> entity.scoreboardTags.contains("npc")
-                                    "passive" -> !entity.scoreboardTags.contains("npc") && nmsEntity is PassiveMob
-                                    "hostile" -> nmsEntity is HostileMob
-                                    "flying" -> nmsEntity is FlyingMob
-                                    else -> entity.isOfType(entityType)
-                                }) {
+                                "all" -> !entity.isRenamed && !entity.scoreboardTags.contains("npc")
+                                "named" -> entity.isRenamed
+                                "npc" -> entity.scoreboardTags.contains("npc")
+                                "passive" -> !entity.scoreboardTags.contains("npc") && nmsEntity is PassiveMob
+                                "hostile" -> nmsEntity is HostileMob
+                                "flying" -> nmsEntity is FlyingMob
+                                else -> entity.isOfType(entityType)
+                            }
+                        ) {
                             val playerLoc = player.location
                             if (radius <= 0 || entity.world == playerLoc.world && entity.location.distance(playerLoc) < radius) {
-                                if (!isInfo) entity.remove() //only kill mobs if command was cmrm and not cminfo
                                 entityCount++
+
+                                if (!isInfo) entity.remove()
                                 if (!tags.contains("additionalPart")) mobCount++
                             }
                         }
                     }
 
-                    sender.success((if (isInfo) "There are " else "Removed ") +
-                            "&l$mobCount&r&a " + (if (entityType == "all") "custom mobs " else "$entityType ") +
-                            (if (entityCount != mobCount) "($entityCount entities) " else "") + //account for multi-entity mobs
-                            (if (radius <= 0) "in all loaded chunks." else "in a radius of $radius blocks."), '&'
+                    sender.success(
+                        """
+                        ${if (isInfo) "There are" else "Removed"}
+                        &l$mobCount&r&a ${if (entityType == "all") "custom mobs" else entityType}
+                        ${if (radius <= 0) "in all loaded chunks." else "in a radius of $radius blocks."}
+                        """.trimIndent().replace("\n", " "), '&'
                     )
                 }
 
@@ -83,7 +87,7 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 val mobName by optionArg(options = MobzyTypeRegistry.typeNames) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
-                val numOfSpawns by intArg() {
+                val numOfSpawns by intArg {
                     name = "number of spawns"
                     default = 1
                 }
@@ -122,33 +126,44 @@ object MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     }
 
     //TODO make the API do tab completion
-    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): List<String> {
-        if (command.name != "mobzy") return emptyList()
-        if (args.size <= 1) return listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config")
+    override fun onTabComplete(
+        sender: CommandSender,
+        command: Command,
+        alias: String,
+        args: Array<String>
+    ): List<String> {
+        return when {
+            command.name != "mobzy" -> emptyList()
+            args.size <= 1 -> listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config")
                 .filter { it.startsWith(args[0]) }
-        val subCommand = args[0]
-        if (subCommand == "spawn" || subCommand == "s")
-            if (args.size == 2) {
-                return MobzyTypeRegistry.typeNames
-                        .filter { it.startsWith(args[1].toLowerCase()) }
-            } else if (args.size == 3) {
-                var min = 1
-                try {
-                    min = args[2].toInt()
-                } catch (e: NumberFormatException) {
-                }
-                return (min until MobzyConfig.data.maxCommandSpawns).asIterable()
-                        .map { it.toString() }.filter { it.startsWith(min.toString()) }
+            else -> {
+                val subCommand = args[0]
+
+                if (subCommand == "spawn" || subCommand == "s")
+                    if (args.size == 2) {
+                        return MobzyTypeRegistry.typeNames
+                            .filter { it.startsWith(args[1].toLowerCase()) }
+                    } else if (args.size == 3) {
+                        var min = 1
+                        try {
+                            min = args[2].toInt()
+                        } catch (e: NumberFormatException) {
+                        }
+                        return (min until MobzyConfig.data.maxCommandSpawns).asIterable()
+                            .map { it.toString() }.filter { it.startsWith(min.toString()) }
+                    }
+
+                if (subCommand in listOf("remove", "rm", "info", "i"))
+                    if (args.size == 2) {
+                        val mobs: MutableList<String> = ArrayList()
+                        mobs.addAll(MobzyTypeRegistry.typeNames)
+                        mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
+                        return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
+                    }
+                return if (subCommand == "config") listOf("mobs", "spawns", "domobspawns")
+                    .filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
+                else emptyList()
             }
-        if (subCommand in listOf("remove", "rm", "info", "i"))
-            if (args.size == 2) {
-                val mobs: MutableList<String> = ArrayList()
-                mobs.addAll(MobzyTypeRegistry.typeNames)
-                mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
-                return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
-            }
-        return if (subCommand == "config") listOf("mobs", "spawns", "domobspawns")
-                .filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
-        else emptyList()
+        }
     }
 }

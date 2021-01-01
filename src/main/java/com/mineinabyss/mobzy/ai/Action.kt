@@ -5,7 +5,7 @@ import kotlinx.serialization.Transient
 
 @Serializable
 abstract class Action(
-        val cost: Int,
+    val cost: Int,
 ) : Comparable<Action> {
     abstract fun conditionsMet(): Boolean
     abstract fun isComplete(): Boolean

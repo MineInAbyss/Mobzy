@@ -16,10 +16,10 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:death_loot")
 class DeathLoot(
-        val minExp: Int? = null,
-        val maxExp: Int? = null,
-        val deathCommands: List<String> = listOf(),
-        val drops: List<MobDrop> = listOf()
+    val minExp: Int? = null,
+    val maxExp: Int? = null,
+    val deathCommands: List<String> = listOf(),
+    val drops: List<MobDrop> = listOf()
 ) : GearyComponent {
     /** Helper function for randomly picking some amount of exp to drop. */
     fun expToDrop(): Int? {

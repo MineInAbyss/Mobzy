@@ -4,6 +4,7 @@ import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Chunk
 import org.nield.kotlinstatistics.WeightedDice
+import kotlin.random.Random
 
 /**
  * Wraps around one chunk to add functionality to take
@@ -13,7 +14,9 @@ import org.nield.kotlinstatistics.WeightedDice
  * @property spawnAreas The spawn areas within the [VerticalSpawn] located at [randomLocInChunk]
  */
 class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val maxY: Int) : Chunk by chunk {
-    private val randomLocInChunk by lazy { chunk.getBlock((Math.random() * 15).toInt(), 0, (Math.random() * 15).toInt()).location }
+    private val randomLocInChunk by lazy {
+        chunk.getBlock(Random.nextInt(15), 0, Random.nextInt(15)).location
+    }
     private val spawnAreas by lazy { VerticalSpawn(randomLocInChunk, minY, maxY).spawnAreas }
 
     /** Gets a random [SpawnArea] from [spawnAreas], through a [VerticalSpawn] */
@@ -21,11 +24,11 @@ class ChunkSpawn(private val chunk: Chunk, private val minY: Int, private val ma
         if (spawnAreas.isEmpty()) return null
         //weighted choice based on gap size
         val weightedChoice = WeightedDice(
-                spawnAreas.associateWith { spawnArea ->
-                    //make underground spawns a little more likely by limiting to 100 blocks
-                    //TODO could be a more complex function eventually
-                    spawnArea.gap.coerceAtMost(100).toDouble()
-                }.filterValues { it > 0 }
+            spawnAreas.associateWith { spawnArea ->
+                //make underground spawns a little more likely by limiting to 100 blocks
+                //TODO could be a more complex function eventually
+                spawnArea.gap.coerceAtMost(100).toDouble()
+            }.filterValues { it > 0 }
         )
 
         return weightedChoice.roll() //pick one

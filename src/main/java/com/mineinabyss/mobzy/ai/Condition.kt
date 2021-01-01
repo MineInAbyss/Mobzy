@@ -7,49 +7,55 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import org.bukkit.entity.Entity
 import kotlin.reflect.KProperty
 
-class Condition {
-}
+class Condition
 
 class ConditionBuilder {
-    fun <T: GearyComponent> from(component: T.() -> Unit){
-
-    }
-    infix fun <T> KProperty<T>.setTo(value: T){
+    fun <T : GearyComponent> from(component: T.() -> Unit) {
 
     }
 
-    operator fun <T: Comparable<*>> KProperty<T>.compareTo(value: T): Int {
+    infix fun <T> KProperty<T>.setTo(value: T) {
+
+    }
+
+    operator fun <T : Comparable<*>> KProperty<T>.compareTo(value: T): Int {
         TODO()
     }
 }
+
 class PostConditionBuilder {
-    fun <T: GearyComponent> own(component: T.() -> Unit){
+    fun <T : GearyComponent> own(component: T.() -> Unit) {
 
     }
-    infix fun <T> KProperty<T>.becomes(value: T){
+
+    infix fun <T> KProperty<T>.becomes(value: T) {
 
     }
-    infix fun <T: Comparable<*>> KProperty<T>.approaches(value: T) {
+
+    infix fun <T : Comparable<*>> KProperty<T>.approaches(value: T) {
         TODO()
     }
-    infix fun <T: Comparable<*>> KProperty<T>.increasesTo(value: T) {
+
+    infix fun <T : Comparable<*>> KProperty<T>.increasesTo(value: T) {
         TODO()
     }
-    infix fun <T: Comparable<*>> KProperty<T>.decreasesTo(value: T) {
+
+    infix fun <T : Comparable<*>> KProperty<T>.decreasesTo(value: T) {
         TODO()
     }
 
 }
 
-fun conditions(init: ConditionBuilder.() -> Unit){
+fun conditions(init: ConditionBuilder.() -> Unit) {
 
 }
-fun postconditions(init: PostConditionBuilder.() -> Unit){
+
+fun postconditions(init: PostConditionBuilder.() -> Unit) {
 
 }
 
 @Suppress("UNREACHABLE_CODE")
-fun createConditionTest(){
+fun createConditionTest() {
     conditions {
         Model::small setTo true
         Model::id < 0

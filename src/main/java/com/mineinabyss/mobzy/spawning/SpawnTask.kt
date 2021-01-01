@@ -90,15 +90,18 @@ object SpawnTask {
         val onlinePlayers = Bukkit.getOnlinePlayers()
         if (onlinePlayers.isEmpty()) return
 
-        val customMobs: List<Entity> = Bukkit.getServer().worlds.flatMap { world -> world.entities.filter { it.isCustomMob } }
+        val customMobs: List<Entity> = Bukkit.getServer().worlds.flatMap { world ->
+            world.entities.filter { it.isCustomMob }
+        }
 
         val entityTypeCounts: MutableMap<String, Int> = customMobs.toEntityTypeCounts()
 
         val creatureTypeCounts: MutableMap<String, Int> = customMobs.toCreatureTypeCounts()
 
         //don't run the task if we've hit all mob caps (might be better to run several loops for each mob type?
-        if (creatureTypeCounts.none { (type, amount) -> amount < MobzyConfig.getCreatureTypeCap(NMSCreatureType.valueOf(type)) })
-            return
+        if (creatureTypeCounts.none { (type, amount) ->
+                amount < MobzyConfig.getCreatureTypeCap(NMSCreatureType.valueOf(type))
+            }) return
 
         //STEP 2: Every player group picks a random chunk around them
         val playerGroups = onlinePlayers.toPlayerGroups()
@@ -111,20 +114,21 @@ object SpawnTask {
 
             //STEP 3: Calculate all mobs that can spawn in this area
             val validSpawns = WeightedDice(
-                    regionContainer.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions
-                            .sorted()
-                            .filterWhenOverlapFlag()
-                            .getMobSpawnsForRegions()
-                            .associateWith { it.getPriority(spawnArea, entityTypeCounts, creatureTypeCounts, playerGroupCount) }
-                            .filterValues { it > 0 }
-                            .also { if (it.isEmpty()) return@playerLoop }
+                regionContainer.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnArea.bottom)).regions
+                    .sorted()
+                    .filterWhenOverlapFlag()
+                    .getMobSpawnsForRegions()
+                    .associateWith { it.getPriority(spawnArea, entityTypeCounts, creatureTypeCounts, playerGroupCount) }
+                    .filterValues { it > 0 }
+                    .also { if (it.isEmpty()) return@playerLoop }
             )
 
             //STEP 4: Pick a random valid spawn and spawn it
             val spawn = MobSpawnEvent(validSpawns.roll(), spawnArea)
 //                    toSpawn.add(spawn)
             entityTypeCounts[spawn.entityType] = entityTypeCounts.getOrDefault(spawn.entityType, 0) + spawn.spawns
-            creatureTypeCounts[spawn.creatureType] = creatureTypeCounts.getOrDefault(spawn.creatureType, 0) + spawn.spawns
+            creatureTypeCounts[spawn.creatureType] =
+                creatureTypeCounts.getOrDefault(spawn.creatureType, 0) + spawn.spawns
 
             //spawn all the mobs we were planning to synchronously (since we can't spawn asynchronously)
             mobzy.schedule(SYNC) {
@@ -146,7 +150,11 @@ object SpawnTask {
                 val angle = Random.nextDouble(0.0, 2 * PI)
                 val newX = ceil(chunk.x + cos(angle) * dist)
                 val newZ = ceil(chunk.z + sin(angle) * dist)
-                if (none { distanceSquared(newX, newZ, it.location.chunk.x, it.location.chunk.z) < (MobzyConfig.data.minChunkSpawnRad * MobzyConfig.data.minChunkSpawnRad) }) {
+                if (none {
+                        val chunk = it.location.chunk
+                        distanceSquared(newX, newZ, chunk.x, chunk.z) <
+                                (MobzyConfig.data.minChunkSpawnRad * MobzyConfig.data.minChunkSpawnRad)
+                    }) {
                     val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())
                     if (!newChunk.isLoaded) continue
                     return ChunkSpawn(newChunk, 0, 255)
@@ -165,30 +173,30 @@ object SpawnTask {
     /** Convert a list of entities to: a map of the names of creature types to the number of creatures of that type,
      * without types that have exceeded their mob cap. */
     private fun List<Entity>.toCreatureTypeCounts(): MutableMap<String, Int> =
-            MobzyConfig.creatureTypes.associateWith { 0 }
-                    .plus(map { it.creatureType }.groupingBy { it }.eachCount())
-                    .toMutableMap()
+        MobzyConfig.creatureTypes.associateWith { 0 }
+            .plus(map { it.creatureType }.groupingBy { it }.eachCount())
+            .toMutableMap()
 
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
     private fun Collection<Entity>.toPlayerGroups(): List<List<Entity>> = groupBy { it.world }
-            .flatMap { (_, players) ->
-                players.dbScanCluster(
-                        maximumRadius = MobzyConfig.data.playerGroupRadius,
-                        minPoints = 0,
-                        xSelector = { it.location.x },
-                        ySelector = { it.location.z }
-                )
-            }.map { it.points }
+        .flatMap { (_, players) ->
+            players.dbScanCluster(
+                maximumRadius = MobzyConfig.data.playerGroupRadius,
+                minPoints = 0,
+                xSelector = { it.location.x },
+                ySelector = { it.location.z }
+            )
+        }.map { it.points }
 
     /** Converts a list of entities to a map of entity types to the amount of entities of that type. */
     private fun List<Entity>.toEntityTypeCounts(): MutableMap<String, Int> =
-            map { it.toNMS().entityType.keyName }.groupingBy { it }.eachCountTo(mutableMapOf())
+        map { it.toNMS().entityType.keyName }.groupingBy { it }.eachCountTo(mutableMapOf())
 
     /** If any of the overlapping regions is set to override, return a list with only the highest priority one,
      * otherwise the original list. */
     private fun List<ProtectedRegion>.filterWhenOverlapFlag(): List<ProtectedRegion> =
-            firstOrNull { region -> region.flags.containsKey(MZ_SPAWN_OVERLAP) && region.getFlag(MZ_SPAWN_OVERLAP) == "override" }
-                    ?.let {
-                        return listOf(it)
-                    } ?: this
+        firstOrNull { region -> region.flags.containsKey(MZ_SPAWN_OVERLAP) && region.getFlag(MZ_SPAWN_OVERLAP) == "override" }
+            ?.let {
+                return listOf(it)
+            } ?: this
 }

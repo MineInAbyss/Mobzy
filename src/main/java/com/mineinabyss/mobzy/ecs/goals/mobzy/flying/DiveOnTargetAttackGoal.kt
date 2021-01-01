@@ -18,35 +18,35 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:behavior.flying_dive_on_target")
 class DiveOnTargetBehavior(
-        private val diveVelocity: Double = -0.3,
-        private val minHeight: Double = 6.0,
-        private val maxHeight: Double = 10.0,
-        private val startDiveDistance: Double = 16.0,
-        private val startDiveHeightRange: Double = 2.0,
-        private val bashVelMultiplier: Double = 0.6,
-        private val bashDuration: Double = 30.0
+    private val diveVelocity: Double = -0.3,
+    private val minHeight: Double = 6.0,
+    private val maxHeight: Double = 10.0,
+    private val startDiveDistance: Double = 16.0,
+    private val startDiveHeightRange: Double = 2.0,
+    private val bashVelMultiplier: Double = 0.6,
+    private val bashDuration: Double = 30.0
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = DiveOnTargetAttackGoal(
-            mob,
-            diveVelocity,
-            minHeight,
-            maxHeight,
-            startDiveDistance,
-            startDiveHeightRange,
-            bashVelMultiplier,
-            bashDuration
+        mob,
+        diveVelocity,
+        minHeight,
+        maxHeight,
+        startDiveDistance,
+        startDiveHeightRange,
+        bashVelMultiplier,
+        bashDuration
     )
 }
 
 class DiveOnTargetAttackGoal(
-        override val mob: Mob,
-        private val diveVelocity: Double = -0.3,
-        private val minHeight: Double = 6.0,
-        private val maxHeight: Double = 10.0,
-        private val startDiveDistance: Double = 16.0,
-        private val startDiveHeightRange: Double = 2.0,
-        private val bashVelMultiplier: Double = 0.6,
-        private val bashDuration: Double = 30.0
+    override val mob: Mob,
+    private val diveVelocity: Double = -0.3,
+    private val minHeight: Double = 6.0,
+    private val maxHeight: Double = 10.0,
+    private val startDiveDistance: Double = 16.0,
+    private val startDiveHeightRange: Double = 2.0,
+    private val bashVelMultiplier: Double = 0.6,
+    private val bashDuration: Double = 30.0
 ) : MobzyPathfinderGoal(type = Type.MOVE) {
     private var currentAction = Action.FLY
     private var diveHeight: Double = pickDiveHeight()

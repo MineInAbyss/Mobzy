@@ -26,7 +26,7 @@ import kotlinx.serialization.modules.subclass
 fun Mobzy.attachToGeary() {
     attachToGeary(types = MobzyTypes) {
         systems(
-                WalkingAnimationSystem
+            WalkingAnimationSystem
         )
 
         components {

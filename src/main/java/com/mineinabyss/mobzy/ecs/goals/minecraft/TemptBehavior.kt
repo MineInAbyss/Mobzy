@@ -15,20 +15,20 @@ import org.bukkit.inventory.ItemStack
 @Serializable
 @SerialName("minecraft:behavior.tempt")
 class TemptBehavior(
-        val items: List<Material>,
-        val speed: Double = 1.0,
-        val losesInterest: Boolean = false
+    val items: List<Material>,
+    val speed: Double = 1.0,
+    val losesInterest: Boolean = false
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalTempt(
-            (mob as Creature).toNMS(),
-            speed,
-            losesInterest,
-            items.map { ItemStack(it) }.toNMSRecipeItemStack()
+        (mob as Creature).toNMS(),
+        speed,
+        losesInterest,
+        items.map { ItemStack(it) }.toNMSRecipeItemStack()
     )
 
 }
 
 fun Collection<ItemStack>.toNMSRecipeItemStack(): RecipeItemStack =
-        RecipeItemStack.a(this
-                .map { CraftItemStack.asNMSCopy(it) }
-                .stream())
+    RecipeItemStack.a(this
+        .map { CraftItemStack.asNMSCopy(it) }
+        .stream())

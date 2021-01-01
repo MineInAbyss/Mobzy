@@ -16,7 +16,7 @@ class VerticalSpawn(private val loc: Location, private var minY: Int, private va
 
         val locations: MutableList<SpawnArea> = mutableListOf()
         val highest = loc.world?.getHighestBlockAt(loc)?.location?.apply { y = y.coerceAtLeast(0.0) }
-                ?: return emptyList()
+            ?: return emptyList()
 
         if (highest.blockY !in minY..maxY) return locations
         //add a gap from this location to the sky

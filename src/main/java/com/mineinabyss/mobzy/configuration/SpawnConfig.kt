@@ -10,13 +10,13 @@ import java.io.File
 
 @GenerateConfigExtensions
 class SpawnConfig(
-        file: File,
-        plugin: Plugin
+    file: File,
+    plugin: Plugin
 ) : IdofrontConfig<SpawnConfig.Data>(plugin, Data.serializer(), file) {
     @Serializable
     class Data(
-            val name: String,
-            val icon: Material,
-            val regions: List<SpawnRegion>
+        val name: String,
+        val icon: Material,
+        val regions: List<SpawnRegion>
     )
 }

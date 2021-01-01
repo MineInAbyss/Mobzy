@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyComponent
-import com.mineinabyss.geary.ecs.GearyEntity
 import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
@@ -17,10 +16,10 @@ import net.minecraft.server.v1_16_R2.EnumCreatureType
  */
 @Serializable
 data class MobType(
-        val baseClass: String,
-        val creatureType: EnumCreatureType,
-        val targets: Map<Double, PathfinderComponent>? = null,
-        val goals: Map<Double, PathfinderComponent>? = null
+    val baseClass: String,
+    val creatureType: EnumCreatureType,
+    val targets: Map<Double, PathfinderComponent>? = null,
+    val goals: Map<Double, PathfinderComponent>? = null
 ) : GearyEntityType() {
     override fun MutableSet<GearyComponent>.addStaticComponents() {
         if (targets != null || goals != null)

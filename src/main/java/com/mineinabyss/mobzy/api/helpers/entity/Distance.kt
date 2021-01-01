@@ -3,8 +3,6 @@ package com.mineinabyss.mobzy.api.helpers.entity
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import org.bukkit.Location
 import org.bukkit.entity.Entity
-import kotlin.math.pow
-
 
 /**
  * @param other Another entity.

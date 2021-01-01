@@ -10,15 +10,21 @@ import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 internal fun Command.createDebugCommands() {
     "pdc" {
         playerAction {
-            sender.sendMessage(player.location.getNearbyEntities(5.0, 5.0, 5.0).first().persistentDataContainer.keys.toString())
+            sender.sendMessage(
+                player.location
+                    .getNearbyEntities(5.0, 5.0, 5.0).first()
+                    .persistentDataContainer.keys.toString()
+            )
         }
     }
     ("configinfo" / "cfginfo")(desc = "Information about the current state of the plugin")?.action {
-        sender.info(("""
-                            LOG OF CURRENTLY REGISTERED STUFF:
-                            Spawn configs: ${MobzyConfig.spawnCfgs}
-                            Registered addons: ${MobzyConfig.registeredAddons}
-                            Registered EntityTypes: ${MobzyTypeRegistry.typeNames}""".trimIndent()))
+        sender.info(
+            """
+            LOG OF CURRENTLY REGISTERED STUFF:
+            Spawn configs: ${MobzyConfig.spawnCfgs}
+            Registered addons: ${MobzyConfig.registeredAddons}
+            Registered EntityTypes: ${MobzyTypeRegistry.typeNames}""".trimIndent()
+        )
     }
     "spawnregion"()?.playerAction {
         player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
