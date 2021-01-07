@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.geary.ecs.types.GearyEntityTypes
+import com.mineinabyss.idofront.messaging.logError
 import com.mineinabyss.mobzy.MobzyAddon
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
@@ -27,9 +28,14 @@ object MobzyTypes : GearyEntityTypes<MobType>(mobzy) {
     fun registerTypes(mobzyAddon: MobzyAddon) {
         mobzyAddon.mobConfigDir.walk().filter { it.isFile }.forEach { file ->
             val name = file.nameWithoutExtension
-            val type = Formats.yamlFormat.decodeFromString(MobType.serializer(), file.readText())
-            MobzyTypeRegistry.registerMob(name, type)
-            MobzyTypes.registerType(name, type)
+            try {
+                val type = Formats.yamlFormat.decodeFromString(MobType.serializer(), file.readText())
+                MobzyTypeRegistry.registerMob(name, type)
+                MobzyTypes.registerType(name, type)
+            } catch (e: Exception) {
+                logError("Error deserializing mob: $name")
+                e.printStackTrace()
+            }
         }
     }
 }
