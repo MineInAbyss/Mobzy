@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.mobzy.MobzyConfig
+import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.entity.creatureType
 import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
@@ -8,6 +9,8 @@ import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
+import com.okkero.skedule.BukkitSchedulerController
+import com.okkero.skedule.SynchronizationContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -149,7 +152,7 @@ data class MobSpawn(
 
     /** Gets the priority of this [MobSpawn]. If it is negative, the spawn should never succeed. The higher the
      * priority, the higher the chance of this spawn being picked. */
-    fun getPriority(
+    suspend fun BukkitSchedulerController.getPriority(
         spawnArea: SpawnArea,
         entityTypeCounts: Map<String, Int>,
         creatureTypeCounts: Map<String, Int>,
@@ -177,11 +180,15 @@ data class MobSpawn(
             if (it > MobzyConfig.getCreatureTypeCap(entityType.creatureType) * playerCount) return -1.0
         }
 
-        //TODO count number of entities around this spawn and prevent it depending on maxLocalGroup
-        /*if (maxLocalGroup > 0) {
-            runInRadius(localGroupRadius) {
+        if (maxLocalGroup > 0) {
+            //TODO considering we are now making this a suspend function, we could probably evaluate all mobs
+            // simultaneously, then only wait for the sync ones to finish off.
+            switchContext(SynchronizationContext.SYNC)
+            loc.world?.getNearbyEntities(loc, localGroupRadius, localGroupRadius, localGroupRadius) {
+                it.toNMS().entityType == entityType
             }
-        }*/
+            switchContext(SynchronizationContext.ASYNC)
+        }
 
         return priority
     }

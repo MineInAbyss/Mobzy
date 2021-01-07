@@ -1,11 +1,13 @@
 name: Java CI with Gradle
 
-on: [ push ]
+on:
+  push:
+    paths-ignore:
+      - '**.md'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -16,6 +18,9 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Build
+        run: gradle build
 
       - name: Upload build
         uses: actions/upload-artifact@v1

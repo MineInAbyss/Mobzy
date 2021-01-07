@@ -53,7 +53,7 @@ dependencies {
     compileOnly "com.okkero.skedule:skedule"
     compileOnly "org.nield:kotlin-statistics"
 
-    implementation "com.mineinabyss:idofront:0.3.29"
+    implementation "com.mineinabyss:idofront:0.4.3"
     compileOnly "com.mineinabyss:geary:0.1.6"
 
     compileOnly "de.erethon:headlib:3.0.2"

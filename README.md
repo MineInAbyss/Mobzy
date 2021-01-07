@@ -43,4 +43,24 @@ Essentially, you would be able to code actions with conditions and outcomes, the
 
 We have [Github packages](https://github.com/MineInAbyss/Mobzy/packages) set up for use with gradle/maven, however the API isn't properly maintained yet. Many things will change as the ECS is being built.
 
+### Gradle
+
+Add the Github Package maven repo and authenticate. We recommend using the [gpr-for-gradle](https://github.com/0ffz/gpr-for-gradle) plugin to authenticate automatically. (Hopefully Github stops forcing you to authenticate for public packages soon!)
+
+```groovy
+plugins {
+    id("io.github.0ffz.github-packages") version "1.x.x"
+}
+
+repositories {
+    maven githubPackage.invoke("MineInAbyss/Mobzy")
+}
+
+dependencies {
+    implementation 'com.mineinabyss:mobzy:<version>'
+}
+```
+
+## Project Wiki
+
 We have started working on a [wiki](https://github.com/MineInAbyss/Mobzy/wiki) but it won't be complete for a while. You can ask us questions in `#plugin-dev` on our [Discord](https://discord.gg/QXPCk2y) server, or come help with development there!

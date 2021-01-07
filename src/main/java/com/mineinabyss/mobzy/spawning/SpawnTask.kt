@@ -79,12 +79,7 @@ object SpawnTask {
     }
 
     private suspend fun BukkitSchedulerController.runSpawnTask() {
-        switchContext(SYNC)
-
-        //TODO anything sync goes here
-
         switchContext(ASYNC)
-
 
         //STEP 1: Get mobs
         val onlinePlayers = Bukkit.getOnlinePlayers()
@@ -118,7 +113,7 @@ object SpawnTask {
                     .sorted()
                     .filterWhenOverlapFlag()
                     .getMobSpawnsForRegions()
-                    .associateWith { it.getPriority(spawnArea, entityTypeCounts, creatureTypeCounts, playerGroupCount) }
+                    .associateWith { it.run { getPriority(spawnArea, entityTypeCounts, creatureTypeCounts, playerGroupCount) }}
                     .filterValues { it > 0 }
                     .also { if (it.isEmpty()) return@playerLoop }
             )
