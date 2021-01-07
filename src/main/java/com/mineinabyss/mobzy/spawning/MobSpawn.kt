@@ -3,7 +3,6 @@ package com.mineinabyss.mobzy.spawning
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.entity.creatureType
-import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
@@ -172,10 +171,6 @@ data class MobSpawn(
             )
         ) return -1.0
 
-        if (maxLocalGroup > 0) entityTypeCounts[entityType.keyName]?.let {
-            //TODO probably rename maxLocalGroup to maxSpawnsPerPlayer
-            if (it > maxLocalGroup * playerCount) return -1.0
-        }
         creatureTypeCounts[entityType.creatureType.toString()]?.let {
             if (it > MobzyConfig.getCreatureTypeCap(entityType.creatureType) * playerCount) return -1.0
         }
@@ -183,11 +178,15 @@ data class MobSpawn(
         if (maxLocalGroup > 0) {
             //TODO considering we are now making this a suspend function, we could probably evaluate all mobs
             // simultaneously, then only wait for the sync ones to finish off.
-            switchContext(SynchronizationContext.SYNC)
-            loc.world?.getNearbyEntities(loc, localGroupRadius, localGroupRadius, localGroupRadius) {
-                it.toNMS().entityType == entityType
+            loc.world?.apply {
+                switchContext(SynchronizationContext.SYNC)
+                val localSpawns = getNearbyEntities(loc, localGroupRadius, localGroupRadius, localGroupRadius).count {
+                    it.toNMS().entityType == entityType
+                }
+                switchContext(SynchronizationContext.ASYNC)
+
+                if (localSpawns > maxLocalGroup) return -1.0
             }
-            switchContext(SynchronizationContext.ASYNC)
         }
 
         return priority
