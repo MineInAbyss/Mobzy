@@ -32,6 +32,7 @@ class ThrowItemsBehavior(
     val damage: Float,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
+    val yOffset: Double = 0.0,
     val cooldown: Long = 3000L
 ) : PathfinderComponent() {
     @Transient
@@ -43,6 +44,7 @@ class ThrowItemsBehavior(
         damage,
         minChaseRad,
         minThrowRad,
+        yOffset,
         cooldown
     )
 }
@@ -59,6 +61,7 @@ class ThrowItemsGoal(
     private val damage: Float,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
+    private val yOffset: Double = 0.0,
     //TODO val accuracy: Double,
     cooldown: Long = 3000L
 ) : MobzyPathfinderGoal(cooldown = cooldown) {
@@ -101,7 +104,7 @@ class ThrowItemsGoal(
 
         //TODO some way to create different types of projectiles
         val projectile = DamagingThrownItem(item, damage, nmsEntity.world, nmsEntity)
-        projectile.setPosition(x, y + mob.eyeHeight * 2, z) //seems eyeHeight is wrong here
+        projectile.setPosition(x, y + yOffset, z)
 
         val targetLoc = target.eyeLocation
         val dX = targetLoc.x - x
