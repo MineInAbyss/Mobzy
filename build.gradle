@@ -39,6 +39,7 @@ repositories {
     maven { url 'http://nexus.okkero.com/repository/maven-releases/' } //Skedule
     maven githubPackage.invoke("MineInAbyss/Idofront")
     maven githubPackage.invoke("MineInAbyss/Guiy")
+    maven githubPackage.invoke("MineInAbyss/Geary")
     maven githubPackage.invoke("MineInAbyss/KotlinSpice")
     mavenLocal()
 }
@@ -53,7 +54,7 @@ dependencies {
     compileOnly "org.nield:kotlin-statistics"
 
     implementation "com.mineinabyss:idofront:0.3.29"
-    compileOnly "com.mineinabyss:geary"
+    compileOnly "com.mineinabyss:geary:0.1"
 
     compileOnly "de.erethon:headlib:3.0.2"
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"
