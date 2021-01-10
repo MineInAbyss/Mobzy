@@ -12,7 +12,7 @@ import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobzy
 import org.bukkit.entity.Mob
 
-object MobzyTypes : GearyEntityTypes<MobType>(mobzy) {
+object MobzyTypes : GearyEntityTypes<MobType>(mobzy.name) {
     /** Gets a mob template if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
     operator fun get(type: NMSEntityType<*>): MobType = get(type.typeName)
 

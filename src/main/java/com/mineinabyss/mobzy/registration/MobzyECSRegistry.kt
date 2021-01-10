@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.registration
 
-import com.mineinabyss.geary.dsl.attachToGeary
+import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.mobzy.Mobzy
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
@@ -24,7 +24,7 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 
 fun Mobzy.attachToGeary() {
-    attachToGeary(types = MobzyTypes) {
+    attachToGeary (types = MobzyTypes) {
         systems(
             WalkingAnimationSystem
         )

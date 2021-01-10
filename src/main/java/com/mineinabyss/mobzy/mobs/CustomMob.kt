@@ -28,6 +28,7 @@ interface CustomMob : GearyEntity, PersistentDataHolder {
     override val gearyId: Int
 
     // ========== Useful properties ===============
+    //TODO Use NMSEntity instead, access insentient via a MobComponent
     val nmsEntity: NMSEntityInsentient
 
     @Suppress("UNCHECKED_CAST")
