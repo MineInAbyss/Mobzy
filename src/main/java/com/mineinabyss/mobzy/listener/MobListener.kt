@@ -2,8 +2,8 @@ package com.mineinabyss.mobzy.listener
 
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.components.with
-import com.mineinabyss.geary.minecraft.components.MobComponent
-import com.mineinabyss.geary.minecraft.store.geary
+import com.mineinabyss.geary.minecraft.components.toBukkit
+import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
@@ -90,7 +90,7 @@ object MobListener : Listener {
     @EventHandler
     fun addEquipmentOnMobSpawn(e: MobSpawnEvent) {
         val (entity) = e
-        val (mob) = entity.get<MobComponent>() ?: return
+        val mob = entity.toBukkit<Mob>() ?: return
 
         //add depth strider item on feet to simulate faster water speed TODO do this better
         entity.with<IncreasedWaterSpeed> { (level) ->
@@ -138,7 +138,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                geary(entity)?.get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
+                entity.get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {
