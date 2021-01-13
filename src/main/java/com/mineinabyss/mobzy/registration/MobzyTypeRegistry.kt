@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
+import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.api.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.mobs.MobType
@@ -19,7 +20,6 @@ import java.lang.reflect.Field
 @Suppress("ObjectPropertyName")
 object MobzyTypeRegistry {
     val typeNames get() = _types.keys.toList()
-
     private val _types: MutableMap<String, NMSEntityType<*>> = mutableMapOf()
 
     /** Gets a mob's [EntityTypes] from a String if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
@@ -30,6 +30,8 @@ object MobzyTypeRegistry {
 
     private val customAttributes = mutableMapOf<NMSEntityType<*>, AttributeProvider>()
 
+    internal fun clear() = customAttributes.clear()
+
     internal fun injectDefaultAttributes() {
         try {
             val attributeDefaultsField = AttributeDefaults::class.java.getDeclaredField("b")
@@ -37,15 +39,20 @@ object MobzyTypeRegistry {
 
             @Suppress("UNCHECKED_CAST")
             val currentAttributes =
-                HashMap(attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
-            currentAttributes += customAttributes
+                (attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
+
+            val keyNamesToInject = customAttributes.map { it.key.keyName }
+
+            val injected = currentAttributes
+                // remove keys that are already injected
+                .filterKeys { it.keyName !in keyNamesToInject } + customAttributes
 
             val unsafeField: Field = Unsafe::class.java.getDeclaredField("theUnsafe")
             unsafeField.isAccessible = true
             val unsafe = unsafeField.get(null) as Unsafe
             val staticFieldBase = unsafe.staticFieldBase(attributeDefaultsField)
             val staticFieldOffset = unsafe.staticFieldOffset(attributeDefaultsField)
-            unsafe.putObject(staticFieldBase, staticFieldOffset, currentAttributes)
+            unsafe.putObject(staticFieldBase, staticFieldOffset, injected)
         } catch (reason: Throwable) {
             reason.printStackTrace()
             error("Failed to inject custom attribute defaults")
@@ -71,7 +78,7 @@ object MobzyTypeRegistry {
                 }
                 .injectType(mobID, extendFrom = "zombie")
 
-        customAttributes += injected to attributes.toNMSBuilder().build()
+        customAttributes[injected] = attributes.toNMSBuilder().build()
         _types[mobID] = injected
         return injected
     }
