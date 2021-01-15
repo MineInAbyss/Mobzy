@@ -23,11 +23,6 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.nield.kotlinstatistics.WeightedDice
 import org.nield.kotlinstatistics.dbScanCluster
-import kotlin.math.PI
-import kotlin.math.ceil
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.random.Random
 
 /**
  * An asynchronous repeating task that finds areas to spawn mobs in.
@@ -102,6 +97,7 @@ object SpawnTask {
         val playerGroups = onlinePlayers.toPlayerGroups()
         val playerGroupCount = playerGroups.size
 
+        //TODO sorted by least mobs around
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             val chunkSpawn: ChunkSpawn = playerGroup.randomChunkSpawnNearby ?: return@playerLoop
 
@@ -133,6 +129,9 @@ object SpawnTask {
         debug("&d&l${creatureTypeCounts.values.sum()} mobs while spawning".color())
     }
 
+    private infix fun Int.`+-`(other: Int) =
+        this + setOf(-1, 1).random() * other
+
     /** Returns a random [ChunkSpawn] that is further than [MobzyConfig.minChunkSpawnRad] from all the players in this
      * list, and at least within [MobzyConfig.maxChunkSpawnRad] to one of them. */
     private val List<Entity>.randomChunkSpawnNearby: ChunkSpawn?
@@ -141,10 +140,11 @@ object SpawnTask {
             //TODO proper min max y for 3d space
             for (i in 0..10) {
                 //get a random angle and distance, then find the side lengths of a triangle with hypotenuse length dist
-                val dist = (MobzyConfig.data.minChunkSpawnRad..MobzyConfig.data.maxChunkSpawnRad).random()
-                val angle = Random.nextDouble(0.0, 2 * PI)
-                val newX = ceil(chunk.x + cos(angle) * dist)
-                val newZ = ceil(chunk.z + sin(angle) * dist)
+                val distRange = (MobzyConfig.data.minChunkSpawnRad..MobzyConfig.data.maxChunkSpawnRad)
+                val distX = distRange.random()
+                val distZ = distRange.random()
+                val newX = chunk.x `+-` distX
+                val newZ = chunk.z `+-` distZ
                 if (none {
                         val entityChunk = it.location.chunk
                         distanceSquared(newX, newZ, entityChunk.x, entityChunk.z) <
