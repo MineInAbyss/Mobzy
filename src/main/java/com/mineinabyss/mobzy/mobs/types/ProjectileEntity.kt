@@ -31,46 +31,9 @@ class ProjectileEntity(
     override val nmsEntity: NMSEntityInsentient
         get() = TODO("Not yet implemented")
 
-    //override val type: MobType = MobzyTypes[this as CustomMob]
-    override val type: MobType = MobzyTypes[this as NMSEntity]
+    override val type: MobType = MobzyTypes[this as NMSEntity] //TODO: Will get changed during refactor
 
-    override fun getPersistentDataContainer(): PersistentDataContainer = object : PersistentDataContainer {
-        override fun <T : Any?, Z : Any?> set(key: NamespacedKey, type: PersistentDataType<T, Z>, value: Z) {
-            return
-        }
-
-        override fun <T : Any?, Z : Any?> has(key: NamespacedKey, type: PersistentDataType<T, Z>): Boolean {
-            return false
-        }
-
-        override fun <T : Any?, Z : Any?> get(key: NamespacedKey, type: PersistentDataType<T, Z>): Z? {
-            return null
-        }
-
-        override fun <T : Any?, Z : Any?> getOrDefault(
-            key: NamespacedKey,
-            type: PersistentDataType<T, Z>,
-            defaultValue: Z
-        ): Z {
-            return defaultValue
-        }
-
-        override fun getKeys(): MutableSet<NamespacedKey> {
-            return mutableSetOf()
-        }
-
-        override fun remove(key: NamespacedKey) {
-            return
-        }
-
-        override fun isEmpty(): Boolean {
-            return true
-        }
-
-        override fun getAdapterContext(): PersistentDataAdapterContext {
-            return this.adapterContext
-        }
-    }
+    override fun getPersistentDataContainer(): PersistentDataContainer = TODO("Not yet implemented")
 
     override var dead: Boolean
         get() = TODO("Not yet implemented")
@@ -107,25 +70,20 @@ class ProjectileEntity(
     }
 
     init {
-        //TODO: Replace with proper inherited init function after MobBase becomes EntityBase
+        //TODO: Replace with proper inherited init function after inheriting from a generic entity
         //val bukkitEntity = toBukkit()
         //val bukkitEntity = (this as NMSEntity).toBukkit()
 
-        //add type under the generic component since getting components doesn't
         addComponent<GearyEntityType>(this.type)
-        //adding components from the type to this entity
         decodeComponents()
-        //addComponent(BukkitEntityComponent(bukkitEntity.uniqueId, bukkitEntity))
 
         //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
         // use the same system here.
         entity.addScoreboardTag("customEntity3")
         entity.addScoreboardTag(this.type.name)
 
-        MobLoadEvent(this).call()
+        MobLoadEvent(this).call() //TODO: rename this event?
 
         item = CraftItemStack.asNMSCopy(get<ItemModel>()?.item?.toItemStack())
-
-        //world.addEntity(this)
     }
 }
