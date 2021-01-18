@@ -5,13 +5,9 @@ import com.mineinabyss.mobzy.Mobzy
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
-import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
-import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
-import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
-import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.*
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
-import com.mineinabyss.mobzy.ecs.components.interaction.AttackPotionEffects
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.goals.minecraft.*
 import com.mineinabyss.mobzy.ecs.goals.mobzy.flying.*
@@ -31,6 +27,7 @@ fun Mobzy.attachToGeary() {
 
         components {
             component(Model.serializer())
+            component(ItemModel.serializer())
             component(Pathfinders.serializer())
             component(Equipment.serializer())
             component(IncreasedWaterSpeed.serializer())
@@ -38,7 +35,6 @@ fun Mobzy.attachToGeary() {
             component(MobAttributes.serializer())
             component(DeathLoot.serializer())
             component(Rideable.serializer())
-            component(AttackPotionEffects.serializer())
         }
 
         serializers {

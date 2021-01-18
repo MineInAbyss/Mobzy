@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
+import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
@@ -45,6 +46,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         registerEvents(
             MobListener,
             MobzyECSListener,
+            MobzyEventListener
         )
 
         //Register commands
