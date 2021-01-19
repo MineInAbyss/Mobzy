@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.ai
 
 import com.mineinabyss.geary.ecs.GearyComponent
-import com.mineinabyss.geary.minecraft.components.MobComponent
+import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import org.bukkit.entity.Entity
@@ -66,7 +66,7 @@ fun createConditionTest() {
 
     }
     postconditions {
-        own<MobComponent> {
+        own<BukkitEntityComponent> {
             val target: Entity = TODO()
             entity.distanceSqrTo(target)
         }

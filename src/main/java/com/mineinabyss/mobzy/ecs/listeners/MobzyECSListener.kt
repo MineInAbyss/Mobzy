@@ -10,7 +10,6 @@ import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.ecs.components.interaction.AttackPotionEffects
 import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
-import net.minecraft.server.v1_16_R2.EntityInsentient
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.event.EventHandler

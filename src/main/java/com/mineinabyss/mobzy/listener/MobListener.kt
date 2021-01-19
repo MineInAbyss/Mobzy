@@ -2,7 +2,8 @@ package com.mineinabyss.mobzy.listener
 
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.components.with
-import com.mineinabyss.geary.minecraft.components.MobComponent
+import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
+import com.mineinabyss.geary.minecraft.components.toBukkit
 import com.mineinabyss.geary.minecraft.store.geary
 import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.entities.leftClicked
@@ -90,7 +91,7 @@ object MobListener : Listener {
     @EventHandler
     fun addEquipmentOnMobSpawn(e: MobSpawnEvent) {
         val (entity) = e
-        val (mob) = entity.get<MobComponent>() ?: return
+        val mob = entity.toBukkit<Mob>() ?: return
 
         //add depth strider item on feet to simulate faster water speed TODO do this better
         entity.with<IncreasedWaterSpeed> { (level) ->
