@@ -4,7 +4,8 @@ import com.mineinabyss.geary.ecs.GearyEntity
 import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.types.GearyEntityType
-import com.mineinabyss.geary.minecraft.components.MobComponent
+import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
+import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
 import com.mineinabyss.geary.minecraft.store.decodeComponents
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.*
@@ -80,7 +81,10 @@ interface CustomMob : GearyEntity, PersistentDataHolder {
         addComponent<GearyEntityType>(type)
         //adding components from the type to this entity
         decodeComponents()
-        addComponent(MobComponent(entity.uniqueId, entity))
+        addComponent(BukkitEntityComponent(entity.uniqueId, entity))
+
+        //allow us to get the geary entity via UUID
+        BukkitEntityAccess.registerEntity(entity, this)
 
         //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
         // use the same system here.

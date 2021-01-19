@@ -50,7 +50,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         )
 
         //Register commands
-        MobzyCommands
+        MobzyCommands()
 
         registerAddonWithMobzy()
     }
