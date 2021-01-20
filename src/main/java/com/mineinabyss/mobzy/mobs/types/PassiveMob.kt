@@ -11,7 +11,7 @@ import net.minecraft.server.v1_16_R2.WorldServer
  * Originally based off EntityPig
  */
 @GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
-open class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
+class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
     override fun createPathfinders() {
 //        addPathfinderGoal(1, PathfinderGoalFloat(this))
 //        addPathfinderGoal(2, PathfinderGoalPanic(this, 1.25))

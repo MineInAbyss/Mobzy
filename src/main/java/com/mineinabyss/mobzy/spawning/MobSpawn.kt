@@ -5,22 +5,22 @@ import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.entity.creatureType
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.spawning.conditions.Condition
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import com.okkero.skedule.BukkitSchedulerController
 import com.okkero.skedule.SynchronizationContext
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.server.v1_16_R2.EntityTypes
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.util.Vector
 import kotlin.math.sign
 import kotlin.random.Random
-import kotlin.reflect.KProperty1
-import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.KProperty
 
 /**
  * A class describing information about
@@ -42,7 +42,7 @@ import kotlin.reflect.jvm.isAccessible
  * @property maxLocalGroup The maximum number of entities of this type that can spawn within the [localGroupRadius].
  * @property localGroupRadius The radius for which the [maxLocalGroup] acts in.
  * @property spawnPos Whether the mob should be spawned directly on the ground, in air, or under cliffs.
- * @property [blockWhitelist] The list of blocks on top of which this mob can spawn.
+ * @property blockWhitelist The list of blocks on top of which this mob can spawn.
  */
 @Serializable
 data class MobSpawn(
@@ -52,90 +52,40 @@ data class MobSpawn(
     @SerialName("max-amount") private val _maxAmount: Int? = null,
     @SerialName("radius") private val _radius: Double? = null,
     @SerialName("priority") private val _basePriority: Double? = null,
-    @SerialName("min-time") private val _minTime: Long? = null,
-    @SerialName("max-time") private val _maxTime: Long? = null,
-    @SerialName("min-light") private val _minLight: Long? = null,
-    @SerialName("max-light") private val _maxLight: Long? = null,
-    @SerialName("min-y") private val _minY: Int? = null,
-    @SerialName("max-y") private val _maxY: Int? = null,
     @SerialName("min-gap") private val _minGap: Int? = null,
     @SerialName("max-gap") private val _maxGap: Int? = null,
     @SerialName("max-local-group") private val _maxLocalGroup: Int? = null,
     @SerialName("local-group-radius") private val _localGroupRadius: Double? = null,
     @SerialName("spawn-pos") private val _spawnPos: SpawnPosition? = null,
-    @SerialName("block-whitelist") private val _blockWhitelist: List<Material>? = null
+    @SerialName("conditions")
+    val _conditions: List<Condition<@Contextual Any>> = listOf()
 ) {
 
     @Transient
     val copyFrom: MobSpawn? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
-    //TODO try to get a cleaner way to mark these as Transient
     @Transient
-    val reuse: String? = _reuse
+    val conditions = (copyFrom?._conditions ?: listOf()) + _conditions
 
-    @Transient
-    val entityTypeName: String? = +MobSpawn::_entityTypeName
+    val entityTypeName: String? by getOrCopy() { _entityTypeName }
+    val minAmount: Int by getOrCopy { _minAmount } ?: 1
+    val maxAmount: Int by getOrCopy { _maxAmount } ?: 1
+    val radius: Double by getOrCopy { _radius } ?: 0.0
+    val basePriority: Double by getOrCopy { _basePriority } ?: 1.0
+    val minGap: Int by getOrCopy { _minGap } ?: 0
+    val maxGap: Int by getOrCopy { _maxGap } ?: 256
+    val maxLocalGroup: Int by getOrCopy { _maxLocalGroup } ?: -1
+    val localGroupRadius: Double by getOrCopy { _localGroupRadius } ?: 50.0
+    val spawnPos: SpawnPosition by getOrCopy { _spawnPos } ?: SpawnPosition.GROUND
 
-    @Transient
-    val minAmount: Int = +MobSpawn::_minAmount ?: 1
-
-    @Transient
-    val maxAmount: Int = +MobSpawn::_maxAmount ?: 1
-
-    @Transient
-    val radius: Double = +MobSpawn::_radius ?: 0.0
-
-    @Transient
-    val basePriority: Double = +MobSpawn::_basePriority ?: 1.0
-
-    @Transient
-    val minTime: Long = +MobSpawn::_minTime ?: -1L
-
-    @Transient
-    val maxTime: Long = +MobSpawn::_maxTime ?: 10000000L
-
-    @Transient
-    val minLight: Long = +MobSpawn::_minLight ?: 0L
-
-    @Transient
-    val maxLight: Long = +MobSpawn::_maxLight ?: 100L
-
-    @Transient
-    val minY: Int = +MobSpawn::_minY ?: 0
-
-    @Transient
-    val maxY: Int = +MobSpawn::_maxY ?: 256
-
-    @Transient
-    val minGap: Int = +MobSpawn::_minGap ?: 0
-
-    @Transient
-    val maxGap: Int = +MobSpawn::_maxGap ?: 256
-
-    @Transient
-    val maxLocalGroup: Int = +MobSpawn::_maxLocalGroup ?: -1
-
-    @Transient
-    val localGroupRadius: Double = +MobSpawn::_localGroupRadius ?: 50.0
-
-    @Transient
-    val spawnPos: SpawnPosition = +MobSpawn::_spawnPos ?: SpawnPosition.GROUND
-
-    @Transient
-    val blockWhitelist: List<Material> = +MobSpawn::_blockWhitelist ?: listOf()
-
-    @Transient
-    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypeRegistry[it] } ?: EntityTypes.ZOMBIE
-
-    private val amountRange: IntRange get() = minAmount..maxAmount
-    private val timeRange: LongRange get() = minTime..maxTime
-    private val lightRange: LongRange get() = minLight..maxLight
-    private val yRange: IntRange get() = minY..maxY
+    val entityType: EntityTypes<*> by entityTypeName?.let { MobzyTypeRegistry[it] } ?: EntityTypes.ZOMBIE
     private val gapRange: IntRange get() = minGap..maxGap
 
     /** Given a [SpawnArea] Spawns a number of entities defined in this [MobSpawn] at its location */
-    fun spawn(area: SpawnArea, spawns: Int = chooseSpawnAmount()): Int {
-        val loc = area.getSpawnLocation(spawnPos)
+    fun spawn(area: SpawnArea): Int {
+        val loc = area.getSpawnFor(spawnPos)
+        val spawns = chooseSpawnAmount()
+
         for (i in 0 until spawns) {
             if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
                 (getSpawnInRadius(loc, radius) ?: loc).spawnEntity(entityType)
@@ -158,18 +108,9 @@ data class MobSpawn(
         playerCount: Int
     ): Double {
         if (spawnArea.gap !in gapRange) return -1.0
+        val loc = spawnArea.getSpawnFor(this@MobSpawn)
 
-        val loc = spawnArea.getSpawnLocation(spawnPos)
-        val priority = basePriority
-        val time = loc.world!!.time
-        val lightLevel = loc.block.lightLevel.toInt()
-
-        //eliminate impossible spawns
-        if (time !in timeRange || lightLevel !in lightRange || loc.blockY !in yRange) return -1.0
-        if (blockWhitelist.isNotEmpty() && !blockWhitelist.contains(
-                loc.clone().add(0.0, -1.0, 0.0).block.type
-            )
-        ) return -1.0
+        conditions.all { it.conditionsMet(spawnArea) }
 
         creatureTypeCounts[entityType.creatureType.toString()]?.let {
             if (it > MobzyConfig.getCreatureTypeCap(entityType.creatureType) * playerCount) return -1.0
@@ -199,7 +140,7 @@ data class MobSpawn(
     /**
      * Where we should look for a location to actually spawn mobs in when calling [spawn]
      *
-     * @see SpawnArea.getSpawnLocation
+     * @see SpawnArea.getSpawnFor
      */
     @Serializable
     enum class SpawnPosition {
@@ -238,12 +179,14 @@ data class MobSpawn(
         return null
     }
 
-    private operator fun <T> KProperty1<MobSpawn, T>.unaryPlus(): T {
-        this.isAccessible = true
-        val thisProp = this.get(this@MobSpawn)
-        return if (copyFrom != null && thisProp == null)
-            this.get(copyFrom)
-        else
-            thisProp
+    // Hacky stuff for the `reuse` keyword
+
+    private inline fun <T> getOrCopy(prop: MobSpawn.() -> T) = copyFrom?.prop() ?: this.prop()
+
+    private operator fun <T> T.provideDelegate(thisRef: Any?, property: KProperty<*>) = TransientProp(this)
+
+    /** Literally just so we dont have to @Transient everything and add 2 spaces per property :( */
+    class TransientProp<T>(private val value: T) {
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
     }
 }

@@ -16,13 +16,13 @@ import org.bukkit.Location
  * @property area The [SpawnArea] that will be spawned in.
  * @property entityType The name of the entity type that will be spawned.
  * @property creatureType The name of the type of the creature that will be spawned (i.e. MONSTER, ANIMAL, etc...)
- * @property location The location chosed from the [SpawnArea], through [SpawnArea.getSpawnLocation] and [mobSpawn]
+ * @property location The location chosed from the [SpawnArea], through [SpawnArea.getSpawnFor] and [mobSpawn]
  */
 class MobSpawnEvent(private val mobSpawn: MobSpawn, private val area: SpawnArea) {
     val spawns: Int = mobSpawn.chooseSpawnAmount()
     val entityType: String get() = mobSpawn.entityType.typeName
     val creatureType: String get() = mobSpawn.entityType.creatureType.toString()
-    val location: Location get() = area.getSpawnLocation(mobSpawn.spawnPos)
+    val location: Location get() = area.getSpawnFor(mobSpawn.spawnPos)
 
     /** Will spawn [mobSpawn] in [area], with [spawns] number of spawns*/
     fun spawn() {
