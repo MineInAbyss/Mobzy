@@ -1,5 +1,7 @@
 package com.mineinabyss.mobzy.configuration
 
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import kotlinx.serialization.Serializable
@@ -10,7 +12,14 @@ import java.io.File
 class SpawnConfig(
     file: File,
     plugin: Plugin
-) : IdofrontConfig<SpawnConfig.Data>(plugin, Data.serializer(), file) {
+) : IdofrontConfig<SpawnConfig.Data>(
+    plugin, Data.serializer(), file,
+    format = Yaml(
+        configuration = YamlConfiguration(
+            extensionDefinitionPrefix = "x-"
+        )
+    )
+) {
     @Serializable
     class Data(
         val name: String,

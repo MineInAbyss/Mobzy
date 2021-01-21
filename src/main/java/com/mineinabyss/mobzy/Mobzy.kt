@@ -1,16 +1,21 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
+import com.mineinabyss.mobzy.api.toMobzy
+import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
+import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
-import com.mineinabyss.mobzy.registration.attachToGeary
 import com.mineinabyss.mobzy.spawning.SpawnTask
+import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import kotlin.time.ExperimentalTime
@@ -28,6 +33,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         MobzyWorldguard.registerFlags()
     }
 
+    @InternalSerializationApi
     @ExperimentalCommandDSL
     @ExperimentalTime
     override fun onEnable() {
@@ -36,7 +42,18 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         saveDefaultConfig()
         reloadConfig()
 
-        attachToGeary()
+        attachToGeary(types = MobzyTypes) {
+            systems(
+                WalkingAnimationSystem
+            )
+
+            autoscanComponents()
+            autoscan<PathfinderComponent>()
+
+            bukkitEntityAccess {
+                entityConversion { toMobzy() }
+            }
+        }
 
         MobzyPacketInterception.registerPacketInterceptors()
         MobzyTypeRegistry //instantiate singleton

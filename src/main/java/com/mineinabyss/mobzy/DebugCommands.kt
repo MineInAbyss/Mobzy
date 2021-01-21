@@ -1,20 +1,47 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.idofront.commands.Command
+import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
+import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
+import kotlin.system.measureTimeMillis
 
 internal fun Command.createDebugCommands() {
     "pdc" {
         playerAction {
             sender.sendMessage(
-                player.location
-                    .getNearbyEntities(5.0, 5.0, 5.0).first()
+                player.getNearbyEntities(5.0, 5.0, 5.0).first()
                     .persistentDataContainer.keys.toString()
             )
+        }
+    }
+
+    "benchmark" {
+        "nearby" {
+            val rad by intArg()
+            val i by intArg() { default = 10000 }
+            playerAction {
+                measureTimeMillis {
+                    val rad = rad.toDouble()
+                    repeat(i) {
+                        player.getNearbyEntities(rad, rad, rad).count()
+                    }
+                }.broadcastVal("Took: ")
+
+            }
+        }
+
+    }
+
+    "nearby" {
+        val rad by intArg()
+        playerAction {
+            val rad = rad.toDouble()
+            sender.info(player.getNearbyEntities(rad, rad, rad).count())
         }
     }
     ("configinfo" / "cfginfo")(desc = "Information about the current state of the plugin")?.action {
