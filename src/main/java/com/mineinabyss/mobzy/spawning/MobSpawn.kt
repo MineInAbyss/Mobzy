@@ -116,7 +116,7 @@ data class MobSpawn(
     val maxLocalGroup: Int = +MobSpawn::_maxLocalGroup ?: -1
 
     @Transient
-    val localGroupRadius: Double = +MobSpawn::_localGroupRadius ?: 10.0
+    val localGroupRadius: Double = +MobSpawn::_localGroupRadius ?: 50.0
 
     @Transient
     val spawnPos: SpawnPosition = +MobSpawn::_spawnPos ?: SpawnPosition.GROUND
@@ -185,7 +185,7 @@ data class MobSpawn(
                 }
                 switchContext(SynchronizationContext.ASYNC)
 
-                if (localSpawns > maxLocalGroup) return -1.0
+                if (localSpawns >= maxLocalGroup) return -1.0
             }
         }
 

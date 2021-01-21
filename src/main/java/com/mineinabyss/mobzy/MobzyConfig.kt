@@ -67,8 +67,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
      */
-    fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = data.creatureTypeCaps[creatureType.toString()]
-        ?: error("could not find mob cap for $creatureType")
+    fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = data.creatureTypeCaps[creatureType.toString()] ?: 0
 
     override fun reload(): ReloadScope.() -> Unit = {
         logSuccess("Reloading mobzy config")
@@ -92,6 +91,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * and create everything they need for them.
      */
     private fun activateAddons() {
+        MobzyTypeRegistry.clear()
         registeredAddons.forEach { it.loadMobTypes() }
 //        registeredAddons.forEach { it.initializeMobs() }
         registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
