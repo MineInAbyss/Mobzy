@@ -1,13 +1,13 @@
 package com.mineinabyss.mobzy.ecs.events
 
-import org.bukkit.entity.Mob
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-data class EntityRightClickEvent(
+data class PlayerRightClickEntityEvent(
     val player: Player,
-    val mob: Mob
+    val entity: Entity
 ) : Event() {
     override fun getHandlers() = handlerList
 
