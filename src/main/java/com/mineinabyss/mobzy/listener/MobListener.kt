@@ -17,8 +17,8 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.ecs.events.EntityRightClickEvent
 import com.mineinabyss.mobzy.ecs.events.MobSpawnEvent
+import com.mineinabyss.mobzy.ecs.events.PlayerRightClickEntityEvent
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
@@ -45,51 +45,43 @@ object MobListener : Listener {
      *
      * This is mainly used to prevent entity killing players statistic changes, since player killing entity statistics
      * are already skipped by the custom mobs' die() method.
-     *
-     * @param e the event
      */
     @EventHandler
-    fun onStatisticIncrement(e: PlayerStatisticIncrementEvent) {
+    fun PlayerStatisticIncrementEvent.onStatisticIncrement() {
         //if the statistic is entity related and the entity is null, it must be custom, therefore we cancel the event
-        if (e.statistic.type == Statistic.Type.ENTITY && e.entityType == null)
-            e.isCancelled = true
+        if (statistic.type == Statistic.Type.ENTITY && entityType == null)
+            isCancelled = true
     }
 
-    /**
-     * Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect.
-     *
-     * @param e the event
-     */
+    /** Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect. */
     @EventHandler(ignoreCancelled = true)
-    fun onHit(e: EntityDamageEvent) {
-        val mob = e.entity.toMobzy() ?: return
-        val model = mob.get<Model>() ?: return
+    fun EntityDamageEvent.onHit() {
+        val gearyEntity = entity.toMobzy() ?: return
+        val mob = entity as? LivingEntity ?: return
+        val model = gearyEntity.get<Model>() ?: return
         model.hitId ?: return
 
         //change the model to its hit version
-        val equipment = mob.entity.equipment ?: return
-        with(equipment) {
+        mob.equipment?.apply {
             helmet = helmet?.editItemMeta {
                 setCustomModelData(model.hitId)
             }
-        }
 
-        //in 5 ticks change the model back to the non hit version
-        mobzy.schedule {
-            waitFor(7)
-            if (!mob.entity.isDead)
-                with(equipment) {
+            //in a few ticks change the model back to the non hit version
+            mobzy.schedule {
+                waitFor(7)
+                if (!mob.isDead)
                     helmet = helmet?.editItemMeta {
                         setCustomModelData(model.id)
                     }
-                }
+            }
         }
+
     }
 
     /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
     @EventHandler
-    fun addEquipmentOnMobSpawn(e: MobSpawnEvent) {
-        val (entity) = e
+    fun MobSpawnEvent.addEquipmentOnMobSpawn() {
         val mob = entity.toBukkit<Mob>() ?: return
 
         //add depth strider item on feet to simulate faster water speed TODO do this better
@@ -114,6 +106,9 @@ object MobListener : Listener {
 
         //create an item based on model ID in head slot if entity will be using itself for the model
         entity.with<Model> { model ->
+            //TODO any way to do this without NMS?
+            if (model.small) mob.toNMS().isBaby = true
+            //TODO model.giant property which would send packets for giant instead of zombie
             mob.equipment?.helmet = model.modelItemStack
             mob.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
         }
@@ -121,10 +116,9 @@ object MobListener : Listener {
 
     /** Ride entities with [Rideable] component on right click. */
     @EventHandler
-    fun rideOnRightClick(event: EntityRightClickEvent) {
-        val (player, mob) = event
-        if (mob.has<Rideable>())
-            mob.addPassenger(player)
+    fun PlayerRightClickEntityEvent.rideOnRightClick() {
+        if (entity.has<Rideable>())
+            entity.addPassenger(player)
     }
 
     /**
@@ -133,8 +127,8 @@ object MobListener : Listener {
      * Update `customMob2` entities with old damage values for models to the new custom-model-data tag.
      */
     @EventHandler
-    fun onChunkLoad(e: ChunkLoadEvent) {
-        for (entity in e.chunk.entities) {
+    fun ChunkLoadEvent.onChunkLoad() {
+        for (entity in chunk.entities) {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
@@ -148,11 +142,11 @@ object MobListener : Listener {
     }
 
     /** The magic method that lets you hit entities in their server side hitboxes. */
-    //TODO this doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do
+    //TODO right click doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do
     @EventHandler
-    fun onLeftClick(e: PlayerInteractEvent) { // TODO I'd like some way to ignore hits onto the disguised entity. Perhaps use a marker armorstand?
-        val player = e.player
-        if (e.leftClicked || e.rightClicked) {
+    fun PlayerInteractEvent.onLeftClick() { // TODO I'd like some way to ignore hits onto the disguised entity. Perhaps use a marker armorstand?
+        val player = player
+        if (leftClicked || rightClicked) {
             //shoot ray to simulate a left/right click, accounting for server-side custom mob hitboxes
             val trace = player.world.rayTrace(
                 player.eyeLocation,
@@ -165,11 +159,13 @@ object MobListener : Listener {
 
             //if we hit a custom mob, attack or fire an event
             trace?.hitEntity?.toMobzy()?.let { hit ->
-                if (e.leftClicked) {
-                    e.isCancelled = true
+                if (leftClicked) {
+                    isCancelled = true
                     player.toNMS().attack(hit.nmsEntity)
                 } else {
-                    EntityRightClickEvent(player, hit.entity).call()
+                    //TODO no way there isn't already a spigot event for this? Not sure if that's why I made this custom
+                    // event originally
+                    PlayerRightClickEntityEvent(player, hit.entity).call()
                 }
             }
         }
