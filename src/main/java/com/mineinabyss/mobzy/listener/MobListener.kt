@@ -16,6 +16,7 @@ import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.events.MobSpawnEvent
 import com.mineinabyss.mobzy.ecs.events.PlayerRightClickEntityEvent
@@ -30,6 +31,7 @@ import org.bukkit.entity.Mob
 import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
@@ -169,5 +171,11 @@ object MobListener : Listener {
                 }
             }
         }
+    }
+
+    /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
+    fun VehicleEnterEvent.onVehicleEnter() {
+        if (entered.has<PreventRiding>())
+            isCancelled = true
     }
 }
