@@ -31,10 +31,10 @@ import org.bukkit.entity.Mob
 import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
+import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -174,6 +174,7 @@ object MobListener : Listener {
     }
 
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
+    @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {
         if (entered.has<PreventRiding>())
             isCancelled = true
