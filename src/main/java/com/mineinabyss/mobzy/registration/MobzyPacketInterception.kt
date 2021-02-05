@@ -8,7 +8,7 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketContainer
 import com.comphenix.protocol.events.PacketEvent
-import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.mobzy
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -19,7 +19,7 @@ object MobzyPacketInterception {
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
             onSend(Server.SPAWN_ENTITY_LIVING) {
-                if (Bukkit.getEntity(packet.uuiDs.read(0))?.isCustomMob == true)
+                if (Bukkit.getEntity(packet.uuiDs.read(0))?.isCustomEntity == true)
                     packet.integers.write(1, 102)
             }
             //pitch lock custom mobs
@@ -30,7 +30,7 @@ object MobzyPacketInterception {
                 Server.LOOK_AT,
                 Server.ENTITY_TELEPORT
             ) {
-                if (packet.getEntityModifier(this).read(0).isCustomMob) //check entity involved
+                if (packet.getEntityModifier(this).read(0).isCustomEntity) //check entity involved
                     packet.bytes.write(1, 0) //modify pitch to be zero
             }
         }

@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.interaction
 
-import com.mineinabyss.geary.ecs.GearyComponent
+import com.mineinabyss.geary.ecs.autoscan.AutoscanComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,4 +9,5 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("mobzy:prevent_riding")
-class PreventRiding : GearyComponent
+@AutoscanComponent
+class PreventRiding

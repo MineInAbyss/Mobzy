@@ -9,7 +9,7 @@ import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.ecs.components.interaction.AttackPotionEffects
-import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
+import com.mineinabyss.mobzy.ecs.events.MobzyLoadEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.event.EventHandler
@@ -19,7 +19,7 @@ import kotlin.random.Random
 
 object MobzyECSListener : Listener {
     @EventHandler
-    fun attachPathfindersOnEntityLoadedEvent(event: MobLoadEvent) {
+    fun attachPathfindersOnEntityLoadedEvent(event: MobzyLoadEvent) {
         val (entity) = event
         val mob = entity.toBukkit<Mob>() ?: return
         val (targets, goals) = entity.get<Pathfinders>() ?: return

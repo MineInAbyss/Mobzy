@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.components.initialization.pathfinding
 
-import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.mobzy.api.nms.aliases.NMSPathfinderGoal
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Mob
@@ -10,7 +9,7 @@ import org.bukkit.entity.Mob
  * and a [build] function to create a new [NMSPathfinderGoal] given that information.
  */
 @Serializable
-abstract class PathfinderComponent : GearyComponent {
+abstract class PathfinderComponent {
     /** @return A new [NMSPathfinderGoal] for this [mob]. */
     abstract fun build(mob: Mob): NMSPathfinderGoal
 }
