@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.ambient
 
-import com.mineinabyss.geary.ecs.GearyComponent
+import com.mineinabyss.geary.ecs.autoscan.AutoscanComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("mobzy:sounds")
+@AutoscanComponent
 class Sounds(
     val volume: Float = 1F,
     val pitch: Double = 1.0,
@@ -27,4 +28,4 @@ class Sounds(
     val hurt: String? = null,
     val splash: String? = null,
     val swim: String? = null,
-) : GearyComponent
+)

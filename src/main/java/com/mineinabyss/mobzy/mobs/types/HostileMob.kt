@@ -28,7 +28,7 @@ open class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMons
     //TODO make sure hostile mobs still get removed when difficulty is not peaceful without method here
 
     init {
-        initMob()
+        initEntity()
         addScoreboardTag("hostileMob")
         entity.removeWhenFarAway = true
         attributeMap
