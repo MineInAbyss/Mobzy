@@ -12,7 +12,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSSound
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
+import com.mineinabyss.mobzy.ecs.events.MobzyLoadEvent
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import org.bukkit.SoundCategory
 import org.bukkit.persistence.PersistentDataContainer
@@ -43,7 +43,7 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
      * Applies some default attributes that every custom mob should have, such as a model, invisibility, and an
      * identifier scoreboard tag
      */
-    fun initMob() {
+    fun initEntity() {
         val type = MobzyTypes[this]
         addComponent<GearyEntityType>(type)
 
@@ -58,7 +58,7 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
         // use the same system here.
         entity.addScoreboardTag("customMob3")
 
-        MobLoadEvent(this).call()
+        MobzyLoadEvent(this).call()
     }
 
     //TODO think of a better place to put this, something less inheritance-ey

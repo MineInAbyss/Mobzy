@@ -7,9 +7,9 @@ import org.bukkit.event.HandlerList
 /**
  * Called whenever an entity first gets spawned, after components are attached.
  *
- * Use this to modify persistent things on the entity, and use [MobLoadEvent] for non-persistent things.
+ * Use this to modify persistent things on the entity, and use [MobzyLoadEvent] for non-persistent things.
  */
-data class MobSpawnEvent(
+data class MobzySpawnEvent(
     val entity: GearyEntity
 ) : Event() {
     override fun getHandlers() = handlerList

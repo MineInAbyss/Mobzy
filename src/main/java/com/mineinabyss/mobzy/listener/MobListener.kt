@@ -9,8 +9,8 @@ import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.mobzy.api.isCustomMob
-import com.mineinabyss.mobzy.api.isRenamed
+import com.mineinabyss.mobzy.api.isCustomAndRenamed
+import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -18,7 +18,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.ecs.events.MobSpawnEvent
+import com.mineinabyss.mobzy.ecs.events.MobzySpawnEvent
 import com.mineinabyss.mobzy.ecs.events.PlayerRightClickEntityEvent
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
@@ -26,6 +26,7 @@ import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
 import org.bukkit.Statistic
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Ageable
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.entity.NPC
@@ -83,7 +84,7 @@ object MobListener : Listener {
 
     /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
     @EventHandler
-    fun MobSpawnEvent.addEquipmentOnMobSpawn() {
+    fun MobzySpawnEvent.addEquipmentOnMobSpawn() {
         val mob = entity.toBukkit<Mob>() ?: return
 
         //add depth strider item on feet to simulate faster water speed TODO do this better
@@ -108,8 +109,7 @@ object MobListener : Listener {
 
         //create an item based on model ID in head slot if entity will be using itself for the model
         entity.with<Model> { model ->
-            //TODO any way to do this without NMS?
-            if (model.small) mob.toNMS().isBaby = true
+            if (model.small && mob is Ageable) mob.setBaby()
             //TODO model.giant property which would send packets for giant instead of zombie
             mob.equipment?.helmet = model.modelItemStack
             mob.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
@@ -137,7 +137,7 @@ object MobListener : Listener {
                 entity.get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
-            } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isRenamed) {
+            } else if (entity.isCustomEntity && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
                 (entity as LivingEntity).removeWhenFarAway = true
             }
         }

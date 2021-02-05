@@ -11,7 +11,8 @@ import com.mineinabyss.mobzy.registration.toEntityTypeName
 import org.bukkit.entity.Entity
 
 /** Whether an entity is a renamed mob registered with Mobzy. */
-val Entity.isRenamed get() = if (!isCustomMob || customName == null) false else customName != this.typeName
+//TODO feels like an unnecessarily specific function?
+val Entity.isCustomAndRenamed get() = if (!isCustomEntity || customName == null) false else customName != this.typeName
 
 /** Converts [Entity] to [CustomEntity]. */
 fun Entity.toMobzy() = toNMS().toMobzy()
@@ -23,7 +24,7 @@ fun NMSEntity.toMobzy() = this as? CustomEntity
 fun Entity.isOfType(typeName: String) = this.typeName == typeName.toEntityTypeName()
 
 /** Whether this is a custom mob registered with Mobzy. */
-val Entity.isCustomMob get() = toNMS().isCustomMob
+val Entity.isCustomEntity get() = toNMS().isCustomEntity
 
 /** Whether this is a custom mob registered with Mobzy. */
-val NMSEntity.isCustomMob get() = this is CustomEntity
+val NMSEntity.isCustomEntity get() = this is CustomEntity

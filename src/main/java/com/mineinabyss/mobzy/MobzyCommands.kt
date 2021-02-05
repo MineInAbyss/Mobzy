@@ -9,9 +9,9 @@ import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.api.isCustomAndRenamed
+import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.isOfType
-import com.mineinabyss.mobzy.api.isRenamed
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.spawnMobzyMob
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
@@ -45,9 +45,9 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     for (world in worlds) for (entity in world.entities) {
                         val tags = entity.scoreboardTags
                         val nmsEntity = entity.toNMS()
-                        if (entity.isCustomMob && when (entityType) {
-                                "all" -> !entity.isRenamed && !entity.scoreboardTags.contains("npc")
-                                "named" -> entity.isRenamed
+                        if (entity.isCustomEntity && when (entityType) {
+                                "all" -> !entity.isCustomAndRenamed && !entity.scoreboardTags.contains("npc")
+                                "named" -> entity.isCustomAndRenamed
                                 "npc" -> entity.scoreboardTags.contains("npc")
                                 "passive" -> !entity.scoreboardTags.contains("npc") && nmsEntity is PassiveMob
                                 "hostile" -> nmsEntity is HostileMob
