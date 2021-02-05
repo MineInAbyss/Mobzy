@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.mobzy.*
-import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.entity.creatureType
@@ -81,7 +81,7 @@ object SpawnTask {
         if (onlinePlayers.isEmpty()) return
 
         val customMobs: List<Entity> = Bukkit.getServer().worlds.flatMap { world ->
-            world.entities.filter { it.isCustomMob }
+            world.entities.filter { it.isCustomEntity }
         }
 
         val entityTypeCounts: MutableMap<String, Int> = customMobs.toEntityTypeCounts()

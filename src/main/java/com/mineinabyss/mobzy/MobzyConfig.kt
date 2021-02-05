@@ -9,7 +9,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
 import com.mineinabyss.mobzy.configuration.SpawnConfig
-import com.mineinabyss.mobzy.mobs.CustomMob
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.registration.MobzyTypes
@@ -131,7 +131,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
 //                if (it.scoreboardTags.contains("additionalPart")) it.remove().also { return@filter false }
 
                 //if this is a custom mob but the nms entity is no longer an instance of CustomMob (likely due to a reload)
-                it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomMob
+                it.scoreboardTags.contains("customMob3") && it.toNMS() !is CustomEntity
             }.onEach {
                 //spawn a replacement entity of the same type as defined in scoreboard tags
                 //TODO read this as StaticType from the PDC

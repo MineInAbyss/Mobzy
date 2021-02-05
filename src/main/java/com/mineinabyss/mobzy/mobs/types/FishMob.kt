@@ -19,7 +19,7 @@ open class FishMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFishSch
     override fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand) = NMSInteractionResult.PASS
 
     init {
-        initMob()
+        initEntity()
         addScoreboardTag("fishMob")
 //        entity.removeWhenFarAway = true
     }

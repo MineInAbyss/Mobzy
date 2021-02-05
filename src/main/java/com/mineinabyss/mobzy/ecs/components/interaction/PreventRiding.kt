@@ -5,9 +5,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Allows players to right click on a mob with this component to start riding them.
+ * Prevents NPC entities from riding vehicles like boats.
  */
 @Serializable
-@SerialName("mobzy:rideable")
+@SerialName("mobzy:prevent_riding")
 @AutoscanComponent
-class Rideable
+class PreventRiding

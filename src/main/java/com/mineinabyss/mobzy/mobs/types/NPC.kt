@@ -1,12 +1,13 @@
 package com.mineinabyss.mobzy.mobs.types
 
+import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LookAtPlayerBehavior
-import com.mineinabyss.mobzy.mobs.CustomMob
 import net.minecraft.server.v1_16_R2.DamageSource
 import net.minecraft.server.v1_16_R2.EnumMoveType
 import net.minecraft.server.v1_16_R2.PathfinderGoalRandomLookaround
@@ -27,7 +28,7 @@ class NPC(type: NMSEntityType<*>, world: NMSWorld) : PassiveMob(type, world) {
     }
 
     init {
-        entity.customName = (this as CustomMob).type.name.capitalize()
+        entity.customName = get<GearyEntityType>()?.name?.capitalize()
         customNameVisible = true
         isInvulnerable = true
         entity.removeWhenFarAway = false

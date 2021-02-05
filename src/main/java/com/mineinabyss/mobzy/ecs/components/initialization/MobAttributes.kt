@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.GearyComponent
+import com.mineinabyss.geary.ecs.autoscan.AutoscanComponent
 import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributes
@@ -12,6 +12,7 @@ import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("mobzy:attributes")
+@AutoscanComponent
 data class MobAttributes(
     val width: Float = 0.7f,
     val height: Float = 0.7f,
@@ -29,7 +30,7 @@ data class MobAttributes(
     val maxHealth: Double? = null,
     val movementSpeed: Double? = 0.25,
     val spawnReinforcements: Double? = null
-) : GearyComponent {
+) {
 
     fun toNMSBuilder(): NMSAttributeBuilder = NMSAttributes.forEntityInsentient()
         .set(GenericAttributes.ARMOR, armor)

@@ -1,119 +1,83 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.types.GearyEntityType
-import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
-import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
-import com.mineinabyss.geary.minecraft.store.decodeComponents
-import com.mineinabyss.idofront.events.call
+import com.mineinabyss.geary.ecs.components.with
 import com.mineinabyss.mobzy.api.nms.aliases.*
-import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.ecs.components.initialization.Model
-import com.mineinabyss.mobzy.ecs.events.MobLoadEvent
-import org.bukkit.SoundCategory
+import com.mineinabyss.mobzy.api.nms.player.addKillScore
+import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
+import com.mineinabyss.mobzy.mobs.types.MobBase
+import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.v1_16_R2.event.CraftEventFactory
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.HumanEntity
-import org.bukkit.persistence.PersistentDataContainer
-import org.bukkit.persistence.PersistentDataHolder
-import kotlin.random.Random
+import org.bukkit.entity.Mob
 
 /**
+ * A class for all our custom living entities to extend. Some shared behaviour is in here, though because we often
+ * need to access protected variables, we force implementation of them here. Since a lot of these things have obfuscated
+ * names, we may expand upon this class to act as a wrapper interface of sorts for custom NMS mobs.
+ *
+ * We share how we override some functions to implement custom behaviour with the help of [MobBase] and an
+ * annotation processor.
+ *
+ * @see MobBase
+ *
  * @property killScore The score with which a player should be rewarded with when the current entity is killed.
- * @property killer The killer of the current entity if it has one.
- * @property scoreboardDisplayNameMZ Used to change the name displayed in the death message.
- * @property type This entity types's [MobType] describing information about entities of this time. It is
- * immutable and not unique to this specific entity.
  */
-interface CustomMob : GearyEntity, PersistentDataHolder {
-    override val gearyId: Int
+interface CustomMob : CustomEntity {
+    override val nmsEntity: NMSEntityInsentient
+    override val entity: Mob
 
-    // ========== Useful properties ===============
-    //TODO Use NMSEntity instead, access insentient via a MobComponent
-    val nmsEntity: NMSEntityInsentient
-
-    @Suppress("UNCHECKED_CAST")
-    val entity
-        get() = nmsEntity.toBukkit()
-
-    override fun getPersistentDataContainer(): PersistentDataContainer = entity.persistentDataContainer
-
-    val type: MobType
-
-    val killer: NMSEntityHuman? get() = nmsEntity.killer
-
-    val scoreboardDisplayNameMZ: NMSChatMessage
-        get() = NMSChatMessage(
-            type.name.split('_').joinToString(" ") { it.capitalize() })
-
-    var target
-        get() = nmsEntity.goalTarget?.toBukkit()
-        set(value) {
-            nmsEntity.goalTarget = value?.toNMS<NMSEntityInsentient>()
-        }
-
-    // ========== Things to be implemented ==========
-    var dead: Boolean
     val killScore: Int
 
+    /** A function to implement pathfinders that should be added to all entities of this type. */
     fun createPathfinders()
 
-    fun lastDamageByPlayerTime(): Int
-
-    fun saveMobNBT(nbttagcompound: NMSDataContainer)
-    fun loadMobNBT(nbttagcompound: NMSDataContainer)
-
+    /** Drops the correct amount of EXP from death at this entity's location. */
     fun dropExp()
 
+    /** Called when a player interacts with this entity. */
     fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult
 
-    // ========== Pre-written behaviour ============
-    /**
-     * Applies some default attributes that every custom mob should have, such as a model, invisibility, and an
-     * identifier scoreboard tag
-     */
-    fun initMob() {
+    /** Custom logic for what happens when this entity dies. Override the NMS die method with this. */
+    fun dieCustom(damageSource: NMSDamageSource?) {
+        val nmsWorld: NMSWorld = entity.world.toNMS()
+        if (!nmsEntity.dead) {
+            nmsEntity.dead = true
+            val killer = nmsEntity.killer
+            if (killScore >= 0 && killer != null) killer.addKillScore(nmsEntity, killScore, damageSource)
+            // this line causes the entity to send a statistics update on death (we don't want this as it causes a NPE exception and crash)
+//            killer?.a_(nmsEntity);
 
-        //save the entity type's name under scoreboard tags so we can identify this entity's type even if it's no longer
-        // considered an instance of CustomMob (ex. after a plugin reload).
+            if (entity.isSleeping) nmsEntity.entityWakeup()
 
-        //add type under the generic component since getting components doesn't
-        addComponent<GearyEntityType>(type)
-        //adding components from the type to this entity
-        decodeComponents()
-        addComponent(BukkitEntityComponent(entity.uniqueId, entity))
+            if (!nmsEntity.world.isClientSide) {
+                if (nmsWorld.gameRules.getBoolean(NMSGameRules.DO_MOB_LOOT) && killer != null) {
+                    dropItems(killer.bukkitEntity)
+                } else CraftEventFactory.callEntityDeathEvent(nmsEntity)
+            }
+            nmsEntity.combatTracker.g() //resets combat tracker
 
-        //allow us to get the geary entity via UUID
-        BukkitEntityAccess.registerEntity(entity, this)
-
-        //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
-        // use the same system here.
-        entity.addScoreboardTag("customMob3")
-        entity.addScoreboardTag(type.name)
-
-        MobLoadEvent(this).call()
-
-        if (get<Model>()?.small == true) entity.toNMS().isBaby = true
+            nmsWorld.broadcastEntityEffect(nmsEntity, 3.toByte())
+            nmsEntity.pose = NMSEntityPose.DYING
+            //TODO add PlaceHolderAPI support
+            get<DeathLoot>()?.deathCommands?.forEach {
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it)
+            }
+        }
     }
 
-    fun makeSound(sound: String?) {
-        val sounds = get<Sounds>()
-        val volume = sounds?.volume ?: 1.0f
-        val pitch = sounds?.pitch ?: 1.0
-        val pitchRange = sounds?.pitchRange ?: 0.2
-        if (sound != null)
-            entity.world.playSound(
-                entity.location,
-                sound,
-                SoundCategory.NEUTRAL,
-                volume,
-                (pitch + (Random.nextDouble(-pitchRange, pitchRange))).toFloat()
-            )
-    }
-
-    /** Plays a sound effect at the mob's location and returns null */
-    fun makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
-        makeSound(get<Sounds>()?.sound() ?: return default)
-        return null
+    /** Custom logic for spawning item drops (upon this entity's death.) */
+    fun dropItems(killer: HumanEntity) {
+        val heldItem = killer.inventory.itemInMainHand
+        val looting = heldItem.enchantments[Enchantment.LOOT_BONUS_MOBS] ?: 0
+        val fire = heldItem.enchantments[Enchantment.FIRE_ASPECT] ?: 0 > 0
+        with<DeathLoot> { deathLoot ->
+            CraftEventFactory.callEntityDeathEvent(
+                nmsEntity,
+                deathLoot.drops.toList().map { it.chooseDrop(looting, fire) })
+            deathLoot.expToDrop()?.let { nmsEntity.expToDrop = it }
+        }
+        dropExp()
     }
 }
