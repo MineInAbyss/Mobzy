@@ -8,6 +8,8 @@ import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
 import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
 import com.mineinabyss.geary.minecraft.store.decodeComponents
+import com.mineinabyss.geary.minecraft.store.encode
+import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSSound
@@ -46,7 +48,11 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
      */
     fun initEntity() {
         val type = MobzyTypes[this]
+
+        //add persisting entity type component and encode it right away if not present
         addPersistingComponent<GearyEntityType>(type)
+        if(!persistentDataContainer.has<GearyEntityType>())
+            persistentDataContainer.encode(type)
 
         //adding components from the type to this entity
         decodeComponents()
