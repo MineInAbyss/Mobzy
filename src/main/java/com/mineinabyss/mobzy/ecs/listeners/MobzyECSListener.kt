@@ -19,8 +19,7 @@ import kotlin.random.Random
 
 object MobzyECSListener : Listener {
     @EventHandler
-    fun attachPathfindersOnEntityLoadedEvent(event: MobzyLoadEvent) {
-        val (entity) = event
+    fun MobzyLoadEvent.attachPathfindersOnEntityLoadedEvent() {
         val mob = entity.toBukkit<Mob>() ?: return
         val (targets, goals) = entity.get<Pathfinders>() ?: return
 
@@ -36,9 +35,9 @@ object MobzyECSListener : Listener {
     }
 
     @EventHandler
-    fun onMobAttack(event: EntityDamageByEntityEvent) {
-        val target = (event.entity as? LivingEntity) ?: return
-        event.damager.with<AttackPotionEffects> { (effects, applyChance) ->
+    fun EntityDamageByEntityEvent.onMobAttack() {
+        val target = (entity as? LivingEntity) ?: return
+        damager.with<AttackPotionEffects> { (effects, applyChance) ->
             if (Random.nextDouble() <= applyChance)
                 target.addPotionEffects(effects)
         }
