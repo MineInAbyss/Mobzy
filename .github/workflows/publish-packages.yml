@@ -32,17 +32,6 @@ jobs:
       - name: Generate Dokka
         run: gradle dokkaHtml
 
-      - name: Move Dokka's assets # from https://github.com/Kotlin/dokka/issues/163
-        run: |
-          set -x -o nounset -o errexit -o pipefail
-          cd ./build/dokka/html
-          mv ./styles ./images ./scripts navigation.html ./mobzy/
-          find ./poweb/ -name '*.html' -print0 | xargs -0 sed -i 's;../styles/;styles/;g'
-          find ./poweb/ -name '*.html' -print0 | xargs -0 sed -i 's;../images/;images/;g'
-          find ./poweb/ -name '*.html' -print0 | xargs -0 sed -i 's;../scripts/;scripts/;g'
-          find ./poweb/ -name '*.html' -print0 | xargs -0 sed -i 's;pathToRoot = "../;pathToRoot = ";g'
-          sed -i 's;href="poweb/;href=";g' ./poweb/navigation.html
-
       - name: Publish documentation to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
