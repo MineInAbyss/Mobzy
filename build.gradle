@@ -8,6 +8,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
     id 'io.github.0ffz.github-packages' version '1.2.0'
     id "com.github.ben-manes.versions" version "0.36.0"
+    id "org.jetbrains.dokka" version "1.4.20"
 }
 
 apply from: 'https://raw.githubusercontent.com/MineInAbyss/shared-gradle/master/common.gradle'
