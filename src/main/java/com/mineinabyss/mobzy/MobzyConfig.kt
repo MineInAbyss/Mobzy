@@ -15,7 +15,6 @@ import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import com.okkero.skedule.schedule
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R2.EntityLiving
 import net.minecraft.server.v1_16_R2.EnumCreatureType
@@ -50,14 +49,6 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
     val spawnCfgs: MutableList<SpawnConfig> = mutableListOf()
 
-    init {
-        //first tick only finishes when all plugins are loaded, which is when we activate addons
-        mobzy.schedule {
-            waitFor(1)
-            activateAddons()
-        }
-    }
-
     override fun save() {
         super.save()
         spawnCfgs.forEach { it.save() }
@@ -69,7 +60,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      */
     fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = data.creatureTypeCaps[creatureType.toString()] ?: 0
 
-    override fun reload(): ReloadScope.() -> Unit = {
+    override fun ReloadScope.reload() {
         logSuccess("Reloading mobzy config")
 
         //We don't clear MobzyTypes since those will only ever change if an addon's code was changed which is impossible
@@ -90,7 +81,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * Addons have registered themselves with the plugin at this point. We just need to parse their configs
      * and create everything they need for them.
      */
-    private fun activateAddons() {
+    internal fun activateAddons() {
         MobzyTypeRegistry.clear()
         registeredAddons.forEach { it.loadMobTypes() }
 //        registeredAddons.forEach { it.initializeMobs() }

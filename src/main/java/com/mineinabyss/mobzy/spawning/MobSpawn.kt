@@ -19,8 +19,7 @@ import org.bukkit.Material
 import org.bukkit.util.Vector
 import kotlin.math.sign
 import kotlin.random.Random
-import kotlin.reflect.KProperty1
-import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.KProperty
 
 /**
  * A class describing information about
@@ -69,63 +68,27 @@ data class MobSpawn(
     @Transient
     val copyFrom: MobSpawn? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
-    //TODO try to get a cleaner way to mark these as Transient
-    @Transient
-    val reuse: String? = _reuse
+    val entityTypeName: String? by getOrCopy() { _entityTypeName }
+    val minAmount: Int by getOrCopy { _minAmount } ?: 1
+    val maxAmount: Int by getOrCopy { _maxAmount } ?: 1
+    val radius: Double by getOrCopy { _radius } ?: 0.0
+    val basePriority: Double by getOrCopy { _basePriority } ?: 1.0
+    val minGap: Int by getOrCopy { _minGap } ?: 0
+    val maxGap: Int by getOrCopy { _maxGap } ?: 256
+    val maxLocalGroup: Int by getOrCopy { _maxLocalGroup } ?: -1
+    val localGroupRadius: Double by getOrCopy { _localGroupRadius } ?: 50.0
+    val spawnPos: SpawnPosition by getOrCopy { _spawnPos } ?: SpawnPosition.GROUND
 
-    @Transient
-    val entityTypeName: String? = +MobSpawn::_entityTypeName
+    //TODO remove when we change conditions system
+    val minY: Int by getOrCopy { _minY } ?: 0
+    val maxY: Int by getOrCopy { _minY } ?: 256
+    val minLight: Long by getOrCopy { _minLight } ?: 0
+    val maxLight: Long by getOrCopy { _maxLight } ?: 100
+    val minTime: Long by getOrCopy { _minTime } ?: -1L
+    val maxTime: Long by getOrCopy { _maxTime } ?: 10000000L
+    val blockWhitelist: List<Material> by getOrCopy { _blockWhitelist } ?: listOf()
 
-    @Transient
-    val minAmount: Int = +MobSpawn::_minAmount ?: 1
-
-    @Transient
-    val maxAmount: Int = +MobSpawn::_maxAmount ?: 1
-
-    @Transient
-    val radius: Double = +MobSpawn::_radius ?: 0.0
-
-    @Transient
-    val basePriority: Double = +MobSpawn::_basePriority ?: 1.0
-
-    @Transient
-    val minTime: Long = +MobSpawn::_minTime ?: -1L
-
-    @Transient
-    val maxTime: Long = +MobSpawn::_maxTime ?: 10000000L
-
-    @Transient
-    val minLight: Long = +MobSpawn::_minLight ?: 0L
-
-    @Transient
-    val maxLight: Long = +MobSpawn::_maxLight ?: 100L
-
-    @Transient
-    val minY: Int = +MobSpawn::_minY ?: 0
-
-    @Transient
-    val maxY: Int = +MobSpawn::_maxY ?: 256
-
-    @Transient
-    val minGap: Int = +MobSpawn::_minGap ?: 0
-
-    @Transient
-    val maxGap: Int = +MobSpawn::_maxGap ?: 256
-
-    @Transient
-    val maxLocalGroup: Int = +MobSpawn::_maxLocalGroup ?: -1
-
-    @Transient
-    val localGroupRadius: Double = +MobSpawn::_localGroupRadius ?: 50.0
-
-    @Transient
-    val spawnPos: SpawnPosition = +MobSpawn::_spawnPos ?: SpawnPosition.GROUND
-
-    @Transient
-    val blockWhitelist: List<Material> = +MobSpawn::_blockWhitelist ?: listOf()
-
-    @Transient
-    val entityType: EntityTypes<*> = entityTypeName?.let { MobzyTypeRegistry[it] } ?: EntityTypes.ZOMBIE
+    val entityType: EntityTypes<*> by entityTypeName?.let { MobzyTypeRegistry[it] } ?: EntityTypes.ZOMBIE
 
     private val amountRange: IntRange get() = minAmount..maxAmount
     private val timeRange: LongRange get() = minTime..maxTime
@@ -238,12 +201,15 @@ data class MobSpawn(
         return null
     }
 
-    private operator fun <T> KProperty1<MobSpawn, T>.unaryPlus(): T {
-        this.isAccessible = true
-        val thisProp = this.get(this@MobSpawn)
-        return if (copyFrom != null && thisProp == null)
-            this.get(copyFrom)
-        else
-            thisProp
+    // Hacky stuff for the `reuse` keyword
+    /** Uses a value from [copyFrom] unless overridden in this spawn. */
+    private inline fun <T> getOrCopy(prop: MobSpawn.() -> T) = this.prop() ?: copyFrom?.prop()
+
+    /** Avoid marking things as `@Transient`. */
+    private operator fun <T> T.provideDelegate(thisRef: Any?, property: KProperty<*>) = TransientProp(this)
+
+    /** Literally just so we dont have to @Transient everything and add 2 spaces per property :( */
+    class TransientProp<T>(private val value: T) {
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
     }
 }
