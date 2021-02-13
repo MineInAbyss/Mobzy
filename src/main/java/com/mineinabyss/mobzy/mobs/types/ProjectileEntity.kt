@@ -17,14 +17,14 @@ class ProjectileEntity(
     type: NMSEntityType<*>,
     world: NMSWorld
 ) : EntitySnowball(type as EntityTypes<EntitySnowball>, world), CustomEntity {
-    init {
-        initEntity()
-        this.item = CraftItemStack.asNMSCopy(get<ItemModel>()?.item?.toItemStack())
-    }
-
     override val gearyId: Int = Engine.getNextId()
 
     override val nmsEntity: NMSSnowball get() = this
+
+    init {
+        initEntity()
+        item = CraftItemStack.asNMSCopy(get<ItemModel>()?.item?.toItemStack())
+    }
 
     override fun a(var0: MovingObjectPositionEntity) {
         return
@@ -33,9 +33,4 @@ class ProjectileEntity(
     override fun a(var0: MovingObjectPosition) {
         return
     }
-
-//    override fun getEntityType(): EntityTypes<*> {
-//        return MobzyTypes["stingerhead_spike"].nmsType
-//    }
-
 }

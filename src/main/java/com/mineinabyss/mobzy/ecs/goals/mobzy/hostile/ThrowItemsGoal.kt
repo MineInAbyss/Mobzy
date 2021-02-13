@@ -1,33 +1,25 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
-import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
-import com.mineinabyss.mobzy.api.nms.aliases.NMSSnowball
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.serializers.MobTypeSerializer
-import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobs.types.ProjectileEntity
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.EntityLiving
-import net.minecraft.server.v1_16_R2.EntitySnowball
-import net.minecraft.server.v1_16_R2.World
 import org.bukkit.Sound
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 import org.bukkit.entity.Creature
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
-import org.bukkit.inventory.ItemStack
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
@@ -106,14 +98,8 @@ class ThrowItemsGoal(
         val location = mob.eyeLocation
         val (x, y, z) = location
 
-        //location.y += yOffset
-        //val projectile = (location.spawnEntity(template.nmsType) as CraftEntity).handle as EntityProjectileThrowable
         val projectile = ProjectileEntity(template.nmsType, world.toNMS())
-        //projectile.addComponent(PacketEntity(77))
-        //val projectile = DamagingThrownItem(SerializableItemStack(Material.SNOWBALL, 1, 100).toItemStack(), nmsEntity.world, nmsEntity)
         projectile.setPosition(x, y + yOffset, z)
-
-        //val projectile = location.spawnEntity(template.nmsType) ?: return
 
         val targetLoc = target.eyeLocation
         val dX = targetLoc.x - x
@@ -127,32 +113,11 @@ class ThrowItemsGoal(
             1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
         )
 
-        //projectile.toNMS<EntityProjectileThrowable>().shooter = mob.toNMS()
         projectile.shoot(dX, dY, dZ, 1.6f, 12.0f)
 
+        //TODO: Eventually have a standardized spawning system.
+        // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
+        // It needs to get added to the world like this.
         world.toNMS().addEntity(projectile)
     }
-}
-
-class DamagingThrownItem(
-    item: ItemStack,
-    world: World?,
-    thrower: EntityLiving,
-    override val gearyId: Int = Engine.getNextId()
-) : EntitySnowball(world, thrower), CustomEntity {
-    override val nmsEntity: NMSSnowball get() = this
-
-    init {
-        this.item = CraftItemStack.asNMSCopy(item)
-    }
-
-//    override fun a(mop: MovingObjectPosition) {
-//        super.a(mop)
-//
-//        if (mop.type == MovingObjectPosition.EnumMovingObjectType.ENTITY) {
-//            val hit = (mop as MovingObjectPositionEntity).entity
-//            if (hit is EntityPlayer)
-//                hit.damageEntity(DamageSource.projectile(this, shooter), damage)
-//        }
-//    }
 }
