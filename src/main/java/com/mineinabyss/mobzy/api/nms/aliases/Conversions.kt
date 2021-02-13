@@ -3,8 +3,6 @@
 package com.mineinabyss.mobzy.api.nms.aliases
 
 import net.minecraft.server.v1_16_R2.Entity
-import net.minecraft.server.v1_16_R2.EntityProjectileThrowable
-import net.minecraft.server.v1_16_R2.EntitySnowball
 import net.minecraft.server.v1_16_R2.World
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld
 import org.bukkit.craftbukkit.v1_16_R2.entity.*
