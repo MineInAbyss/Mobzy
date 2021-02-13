@@ -8,6 +8,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
     id 'io.github.0ffz.github-packages' version '1.2.0'
     id "com.github.ben-manes.versions" version "0.36.0"
+    id "org.jetbrains.dokka" version "1.4.20"
 }
 
 apply from: 'https://raw.githubusercontent.com/MineInAbyss/shared-gradle/master/common.gradle'
@@ -41,6 +42,7 @@ repositories {
     maven githubPackage.invoke("MineInAbyss/Guiy")
     maven githubPackage.invoke("MineInAbyss/Geary")
     maven githubPackage.invoke("MineInAbyss/KotlinSpice")
+    maven githubPackage.invoke("MineInAbyss/ProtocolBurrito")
     mavenLocal()
 }
 
@@ -53,8 +55,9 @@ dependencies {
     compileOnly "com.okkero.skedule:skedule"
     compileOnly "org.nield:kotlin-statistics"
 
-    implementation "com.mineinabyss:idofront:0.4.3"
+    implementation "com.mineinabyss:idofront:0.5.4"
     compileOnly "com.mineinabyss:geary-spigot:0.2.19"
+    compileOnly "com.mineinabyss:protocolburrito:0.1.10"
 
     compileOnly "de.erethon:headlib:3.0.2"
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"
