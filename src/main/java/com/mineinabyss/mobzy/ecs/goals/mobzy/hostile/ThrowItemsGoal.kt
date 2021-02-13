@@ -1,25 +1,33 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
+import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
+import com.mineinabyss.mobzy.api.nms.aliases.NMSSnowball
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.serializers.MobTypeSerializer
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.mobs.types.ProjectileEntity
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.EntityProjectileThrowable
+import net.minecraft.server.v1_16_R2.EntityLiving
+import net.minecraft.server.v1_16_R2.EntitySnowball
+import net.minecraft.server.v1_16_R2.World
 import org.bukkit.Sound
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 import org.bukkit.entity.Creature
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
+import org.bukkit.inventory.ItemStack
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
@@ -27,15 +35,19 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-    val template: @Serializable(with = MobTypeSerializer::class) MobType,
+    val type: @Serializable(with = MobTypeSerializer::class) String,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
     val cooldown: Long = 3000L
 ) : PathfinderComponent() {
+    private val mobType: MobType by lazy {
+        if (MobzyTypes[type].baseClass == "mobzy:projectile") MobzyTypes[type] else error("Template is not of type projectile")
+    }
+
     override fun build(mob: Mob) = ThrowItemsGoal(
         (mob as Creature),
-        if (template.baseClass == "mobzy:projectile") template else error("Template is not of type projectile"),
+        mobType,
         minChaseRad,
         minThrowRad,
         yOffset,
@@ -89,13 +101,19 @@ class ThrowItemsGoal(
     }
 
     /** Throws the mob's defined item at the [target]*/
-    fun throwItem(target: LivingEntity) {
+    private fun throwItem(target: LivingEntity) {
         val world = mob.location.world ?: return
         val location = mob.eyeLocation
         val (x, y, z) = location
 
-        location.y += yOffset
-        val projectile = location.spawnEntity(template.nmsType) ?: return
+        //location.y += yOffset
+        //val projectile = (location.spawnEntity(template.nmsType) as CraftEntity).handle as EntityProjectileThrowable
+        val projectile = ProjectileEntity(template.nmsType, world.toNMS())
+        //projectile.addComponent(PacketEntity(77))
+        //val projectile = DamagingThrownItem(SerializableItemStack(Material.SNOWBALL, 1, 100).toItemStack(), nmsEntity.world, nmsEntity)
+        projectile.setPosition(x, y + yOffset, z)
+
+        //val projectile = location.spawnEntity(template.nmsType) ?: return
 
         val targetLoc = target.eyeLocation
         val dX = targetLoc.x - x
@@ -109,6 +127,32 @@ class ThrowItemsGoal(
             1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
         )
 
-        (projectile.toNMS() as EntityProjectileThrowable).shoot(dX, dY, dZ, 1.6f, 12.0f)
+        //projectile.toNMS<EntityProjectileThrowable>().shooter = mob.toNMS()
+        projectile.shoot(dX, dY, dZ, 1.6f, 12.0f)
+
+        world.toNMS().addEntity(projectile)
     }
+}
+
+class DamagingThrownItem(
+    item: ItemStack,
+    world: World?,
+    thrower: EntityLiving,
+    override val gearyId: Int = Engine.getNextId()
+) : EntitySnowball(world, thrower), CustomEntity {
+    override val nmsEntity: NMSSnowball get() = this
+
+    init {
+        this.item = CraftItemStack.asNMSCopy(item)
+    }
+
+//    override fun a(mop: MovingObjectPosition) {
+//        super.a(mop)
+//
+//        if (mop.type == MovingObjectPosition.EnumMovingObjectType.ENTITY) {
+//            val hit = (mop as MovingObjectPositionEntity).entity
+//            if (hit is EntityPlayer)
+//                hit.damageEntity(DamageSource.projectile(this, shooter), damage)
+//        }
+//    }
 }

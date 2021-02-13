@@ -3,6 +3,8 @@
 package com.mineinabyss.mobzy.api.nms.aliases
 
 import net.minecraft.server.v1_16_R2.Entity
+import net.minecraft.server.v1_16_R2.EntityProjectileThrowable
+import net.minecraft.server.v1_16_R2.EntitySnowball
 import net.minecraft.server.v1_16_R2.World
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld
 import org.bukkit.craftbukkit.v1_16_R2.entity.*
@@ -26,6 +28,7 @@ inline fun Mob.toNMS(): NMSEntityInsentient = (this as CraftMob).handle
 inline fun Creature.toNMS(): NMSEntityCreature = (this as CraftCreature).handle
 inline fun HumanEntity.toNMS(): NMSEntityHuman = (this as CraftHumanEntity).handle
 inline fun Player.toNMS(): NMSPlayer = (this as CraftPlayer).handle
+inline fun Snowball.toNMS(): NMSSnowball = (this as CraftSnowball).handle
 
 inline fun NMSEntity.toBukkit() = bukkitEntity as BukkitEntity
 inline fun NMSEntityLiving.toBukkit() = bukkitEntity as LivingEntity
@@ -33,6 +36,7 @@ inline fun NMSEntityInsentient.toBukkit() = bukkitEntity as Mob
 inline fun NMSEntityCreature.toBukkit() = bukkitEntity as Creature
 inline fun NMSEntityHuman.toBukkit() = bukkitEntity as HumanEntity
 inline fun NMSPlayer.toBukkit() = bukkitEntity as Player
+inline fun NMSSnowball.toBukkit() = bukkitEntity as Snowball
 
 /** Converts to an NMS entity casted to a specified type */
 @Suppress("UNCHECKED_CAST")

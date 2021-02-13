@@ -8,29 +8,41 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketContainer
 import com.comphenix.protocol.events.PacketEvent
-import com.mineinabyss.mobzy.api.isCustomEntity
+import com.mineinabyss.geary.ecs.types.GearyEntityType
+import com.mineinabyss.geary.minecraft.store.with
+import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.mobzy.ecs.components.initialization.PacketEntity
+import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobzy
 import org.bukkit.Bukkit
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 
 object MobzyPacketInterception {
     fun registerPacketInterceptors() {
         protocolManager(mobzy) {
-            //send zombie as entity type for custom mobs
             onSend(Server.SPAWN_ENTITY_LIVING) {
-                if (Bukkit.getEntity(packet.uuiDs.read(0))?.isCustomEntity == true)
-                    packet.integers.write(1, 102)
+                Bukkit.getEntity(packet.uuiDs.read(0))?.with<PacketEntity> {
+                    packet.integers.write(1, it.typeId)
+                }
+            }
+            onSend(Server.SPAWN_ENTITY) {
+                Bukkit.getEntity(packet.uuiDs.read(0))?.with<GearyEntityType> {
+                    if ((it as MobType).baseClass == "mobzy:projectile") {
+                        packet.entityTypeModifier.write(0, EntityType.SNOWBALL)
+                    }
+                }
             }
             //pitch lock custom mobs
             onSend(
-                //all these packets seem to be enough to cover all head rotations
+                //all these packets seem to be enough to cover all head rotationsS
                 Server.ENTITY_LOOK,
                 Server.REL_ENTITY_MOVE_LOOK,
                 Server.LOOK_AT,
                 Server.ENTITY_TELEPORT
             ) {
-                if (packet.getEntityModifier(this).read(0).isCustomEntity) //check entity involved
+                if (packet.getEntityModifier(this).read(0).isCustomMob) //check entity involved
                     packet.bytes.write(1, 0) //modify pitch to be zero
             }
         }

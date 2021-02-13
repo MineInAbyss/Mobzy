@@ -11,6 +11,7 @@ import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomEntity
+import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -137,9 +138,10 @@ object MobListener : Listener {
                 entity.get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
-            } else if (entity.isCustomEntity && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
+            } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
                 (entity as LivingEntity).removeWhenFarAway = true
             }
+            //TODO: Do we need to despawn non-monster entities?
         }
     }
 
