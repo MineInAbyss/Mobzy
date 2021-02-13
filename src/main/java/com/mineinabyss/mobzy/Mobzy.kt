@@ -15,6 +15,7 @@ import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.okkero.skedule.schedule
 import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -70,6 +71,12 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         MobzyCommands()
 
         registerAddonWithMobzy()
+
+        //first tick only finishes when all plugins are loaded, which is when we activate addons
+        mobzy.schedule {
+            waitFor(1)
+            MobzyConfig.activateAddons()
+        }
     }
 
     override fun onDisable() { // Plugin shutdown logic
