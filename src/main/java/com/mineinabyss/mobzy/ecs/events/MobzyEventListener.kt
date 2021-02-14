@@ -31,7 +31,7 @@ object MobzyEventListener : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun EntityDamageByEntityEvent.onDamage() {
-        val gearyEntity = gearyOrNull(entity) ?: return
+        val gearyEntity = gearyOrNull(damager) ?: return
 
         gearyEntity.addComponent(Target(geary(entity)))
 
