@@ -6,27 +6,37 @@ import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.ecs.components.removeComponent
 import com.mineinabyss.geary.minecraft.events.event
 import com.mineinabyss.geary.minecraft.store.geary
+import com.mineinabyss.geary.minecraft.store.gearyOrNull
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.ProjectileHitEvent
 
 object MobzyEventListener : Listener {
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     fun ProjectileCollideEvent.onCollision() {
-        geary(entity).addComponent(Target(geary(collidedWith)))
+        val gearyEntity = gearyOrNull(entity) ?: return
 
-        event(geary(entity), "projectileHit")
+        gearyEntity.addComponent(Target(geary(collidedWith)))
 
-        geary(entity).removeComponent<Target>()
+        event(gearyEntity, "projectileHit")
+
+        gearyEntity.removeComponent<Target>()
     }
 
+    @EventHandler(ignoreCancelled = true)
+    fun ProjectileHitEvent.onProjectileLand(){
+        event(gearyOrNull(entity), "projectileLand")
+    }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     fun EntityDamageByEntityEvent.onDamage() {
-        geary(damager).addComponent(Target(geary(entity)))
+        val gearyEntity = gearyOrNull(entity) ?: return
 
-        event(geary(damager), "onTargetHit")
+        gearyEntity.addComponent(Target(geary(entity)))
 
-        geary(damager).removeComponent<Target>()
+        event(gearyEntity, "onTargetHit")
+
+        gearyEntity.removeComponent<Target>()
     }
 }

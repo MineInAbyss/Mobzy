@@ -9,7 +9,6 @@ import com.mineinabyss.mobzy.ecs.components.initialization.ItemModel
 import com.mineinabyss.mobzy.mobs.CustomEntity
 import net.minecraft.server.v1_16_R2.EntitySnowball
 import net.minecraft.server.v1_16_R2.EntityTypes
-import net.minecraft.server.v1_16_R2.MovingObjectPosition
 import net.minecraft.server.v1_16_R2.MovingObjectPositionEntity
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 
@@ -28,6 +27,4 @@ class ProjectileEntity(
 
     //Stop vanilla snowball hit behaviour
     override fun a(var0: MovingObjectPositionEntity) = Unit
-
-    override fun a(var0: MovingObjectPosition) = Unit
 }
