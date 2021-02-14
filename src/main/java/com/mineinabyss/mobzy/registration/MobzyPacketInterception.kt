@@ -10,6 +10,7 @@ import com.mineinabyss.protocolburrito.enums.PacketEntityType
 import com.mineinabyss.protocolburrito.packets.PacketEntityLook
 import com.mineinabyss.protocolburrito.packets.PacketSpawnEntity
 import com.mineinabyss.protocolburrito.packets.PacketSpawnEntityLiving
+import org.bukkit.entity.EntityType
 
 object MobzyPacketInterception {
     fun registerPacketInterceptors() {
@@ -25,8 +26,9 @@ object MobzyPacketInterception {
             onSend(Server.SPAWN_ENTITY) {
                 PacketSpawnEntity(packet).apply{
                     entity(entityId).with<GearyEntityType>{
+                        //FIXME ProtocolBurrito doesn't work because of an NMS inconsistency here
                         //TODO make a component to allow overriding the type here
-                        type = PacketEntityType.SNOWBALL.id
+                        packet.entityTypeModifier.write(0, EntityType.SNOWBALL)
                     }
                 }
             }
