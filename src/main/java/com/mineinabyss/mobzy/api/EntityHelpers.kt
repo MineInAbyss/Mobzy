@@ -30,6 +30,8 @@ val Entity.isCustomEntity get() = toNMS().isCustomEntity
 /** Whether this is a custom entity registered with Mobzy. */
 val NMSEntity.isCustomEntity get() = this is CustomEntity
 
+/** Whether this is a custom mob registered with Mobzy. */
 val Entity.isCustomMob get() = toNMS().isCustomMob
 
+/** Whether this is a custom mob registered with Mobzy. */
 val NMSEntity.isCustomMob get() = this is CustomMob

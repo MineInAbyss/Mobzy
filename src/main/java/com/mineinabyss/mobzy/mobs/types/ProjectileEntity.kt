@@ -26,11 +26,8 @@ class ProjectileEntity(
         item = CraftItemStack.asNMSCopy(get<ItemModel>()?.item?.toItemStack())
     }
 
-    override fun a(var0: MovingObjectPositionEntity) {
-        return
-    }
+    //Stop vanilla snowball hit behaviour
+    override fun a(var0: MovingObjectPositionEntity) = Unit
 
-    override fun a(var0: MovingObjectPosition) {
-        return
-    }
+    override fun a(var0: MovingObjectPosition) = Unit
 }
