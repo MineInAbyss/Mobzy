@@ -3,24 +3,22 @@ package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
-import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.mobs.types.ProjectileEntity
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import net.minecraft.server.v1_16_R2.*
 import org.bukkit.Sound
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 import org.bukkit.entity.Creature
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
-import org.bukkit.inventory.ItemStack
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
@@ -28,20 +26,21 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-    @SerialName("item") private val _item: SerializableItemStack,
-    val damage: Float,
+    val type: String,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
     val cooldown: Long = 3000L
 ) : PathfinderComponent() {
-    @Transient
-    val item = _item.toItemStack()
+    //TODO evaluated lazily because MobTypes aren't registered while we are registering our mobs. Either somehow have a
+    // 2-step process for registering MobTypes or make a lazy type serializer. 
+    private val mobType: MobType by lazy {
+        if (MobzyTypes[type].baseClass == "mobzy:projectile") MobzyTypes[type] else error("Template is not of type projectile")
+    }
 
     override fun build(mob: Mob) = ThrowItemsGoal(
         (mob as Creature),
-        item,
-        damage,
+        mobType,
         minChaseRad,
         minThrowRad,
         yOffset,
@@ -57,8 +56,7 @@ class ThrowItemsBehavior(
  */
 class ThrowItemsGoal(
     override val mob: Creature,
-    private val item: ItemStack,
-    private val damage: Float,
+    private val template: MobType,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
     private val yOffset: Double = 0.0,
@@ -95,15 +93,13 @@ class ThrowItemsGoal(
         }
     }
 
-    //TODO try not to rely on NMS at all here
     /** Throws the mob's defined item at the [target]*/
-    fun throwItem(target: LivingEntity) {
+    private fun throwItem(target: LivingEntity) {
         val world = mob.location.world ?: return
         val location = mob.eyeLocation
         val (x, y, z) = location
 
-        //TODO some way to create different types of projectiles
-        val projectile = DamagingThrownItem(item, damage, nmsEntity.world, nmsEntity)
+        val projectile = ProjectileEntity(template.nmsType, world.toNMS())
         projectile.setPosition(x, y + yOffset, z)
 
         val targetLoc = target.eyeLocation
@@ -117,28 +113,12 @@ class ThrowItemsGoal(
             1.0f,
             1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
         )
+
         projectile.shoot(dX, dY, dZ, 1.6f, 12.0f)
+
+        //TODO: Eventually have a standardized spawning system.
+        // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
+        // It needs to get added to the world like this.
         world.toNMS().addEntity(projectile)
-    }
-}
-
-class DamagingThrownItem(
-    item: ItemStack,
-    val damage: Float,
-    world: World?,
-    thrower: EntityLiving
-) : EntitySnowball(world, thrower) {
-    init {
-        this.item = CraftItemStack.asNMSCopy(item)
-    }
-
-    override fun a(mop: MovingObjectPosition) {
-        super.a(mop)
-
-        if (mop.type == MovingObjectPosition.EnumMovingObjectType.ENTITY) {
-            val hit = (mop as MovingObjectPositionEntity).entity
-            if (hit is EntityPlayer)
-                hit.damageEntity(DamageSource.projectile(this, shooter), damage)
-        }
     }
 }

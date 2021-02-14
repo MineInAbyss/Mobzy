@@ -8,6 +8,7 @@ typealias NMSEntityInsentient = EntityInsentient
 typealias NMSEntityCreature = EntityCreature
 typealias NMSEntityHuman = EntityHuman
 typealias NMSPlayer = EntityPlayer
+typealias NMSSnowball = EntitySnowball
 
 typealias NMSEntityType<T> = EntityTypes<T>
 

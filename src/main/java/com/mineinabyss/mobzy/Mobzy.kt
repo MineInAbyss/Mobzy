@@ -6,6 +6,7 @@ import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import com.mineinabyss.mobzy.listener.MobListener
@@ -42,7 +43,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         saveDefaultConfig()
         reloadConfig()
 
-        attachToGeary (types = MobzyTypes) {
+        attachToGeary(types = MobzyTypes) {
             systems(
                 WalkingAnimationSystem
             )
@@ -63,6 +64,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         registerEvents(
             MobListener,
             MobzyECSListener,
+            MobzyEventListener
         )
 
         //Register commands

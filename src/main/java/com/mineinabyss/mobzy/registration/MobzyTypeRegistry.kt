@@ -88,7 +88,8 @@ object MobzyTypeRegistry {
         "mobzy:hostile" to ::HostileMob,
         "mobzy:passive" to ::PassiveMob,
         "mobzy:fish" to ::FishMob,
-        "mobzy:npc" to ::NPC
+        "mobzy:npc" to ::NPC,
+        "mobzy:projectile" to ::ProjectileEntity,
     )
 
     fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {
