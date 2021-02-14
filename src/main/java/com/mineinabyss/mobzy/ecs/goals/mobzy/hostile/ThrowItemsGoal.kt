@@ -9,10 +9,10 @@ import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
-import com.mineinabyss.mobzy.ecs.serializers.MobTypeSerializer
 import com.mineinabyss.mobzy.mobs.MobType
 import com.mineinabyss.mobzy.mobs.types.ProjectileEntity
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
+import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Sound
@@ -26,20 +26,21 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-    val type: @Serializable(with = MobTypeSerializer::class) MobType,
+    val type: String,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
     val cooldown: Long = 3000L
 ) : PathfinderComponent() {
-    init {
-        //TODO a better way of ensuring a MobType is a subtype of a certain NMS class. Type erasure makes this hard :(
-        if (type.baseClass != "mobzy:projectile") error("Template is not of type projectile")
+    //TODO evaluated lazily because MobTypes aren't registered while we are registering our mobs. Either somehow have a
+    // 2-step process for registering MobTypes or make a lazy type serializer. 
+    private val mobType: MobType by lazy {
+        if (MobzyTypes[type].baseClass == "mobzy:projectile") MobzyTypes[type] else error("Template is not of type projectile")
     }
 
     override fun build(mob: Mob) = ThrowItemsGoal(
         (mob as Creature),
-        type,
+        mobType,
         minChaseRad,
         minThrowRad,
         yOffset,
