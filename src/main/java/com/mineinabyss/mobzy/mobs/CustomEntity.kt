@@ -6,6 +6,7 @@ import com.mineinabyss.geary.ecs.components.addPersistingComponent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
+import com.mineinabyss.geary.minecraft.events.GearyMinecraftLoadEvent
 import com.mineinabyss.geary.minecraft.isGearyEntity
 import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
 import com.mineinabyss.geary.minecraft.store.decodeComponents
@@ -16,7 +17,6 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSSound
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.ecs.events.MobzyLoadEvent
 import com.mineinabyss.mobzy.registration.MobzyTypes
 import org.bukkit.SoundCategory
 import org.bukkit.persistence.PersistentDataContainer
@@ -68,7 +68,7 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
         // use the same system here.
         entity.addScoreboardTag(ENTITY_VERSION)
 
-        MobzyLoadEvent(this).call()
+        GearyMinecraftLoadEvent(this).call()
     }
 
     //TODO think of a better place to put this, something less inheritance-ey
