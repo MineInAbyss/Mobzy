@@ -51,11 +51,11 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
         val type = MobzyTypes[this]
 
         //add persisting entity type component and encode it right away if not present
-        persistentDataContainer.isGearyEntity = true
-        addPersistingComponent<GearyEntityType>(type)
-
-        if (!persistentDataContainer.has<GearyEntityType>())
+        if (!persistentDataContainer.has<GearyEntityType>()) {
+            persistentDataContainer.isGearyEntity = true
+            addPersistingComponent<GearyEntityType>(type)
             persistentDataContainer.encode(type)
+        }
 
         //adding components from the type to this entity
         decodeComponents()
