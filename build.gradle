@@ -56,7 +56,7 @@ dependencies {
     compileOnly "org.nield:kotlin-statistics"
 
     implementation "com.mineinabyss:idofront:0.5.4"
-    compileOnly "com.mineinabyss:geary-spigot:0.2.21"
+    compileOnly "com.mineinabyss:geary-spigot:0.2.23"
     compileOnly "com.mineinabyss:protocolburrito:0.1.10"
 
     compileOnly "de.erethon:headlib:3.0.2"
