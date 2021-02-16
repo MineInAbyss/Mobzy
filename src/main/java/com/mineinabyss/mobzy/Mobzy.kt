@@ -5,7 +5,6 @@ import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
 import com.mineinabyss.mobzy.api.toMobzy
-import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
@@ -49,7 +48,6 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             )
 
             autoscanComponents()
-            autoscan<PathfinderComponent>()
 
             bukkitEntityAccess {
                 entityConversion { toMobzy() }
