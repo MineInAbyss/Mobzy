@@ -14,8 +14,7 @@ import org.bukkit.event.Listener
 
 object MobzyECSListener : Listener {
     @EventHandler
-    fun attachPathfindersOnEntityLoadedEvent(event: MobzyLoadEvent) {
-        val (entity) = event
+    fun MobzyLoadEvent.attachPathfindersOnEntityLoadedEvent() {
         val mob = entity.toBukkit<Mob>() ?: return
         val (targets, goals) = entity.get<Pathfinders>() ?: return
 

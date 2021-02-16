@@ -2,11 +2,15 @@ package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyEntity
 import com.mineinabyss.geary.ecs.components.addComponent
+import com.mineinabyss.geary.ecs.components.addPersistingComponent
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
+import com.mineinabyss.geary.minecraft.isGearyEntity
 import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
 import com.mineinabyss.geary.minecraft.store.decodeComponents
+import com.mineinabyss.geary.minecraft.store.encode
+import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSSound
@@ -45,7 +49,13 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
      */
     fun initEntity() {
         val type = MobzyTypes[this]
-        addComponent<GearyEntityType>(type)
+
+        //add persisting entity type component and encode it right away if not present
+        persistentDataContainer.isGearyEntity = true
+        addPersistingComponent<GearyEntityType>(type)
+
+        if (!persistentDataContainer.has<GearyEntityType>())
+            persistentDataContainer.encode(type)
 
         //adding components from the type to this entity
         decodeComponents()
@@ -56,7 +66,7 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
 
         //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
         // use the same system here.
-        entity.addScoreboardTag("customMob3")
+        entity.addScoreboardTag(ENTITY_VERSION)
 
         MobzyLoadEvent(this).call()
     }
@@ -81,5 +91,9 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
     fun makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
         makeSound(get<Sounds>()?.sound() ?: return default)
         return null
+    }
+
+    companion object {
+        const val ENTITY_VERSION = "customMob3"
     }
 }
