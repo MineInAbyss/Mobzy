@@ -1,23 +1,12 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.addPersistingComponent
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.types.GearyEntityType
-import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
-import com.mineinabyss.geary.minecraft.events.GearyMinecraftLoadEvent
-import com.mineinabyss.geary.minecraft.isGearyEntity
-import com.mineinabyss.geary.minecraft.store.BukkitEntityAccess
-import com.mineinabyss.geary.minecraft.store.decodeComponents
-import com.mineinabyss.geary.minecraft.store.encode
-import com.mineinabyss.geary.minecraft.store.has
-import com.mineinabyss.idofront.events.call
+import com.mineinabyss.geary.minecraft.store.geary
+import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSSound
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.registration.MobzyTypes
 import org.bukkit.SoundCategory
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataHolder
@@ -35,45 +24,17 @@ import kotlin.random.Random
  * @see CustomMob
  */
 interface CustomEntity : GearyEntity, PersistentDataHolder {
-    //TODO this should always be implemented as Engine.getNextId() but we can't init here :(
-    override val gearyId: Int
+    //TODO try to do this without getting the id via entity every time
+    override val gearyId: Int get() = geary(entity).gearyId
 
     val nmsEntity: NMSEntity
     val entity get() = nmsEntity.toBukkit()
 
     override fun getPersistentDataContainer(): PersistentDataContainer = entity.persistentDataContainer
 
-    /**
-     * Applies some default attributes that every custom mob should have, such as a model, invisibility, and an
-     * identifier scoreboard tag
-     */
-    fun initEntity() {
-        val type = MobzyTypes[this]
-
-        //add persisting entity type component and encode it right away if not present
-        if (!persistentDataContainer.has<GearyEntityType>()) {
-            persistentDataContainer.isGearyEntity = true
-            addPersistingComponent<GearyEntityType>(type)
-            persistentDataContainer.encode(type)
-        }
-
-        //adding components from the type to this entity
-        decodeComponents()
-        addComponent(BukkitEntityComponent(entity.uniqueId, entity))
-
-        //allow us to get the geary entity via UUID
-        BukkitEntityAccess.registerEntity(entity, this)
-
-        //the number is literally just for migrations. Once we figure out how we do that for ecs components, we should
-        // use the same system here.
-        entity.addScoreboardTag(ENTITY_VERSION)
-
-        GearyMinecraftLoadEvent(this).call()
-    }
-
     //TODO think of a better place to put this, something less inheritance-ey
     fun makeSound(sound: String) {
-        val sounds = get<Sounds>()
+        val sounds = entity.get<Sounds>()
         val volume = sounds?.volume ?: 1.0f
         val pitch = sounds?.pitch ?: 1.0
         val pitchRange = sounds?.pitchRange ?: 0.2
@@ -89,7 +50,7 @@ interface CustomEntity : GearyEntity, PersistentDataHolder {
 
     /** Plays a sound effect at the mob's location and returns null */
     fun makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
-        makeSound(get<Sounds>()?.sound() ?: return default)
+        makeSound(entity.get<Sounds>()?.sound() ?: return default)
         return null
     }
 

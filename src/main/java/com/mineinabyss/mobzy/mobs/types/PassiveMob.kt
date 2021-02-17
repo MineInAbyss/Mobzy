@@ -24,7 +24,6 @@ open class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnim
     override fun createChild(p0: WorldServer?, p1: EntityAgeable?): EntityAgeable? = null
 
     init {
-        initEntity()
         addScoreboardTag("passiveMob")
         entity.removeWhenFarAway = false
     }

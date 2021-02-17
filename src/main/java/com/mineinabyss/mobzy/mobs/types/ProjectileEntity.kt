@@ -21,7 +21,6 @@ class ProjectileEntity(
     override val nmsEntity: NMSSnowball get() = this
 
     init {
-        initEntity()
         item = CraftItemStack.asNMSCopy(get<ItemModel>()?.item?.toItemStack())
     }
 

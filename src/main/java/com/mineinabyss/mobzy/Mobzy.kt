@@ -4,15 +4,13 @@ import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
-import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import com.mineinabyss.mobzy.listener.MobListener
+import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
-import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
-import com.mineinabyss.mobzy.registration.MobzyTypes
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.okkero.skedule.schedule
@@ -43,7 +41,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         saveDefaultConfig()
         reloadConfig()
 
-        attachToGeary(types = MobzyTypes) {
+        attachToGeary {
             systems(
                 WalkingAnimationSystem
             )
@@ -53,13 +51,13 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             // Autoscan the subclasses of PathfinderComponent
             autoscan<PathfinderComponent>()
 
-            bukkitEntityAccess {
-                entityConversion { toMobzy() }
+            loadPrefabs(mobConfigDir) { name, prefab ->
+                MobzyNMSTypeInjector.inject(name, prefab)
             }
         }
 
         MobzyPacketInterception.registerPacketInterceptors()
-        MobzyTypeRegistry //instantiate singleton
+        MobzyNMSTypeInjector //instantiate singleton
         SpawnTask.startTask()
 
         //Register events

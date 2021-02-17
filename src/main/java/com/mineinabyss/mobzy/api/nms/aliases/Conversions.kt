@@ -4,14 +4,16 @@ package com.mineinabyss.mobzy.api.nms.aliases
 
 import net.minecraft.server.v1_16_R2.Entity
 import net.minecraft.server.v1_16_R2.World
+import net.minecraft.server.v1_16_R2.WorldServer
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld
 import org.bukkit.craftbukkit.v1_16_R2.entity.*
 import org.bukkit.entity.*
 
 typealias BukkitWorld = org.bukkit.World
 typealias NMSWorld = World
+typealias NMSWorldServer = WorldServer
 
-inline fun BukkitWorld.toNMS(): NMSWorld = (this as CraftWorld).handle
+inline fun BukkitWorld.toNMS(): NMSWorldServer = (this as CraftWorld).handle
 inline fun NMSWorld.toBukkit(): BukkitWorld = this.world
 
 

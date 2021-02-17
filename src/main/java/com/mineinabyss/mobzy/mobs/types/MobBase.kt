@@ -1,8 +1,7 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.types.GearyEntityType
+import com.mineinabyss.geary.ecs.prefab.GearyPrefab
 import com.mineinabyss.geary.minecraft.store.encodeComponents
 import com.mineinabyss.mobzy.api.nms.aliases.*
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
@@ -22,8 +21,6 @@ import org.bukkit.entity.Mob
  * @property scoreboardDisplayName Used to change the name displayed in the death message.
  */
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
-    final override val gearyId: Int = Engine.getNextId()
-
     final override val nmsEntity: NMSEntityInsentient get() = this
     final override val entity: Mob get() = this.toBukkit()
 
@@ -54,7 +51,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun die(damagesource: NMSDamageSource) = dieCustom(damagesource)
 
     private val scoreboardDisplayName =
-        NMSChatMessage(get<GearyEntityType>()?.name?.split('_')?.joinToString(" ") { it.capitalize() })
+        NMSChatMessage(get<GearyPrefab>()?.name?.split('_')?.joinToString(" ") { it.capitalize() })
 
     override fun getScoreboardDisplayName() = scoreboardDisplayName
 

@@ -19,7 +19,8 @@ open class FishMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFishSch
     override fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand) = NMSInteractionResult.PASS
 
     init {
-        initEntity()
+        //TODO dont add these scoreboard tags, I think they're only used to filter by type when spawning, just use a
+        // better system than this...
         addScoreboardTag("fishMob")
 //        entity.removeWhenFarAway = true
     }

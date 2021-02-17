@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
 import com.mineinabyss.geary.minecraft.actions.SpawnEntityAction
-import com.mineinabyss.geary.minecraft.store.geary
+import com.mineinabyss.geary.minecraft.components.toBukkit
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
@@ -95,7 +95,8 @@ class ThrowItemsGoal(
         val location = mob.eyeLocation
         val (x, y, z) = location
 
-        val projectile = spawn.spawnAt(location.add(0.0, yOffset, 0.0)) as Snowball
+        val projectile = spawn.spawnAt(location.add(0.0, yOffset, 0.0))?.toBukkit<Snowball>()
+            ?: error("Entity spawned from prefab was not a snowball")
 
         val targetLoc = target.eyeLocation
         val dX = targetLoc.x - x
@@ -110,10 +111,5 @@ class ThrowItemsGoal(
         )
 
         projectile.toNMS().shoot(dX, dY, dZ, 1.6f, 12.0f)
-
-        //TODO: Eventually have a standardized spawning system.
-        // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
-        // It needs to get added to the world like this.
-//        world.toNMS().addEntity(projectile)
     }
 }

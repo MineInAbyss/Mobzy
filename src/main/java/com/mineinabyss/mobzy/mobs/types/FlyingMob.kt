@@ -18,7 +18,6 @@ open class FlyingMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFlyin
     }
 
     init {
-        initEntity()
         addScoreboardTag("flyingMob")
         entity.removeWhenFarAway = true
         //TODO movement controller is being wacko with speed limits

@@ -1,18 +1,18 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.prefab.GearyPrefab
 import com.mineinabyss.geary.minecraft.store.decode
 import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.mobzy.api.instantiateMobzy
 import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.nms.entity.typeName
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.mobs.CustomEntity
-import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
-import com.mineinabyss.mobzy.registration.MobzyTypes
+import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import kotlinx.serialization.Serializable
@@ -62,9 +62,9 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     override fun ReloadScope.reload() {
         logSuccess("Reloading mobzy config")
 
-        //We don't clear MobzyTypes since those will only ever change if an addon's code was changed which is impossible
-        // to see during a soft reload like this.
-        MobzyTypes.reset()
+        MobzyNMSTypeInjector.clear()
+        //TODO PrefabManager.clearFromPlugin(mobzy)
+
         spawnCfgs.clear()
         unregisterSpawns()
 
@@ -81,18 +81,15 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * and create everything they need for them.
      */
     internal fun activateAddons() {
-        MobzyTypeRegistry.clear()
-        registeredAddons.forEach { it.loadMobTypes() }
-//        registeredAddons.forEach { it.initializeMobs() }
         registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
-        MobzyTypeRegistry.injectDefaultAttributes()
+        MobzyNMSTypeInjector.injectDefaultAttributes()
         SpawnTask.startTask()
 
         fixEntitiesAfterReload()
 
         logSuccess("Registered addons: $registeredAddons")
-        logSuccess("Loaded types: ${MobzyTypeRegistry.typeNames}")
+        logSuccess("Loaded types: ${MobzyNMSTypeInjector.typeNames}")
     }
 
     /**
@@ -101,13 +98,6 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @receiver The addon registering it
      */
     private fun MobzyAddon.loadSpawns() = SpawnConfig(spawnConfig, this)
-
-    /**
-     * Loads [MobType]s for an addon
-     */
-    private fun MobzyAddon.loadMobTypes() {
-        MobzyTypes.registerTypes(this)
-    }
 
     /**
      * Remove entities marked as a custom mob, but which are no longer considered an instance of CustomMob, and replace
@@ -119,9 +109,11 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
                 //is a custom mob but the nms entity is no longer an instance of CustomMob (likely due to a reload)
                 it.scoreboardTags.contains(CustomEntity.ENTITY_VERSION) && it.toNMS() !is CustomEntity
             }.onEach { oldEntity ->
-                //spawn a replacement entity of the same type as defined in scoreboard tags
-                val replacement = oldEntity.persistentDataContainer.decode<MobType>()
-                    ?.instantiateEntity(oldEntity.location)
+                //spawn a replacement entity of the same type
+                val replacement = oldEntity.persistentDataContainer.decode<GearyPrefab>()
+                    //FIXME this will create a geary entity before we've actually assigned the correct PDC to it,
+                    // could lead to some very weird errors where the old PDC gets cleared.
+                    ?.instantiateMobzy(oldEntity.location)
                     ?: error("Failed to find a Mobzy type while reloading entity of type ${oldEntity.typeName}")
 
                 val oldNMS = oldEntity.toNMS()

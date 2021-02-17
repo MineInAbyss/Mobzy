@@ -22,5 +22,5 @@ class SpawnRegion(
 
     fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns
         .firstOrNull { it.entityType == type }
-        ?: error("Could not find ${type.typeName} from ${spawns.map { it.entityTypeName }}")
+        ?: error("Could not find ${type.typeName} from ${spawns.map { it.prefab }}")
 }

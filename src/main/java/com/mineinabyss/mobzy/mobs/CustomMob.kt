@@ -25,6 +25,7 @@ import org.bukkit.entity.Mob
  * @property killScore The score with which a player should be rewarded with when the current entity is killed.
  */
 interface CustomMob : CustomEntity {
+
     override val nmsEntity: NMSEntityInsentient
     override val entity: Mob
 
