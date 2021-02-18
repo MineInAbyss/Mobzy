@@ -1,25 +1,21 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
+import com.mineinabyss.geary.minecraft.actions.SpawnEntityAction
+import com.mineinabyss.geary.minecraft.store.geary
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.shootDirection
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
-import com.mineinabyss.mobzy.mobs.MobType
-import com.mineinabyss.mobzy.mobs.types.ProjectileEntity
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
-import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Sound
-import org.bukkit.entity.Creature
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Mob
+import org.bukkit.entity.*
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
@@ -27,29 +23,24 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-    val type: String,
+    val spawn: SpawnEntityAction = SpawnEntityAction(EntityType.SNOWBALL),
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
-    val cooldown: Long = 3000L,
-    val projectileSpeed: Float = 1.6f,
-    val projectileRandomAngle: Double = 12.0,
+    val cooldown: Long = 3000L
 ) : PathfinderComponent() {
-    //TODO evaluated lazily because MobTypes aren't registered while we are registering our mobs. Either somehow have a
-    // 2-step process for registering MobTypes or make a lazy type serializer. 
-    private val mobType: MobType by lazy {
-        if (MobzyTypes[type].baseClass == "mobzy:projectile") MobzyTypes[type] else error("Template is not of type projectile")
+    init {
+        if (!Snowball::class.java.isAssignableFrom(spawn.type.entityClass!!))
+            error("Thrown entity must be a subclass of Snowball!")
     }
 
     override fun build(mob: Mob) = ThrowItemsGoal(
         (mob as Creature),
-        mobType,
+        spawn,
         minChaseRad,
         minThrowRad,
         yOffset,
-        projectileSpeed,
-        projectileRandomAngle,
-        cooldown,
+        cooldown
     )
 }
 
@@ -61,12 +52,11 @@ class ThrowItemsBehavior(
  */
 class ThrowItemsGoal(
     override val mob: Creature,
-    private val template: MobType,
+    private val spawn: SpawnEntityAction,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
-    private val yOffset: Double,
-    private val speed: Float,
-    private val randomAngle: Double,
+    private val yOffset: Double = 0.0,
+    //TODO val accuracy: Double,
     cooldown: Long = 3000L
 ) : MobzyPathfinderGoal(cooldown = cooldown) {
     private var distance = 0.0
@@ -105,8 +95,7 @@ class ThrowItemsGoal(
         val location = mob.eyeLocation
         val (x, y, z) = location
 
-        val projectile = ProjectileEntity(template.nmsType, world.toNMS())
-        projectile.setPosition(x, y + yOffset, z)
+        val projectile = spawn.spawnAt(location.add(0.0, yOffset, 0.0)) as Snowball
 
         val targetLoc = target.eyeLocation
         val dX = targetLoc.x - x
@@ -120,11 +109,11 @@ class ThrowItemsGoal(
             1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
         )
 
-        projectile.shootDirection(dX, dY, dZ, speed, randomAngle)
+        projectile.toNMS().shoot(dX, dY, dZ, 1.6f, 12.0f)
 
         //TODO: Eventually have a standardized spawning system.
         // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
         // It needs to get added to the world like this.
-        world.toNMS().addEntity(projectile)
+//        world.toNMS().addEntity(projectile)
     }
 }

@@ -3,6 +3,8 @@ package com.mineinabyss.mobzy.mobs
 import com.mineinabyss.geary.ecs.GearyComponent
 import com.mineinabyss.geary.ecs.types.GearyEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
+import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
@@ -10,6 +12,7 @@ import com.mineinabyss.mobzy.registration.MobzyTypes
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.server.v1_16_R2.EnumCreatureType
+import org.bukkit.Location
 
 /**
  * A class which stores information on mobs that can be deserialized from the config.
@@ -30,4 +33,8 @@ data class MobType(
     override val types = MobzyTypes
 
     val nmsType: NMSEntityType<*> by lazy { MobzyTypeRegistry[name] }
+
+    fun instantiateEntity(location: Location): CustomEntity {
+        return location.spawnEntity(nmsType)?.toMobzy() ?: error("Summoned mob was not a Mobzy entity")
+    }
 }

@@ -49,6 +49,8 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             )
 
             autoscanComponents()
+
+            // Autoscan the subclasses of PathfinderComponent
             autoscan<PathfinderComponent>()
 
             bukkitEntityAccess {

@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.listener
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.components.with
 import com.mineinabyss.geary.minecraft.components.toBukkit
+import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.entities.leftClicked
@@ -10,7 +11,6 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
-import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
@@ -19,7 +19,6 @@ import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.ecs.events.MobzySpawnEvent
 import com.mineinabyss.mobzy.ecs.events.PlayerRightClickEntityEvent
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
@@ -85,7 +84,7 @@ object MobListener : Listener {
 
     /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
     @EventHandler
-    fun MobzySpawnEvent.addEquipmentOnMobSpawn() {
+    fun GearyMinecraftSpawnEvent.addEquipmentOnMobSpawn() {
         val mob = entity.toBukkit<Mob>() ?: return
 
         //add depth strider item on feet to simulate faster water speed TODO do this better
