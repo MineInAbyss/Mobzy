@@ -31,6 +31,7 @@ fun IProjectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float,
 
     mot = Vec3D(directionVector.x, directionVector.y, directionVector.z)
 
+    // NMS stuff for orienting the projectile model towards the target
     val horizontalDistanceSqrt = sqrt(directionVector.x * directionVector.x + directionVector.z * directionVector.z)
     yaw = (atan2(directionVector.x, directionVector.z) * 57.2957763671875).toFloat()
     pitch = (atan2(directionVector.y, horizontalDistanceSqrt) * 57.2957763671875).toFloat()
