@@ -5,6 +5,7 @@ import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.nms.entity.shootDirection
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
@@ -30,7 +31,9 @@ class ThrowItemsBehavior(
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
-    val cooldown: Long = 3000L
+    val cooldown: Long = 3000L,
+    val projectileSpeed: Float = 1.6f,
+    val projectileRandomAngle: Double = 12.0,
 ) : PathfinderComponent() {
     //TODO evaluated lazily because MobTypes aren't registered while we are registering our mobs. Either somehow have a
     // 2-step process for registering MobTypes or make a lazy type serializer. 
@@ -44,7 +47,9 @@ class ThrowItemsBehavior(
         minChaseRad,
         minThrowRad,
         yOffset,
-        cooldown
+        projectileSpeed,
+        projectileRandomAngle,
+        cooldown,
     )
 }
 
@@ -59,8 +64,9 @@ class ThrowItemsGoal(
     private val template: MobType,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
-    private val yOffset: Double = 0.0,
-    //TODO val accuracy: Double,
+    private val yOffset: Double,
+    private val speed: Float,
+    private val randomAngle: Double,
     cooldown: Long = 3000L
 ) : MobzyPathfinderGoal(cooldown = cooldown) {
     private var distance = 0.0
@@ -114,7 +120,7 @@ class ThrowItemsGoal(
             1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
         )
 
-        projectile.shoot(dX, dY, dZ, 1.6f, 12.0f)
+        projectile.shootDirection(dX, dY, dZ, speed, randomAngle)
 
         //TODO: Eventually have a standardized spawning system.
         // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
