@@ -21,10 +21,13 @@ import kotlin.random.Random
 //TODO: Implement the entity deltaPosition ticking ourselves at some point, to circumvent NMS.
 fun IProjectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float, randomAngle: Double) {
     val directionVector = Vector(dX, dY, dZ).normalize()
-    directionVector.rotateAroundX(Random.nextDouble(-randomAngle, randomAngle).toRadians())
-    directionVector.rotateAroundY(Random.nextDouble(-randomAngle, randomAngle).toRadians())
-    directionVector.rotateAroundZ(Random.nextDouble(-randomAngle, randomAngle).toRadians())
-    directionVector.normalize().multiply(speed)
+    if(randomAngle != 0.0) {
+        directionVector.rotateAroundX(Random.nextDouble(-randomAngle, randomAngle).toRadians())
+        directionVector.rotateAroundY(Random.nextDouble(-randomAngle, randomAngle).toRadians())
+        directionVector.rotateAroundZ(Random.nextDouble(-randomAngle, randomAngle).toRadians())
+        directionVector.normalize()
+    }
+    directionVector.multiply(speed)
 
     mot = Vec3D(directionVector.x, directionVector.y, directionVector.z)
 
