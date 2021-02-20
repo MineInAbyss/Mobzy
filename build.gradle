@@ -43,6 +43,7 @@ repositories {
     maven githubPackage.invoke("MineInAbyss/Geary")
     maven githubPackage.invoke("MineInAbyss/KotlinSpice")
     maven githubPackage.invoke("MineInAbyss/ProtocolBurrito")
+    maven { url 'https://jitpack.io' }
     mavenLocal()
 }
 
@@ -62,6 +63,8 @@ dependencies {
     compileOnly "de.erethon:headlib:3.0.2"
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"
     compileOnly "com.comphenix.protocol:ProtocolLib:4.5.0"
+    //TODO switch to their proper maven repo once that's set up
+    compileOnly files('libs/Model-Engine-API.jar')
 
     compileOnly project(":processor")
     kapt project(":processor")

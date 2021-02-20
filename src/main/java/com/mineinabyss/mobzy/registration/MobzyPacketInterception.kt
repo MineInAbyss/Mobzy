@@ -1,22 +1,13 @@
 package com.mineinabyss.mobzy.registration
 
-import com.comphenix.protocol.PacketType.Play.Server
-import com.mineinabyss.geary.ecs.types.GearyEntityType
-import com.mineinabyss.geary.minecraft.store.with
-import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
-import com.mineinabyss.protocolburrito.enums.PacketEntityType
-import com.mineinabyss.protocolburrito.packets.PacketEntityLook
-import com.mineinabyss.protocolburrito.packets.PacketSpawnEntity
-import com.mineinabyss.protocolburrito.packets.PacketSpawnEntityLiving
-import org.bukkit.entity.EntityType
 
 object MobzyPacketInterception {
     fun registerPacketInterceptors() {
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
-            onSend(Server.SPAWN_ENTITY_LIVING) {
+            /*onSend(Server.SPAWN_ENTITY_LIVING) {
                 PacketSpawnEntityLiving(packet).apply {
                     if (entity(entityUUID)?.isCustomMob == true)
                         type = PacketEntityType.ZOMBIE.id
@@ -45,7 +36,7 @@ object MobzyPacketInterception {
                     if (entity(entityId).isCustomMob) //check mob involved
                         pitch = 0
                 }
-            }
+            }*/
         }
     }
 }

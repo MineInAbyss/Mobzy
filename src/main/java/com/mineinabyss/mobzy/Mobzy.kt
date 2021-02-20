@@ -8,6 +8,7 @@ import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
+import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
@@ -66,7 +67,8 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         registerEvents(
             MobListener,
             MobzyECSListener,
-            MobzyEventListener
+            MobzyEventListener,
+            ModelEngineSystem(),
         )
 
         //Register commands
