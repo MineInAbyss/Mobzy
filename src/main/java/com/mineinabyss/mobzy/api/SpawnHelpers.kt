@@ -3,14 +3,15 @@
 
 package com.mineinabyss.mobzy.api
 
-import com.mineinabyss.geary.ecs.prefab.GearyPrefab
+import com.mineinabyss.geary.ecs.GearyEntity
+import com.mineinabyss.geary.ecs.components.GearyPrefab
+import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.minecraft.store.*
 import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.mobs.CustomEntity
-import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import net.minecraft.server.v1_16_R2.BlockPosition
 import net.minecraft.server.v1_16_R2.EnumMobSpawn
 import net.minecraft.server.v1_16_R2.IChatBaseComponent
@@ -51,8 +52,9 @@ fun Location.spawnEntity(
 }
 
 
-fun GearyPrefab.instantiateMobzy(location: Location): CustomEntity? {
-    val entity = location.spawnEntity(MobzyNMSTypeInjector[name]) ?: return null
+fun GearyEntity.instantiateMobzy(location: Location): CustomEntity? {
+    val type = get<NMSEntityType<*>>() ?: return null
+    val entity = location.spawnEntity(type) ?: return null
     val customEntity = entity.toMobzy() ?: error("Summoned mob was not a Mobzy entity")
 
     geary(entity) {

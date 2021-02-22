@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.registration
 
-import com.mineinabyss.geary.ecs.prefab.GearyPrefab
+import com.mineinabyss.geary.ecs.components.GearyPrefab
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType

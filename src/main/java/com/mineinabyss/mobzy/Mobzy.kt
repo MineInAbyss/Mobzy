@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.components.addComponent
 import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
@@ -52,7 +53,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             autoscan<PathfinderComponent>()
 
             loadPrefabs(mobConfigDir) { name, prefab ->
-                MobzyNMSTypeInjector.inject(name, prefab)
+                prefab.addComponent(MobzyNMSTypeInjector.inject(name, prefab))
             }
         }
 

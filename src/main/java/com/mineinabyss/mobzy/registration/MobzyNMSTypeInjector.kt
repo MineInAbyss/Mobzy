@@ -1,13 +1,15 @@
 package com.mineinabyss.mobzy.registration
 
-import com.mineinabyss.geary.ecs.prefab.GearyPrefab
+import com.mineinabyss.geary.ecs.GearyEntity
+import com.mineinabyss.geary.ecs.components.GearyPrefab
+import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.api.nms.typeinjection.*
-import com.mineinabyss.mobzy.ecs.components.MobzySpawnComponent
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
+import com.mineinabyss.mobzy.ecs.components.initialization.MobzySpawnComponent
 import com.mineinabyss.mobzy.mobs.types.*
 import com.mineinabyss.mobzy.mobs.types.NPC
 import net.minecraft.server.v1_16_R2.*
@@ -22,14 +24,6 @@ import java.lang.reflect.Field
 object MobzyNMSTypeInjector {
     val typeNames get() = _types.keys.toList()
     private val _types: MutableMap<String, NMSEntityType<*>> = mutableMapOf()
-
-    /** Gets a mob's [EntityTypes] from a String if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
-    operator fun get(name: String): NMSEntityType<*> = _types[name.toEntityTypeName()]
-        ?: error("Mob type ${name.toEntityTypeName()} not found, only know $typeNames")
-
-    operator fun get(prefab: GearyPrefab) = get(prefab.name)
-
-    operator fun contains(name: String) = _types.contains(name.toEntityTypeName())
 
     private val customAttributes = mutableMapOf<NMSEntityType<*>, AttributeProvider>()
 
@@ -68,12 +62,13 @@ object MobzyNMSTypeInjector {
      *
      * @see injectType
      */
-    fun inject(name: String, prefab: GearyPrefab): EntityTypes<*> {
-        val prefabInfo = prefab.spawn as? MobzySpawnComponent ?: error("Prefab $name is not a mob prefab!")
+    fun inject(name: String, prefab: GearyEntity): EntityTypes<*> {
+        val prefabInfo =
+            prefab.get<MobzySpawnComponent>() ?: error("Error while injecting $name. Prefab is not a mob prefab!")
 
         val init = mobBaseClasses[prefabInfo.baseClass] ?: error("Not a valid parent class: ${prefabInfo.baseClass}")
         val mobID = name.toEntityTypeName()
-        val attributes = prefab.get<MobAttributes>() ?: MobAttributes()
+        val attributes = prefab.get<GearyPrefab>()?.get<MobAttributes>() ?: MobAttributes()
         val injected: NMSEntityType<Entity> =
             (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
                 .builderForCreatureType(prefabInfo.creatureType)

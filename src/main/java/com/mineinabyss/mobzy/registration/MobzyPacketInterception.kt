@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.registration
 
 import com.comphenix.protocol.PacketType.Play.Server
-import com.mineinabyss.geary.ecs.prefab.GearyPrefab
+import com.mineinabyss.geary.ecs.components.GearyPrefab
 import com.mineinabyss.geary.minecraft.store.with
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.mobzy

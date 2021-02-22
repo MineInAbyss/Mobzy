@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.components.PrefabKey
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
@@ -95,7 +96,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 playerAction {
                     val cappedSpawns = numOfSpawns.coerceAtMost(MobzyConfig.data.maxCommandSpawns)
-                    val prefab = PrefabManager[mobName]!!
+                    val prefab = PrefabManager[PrefabKey("mobzy", mobName)] ?: error("Prefab $mobName not found")
 
                     repeat(cappedSpawns) {
                         prefab.instantiateMobzy(player.location)

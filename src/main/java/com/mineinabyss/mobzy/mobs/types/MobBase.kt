@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.mobs.types
 
+import com.mineinabyss.geary.ecs.components.GearyPrefab
 import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.prefab.GearyPrefab
 import com.mineinabyss.geary.minecraft.store.encodeComponents
 import com.mineinabyss.mobzy.api.nms.aliases.*
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
