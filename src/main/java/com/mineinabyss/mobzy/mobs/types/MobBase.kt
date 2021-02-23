@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.geary.ecs.components.GearyPrefab
+import com.mineinabyss.geary.ecs.components.PrefabKey
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.minecraft.store.encodeComponents
 import com.mineinabyss.mobzy.api.nms.aliases.*
@@ -51,7 +51,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun die(damagesource: NMSDamageSource) = dieCustom(damagesource)
 
     private val scoreboardDisplayName =
-        NMSChatMessage(get<GearyPrefab>()?.name?.split('_')?.joinToString(" ") { it.capitalize() })
+        NMSChatMessage(get<PrefabKey>()?.name?.split('_')?.joinToString(" ") { it.capitalize() })
 
     override fun getScoreboardDisplayName() = scoreboardDisplayName
 

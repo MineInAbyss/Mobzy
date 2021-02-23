@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.geary.ecs.components.GearyPrefab
+import com.mineinabyss.geary.ecs.components.PrefabKey
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
@@ -28,7 +28,8 @@ class NPC(type: NMSEntityType<*>, world: NMSWorld) : PassiveMob(type, world) {
     }
 
     init {
-        entity.customName = get<GearyPrefab>()?.name?.capitalize()
+        //TODO CustomName component perhaps?
+        entity.customName = get<PrefabKey>()?.name?.capitalize()
         customNameVisible = true
         isInvulnerable = true
         entity.removeWhenFarAway = false

@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
+import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
-import com.mineinabyss.mobzy.ecs.components.initialization.attributes
+import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
@@ -15,7 +16,7 @@ import org.bukkit.event.entity.EntityTargetEvent
 class TargetAttacker(
     private val range: Double? = null
 ) : PathfinderComponent() {
-    override fun build(mob: Mob) = TargetAttackerGoal(mob, range ?: mob.attributes?.followRange ?: 0.0)
+    override fun build(mob: Mob) = TargetAttackerGoal(mob, range ?: mob.get<MobAttributes>()?.followRange ?: 0.0)
 }
 
 class TargetAttackerGoal(

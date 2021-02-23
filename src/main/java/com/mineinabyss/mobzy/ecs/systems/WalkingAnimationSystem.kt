@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.ecs.systems
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.engine.forEach
 import com.mineinabyss.geary.ecs.systems.TickingSystem
-import com.mineinabyss.geary.minecraft.components.BukkitEntityComponent
+import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import net.minecraft.server.v1_16_R2.EnumItemSlot
@@ -12,7 +12,7 @@ import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 
 object WalkingAnimationSystem : TickingSystem(interval = 10) {
-    override fun tick() = Engine.forEach<Model, BukkitEntityComponent> { model, (mob) ->
+    override fun tick() = Engine.forEach<Model, BukkitEntity> { model, mob ->
         if (mob !is Mob) return@forEach
 
         val headItem = mob.toNMS().getEquipment(EnumItemSlot.HEAD)

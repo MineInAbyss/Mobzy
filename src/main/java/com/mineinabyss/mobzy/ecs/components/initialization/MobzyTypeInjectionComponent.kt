@@ -4,7 +4,7 @@ import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import kotlinx.serialization.Serializable
 
 @Serializable
-class MobzySpawnComponent(
+class MobzyTypeInjectionComponent(
     val baseClass: String,
     val creatureType: NMSCreatureType,
 )

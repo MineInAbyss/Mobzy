@@ -3,15 +3,10 @@
 
 package com.mineinabyss.mobzy.api
 
-import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.components.GearyPrefab
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.minecraft.store.*
 import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.mobs.CustomEntity
 import net.minecraft.server.v1_16_R2.BlockPosition
 import net.minecraft.server.v1_16_R2.EnumMobSpawn
 import net.minecraft.server.v1_16_R2.IChatBaseComponent
@@ -49,21 +44,4 @@ fun Location.spawnEntity(
         spawnReason
     ) // not sure. alters the Y position. this is only ever true when using spawn egg and clicked face is UP
     return nmsEntity?.toBukkit()
-}
-
-
-fun GearyEntity.instantiateMobzy(location: Location): CustomEntity? {
-    val type = get<NMSEntityType<*>>() ?: return null
-    val entity = location.spawnEntity(type) ?: return null
-    val customEntity = entity.toMobzy() ?: error("Summoned mob was not a Mobzy entity")
-
-    geary(entity) {
-        val pdc = entity.persistentDataContainer
-        //add persisting entity type component and encode it right away if not present
-        if (!pdc.has<GearyPrefab>()) {
-            pdc.encode(this@instantiateMobzy)
-            decodeComponentsFrom(pdc)
-        }
-    }
-    return customEntity
 }

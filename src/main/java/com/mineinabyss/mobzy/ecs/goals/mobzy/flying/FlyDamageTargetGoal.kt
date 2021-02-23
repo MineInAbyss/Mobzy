@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 
+import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.mobzy.api.helpers.entity.canReach
-import com.mineinabyss.mobzy.ecs.components.initialization.attributes
+import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
@@ -22,7 +23,7 @@ class FlyDamageTargetGoal(override val mob: Mob) : MobzyPathfinderGoal() {
     override fun execute() {
         restartCooldown()
         val target = mob.target ?: return
-        val attackDamage: Double = mob.attributes?.attackDamage ?: return
+        val attackDamage: Double = mob.get<MobAttributes>()?.attackDamage ?: return
         //if within range, harm
         if (mob.canReach(target)) target.damage(attackDamage, mob)
     }

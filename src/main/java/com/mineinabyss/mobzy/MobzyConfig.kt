@@ -1,21 +1,24 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.components.GearyPrefab
-import com.mineinabyss.geary.minecraft.store.decode
+import com.mineinabyss.geary.ecs.components.addComponents
+import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.engine.entity
+import com.mineinabyss.geary.minecraft.components.SpawnBukkit
+import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
 import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.typeName
 import com.mineinabyss.mobzy.configuration.SpawnConfig
+import com.mineinabyss.mobzy.ecs.components.CopyNBT
 import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.EntityLiving
 import net.minecraft.server.v1_16_R2.EnumCreatureType
 import net.minecraft.server.v1_16_R2.NBTTagCompound
 import org.bukkit.Bukkit
@@ -106,26 +109,16 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         val num = Bukkit.getServer().worlds.map { world ->
             world.entities.filter {
                 //is a custom mob but the nms entity is no longer an instance of CustomMob (likely due to a reload)
-                it.scoreboardTags.contains(CustomEntity.ENTITY_VERSION) && it.toNMS() !is CustomEntity
+                it.scoreboardTags.contains(CustomEntity.ENTITY_VERSION) && !it.isCustomEntity
             }.onEach { oldEntity ->
-                //spawn a replacement entity of the same type
-                val replacement = oldEntity.persistentDataContainer.decode<GearyPrefab>()
-                    //FIXME this will create a geary entity before we've actually assigned the correct PDC to it,
-                    // could lead to some very weird errors where the old PDC gets cleared.
-                    ?.instantiateMobzy(oldEntity.location)
-                    ?: error("Failed to find a Mobzy type while reloading entity of type ${oldEntity.typeName}")
-
-                val oldNMS = oldEntity.toNMS()
-                val replacementNMS = replacement.nmsEntity
-
-                if (oldNMS is EntityLiving && replacementNMS is EntityLiving) {
-                    val nbt = NBTTagCompound()
-                    //copies the entity nbt data to the compound
-                    oldNMS.loadData(nbt)
-                    //writes this nbt data to the replacement entity
-                    replacementNMS.saveData(nbt)
+                //spawn a replacement entity and copy this entity's NBT over to it
+                Engine.entity {
+                    decodeComponentsFrom(oldEntity.persistentDataContainer)
+                    addComponents(
+                        CopyNBT(NBTTagCompound().apply { oldEntity.toNMS().load(this) }),
+                        SpawnBukkit(oldEntity.location)
+                    )
                 }
-
                 oldEntity.remove()
             }.count()
         }.sum()

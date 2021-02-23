@@ -1,7 +1,11 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.components.PrefabKey
+import com.mineinabyss.geary.ecs.components.addComponent
+import com.mineinabyss.geary.ecs.engine.Engine
+import com.mineinabyss.geary.ecs.engine.entity
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
+import com.mineinabyss.geary.minecraft.components.SpawnBukkit
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -11,7 +15,6 @@ import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.api.instantiateMobzy
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.isOfType
@@ -99,7 +102,10 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     val prefab = PrefabManager[PrefabKey("mobzy", mobName)] ?: error("Prefab $mobName not found")
 
                     repeat(cappedSpawns) {
-                        prefab.instantiateMobzy(player.location)
+                        Engine.entity {
+                            Engine.addEntityFor(gearyId, prefab.gearyId)
+                            addComponent(SpawnBukkit(player.location))
+                        }
                     }
                 }
             }

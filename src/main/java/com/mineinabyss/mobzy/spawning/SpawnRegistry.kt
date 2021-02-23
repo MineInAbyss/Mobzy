@@ -1,6 +1,10 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
+import com.mineinabyss.geary.ecs.components.PrefabKey
+import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.ecs.prefab.PrefabManager
+import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_REGIONS
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
@@ -30,7 +34,12 @@ object SpawnRegistry {
     fun findMobSpawn(spawn: String): MobSpawn =
         (regionSpawns[spawn.substring(0, spawn.indexOf(':'))]
             ?: error("Could not find registered region for $spawn"))
-            .getSpawnOfType(MobzyNMSTypeInjector[spawn.substring(spawn.indexOf(':') + 1)])
+            .getSpawnOfType(
+                PrefabManager[PrefabKey(
+                    mobzy.name,
+                    spawn.substring(spawn.indexOf(':') + 1)
+                )]?.get<NMSEntityType<*>>() ?: error("Could not find")
+            )
 
     /** Takes a list of spawn region names and converts to a list of [MobSpawn]s from those regions */
     fun List<ProtectedRegion>.getMobSpawnsForRegions(): List<MobSpawn> = this
