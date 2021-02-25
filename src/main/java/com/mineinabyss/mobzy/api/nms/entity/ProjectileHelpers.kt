@@ -32,14 +32,15 @@ fun IProjectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float,
     mot = Vec3D(directionVector.x, directionVector.y, directionVector.z)
 
     // NMS stuff for orienting the projectile model towards the target
+    val someNMSnumber = 57.2957763671875 //Not sure what this represents
     val horizontalDistanceSqrt = sqrt(directionVector.x * directionVector.x + directionVector.z * directionVector.z)
-    yaw = (atan2(directionVector.x, directionVector.z) * 57.2957763671875).toFloat()
-    pitch = (atan2(directionVector.y, horizontalDistanceSqrt) * 57.2957763671875).toFloat()
+    yaw = (atan2(directionVector.x, directionVector.z) * someNMSnumber).toFloat()
+    pitch = (atan2(directionVector.y, horizontalDistanceSqrt) * someNMSnumber).toFloat()
     lastYaw = yaw
     lastPitch = pitch
 }
 
-fun Double.toRadians(): Double {
+internal fun Double.toRadians(): Double {
     var result = this
     if (this < 0)
         result = this + 360.0

@@ -28,7 +28,7 @@ class ThrowItemsBehavior(
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
     val projectileSpeed: Float = 1.6f,
-    val projectileRandomAngle: Double = 12.0,
+    val projectileAngularDiameter: Double = 12.0,
     val cooldown: Long = 3000L,
 ) : PathfinderComponent() {
     init {
@@ -43,7 +43,7 @@ class ThrowItemsBehavior(
         minThrowRad,
         yOffset,
         projectileSpeed,
-        projectileRandomAngle,
+        projectileAngularDiameter,
         cooldown,
     )
 }
