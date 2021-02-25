@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.mobs.types
 
+import com.mineinabyss.geary.ecs.GearyEntityId
 import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
@@ -16,7 +17,7 @@ class ProjectileEntity(
     type: NMSEntityType<*>,
     world: NMSWorld
 ) : EntitySnowball(type as EntityTypes<EntitySnowball>, world), CustomEntity {
-    override val gearyId: Int = Engine.getNextId()
+    override val gearyId: GearyEntityId = Engine.getNextId()
 
     override val nmsEntity: NMSSnowball get() = this
 

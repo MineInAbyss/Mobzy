@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.components.PrefabKey
 import com.mineinabyss.geary.ecs.components.addComponent
+import com.mineinabyss.geary.ecs.components.set
 import com.mineinabyss.geary.ecs.engine.Engine
 import com.mineinabyss.geary.ecs.engine.entity
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
@@ -103,7 +104,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                     repeat(cappedSpawns) {
                         Engine.entity {
-                            Engine.addEntityFor(gearyId, prefab.gearyId)
+                            set(prefab.gearyId) //TODO id | INSTANCEOF
                             addComponent(SpawnBukkit(player.location))
                         }
                     }

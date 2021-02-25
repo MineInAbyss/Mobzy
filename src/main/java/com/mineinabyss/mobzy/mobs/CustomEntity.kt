@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.GearyEntity
+import com.mineinabyss.geary.ecs.GearyEntityId
 import com.mineinabyss.geary.minecraft.store.geary
 import com.mineinabyss.geary.minecraft.store.get
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
@@ -25,7 +26,7 @@ import kotlin.random.Random
  */
 interface CustomEntity : GearyEntity, PersistentDataHolder {
     //TODO try to do this without getting the id via entity every time
-    override val gearyId: Int get() = geary(entity).gearyId
+    override val gearyId: GearyEntityId get() = geary(entity).gearyId
 
     val nmsEntity: NMSEntity
     val entity get() = nmsEntity.toBukkit()
