@@ -1,12 +1,12 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
 import com.mineinabyss.geary.minecraft.actions.SpawnEntityAction
-import com.mineinabyss.geary.minecraft.store.geary
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.mobzy.api.nms.entity.shootDirection
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
@@ -27,7 +27,9 @@ class ThrowItemsBehavior(
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
-    val cooldown: Long = 3000L
+    val projectileSpeed: Float = 1.6f,
+    val projectileAngularDiameter: Double = 12.0,
+    val cooldown: Long = 3000L,
 ) : PathfinderComponent() {
     init {
         if (!Snowball::class.java.isAssignableFrom(spawn.type.entityClass!!))
@@ -40,7 +42,9 @@ class ThrowItemsBehavior(
         minChaseRad,
         minThrowRad,
         yOffset,
-        cooldown
+        projectileSpeed,
+        projectileAngularDiameter,
+        cooldown,
     )
 }
 
@@ -55,9 +59,10 @@ class ThrowItemsGoal(
     private val spawn: SpawnEntityAction,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
-    private val yOffset: Double = 0.0,
-    //TODO val accuracy: Double,
-    cooldown: Long = 3000L
+    private val yOffset: Double,
+    private val speed: Float,
+    private val randomAngle: Double,
+    cooldown: Long = 3000L,
 ) : MobzyPathfinderGoal(cooldown = cooldown) {
     private var distance = 0.0
 
@@ -109,7 +114,7 @@ class ThrowItemsGoal(
             1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
         )
 
-        projectile.toNMS().shoot(dX, dY, dZ, 1.6f, 12.0f)
+        projectile.toNMS().shootDirection(dX, dY, dZ, speed, randomAngle)
 
         //TODO: Eventually have a standardized spawning system.
         // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
