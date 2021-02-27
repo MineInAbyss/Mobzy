@@ -10,6 +10,7 @@ import com.mineinabyss.geary.minecraft.store.gearyOrNull
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 
 object MobzyEventListener : Listener {
@@ -38,5 +39,10 @@ object MobzyEventListener : Listener {
         event(gearyEntity, "onTargetHit")
 
         gearyEntity.removeComponent<Target>()
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun EntityDamageEvent.onDamaged(){
+        event(gearyOrNull(entity), "onDamaged")
     }
 }
