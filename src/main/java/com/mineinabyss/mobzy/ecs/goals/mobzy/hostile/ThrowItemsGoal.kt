@@ -29,6 +29,7 @@ class ThrowItemsBehavior(
     val yOffset: Double = 0.0,
     val projectileSpeed: Float = 1.6f,
     val projectileAngularDiameter: Double = 12.0,
+    val projectileCountPerThrow: Int = 1,
     val cooldown: Long = 3000L,
 ) : PathfinderComponent() {
     init {
@@ -44,6 +45,7 @@ class ThrowItemsBehavior(
         yOffset,
         projectileSpeed,
         projectileAngularDiameter,
+        projectileCountPerThrow,
         cooldown,
     )
 }
@@ -62,6 +64,7 @@ class ThrowItemsGoal(
     private val yOffset: Double,
     private val speed: Float,
     private val randomAngle: Double,
+    private val count: Int,
     cooldown: Long = 3000L,
 ) : MobzyPathfinderGoal(cooldown = cooldown) {
     private var distance = 0.0
@@ -100,12 +103,16 @@ class ThrowItemsGoal(
         val location = mob.eyeLocation
         val (x, y, z) = location
 
-        val projectile = spawn.spawnAt(location.add(0.0, yOffset, 0.0)) as Snowball
+        repeat(count) {
+            val projectile = spawn.spawnAt(location.add(0.0, yOffset, 0.0)) as Snowball
 
-        val targetLoc = target.eyeLocation
-        val dX = targetLoc.x - x
-        val dY = targetLoc.y - y - 0.4
-        val dZ = targetLoc.z - z
+            val targetLoc = target.eyeLocation
+            val dX = targetLoc.x - x
+            val dY = targetLoc.y - y - 0.4
+            val dZ = targetLoc.z - z
+
+            projectile.toNMS().shootDirection(dX, dY, dZ, speed, randomAngle)
+        }
 
         world.playSound(
             mob.location,
@@ -113,8 +120,6 @@ class ThrowItemsGoal(
             1.0f,
             1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
         )
-
-        projectile.toNMS().shootDirection(dX, dY, dZ, speed, randomAngle)
 
         //TODO: Eventually have a standardized spawning system.
         // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
