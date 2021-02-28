@@ -1,11 +1,9 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.set
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.engine.entity
+import com.mineinabyss.geary.ecs.api.engine.Engine
+import com.mineinabyss.geary.ecs.api.engine.entity
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.ecs.entities.addPrefab
 import com.mineinabyss.geary.ecs.prefab.PrefabByReferenceSerializer
 import com.mineinabyss.geary.minecraft.components.SpawnBukkit
 import com.mineinabyss.mobzy.MobzyConfig
@@ -113,8 +111,8 @@ data class MobSpawn(
 
             Engine.entity {
                 //TODO id | INSTANCEOF
-                set(prefab.gearyId)
-                addComponent(SpawnBukkit(chosenLoc))
+                addPrefab(prefab)
+                set(SpawnBukkit(chosenLoc))
             }
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
             /*if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) { //length is actually the height, don't know why, it's just how it be

@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.api.engine.Engine
+import com.mineinabyss.geary.ecs.api.engine.entity
 import com.mineinabyss.geary.ecs.components.PrefabKey
-import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.set
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.engine.entity
+import com.mineinabyss.geary.ecs.entities.addPrefab
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.geary.minecraft.components.SpawnBukkit
 import com.mineinabyss.idofront.commands.arguments.booleanArg
@@ -104,8 +103,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                     repeat(cappedSpawns) {
                         Engine.entity {
-                            set(prefab.gearyId) //TODO id | INSTANCEOF
-                            addComponent(SpawnBukkit(player.location))
+                            addPrefab(prefab)
+                            set(SpawnBukkit(player.location))
                         }
                     }
                 }

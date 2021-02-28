@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.autoscan.AutoscanComponent
+import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributes
 import com.mineinabyss.mobzy.api.nms.typeinjection.set

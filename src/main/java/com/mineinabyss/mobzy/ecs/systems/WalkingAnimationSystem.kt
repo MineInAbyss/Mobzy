@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.ecs.systems
 
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.engine.forEach
-import com.mineinabyss.geary.ecs.systems.TickingSystem
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.ecs.api.systems.TickingSystem
+import com.mineinabyss.geary.ecs.api.systems.accessor
 import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
@@ -12,11 +12,14 @@ import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 
 object WalkingAnimationSystem : TickingSystem(interval = 10) {
-    override fun tick() = Engine.forEach<Model, BukkitEntity> { model, mob ->
-        if (mob !is Mob) return@forEach
+    private val model by accessor<Model>()
+    private val mob by accessor<BukkitEntity>()
+
+    override fun GearyEntity.tick() {
+        val mob = mob as? Mob ?: return
 
         val headItem = mob.toNMS().getEquipment(EnumItemSlot.HEAD)
-        val meta = CraftItemStack.getItemMeta(headItem) ?: return@forEach
+        val meta = CraftItemStack.getItemMeta(headItem) ?: return
         val modelId = meta.customModelData
         if (modelId != model.hitId) {
             if (mob.toNMS().mot.lengthSqr > 0.007) {
@@ -26,7 +29,6 @@ object WalkingAnimationSystem : TickingSystem(interval = 10) {
                 CraftItemStack.setItemMeta(headItem, meta.apply { setCustomModelData(model.id) })
         }
     }
-
 }
 
 //TODO move

@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.with
+import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.mobzy.api.nms.aliases.*
 import com.mineinabyss.mobzy.api.nms.player.addKillScore
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
@@ -62,7 +61,7 @@ interface CustomMob : CustomEntity {
             nmsWorld.broadcastEntityEffect(nmsEntity, 3.toByte())
             nmsEntity.pose = NMSEntityPose.DYING
             //TODO add PlaceHolderAPI support
-            get<DeathLoot>()?.deathCommands?.forEach {
+            geary(entity).get<DeathLoot>()?.deathCommands?.forEach {
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it)
             }
         }
@@ -73,7 +72,7 @@ interface CustomMob : CustomEntity {
         val heldItem = killer.inventory.itemInMainHand
         val looting = heldItem.enchantments[Enchantment.LOOT_BONUS_MOBS] ?: 0
         val fire = heldItem.enchantments[Enchantment.FIRE_ASPECT] ?: 0 > 0
-        with<DeathLoot> { deathLoot ->
+        geary(entity).with<DeathLoot> { deathLoot ->
             CraftEventFactory.callEntityDeathEvent(
                 nmsEntity,
                 deathLoot.drops.toList().map { it.chooseDrop(looting, fire) })

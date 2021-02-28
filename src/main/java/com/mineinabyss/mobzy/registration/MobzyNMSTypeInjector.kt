@@ -1,9 +1,9 @@
 package com.mineinabyss.mobzy.registration
 
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.ecs.api.systems.TickingSystem
+import com.mineinabyss.geary.ecs.api.systems.accessor
 import com.mineinabyss.geary.ecs.components.*
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.engine.forEach
-import com.mineinabyss.geary.ecs.systems.TickingSystem
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
@@ -24,9 +24,12 @@ import kotlin.collections.set
  */
 @Suppress("ObjectPropertyName")
 object MobzyNMSTypeInjector : TickingSystem() {
-    override fun tick() = Engine.forEach<MobzyTypeInjectionComponent, PrefabKey> { info, key ->
-        addComponent(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
-        removeComponent<MobzyTypeInjectionComponent>()
+    private val info by accessor<MobzyTypeInjectionComponent>()
+    private val key by accessor<PrefabKey>()
+
+    override fun GearyEntity.tick() {
+        set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
+        remove<MobzyTypeInjectionComponent>()
     }
 
     val typeNames get() = _types.keys.toList()
@@ -96,7 +99,6 @@ object MobzyNMSTypeInjector : TickingSystem() {
         "mobzy:passive" to ::PassiveMob,
         "mobzy:fish" to ::FishMob,
         "mobzy:npc" to ::NPC,
-        "mobzy:projectile" to ::ProjectileEntity,
     )
 
     fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {

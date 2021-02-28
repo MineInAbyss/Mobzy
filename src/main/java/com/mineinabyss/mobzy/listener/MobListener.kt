@@ -1,11 +1,9 @@
 package com.mineinabyss.mobzy.listener
 
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.with
-import com.mineinabyss.geary.minecraft.components.toBukkit
+import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.geary.minecraft.access.gearyOrNull
+import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
-import com.mineinabyss.geary.minecraft.store.get
-import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
@@ -59,7 +57,7 @@ object MobListener : Listener {
     /** Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect. */
     @EventHandler(ignoreCancelled = true)
     fun EntityDamageEvent.onHit() {
-        val gearyEntity = entity.toMobzy() ?: return
+        val gearyEntity = gearyOrNull(entity) ?: return
         val mob = entity as? LivingEntity ?: return
         val model = gearyEntity.get<Model>() ?: return
         model.hitId ?: return
@@ -119,7 +117,7 @@ object MobListener : Listener {
     /** Ride entities with [Rideable] component on right click. */
     @EventHandler
     fun PlayerRightClickEntityEvent.rideOnRightClick() {
-        if (entity.has<Rideable>())
+        if (geary(entity).has<Rideable>())
             entity.addPassenger(player)
     }
 
@@ -134,7 +132,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                entity.get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
+                geary(entity).get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
@@ -177,7 +175,7 @@ object MobListener : Listener {
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
     @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {
-        if (entered.has<PreventRiding>())
+        if (geary(entered).has<PreventRiding>())
             isCancelled = true
     }
 }

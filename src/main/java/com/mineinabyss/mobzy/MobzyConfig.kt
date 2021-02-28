@@ -1,8 +1,7 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.components.addComponents
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.engine.entity
+import com.mineinabyss.geary.ecs.api.engine.Engine
+import com.mineinabyss.geary.ecs.api.engine.entity
 import com.mineinabyss.geary.minecraft.components.SpawnBukkit
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
 import com.mineinabyss.idofront.config.IdofrontConfig
@@ -114,10 +113,8 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
                 //spawn a replacement entity and copy this entity's NBT over to it
                 Engine.entity {
                     decodeComponentsFrom(oldEntity.persistentDataContainer)
-                    addComponents(
-                        CopyNBT(NBTTagCompound().apply { oldEntity.toNMS().load(this) }),
-                        SpawnBukkit(oldEntity.location)
-                    )
+                    set(CopyNBT(NBTTagCompound().apply { oldEntity.toNMS().load(this) }))
+                    set(SpawnBukkit(oldEntity.location))
                 }
                 oldEntity.remove()
             }.count()

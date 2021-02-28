@@ -1,9 +1,6 @@
 package com.mineinabyss.mobzy.ecs.listeners
 
-import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.with
-import com.mineinabyss.geary.minecraft.components.toBukkit
+import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftLoadEvent
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
@@ -25,11 +22,11 @@ object MobzyECSListener : Listener {
         targets?.forEach { (priority, component) ->
             mob.toNMS().addTargetSelector(priority.toInt(), component.build(mob))
 
-            entity.addComponent(component)
+            entity.set(component)
         }
         goals?.forEach { (priority, component) ->
             mob.toNMS().addPathfinderGoal(priority.toInt(), component.build(mob))
-            entity.addComponent(component)
+            entity.set(component)
         }
     }
 

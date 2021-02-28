@@ -51,7 +51,7 @@ dependencies {
     compileOnly "org.spigotmc:spigot:$server_version" // NMS
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    compileOnly platform("com.mineinabyss:kotlinspice:1.4.10-10")
+    compileOnly platform("com.mineinabyss:kotlinspice:$kotlin_version+")
     compileOnly "com.okkero.skedule:skedule"
     compileOnly "org.nield:kotlin-statistics"
 

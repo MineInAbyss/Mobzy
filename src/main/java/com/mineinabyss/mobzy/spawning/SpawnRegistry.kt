@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.components.PrefabKey
-import com.mineinabyss.geary.ecs.components.get
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.mobzy

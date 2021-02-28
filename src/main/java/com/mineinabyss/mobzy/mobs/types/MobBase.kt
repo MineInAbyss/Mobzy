@@ -1,9 +1,9 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.geary.ecs.components.PrefabKey
-import com.mineinabyss.geary.ecs.components.get
+import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.store.encodeComponents
 import com.mineinabyss.mobzy.api.nms.aliases.*
+import com.mineinabyss.mobzy.api.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.mobs.CustomMob
@@ -32,7 +32,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun createPathfinders() = super.initPathfinder()
 
     final override fun saveData(nbttagcompound: NMSDataContainer) {
-        encodeComponents()
+        encodeComponents(geary(entity).getPersistingComponents())
         super.saveData(nbttagcompound)
     }
 
@@ -51,13 +51,15 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun die(damagesource: NMSDamageSource) = dieCustom(damagesource)
 
     private val scoreboardDisplayName =
-        NMSChatMessage(get<PrefabKey>()?.name?.split('_')?.joinToString(" ") { it.capitalize() })
+        //TODO make sure this is properly formatting entityType name
+        NMSChatMessage(nmsEntity.entityType.typeName.split('_').joinToString(" ") { it.capitalize() })
 
     override fun getScoreboardDisplayName() = scoreboardDisplayName
 
-    override fun getExpValue(entityhuman: NMSEntityHuman): Int = get<DeathLoot>()?.expToDrop() ?: this.expToDrop
+    override fun getExpValue(entityhuman: NMSEntityHuman): Int =
+        geary(entity).get<DeathLoot>()?.expToDrop() ?: this.expToDrop
 
-    override fun getSoundVolume(): Float = get<Sounds>()?.volume ?: super.getSoundVolume()
+    override fun getSoundVolume(): Float = geary(entity).get<Sounds>()?.volume ?: super.getSoundVolume()
     override fun getSoundAmbient(): NMSSound? = makeSound(super.getSoundAmbient()) { ambient }
     override fun getSoundDeath(): NMSSound? = makeSound(super.getSoundDeath()) { death }
     override fun getSoundSplash(): NMSSound? = makeSound(super.getSoundSplash()) { splash }
