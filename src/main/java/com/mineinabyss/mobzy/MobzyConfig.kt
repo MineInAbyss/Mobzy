@@ -82,7 +82,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * and create everything they need for them.
      */
     internal fun activateAddons() {
-        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
+//        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
         MobzyNMSTypeInjector.injectDefaultAttributes()
         SpawnTask.startTask()

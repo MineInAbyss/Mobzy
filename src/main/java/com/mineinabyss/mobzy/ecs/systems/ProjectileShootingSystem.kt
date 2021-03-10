@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.ecs.systems
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
-import com.mineinabyss.geary.ecs.api.systems.accessor
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
@@ -14,8 +13,8 @@ import org.bukkit.entity.Snowball
 import kotlin.random.Random
 
 class ProjectileShootingSystem : TickingSystem() {
-    val target by accessor<ProjectileShootAt>()
-    val entity by accessor<BukkitEntity>()
+    val target by get<ProjectileShootAt>()
+    val entity by get<BukkitEntity>()
 
     override fun GearyEntity.tick() {
         val loc = entity.location

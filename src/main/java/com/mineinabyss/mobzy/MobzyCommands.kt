@@ -1,11 +1,7 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.api.engine.Engine
-import com.mineinabyss.geary.ecs.api.engine.entity
 import com.mineinabyss.geary.ecs.components.PrefabKey
-import com.mineinabyss.geary.ecs.entities.addPrefab
-import com.mineinabyss.geary.ecs.prefab.PrefabManager
-import com.mineinabyss.geary.minecraft.components.SpawnBukkit
+import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -99,13 +95,10 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 playerAction {
                     val cappedSpawns = numOfSpawns.coerceAtMost(MobzyConfig.data.maxCommandSpawns)
-                    val prefab = PrefabManager[PrefabKey("mobzy", mobName)] ?: error("Prefab $mobName not found")
+                    val key = PrefabKey(mobzy.name, mobName)
 
                     repeat(cappedSpawns) {
-                        Engine.entity {
-                            addPrefab(prefab)
-                            set(SpawnBukkit(player.location))
-                        }
+                        player.location.spawnGeary(key) ?: error("Prefab $mobName not found")
                     }
                 }
             }

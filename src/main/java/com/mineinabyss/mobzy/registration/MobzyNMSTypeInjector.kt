@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
-import com.mineinabyss.geary.ecs.api.systems.accessor
 import com.mineinabyss.geary.ecs.components.*
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
 import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
@@ -24,8 +23,8 @@ import kotlin.collections.set
  */
 @Suppress("ObjectPropertyName")
 object MobzyNMSTypeInjector : TickingSystem() {
-    private val info by accessor<MobzyTypeInjectionComponent>()
-    private val key by accessor<PrefabKey>()
+    private val info by get<MobzyTypeInjectionComponent>()
+    private val key by get<PrefabKey>()
 
     override fun GearyEntity.tick() {
         set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))

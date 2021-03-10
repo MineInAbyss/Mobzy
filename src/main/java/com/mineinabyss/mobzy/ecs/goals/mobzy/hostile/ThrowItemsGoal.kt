@@ -10,7 +10,7 @@ import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.ProjectileShootAt
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
-import kotlinx.serialization.Contextual
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Creature
@@ -22,7 +22,7 @@ import kotlin.math.pow
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-    val spawn: List<@Contextual GearyComponent>,
+    val spawn: List<@Polymorphic GearyComponent>,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
@@ -46,7 +46,7 @@ class ThrowItemsBehavior(
  */
 class ThrowItemsGoal(
     override val mob: Creature,
-    private val spawn: List<@Contextual GearyComponent>,
+    private val spawn: List<@Polymorphic GearyComponent>,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
     private val yOffset: Double = 0.0,

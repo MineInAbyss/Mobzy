@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.ecs.systems
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
-import com.mineinabyss.geary.ecs.api.systems.accessor
 import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
 import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
@@ -12,8 +11,8 @@ import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 
 object WalkingAnimationSystem : TickingSystem(interval = 10) {
-    private val model by accessor<Model>()
-    private val mob by accessor<BukkitEntity>()
+    private val model by get<Model>()
+    private val mob by get<BukkitEntity>()
 
     override fun GearyEntity.tick() {
         val mob = mob as? Mob ?: return
