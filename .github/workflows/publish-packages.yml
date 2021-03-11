@@ -1,4 +1,4 @@
-name: Publish GitHub Packages
+name: Publish Packages
 
 on:
   push:
@@ -22,13 +22,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Package publish
-      - name: Publish to GitHub Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gradle publish
+      - name: Run gradle publish
+        run: gradle publish -PmineinabyssMavenUsername=${{ secrets.MAVEN_PUBLISH_USERNAME }} -PmineinabyssMavenPassword=${{ secrets.MAVEN_PUBLISH_PASSWORD }}
 
-      # Documentation publish
       - name: Generate Dokka
         run: gradle dokkaHtml
 
