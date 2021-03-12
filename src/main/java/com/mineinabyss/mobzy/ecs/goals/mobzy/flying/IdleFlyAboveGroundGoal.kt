@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
-import com.mineinabyss.mobzy.api.pathfindergoals.moveTo
+import com.mineinabyss.idofront.nms.pathfindergoals.moveTo
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

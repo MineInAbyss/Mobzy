@@ -8,9 +8,9 @@ import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomMob
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed

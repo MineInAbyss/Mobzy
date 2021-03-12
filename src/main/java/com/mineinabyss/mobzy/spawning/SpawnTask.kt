@@ -1,12 +1,12 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.idofront.messaging.color
+import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
+import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.creatureType
+import com.mineinabyss.idofront.nms.entity.keyName
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.api.isCustomEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.creatureType
-import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.SpawnTask.randomChunkSpawnNearby

@@ -1,9 +1,9 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
 import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
-import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributeBuilder
-import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributes
-import com.mineinabyss.mobzy.api.nms.typeinjection.set
+import com.mineinabyss.idofront.nms.typeinjection.NMSAttributeBuilder
+import com.mineinabyss.idofront.nms.typeinjection.NMSAttributes
+import com.mineinabyss.idofront.nms.typeinjection.set
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R2.GenericAttributes

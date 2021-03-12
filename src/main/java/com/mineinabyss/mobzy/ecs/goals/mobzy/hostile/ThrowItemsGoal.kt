@@ -3,10 +3,10 @@ package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 import com.mineinabyss.geary.ecs.api.GearyComponent
 import com.mineinabyss.geary.ecs.api.entities.createEntity
 import com.mineinabyss.geary.minecraft.components.SpawnBukkit
-import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
-import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
-import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
-import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
+import com.mineinabyss.idofront.nms.entity.distanceSqrTo
+import com.mineinabyss.idofront.nms.pathfindergoals.doneNavigating
+import com.mineinabyss.idofront.nms.pathfindergoals.moveToEntity
+import com.mineinabyss.idofront.nms.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.ProjectileShootAt
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal

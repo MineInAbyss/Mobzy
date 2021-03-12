@@ -1,9 +1,9 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.minecraft.access.geary
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSSound
-import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
+import com.mineinabyss.idofront.nms.aliases.NMSEntity
+import com.mineinabyss.idofront.nms.aliases.NMSSound
+import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import org.bukkit.SoundCategory
 import org.bukkit.persistence.PersistentDataContainer

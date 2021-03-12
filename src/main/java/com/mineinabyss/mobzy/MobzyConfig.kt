@@ -8,9 +8,9 @@ import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
 import com.mineinabyss.mobzy.mobs.CustomEntity

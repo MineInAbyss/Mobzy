@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.initialization.pathfinding
 
-import com.mineinabyss.mobzy.api.nms.aliases.NMSPathfinderGoal
+import com.mineinabyss.idofront.nms.aliases.NMSPathfinderGoal
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Mob
 

@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.components.PrefabKey
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_REGIONS
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns

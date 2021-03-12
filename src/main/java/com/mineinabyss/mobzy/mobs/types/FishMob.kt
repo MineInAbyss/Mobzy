@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mieninabyss.mobzy.processor.GenerateFromBase
-import com.mineinabyss.mobzy.api.nms.aliases.*
+import com.mineinabyss.idofront.nms.aliases.*
 import net.minecraft.server.v1_16_R2.EntityFishSchool
 import org.bukkit.entity.HumanEntity
 

@@ -3,8 +3,8 @@ package com.mineinabyss.mobzy.ecs.systems
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
-import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.aliases.BukkitEntity
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
 
 /**

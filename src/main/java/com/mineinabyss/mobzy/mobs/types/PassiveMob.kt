@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mieninabyss.mobzy.processor.GenerateFromBase
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSWorld
 import net.minecraft.server.v1_16_R2.EntityAgeable
 import net.minecraft.server.v1_16_R2.EntityAnimal
 import net.minecraft.server.v1_16_R2.WorldServer

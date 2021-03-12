@@ -5,8 +5,8 @@ import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
-import com.mineinabyss.mobzy.api.nms.aliases.BukkitEntity
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.aliases.BukkitEntity
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.interaction.ProjectileShootAt
 import org.bukkit.Sound
 import org.bukkit.entity.Snowball

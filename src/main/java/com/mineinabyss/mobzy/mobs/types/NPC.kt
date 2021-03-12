@@ -1,11 +1,11 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
-import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
-import com.mineinabyss.mobzy.api.nms.entity.typeName
-import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
+import com.mineinabyss.idofront.nms.aliases.NMSEntity
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSWorld
+import com.mineinabyss.idofront.nms.aliases.toBukkit
+import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.idofront.nms.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LookAtPlayerBehavior
 import net.minecraft.server.v1_16_R2.DamageSource
 import net.minecraft.server.v1_16_R2.EnumMoveType

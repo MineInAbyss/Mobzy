@@ -4,8 +4,8 @@ import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.minecraft.access.BukkitEntityAccess
 import com.mineinabyss.geary.minecraft.components.SpawnBukkit
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.spawnEntity
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.spawnEntity
 import org.bukkit.event.entity.CreatureSpawnEvent
 
 class SpawnFromNMSTypeSystem : TickingSystem() {

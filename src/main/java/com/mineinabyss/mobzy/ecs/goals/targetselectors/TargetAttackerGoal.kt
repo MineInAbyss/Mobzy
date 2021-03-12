@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
 import com.mineinabyss.geary.minecraft.access.geary
-import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
+import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal

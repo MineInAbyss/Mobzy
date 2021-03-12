@@ -6,10 +6,10 @@ import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.entities.addPrefab
 import com.mineinabyss.geary.ecs.prefab.PrefabByReferenceSerializer
 import com.mineinabyss.geary.minecraft.components.SpawnBukkit
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.creatureType
 import com.mineinabyss.mobzy.MobzyConfig
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.creatureType
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp

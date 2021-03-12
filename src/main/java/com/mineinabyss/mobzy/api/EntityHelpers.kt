@@ -1,11 +1,8 @@
-@file:JvmMultifileClass
-@file:JvmName("MobzyAPI")
-
 package com.mineinabyss.mobzy.api
 
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.typeName
+import com.mineinabyss.idofront.nms.aliases.NMSEntity
+import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.CustomMob
 import com.mineinabyss.mobzy.registration.toEntityTypeName

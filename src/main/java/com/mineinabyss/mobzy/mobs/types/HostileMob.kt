@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mieninabyss.mobzy.processor.GenerateFromBase
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.ecs.goals.minecraft.*

@@ -3,11 +3,11 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.ecs.components.*
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
-import com.mineinabyss.mobzy.api.nms.entity.keyName
-import com.mineinabyss.mobzy.api.nms.typeinjection.*
+import com.mineinabyss.idofront.nms.aliases.NMSEntity
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSWorld
+import com.mineinabyss.idofront.nms.entity.keyName
+import com.mineinabyss.idofront.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyTypeInjectionComponent
 import com.mineinabyss.mobzy.mobs.types.*

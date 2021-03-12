@@ -2,8 +2,8 @@ package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.store.encodeComponents
-import com.mineinabyss.mobzy.api.nms.aliases.*
-import com.mineinabyss.mobzy.api.nms.entity.typeName
+import com.mineinabyss.idofront.nms.aliases.*
+import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.mobs.CustomMob
