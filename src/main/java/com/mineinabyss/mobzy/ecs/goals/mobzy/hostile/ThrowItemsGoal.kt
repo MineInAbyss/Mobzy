@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
 import com.mineinabyss.geary.ecs.api.GearyComponent
 import com.mineinabyss.geary.ecs.api.entities.createEntity
-import com.mineinabyss.geary.minecraft.components.SpawnBukkit
+import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.idofront.nms.pathfindergoals.doneNavigating
 import com.mineinabyss.idofront.nms.pathfindergoals.moveToEntity
@@ -85,8 +85,8 @@ class ThrowItemsGoal(
 
     /** Throws the mob's defined item at the [target]*/
     private fun throwItem(target: LivingEntity) {
+        mob.eyeLocation.spawnGeary(spawn.createEntity())
         spawn.createEntity().apply {
-            set(SpawnBukkit(mob.eyeLocation.add(0.0, yOffset, 0.0)))
             set(ProjectileShootAt(target.eyeLocation))
         }
     }

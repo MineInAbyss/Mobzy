@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.api.engine.Engine
-import com.mineinabyss.geary.ecs.api.engine.entity
-import com.mineinabyss.geary.minecraft.components.SpawnBukkit
+import com.mineinabyss.geary.ecs.components.PrefabKey
+import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
 import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.idofront.config.ReloadScope
@@ -111,10 +111,10 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
                 it.scoreboardTags.contains(CustomEntity.ENTITY_VERSION) && !it.isCustomEntity
             }.onEach { oldEntity ->
                 //spawn a replacement entity and copy this entity's NBT over to it
-                Engine.entity {
+                val prefab = geary(oldEntity).get<PrefabKey>() ?: return@onEach //TODO handle better or error
+                geary(oldEntity.location.spawnGeary(prefab) ?: return@onEach) {
                     decodeComponentsFrom(oldEntity.persistentDataContainer)
                     set(CopyNBT(NBTTagCompound().apply { oldEntity.toNMS().load(this) }))
-                    set(SpawnBukkit(oldEntity.location))
                 }
                 oldEntity.remove()
             }.count()

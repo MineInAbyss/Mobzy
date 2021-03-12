@@ -1,11 +1,8 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.ecs.api.engine.Engine
-import com.mineinabyss.geary.ecs.api.engine.entity
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.entities.addPrefab
 import com.mineinabyss.geary.ecs.prefab.PrefabByReferenceSerializer
-import com.mineinabyss.geary.minecraft.components.SpawnBukkit
+import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.creatureType
@@ -109,11 +106,7 @@ data class MobSpawn(
                 getSpawnInRadius(loc, radius) ?: loc
             else loc
 
-            Engine.entity {
-                //TODO id | INSTANCEOF
-                addPrefab(prefab)
-                set(SpawnBukkit(chosenLoc))
-            }
+            chosenLoc.spawnGeary(prefab)
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
             /*if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) { //length is actually the height, don't know why, it's just how it be
                 MobzyAPI.debug(ChatColor.YELLOW + "Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");
