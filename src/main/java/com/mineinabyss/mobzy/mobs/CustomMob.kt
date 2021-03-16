@@ -24,7 +24,6 @@ import org.bukkit.entity.Mob
  * @property killScore The score with which a player should be rewarded with when the current entity is killed.
  */
 interface CustomMob : CustomEntity {
-
     override val nmsEntity: NMSEntityInsentient
     override val entity: Mob
 
@@ -35,9 +34,6 @@ interface CustomMob : CustomEntity {
 
     /** Drops the correct amount of EXP from death at this entity's location. */
     fun dropExp()
-
-    /** Called when a player interacts with this entity. */
-    fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult
 
     /** Custom logic for what happens when this entity dies. Override the NMS die method with this. */
     fun dieCustom(damageSource: NMSDamageSource?) {
@@ -76,7 +72,6 @@ interface CustomMob : CustomEntity {
             CraftEventFactory.callEntityDeathEvent(
                 nmsEntity,
                 deathLoot.drops.toList().map { it.chooseDrop(looting, fire) })
-            deathLoot.expToDrop()?.let { nmsEntity.expToDrop = it }
         }
         dropExp()
     }

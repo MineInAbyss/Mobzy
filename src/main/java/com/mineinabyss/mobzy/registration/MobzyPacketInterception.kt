@@ -46,6 +46,15 @@ object MobzyPacketInterception {
                         pitch = 0
                 }
             }
+
+            //TODO if entity has custom sound effects component, prevent entity sound packets
+            // Uncomment when new sound system is ready
+            /*onSend(Server.ENTITY_SOUND) {
+                PacketEntitySoundEffect(packet).apply {
+                    if(gearyOrNull(entity(entityId))?.has<Sounds>() == true)
+                        isCancelled = true
+                }
+            }*/
         }
     }
 }

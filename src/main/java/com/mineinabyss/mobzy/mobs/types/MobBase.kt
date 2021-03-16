@@ -1,14 +1,11 @@
 package com.mineinabyss.mobzy.mobs.types
 
 import com.mineinabyss.geary.minecraft.access.geary
-import com.mineinabyss.geary.minecraft.store.encodeComponents
 import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.CustomMob
-import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Mob
 
 /**
@@ -32,33 +29,14 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override fun initPathfinder() = createPathfinders()
     override fun createPathfinders() = super.initPathfinder()
 
-    final override fun saveData(nbttagcompound: NMSDataContainer) {
-        encodeComponents(geary(entity).getPersistingComponents())
-        super.saveData(nbttagcompound)
-    }
-
-    final override fun loadData(nbttagcompound: NMSDataContainer) {
-        //TODO Not sure if we should load components here considering they already get loaded on init
-//        decodeComponents()
-        super.loadData(nbttagcompound)
-    }
-
-    final override fun b(entityhuman: NMSEntityHuman, enumhand: NMSHand): NMSInteractionResult =
-        onPlayerInteract(entityhuman.toBukkit(), enumhand)
-
-    override fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult =
-        super.b(player.toNMS(), enumhand)
-
     override fun die(damagesource: NMSDamageSource) = dieCustom(damagesource)
 
     private val scoreboardDisplayName =
         //TODO make sure this is properly formatting entityType name
         NMSChatMessage(nmsEntity.entityType.typeName.split('_').joinToString(" ") { it.capitalize() })
 
+    //TODO if we can override the name in the entity type, this will read it from there
     override fun getScoreboardDisplayName() = scoreboardDisplayName
-
-    override fun getExpValue(entityhuman: NMSEntityHuman): Int =
-        geary(entity).get<DeathLoot>()?.expToDrop() ?: this.expToDrop
 
     override fun getSoundVolume(): Float = geary(entity).get<Sounds>()?.volume ?: super.getSoundVolume()
     override fun getSoundAmbient(): NMSSound? = makeSound(super.getSoundAmbient()) { ambient }
