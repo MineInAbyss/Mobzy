@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.registration
 
 import com.comphenix.protocol.PacketType.Play.Server
-import com.mineinabyss.geary.ecs.components.GearyPrefab
+import com.mineinabyss.geary.ecs.components.CopyToInstances
 import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.mobzy
@@ -25,7 +25,7 @@ object MobzyPacketInterception {
 
             onSend(Server.SPAWN_ENTITY) {
                 PacketSpawnEntity(packet).apply{
-                    geary(entity(entityId)).with<GearyPrefab>{
+                    geary(entity(entityId)).with<CopyToInstances>{
                         //FIXME ProtocolBurrito doesn't work because of an NMS inconsistency here
                         //TODO make a component to allow overriding the type here
                         packet.entityTypeModifier.write(0, EntityType.SNOWBALL)
