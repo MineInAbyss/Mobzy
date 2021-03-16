@@ -82,6 +82,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * and create everything they need for them.
      */
     internal fun activateAddons() {
+        //FIXME recursively deserializing something here I think (thread freezes forever)
 //        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
         MobzyNMSTypeInjector.injectDefaultAttributes()
@@ -105,6 +106,8 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * them with the equivalent custom mob, transferring over the data.
      */
     private fun fixEntitiesAfterReload() {
+        val customEntityClass = CustomEntity::class.qualifiedName
+
         val num = Bukkit.getServer().worlds.map { world ->
             world.entities.filter {
                 //is a custom mob but the nms entity is no longer an instance of CustomMob (likely due to a reload)
@@ -114,7 +117,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
                 val prefab = geary(oldEntity).get<PrefabKey>() ?: return@onEach //TODO handle better or error
                 geary(oldEntity.location.spawnGeary(prefab) ?: return@onEach) {
                     decodeComponentsFrom(oldEntity.persistentDataContainer)
-                    set(CopyNBT(NBTTagCompound().apply { oldEntity.toNMS().load(this) }))
+                    set(CopyNBT(NBTTagCompound().apply { oldEntity.toNMS().save(this) }))
                 }
                 oldEntity.remove()
             }.count()

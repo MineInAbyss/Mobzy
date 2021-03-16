@@ -28,6 +28,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
 
     override fun GearyEntity.tick() {
         set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
+        //TODO concurrent modification exception
         remove<MobzyTypeInjectionComponent>()
     }
 

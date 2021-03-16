@@ -19,7 +19,7 @@ class CopyNBTSystem : TickingSystem() {
     private val entity by get<BukkitEntity>()
 
     override fun GearyEntity.tick() {
-        entity.toNMS().save(nbt.compound)
+        entity.toNMS().load(nbt.compound)
         decodeComponentsFrom(entity.persistentDataContainer)
         remove<CopyNBT>()
     }

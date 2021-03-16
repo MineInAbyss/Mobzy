@@ -6,6 +6,7 @@ import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.CustomMob
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Mob
@@ -66,4 +67,8 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun getSoundSwim(): NMSSound? = makeSound(super.getSoundSwim()) { swim }
     override fun getSoundHurt(damagesource: NMSDamageSource): NMSSound? =
         makeSound(super.getSoundHurt(damagesource)) { hurt }
+
+    init {
+        entity.addScoreboardTag(CustomEntity.ENTITY_VERSION)
+    }
 }
