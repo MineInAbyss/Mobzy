@@ -25,7 +25,7 @@ class ProjectileShootingSystem : TickingSystem() {
         val dY = targetLoc.y - y - 0.4
         val dZ = targetLoc.z - z
 
-        loc.world.playSound(
+        loc.world?.playSound(
             loc,
             Sound.ENTITY_SNOW_GOLEM_SHOOT,
             1.0f,

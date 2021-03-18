@@ -183,6 +183,7 @@ object MobListener : Listener {
             isCancelled = true
     }
 
+    //TODO this is not currently working
     @EventHandler
     fun EntityDeathEvent.setExpOnDeath(){
         val gearyEntity = gearyOrNull(entity) ?: return

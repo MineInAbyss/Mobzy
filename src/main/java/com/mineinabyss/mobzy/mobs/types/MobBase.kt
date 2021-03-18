@@ -23,7 +23,6 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override val entity: Mob get() = this.toBukkit()
 
     override val killScore: Int get() = aO
-    override fun dropExp() = dropExperience()
 
     //TODO option to inherit pathfinders from a group
     final override fun initPathfinder() = createPathfinders()

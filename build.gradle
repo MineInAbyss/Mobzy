@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:$server_version"
-    compileOnly "org.spigotmc:spigot:$server_version" // NMS
+    compileOnly "com.destroystokyo.paper:paper:$server_version" // NMS
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     compileOnly platform("com.mineinabyss:kotlinspice:$kotlin_version+")

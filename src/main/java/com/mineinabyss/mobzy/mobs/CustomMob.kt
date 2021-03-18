@@ -32,9 +32,6 @@ interface CustomMob : CustomEntity {
     /** A function to implement pathfinders that should be added to all entities of this type. */
     fun createPathfinders()
 
-    /** Drops the correct amount of EXP from death at this entity's location. */
-    fun dropExp()
-
     /** Custom logic for what happens when this entity dies. Override the NMS die method with this. */
     fun dieCustom(damageSource: NMSDamageSource?) {
         val nmsWorld: NMSWorld = entity.world.toNMS()
@@ -73,6 +70,5 @@ interface CustomMob : CustomEntity {
                 nmsEntity,
                 deathLoot.drops.toList().map { it.chooseDrop(looting, fire) })
         }
-        dropExp()
     }
 }

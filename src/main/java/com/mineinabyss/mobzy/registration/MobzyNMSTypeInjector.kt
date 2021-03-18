@@ -76,7 +76,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
         name: String,
         prefabInfo: MobzyTypeInjectionComponent,
         attributes: MobAttributes = MobAttributes()
-    ): EntityTypes<*> {
+    ): NMSEntityType<*> {
         val init = mobBaseClasses[prefabInfo.baseClass] ?: error("Not a valid parent class: ${prefabInfo.baseClass}")
         val mobID = name.toEntityTypeName()
         val injected: NMSEntityType<Entity> =
