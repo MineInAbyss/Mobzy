@@ -7,9 +7,6 @@ import net.minecraft.server.v1_16_R2.EntityAgeable
 import net.minecraft.server.v1_16_R2.EntityAnimal
 import net.minecraft.server.v1_16_R2.WorldServer
 
-/**
- * Originally based off EntityPig
- */
 @GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
 open class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {
     override fun createPathfinders() {

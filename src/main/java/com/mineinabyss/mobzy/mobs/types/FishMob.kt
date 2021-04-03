@@ -4,9 +4,6 @@ import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.idofront.nms.aliases.*
 import net.minecraft.server.v1_16_R2.EntityFishSchool
 
-/**
- * Lots of code taken from the EntityGhast class for flying mobs
- */
 @GenerateFromBase(base = MobBase::class, createFor = [EntityFishSchool::class])
 open class FishMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFishSchool(world, type) {
     //bucket you get from picking up fish (we disable this interaction anyways)

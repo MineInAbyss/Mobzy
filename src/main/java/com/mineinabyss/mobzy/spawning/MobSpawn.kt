@@ -69,7 +69,7 @@ data class MobSpawn(
     @Transient
     val copyFrom: MobSpawn? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
-    val prefab: GearyEntity by getOrCopy() { _prefab } ?: error("Mob must not be null")
+    val prefab: GearyEntity by getOrCopy { _prefab } ?: error("Mob must not be null")
     val minAmount: Int by getOrCopy { _minAmount } ?: 1
     val maxAmount: Int by getOrCopy { _maxAmount } ?: 1
     val radius: Double by getOrCopy { _radius } ?: 0.0

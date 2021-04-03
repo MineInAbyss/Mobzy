@@ -150,7 +150,7 @@ object SpawnTask {
                         distanceSquared(newX, newZ, entityChunk.x, entityChunk.z) <
                                 (MobzyConfig.data.minChunkSpawnRad * MobzyConfig.data.minChunkSpawnRad)
                     }) {
-                    val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())
+                    val newChunk = chunk.world.getChunkAt(newX, newZ)
                     if (!newChunk.isLoaded) continue
                     return ChunkSpawn(newChunk, 0, 255)
                 }

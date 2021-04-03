@@ -31,7 +31,7 @@ internal fun Command.createDebugCommands() {
     "benchmark" {
         "nearby" {
             val rad by intArg()
-            val i by intArg() { default = 10000 }
+            val i by intArg { default = 10000 }
             playerAction {
                 measureTimeMillis {
                     val rad = rad.toDouble()
