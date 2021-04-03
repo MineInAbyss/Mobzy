@@ -1,16 +1,24 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.components.Expiry
+import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import kotlin.system.measureTimeMillis
 
 internal fun Command.createDebugCommands() {
+    "expire" {
+        playerAction {
+            geary(player.getNearbyEntities(5.0, 5.0, 5.0).first()).setRelationWithData<Expiry, Model>(Expiry(3000))
+        }
+    }
     "pdc" {
         playerAction {
             sender.sendMessage(
@@ -31,7 +39,6 @@ internal fun Command.createDebugCommands() {
                         player.getNearbyEntities(rad, rad, rad).count()
                     }
                 }.broadcastVal("Took: ")
-
             }
         }
 
