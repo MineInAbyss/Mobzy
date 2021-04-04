@@ -1,29 +1,31 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
-import com.mineinabyss.geary.minecraft.actions.SpawnEntityAction
-import com.mineinabyss.idofront.destructure.component1
-import com.mineinabyss.idofront.destructure.component2
-import com.mineinabyss.idofront.destructure.component3
+import com.mineinabyss.geary.ecs.api.GearyComponent
+import com.mineinabyss.geary.ecs.api.entities.createEntity
+import com.mineinabyss.geary.minecraft.spawnGeary
+import com.mineinabyss.idofront.nms.entity.distanceSqrTo
+import com.mineinabyss.idofront.nms.pathfindergoals.doneNavigating
+import com.mineinabyss.idofront.nms.pathfindergoals.moveToEntity
+import com.mineinabyss.idofront.nms.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.shootDirection
 import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
 import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
 import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.Sound
-import org.bukkit.entity.*
+import org.bukkit.entity.Creature
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
 import kotlin.math.min
 import kotlin.math.pow
-import kotlin.random.Random
 
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-    val spawn: SpawnEntityAction = SpawnEntityAction(EntityType.SNOWBALL),
+    val spawn: List<@Polymorphic GearyComponent>,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
@@ -32,11 +34,6 @@ class ThrowItemsBehavior(
     val projectileCountPerThrow: Int = 1,
     val cooldown: Long = 3000L,
 ) : PathfinderComponent() {
-    init {
-        if (!Snowball::class.java.isAssignableFrom(spawn.type.entityClass!!))
-            error("Thrown entity must be a subclass of Snowball!")
-    }
-
     override fun build(mob: Mob) = ThrowItemsGoal(
         (mob as Creature),
         spawn,
@@ -58,7 +55,7 @@ class ThrowItemsBehavior(
  */
 class ThrowItemsGoal(
     override val mob: Creature,
-    private val spawn: SpawnEntityAction,
+    private val spawn: List<@Polymorphic GearyComponent>,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
     private val yOffset: Double,
@@ -99,31 +96,12 @@ class ThrowItemsGoal(
 
     /** Throws the mob's defined item at the [target]*/
     private fun throwItem(target: LivingEntity) {
-        val world = mob.location.world ?: return
-        val location = mob.eyeLocation
-        val (x, y, z) = location
+        mob.eyeLocation.spawnGeary(spawn.createEntity())
 
         repeat(count) {
-            val projectile = spawn.spawnAt(location.add(0.0, yOffset, 0.0)) as Snowball
-
-            val targetLoc = target.eyeLocation
-            val dX = targetLoc.x - x
-            val dY = targetLoc.y - y - 0.4
-            val dZ = targetLoc.z - z
-
-            projectile.toNMS().shootDirection(dX, dY, dZ, speed, randomAngle)
+            spawn.createEntity().apply {
+                set(ProjectileShootAt(target.eyeLocation, speed, randomAngle))
+            }
         }
-
-        world.playSound(
-            mob.location,
-            Sound.ENTITY_SNOW_GOLEM_SHOOT,
-            1.0f,
-            1.0f / (Random.nextDouble(0.8, 1.2).toFloat())
-        )
-
-        //TODO: Eventually have a standardized spawning system.
-        // Cannot use the logic in location.spawnEntity though, that doesn't work for projectiles.
-        // It needs to get added to the world like this.
-//        world.toNMS().addEntity(projectile)
     }
 }

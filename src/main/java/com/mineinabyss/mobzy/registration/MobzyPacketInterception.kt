@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.registration
 
 import com.comphenix.protocol.PacketType.Play.Server
-import com.mineinabyss.geary.ecs.types.GearyEntityType
-import com.mineinabyss.geary.minecraft.store.with
+import com.mineinabyss.geary.ecs.components.CopyToInstances
+import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
@@ -25,7 +25,7 @@ object MobzyPacketInterception {
 
             onSend(Server.SPAWN_ENTITY) {
                 PacketSpawnEntity(packet).apply{
-                    entity(entityId).with<GearyEntityType>{
+                    geary(entity(entityId)).with<CopyToInstances>{
                         //FIXME ProtocolBurrito doesn't work because of an NMS inconsistency here
                         //TODO make a component to allow overriding the type here
                         packet.entityTypeModifier.write(0, EntityType.SNOWBALL)
@@ -46,6 +46,15 @@ object MobzyPacketInterception {
                         pitch = 0
                 }
             }
+
+            //TODO if entity has custom sound effects component, prevent entity sound packets
+            // Uncomment when new sound system is ready
+            /*onSend(Server.ENTITY_SOUND) {
+                PacketEntitySoundEffect(packet).apply {
+                    if(gearyOrNull(entity(entityId))?.has<Sounds>() == true)
+                        isCancelled = true
+                }
+            }*/
         }
     }
 }

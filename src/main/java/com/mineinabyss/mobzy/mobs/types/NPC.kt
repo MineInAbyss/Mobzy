@@ -1,12 +1,11 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.types.GearyEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
-import com.mineinabyss.mobzy.api.nms.aliases.toBukkit
-import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
+import com.mineinabyss.idofront.nms.aliases.NMSEntity
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSWorld
+import com.mineinabyss.idofront.nms.aliases.toBukkit
+import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.idofront.nms.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LookAtPlayerBehavior
 import net.minecraft.server.v1_16_R2.DamageSource
 import net.minecraft.server.v1_16_R2.EnumMoveType
@@ -28,7 +27,8 @@ class NPC(type: NMSEntityType<*>, world: NMSWorld) : PassiveMob(type, world) {
     }
 
     init {
-        entity.customName = get<GearyEntityType>()?.name?.capitalize()
+        //TODO CustomName component perhaps?
+        entity.customName = nmsEntity.entityType.typeName
         customNameVisible = true
         isInvulnerable = true
         entity.removeWhenFarAway = false

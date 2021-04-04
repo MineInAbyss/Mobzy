@@ -1,12 +1,9 @@
 package com.mineinabyss.mobzy.ecs.listeners
 
-import com.mineinabyss.geary.ecs.components.addComponent
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.with
-import com.mineinabyss.geary.minecraft.components.toBukkit
+import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftLoadEvent
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.ecs.components.initialization.ItemModel
@@ -23,13 +20,13 @@ object MobzyECSListener : Listener {
         val (targets, goals) = entity.get<Pathfinders>() ?: return
 
         targets?.forEach { (priority, component) ->
-            mob.toNMS().addTargetSelector(priority.toInt(), component.build(mob))
+            mob.toNMS().addTargetSelector(priority.toInt(), component)
 
-            entity.addComponent(component)
+            entity.set(component)
         }
         goals?.forEach { (priority, component) ->
-            mob.toNMS().addPathfinderGoal(priority.toInt(), component.build(mob))
-            entity.addComponent(component)
+            mob.toNMS().addPathfinderGoal(priority.toInt(), component)
+            entity.set(component)
         }
     }
 

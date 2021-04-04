@@ -1,6 +1,3 @@
-@file:JvmMultifileClass
-@file:JvmName("MobzyAPI")
-
 package com.mineinabyss.mobzy.api
 
 import com.mineinabyss.mobzy.MobzyAddon

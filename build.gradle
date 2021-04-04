@@ -6,7 +6,6 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlin.kapt'
-    id 'io.github.0ffz.github-packages' version '1.2.0'
     id "com.github.ben-manes.versions" version "0.36.0"
     id "org.jetbrains.dokka" version "1.4.20"
 }
@@ -37,27 +36,22 @@ repositories {
     maven { url 'https://erethon.de/repo/' } //HeadLib
     maven { url "https://repo.dmulloy2.net/nexus/repository/public/" } //ProtocolLib
     maven { url 'https://maven.sk89q.com/repo/' } //WorldGuard/Edit
-    maven { url 'http://nexus.okkero.com/repository/maven-releases/' } //Skedule
-    maven githubPackage.invoke("MineInAbyss/Idofront")
-    maven githubPackage.invoke("MineInAbyss/Guiy")
-    maven githubPackage.invoke("MineInAbyss/Geary")
-    maven githubPackage.invoke("MineInAbyss/KotlinSpice")
-    maven githubPackage.invoke("MineInAbyss/ProtocolBurrito")
-    mavenLocal()
+    maven { url 'https://repo.mineinabyss.com/releases'}
+    maven { url 'https://jitpack.io' }
+//    mavenLocal()
 }
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:$server_version"
-    compileOnly "org.spigotmc:spigot:$server_version" // NMS
+    compileOnly "com.destroystokyo.paper:paper:$server_version" // NMS
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    compileOnly platform("com.mineinabyss:kotlinspice:1.4.10-10")
-    compileOnly "com.okkero.skedule:skedule"
+    compileOnly platform("com.mineinabyss:kotlinspice:$kotlin_version+")
+    compileOnly "com.github.okkero:skedule"
     compileOnly "org.nield:kotlin-statistics"
-
-    implementation "com.mineinabyss:idofront:0.5.5"
-    compileOnly "com.mineinabyss:geary-spigot:0.2.25"
-    compileOnly "com.mineinabyss:protocolburrito:0.1.10"
+    implementation "com.mineinabyss:idofront-nms:0.5.8"
+    compileOnly "com.mineinabyss:geary-spigot:0.3.27"
+    compileOnly "com.mineinabyss:protocolburrito:0.1.12"
 
     compileOnly "de.erethon:headlib:3.0.2"
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.2"
@@ -82,10 +76,16 @@ build.dependsOn shadowJar
 
 publishing {
     repositories {
-        maven githubPackagePublish.invoke("MineInAbyss/Mobzy")
+        maven {
+            url = "https://repo.mineinabyss.com/releases"
+            credentials {
+                username = findProperty('mineinabyssMavenUsername')
+                password = findProperty('mineinabyssMavenPassword')
+            }
+        }
     }
     publications {
-        gpr(MavenPublication) {
+        maven(MavenPublication) {
             from components.java
         }
     }

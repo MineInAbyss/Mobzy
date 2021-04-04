@@ -1,13 +1,14 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
 import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
-import com.mineinabyss.idofront.serialization.SerializableItemStack
+import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("mobzy:item_model")
+@SerialName("mobzy:type")
 @AutoscanComponent
-data class ItemModel(
-    val item: SerializableItemStack
+class MobzyTypeInjectionComponent(
+    val baseClass: String,
+    val creatureType: NMSCreatureType,
 )

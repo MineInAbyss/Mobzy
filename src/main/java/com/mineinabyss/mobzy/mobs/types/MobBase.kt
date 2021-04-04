@@ -1,14 +1,11 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.engine.Engine
-import com.mineinabyss.geary.ecs.types.GearyEntityType
-import com.mineinabyss.geary.minecraft.store.encodeComponents
-import com.mineinabyss.mobzy.api.nms.aliases.*
+import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.idofront.nms.aliases.*
+import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.CustomMob
-import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Mob
 
 /**
@@ -22,49 +19,33 @@ import org.bukkit.entity.Mob
  * @property scoreboardDisplayName Used to change the name displayed in the death message.
  */
 abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
-    final override val gearyId: Int = Engine.getNextId()
-
     final override val nmsEntity: NMSEntityInsentient get() = this
     final override val entity: Mob get() = this.toBukkit()
 
     override val killScore: Int get() = aO
-    override fun dropExp() = dropExperience()
 
     //TODO option to inherit pathfinders from a group
     final override fun initPathfinder() = createPathfinders()
     override fun createPathfinders() = super.initPathfinder()
 
-    final override fun saveData(nbttagcompound: NMSDataContainer) {
-        encodeComponents()
-        super.saveData(nbttagcompound)
-    }
-
-    final override fun loadData(nbttagcompound: NMSDataContainer) {
-        //TODO Not sure if we should load components here considering they already get loaded on init
-//        decodeComponents()
-        super.loadData(nbttagcompound)
-    }
-
-    final override fun b(entityhuman: NMSEntityHuman, enumhand: NMSHand): NMSInteractionResult =
-        onPlayerInteract(entityhuman.toBukkit(), enumhand)
-
-    override fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult =
-        super.b(player.toNMS(), enumhand)
-
     override fun die(damagesource: NMSDamageSource) = dieCustom(damagesource)
 
     private val scoreboardDisplayName =
-        NMSChatMessage(get<GearyEntityType>()?.name?.split('_')?.joinToString(" ") { it.capitalize() })
+        //TODO make sure this is properly formatting entityType name
+        NMSChatMessage(nmsEntity.entityType.typeName.split('_').joinToString(" ") { it.capitalize() })
 
+    //TODO if we can override the name in the entity type, this will read it from there
     override fun getScoreboardDisplayName() = scoreboardDisplayName
 
-    override fun getExpValue(entityhuman: NMSEntityHuman): Int = get<DeathLoot>()?.expToDrop() ?: this.expToDrop
-
-    override fun getSoundVolume(): Float = get<Sounds>()?.volume ?: super.getSoundVolume()
+    override fun getSoundVolume(): Float = geary(entity).get<Sounds>()?.volume ?: super.getSoundVolume()
     override fun getSoundAmbient(): NMSSound? = makeSound(super.getSoundAmbient()) { ambient }
     override fun getSoundDeath(): NMSSound? = makeSound(super.getSoundDeath()) { death }
     override fun getSoundSplash(): NMSSound? = makeSound(super.getSoundSplash()) { splash }
     override fun getSoundSwim(): NMSSound? = makeSound(super.getSoundSwim()) { swim }
     override fun getSoundHurt(damagesource: NMSDamageSource): NMSSound? =
         makeSound(super.getSoundHurt(damagesource)) { hurt }
+
+    init {
+        entity.addScoreboardTag(CustomEntity.ENTITY_VERSION)
+    }
 }

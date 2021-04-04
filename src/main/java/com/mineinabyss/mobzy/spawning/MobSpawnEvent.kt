@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.mobzy.api.nms.entity.creatureType
-import com.mineinabyss.mobzy.api.nms.entity.typeName
+import com.mineinabyss.idofront.nms.entity.creatureType
+import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import org.bukkit.Location
 

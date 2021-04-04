@@ -1,6 +1,9 @@
-# Mobzy
+[![Java CI with Gradle](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml)
+[![Maven](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/mobzy/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/mobzy)
+[![Wiki](https://badgen.net/badge/color/Project%20Wiki/purple?icon=wiki&label)](https://github.com/MineInAbyss/Mobzy/wiki)
 
-![CI](https://github.com/MineInAbyss/Mobzy/workflows/Java%20CI/badge.svg)
+
+# Mobzy
 
 ### Overview
 
@@ -41,19 +44,13 @@ Essentially, you would be able to code actions with conditions and outcomes, the
 
 ## Usage
 
-We have [Github packages](https://github.com/MineInAbyss/Mobzy/packages) set up for use with gradle/maven, however the API isn't properly maintained yet. Many things will change as the ECS is being built.
+We have a maven repo set up, however the API isn't properly maintained yet. Many things will change as the ECS is being built.
 
 ### Gradle
 
-Add the Github Package maven repo and authenticate. We recommend using the [gpr-for-gradle](https://github.com/0ffz/gpr-for-gradle) plugin to authenticate automatically. (Hopefully Github stops forcing you to authenticate for public packages soon!)
-
 ```groovy
-plugins {
-    id("io.github.0ffz.github-packages") version "1.x.x"
-}
-
 repositories {
-    maven githubPackage.invoke("MineInAbyss/Mobzy")
+    maven { url 'https://repo.mineinabyss.com/releases' }
 }
 
 dependencies {

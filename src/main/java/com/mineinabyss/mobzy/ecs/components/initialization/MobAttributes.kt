@@ -1,14 +1,12 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.autoscan.AutoscanComponent
-import com.mineinabyss.geary.minecraft.store.get
-import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributeBuilder
-import com.mineinabyss.mobzy.api.nms.typeinjection.NMSAttributes
-import com.mineinabyss.mobzy.api.nms.typeinjection.set
+import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
+import com.mineinabyss.idofront.nms.typeinjection.NMSAttributeBuilder
+import com.mineinabyss.idofront.nms.typeinjection.NMSAttributes
+import com.mineinabyss.idofront.nms.typeinjection.set
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R2.GenericAttributes
-import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("mobzy:attributes")
@@ -47,5 +45,3 @@ data class MobAttributes(
         .set(GenericAttributes.MOVEMENT_SPEED, movementSpeed)
         .set(GenericAttributes.SPAWN_REINFORCEMENTS, spawnReinforcements)
 }
-
-val Mob.attributes get() = get<MobAttributes>()

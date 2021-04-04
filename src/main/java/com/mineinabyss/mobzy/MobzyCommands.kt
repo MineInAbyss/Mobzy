@@ -1,5 +1,7 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.components.PrefabKey
+import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -9,15 +11,14 @@ import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.success
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.isOfType
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.spawnMobzyMob
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
-import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
+import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -84,7 +85,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("spawn" / "s")(desc = "Spawns a custom mob") {
-                val mobName by optionArg(options = MobzyTypeRegistry.typeNames) {
+                val mobName by optionArg(options = MobzyNMSTypeInjector.typeNames) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val numOfSpawns by intArg {
@@ -94,7 +95,11 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 playerAction {
                     val cappedSpawns = numOfSpawns.coerceAtMost(MobzyConfig.data.maxCommandSpawns)
-                    for (i in 1..cappedSpawns) player.location.spawnMobzyMob(mobName)
+                    val key = PrefabKey(mobzy.name, mobName)
+
+                    repeat(cappedSpawns) {
+                        player.location.spawnGeary(key) ?: error("Prefab $mobName not found")
+                    }
                 }
             }
 
@@ -103,7 +108,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
-                sender.success("All registered types:\n${MobzyTypeRegistry.typeNames}")
+                sender.success("All registered types:\n${MobzyNMSTypeInjector.typeNames}")
             }
 
             "config"(desc = "Configuration options") {
@@ -141,7 +146,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 if (subCommand == "spawn" || subCommand == "s")
                     if (args.size == 2) {
-                        return MobzyTypeRegistry.typeNames
+                        return MobzyNMSTypeInjector.typeNames
                             .filter { it.startsWith(args[1].toLowerCase()) }
                     } else if (args.size == 3) {
                         var min = 1
@@ -156,7 +161,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 if (subCommand in listOf("remove", "rm", "info", "i"))
                     if (args.size == 2) {
                         val mobs: MutableList<String> = ArrayList()
-                        mobs.addAll(MobzyTypeRegistry.typeNames)
+                        mobs.addAll(MobzyNMSTypeInjector.typeNames)
                         mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
                         return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
                     }

@@ -1,32 +1,39 @@
 package com.mineinabyss.mobzy.registration
 
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.api.nms.aliases.NMSWorld
-import com.mineinabyss.mobzy.api.nms.entity.keyName
-import com.mineinabyss.mobzy.api.nms.typeinjection.*
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.ecs.api.systems.TickingSystem
+import com.mineinabyss.geary.ecs.components.*
+import com.mineinabyss.idofront.nms.aliases.NMSEntity
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSWorld
+import com.mineinabyss.idofront.nms.entity.keyName
+import com.mineinabyss.idofront.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
-import com.mineinabyss.mobzy.mobs.MobType
+import com.mineinabyss.mobzy.ecs.components.initialization.MobzyTypeInjectionComponent
 import com.mineinabyss.mobzy.mobs.types.*
 import com.mineinabyss.mobzy.mobs.types.NPC
 import net.minecraft.server.v1_16_R2.*
 import sun.misc.Unsafe
 import java.lang.reflect.Field
+import kotlin.collections.set
 
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobType]
  * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
  */
 @Suppress("ObjectPropertyName")
-object MobzyTypeRegistry {
+object MobzyNMSTypeInjector : TickingSystem() {
+    private val info by get<MobzyTypeInjectionComponent>()
+    private val key by get<PrefabKey>()
+
+    override fun GearyEntity.tick() {
+        set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
+        //TODO concurrent modification exception
+        remove<MobzyTypeInjectionComponent>()
+    }
+
     val typeNames get() = _types.keys.toList()
     private val _types: MutableMap<String, NMSEntityType<*>> = mutableMapOf()
-
-    /** Gets a mob's [EntityTypes] from a String if it is registered with the plugin, otherwise throws an [IllegalArgumentException] */
-    operator fun get(name: String): NMSEntityType<*> = _types[name.toEntityTypeName()]
-        ?: error("Mob type ${name.toEntityTypeName()} not found, only know $typeNames")
-
-    operator fun contains(name: String) = _types.contains(name.toEntityTypeName())
 
     private val customAttributes = mutableMapOf<NMSEntityType<*>, AttributeProvider>()
 
@@ -65,13 +72,16 @@ object MobzyTypeRegistry {
      *
      * @see injectType
      */
-    fun registerMob(name: String, type: MobType): EntityTypes<*> {
-        val init = mobBaseClasses[type.baseClass] ?: error("Not a valid parent class: ${type.baseClass}")
+    fun inject(
+        name: String,
+        prefabInfo: MobzyTypeInjectionComponent,
+        attributes: MobAttributes = MobAttributes()
+    ): NMSEntityType<*> {
+        val init = mobBaseClasses[prefabInfo.baseClass] ?: error("Not a valid parent class: ${prefabInfo.baseClass}")
         val mobID = name.toEntityTypeName()
-        val attributes = type.get<MobAttributes>() ?: MobAttributes()
         val injected: NMSEntityType<Entity> =
             (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
-                .builderForCreatureType(type.creatureType)
+                .builderForCreatureType(prefabInfo.creatureType)
                 .withSize(attributes.width, attributes.height)
                 .apply {
                     if (attributes.fireImmune) withFireImmunity()
@@ -84,12 +94,11 @@ object MobzyTypeRegistry {
     }
 
     private val mobBaseClasses = mutableMapOf<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>(
-        "mobzy:flying" to ::FlyingMob, //TODO use proper keys
+        "mobzy:flying" to ::FlyingMob, //TODO use namespaced keys
         "mobzy:hostile" to ::HostileMob,
         "mobzy:passive" to ::PassiveMob,
         "mobzy:fish" to ::FishMob,
         "mobzy:npc" to ::NPC,
-        "mobzy:projectile" to ::ProjectileEntity,
     )
 
     fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {

@@ -1,12 +1,12 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.idofront.messaging.color
+import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
+import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.creatureType
+import com.mineinabyss.idofront.nms.entity.keyName
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.api.isCustomEntity
-import com.mineinabyss.mobzy.api.nms.aliases.NMSCreatureType
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.creatureType
-import com.mineinabyss.mobzy.api.nms.entity.keyName
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.SpawnTask.randomChunkSpawnNearby
@@ -150,7 +150,7 @@ object SpawnTask {
                         distanceSquared(newX, newZ, entityChunk.x, entityChunk.z) <
                                 (MobzyConfig.data.minChunkSpawnRad * MobzyConfig.data.minChunkSpawnRad)
                     }) {
-                    val newChunk = chunk.world.getChunkAt(newX.toInt(), newZ.toInt())
+                    val newChunk = chunk.world.getChunkAt(newX, newZ)
                     if (!newChunk.isLoaded) continue
                     return ChunkSpawn(newChunk, 0, 255)
                 }

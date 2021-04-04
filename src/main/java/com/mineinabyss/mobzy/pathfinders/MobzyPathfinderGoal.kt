@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.pathfinders
 
-import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
-import com.mineinabyss.mobzy.api.nms.aliases.NMSPathfinderGoal
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.pathfindergoals.PathfinderGoal
-import com.mineinabyss.mobzy.ecs.components.initialization.attributes
+import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.idofront.nms.aliases.NMSPathfinderGoal
+import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.distanceSqrTo
+import com.mineinabyss.idofront.nms.pathfindergoals.PathfinderGoal
+import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import net.minecraft.server.v1_16_R2.ControllerMove
 import net.minecraft.server.v1_16_R2.EntityInsentient
 import org.bukkit.GameMode
@@ -50,7 +51,7 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, type: Type?
 
     open fun executeWhenCooledDown() = Unit
 
-    fun isPlayerValidTarget(player: Player, range: Double = mob.attributes?.followRange ?: 0.0) =
+    fun isPlayerValidTarget(player: Player, range: Double = geary(mob).get<MobAttributes>()?.followRange ?: 0.0) =
         !player.isInvulnerable &&
                 !player.isDead &&
                 player.gameMode != GameMode.SPECTATOR &&

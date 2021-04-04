@@ -1,10 +1,12 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.ecs.prefab.PrefabByReferenceSerializer
+import com.mineinabyss.geary.minecraft.spawnGeary
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.creatureType
 import com.mineinabyss.mobzy.MobzyConfig
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
-import com.mineinabyss.mobzy.api.nms.entity.creatureType
-import com.mineinabyss.mobzy.api.nms.typeinjection.spawnEntity
-import com.mineinabyss.mobzy.registration.MobzyTypeRegistry
 import com.mineinabyss.mobzy.spawning.vertical.SpawnArea
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
@@ -13,7 +15,6 @@ import com.okkero.skedule.SynchronizationContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import net.minecraft.server.v1_16_R2.EntityTypes
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.util.Vector
@@ -46,7 +47,7 @@ import kotlin.reflect.KProperty
 @Serializable
 data class MobSpawn(
     @SerialName("reuse") private val _reuse: String? = null,
-    @SerialName("mob") private val _entityTypeName: String? = null,
+    @SerialName("mob") private val _prefab: @Serializable(with = PrefabByReferenceSerializer::class) GearyEntity? = null,
     @SerialName("min-amount") private val _minAmount: Int? = null,
     @SerialName("max-amount") private val _maxAmount: Int? = null,
     @SerialName("radius") private val _radius: Double? = null,
@@ -68,7 +69,7 @@ data class MobSpawn(
     @Transient
     val copyFrom: MobSpawn? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
-    val entityTypeName: String? by getOrCopy() { _entityTypeName }
+    val prefab: GearyEntity by getOrCopy { _prefab } ?: error("Mob must not be null")
     val minAmount: Int by getOrCopy { _minAmount } ?: 1
     val maxAmount: Int by getOrCopy { _maxAmount } ?: 1
     val radius: Double by getOrCopy { _radius } ?: 0.0
@@ -88,7 +89,8 @@ data class MobSpawn(
     val maxTime: Long by getOrCopy { _maxTime } ?: 10000000L
     val blockWhitelist: List<Material> by getOrCopy { _blockWhitelist } ?: listOf()
 
-    val entityType: EntityTypes<*> by entityTypeName?.let { MobzyTypeRegistry[it] } ?: EntityTypes.ZOMBIE
+    val entityType: NMSEntityType<*> by prefab.get<NMSEntityType<*>>()
+        ?: error("Not type found for prefab in mob spawn")
 
     private val amountRange: IntRange get() = minAmount..maxAmount
     private val timeRange: LongRange get() = minTime..maxTime
@@ -100,9 +102,11 @@ data class MobSpawn(
     fun spawn(area: SpawnArea, spawns: Int = chooseSpawnAmount()): Int {
         val loc = area.getSpawnLocation(spawnPos)
         for (i in 0 until spawns) {
-            if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
-                (getSpawnInRadius(loc, radius) ?: loc).spawnEntity(entityType)
-            else loc.spawnEntity(entityType)
+            val chosenLoc = if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
+                getSpawnInRadius(loc, radius) ?: loc
+            else loc
+
+            chosenLoc.spawnGeary(prefab)
             //TODO could be a better way of handling mobs spawning with too little space (in getPriority) but this works well enough for now
             /*if (!enoughSpace(loc, nmsEntity.width, nmsEntity.length)) { //length is actually the height, don't know why, it's just how it be
                 MobzyAPI.debug(ChatColor.YELLOW + "Removed " + ((CustomMob) nmsEntity).getBuilder().getName() + " because of lack of space");

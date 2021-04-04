@@ -1,9 +1,8 @@
 package com.mineinabyss.mobzy.mobs
 
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.with
-import com.mineinabyss.mobzy.api.nms.aliases.*
-import com.mineinabyss.mobzy.api.nms.player.addKillScore
+import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.idofront.nms.aliases.*
+import com.mineinabyss.idofront.nms.player.addKillScore
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.mobs.types.MobBase
 import org.bukkit.Bukkit
@@ -33,12 +32,6 @@ interface CustomMob : CustomEntity {
     /** A function to implement pathfinders that should be added to all entities of this type. */
     fun createPathfinders()
 
-    /** Drops the correct amount of EXP from death at this entity's location. */
-    fun dropExp()
-
-    /** Called when a player interacts with this entity. */
-    fun onPlayerInteract(player: HumanEntity, enumhand: NMSHand): NMSInteractionResult
-
     /** Custom logic for what happens when this entity dies. Override the NMS die method with this. */
     fun dieCustom(damageSource: NMSDamageSource?) {
         val nmsWorld: NMSWorld = entity.world.toNMS()
@@ -61,7 +54,7 @@ interface CustomMob : CustomEntity {
             nmsWorld.broadcastEntityEffect(nmsEntity, 3.toByte())
             nmsEntity.pose = NMSEntityPose.DYING
             //TODO add PlaceHolderAPI support
-            get<DeathLoot>()?.deathCommands?.forEach {
+            geary(entity).get<DeathLoot>()?.deathCommands?.forEach {
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), it)
             }
         }
@@ -72,12 +65,10 @@ interface CustomMob : CustomEntity {
         val heldItem = killer.inventory.itemInMainHand
         val looting = heldItem.enchantments[Enchantment.LOOT_BONUS_MOBS] ?: 0
         val fire = heldItem.enchantments[Enchantment.FIRE_ASPECT] ?: 0 > 0
-        with<DeathLoot> { deathLoot ->
+        geary(entity).with<DeathLoot> { deathLoot ->
             CraftEventFactory.callEntityDeathEvent(
                 nmsEntity,
                 deathLoot.drops.toList().map { it.chooseDrop(looting, fire) })
-            deathLoot.expToDrop()?.let { nmsEntity.expToDrop = it }
         }
-        dropExp()
     }
 }

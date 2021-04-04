@@ -1,25 +1,23 @@
 package com.mineinabyss.mobzy.listener
 
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.ecs.components.with
-import com.mineinabyss.geary.minecraft.components.toBukkit
+import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.geary.minecraft.access.gearyOrNull
+import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
-import com.mineinabyss.geary.minecraft.store.get
-import com.mineinabyss.geary.minecraft.store.has
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomMob
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.toMobzy
+import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.ecs.events.PlayerRightClickEntityEvent
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
@@ -33,6 +31,8 @@ import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
@@ -59,7 +59,7 @@ object MobListener : Listener {
     /** Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect. */
     @EventHandler(ignoreCancelled = true)
     fun EntityDamageEvent.onHit() {
-        val gearyEntity = entity.toMobzy() ?: return
+        val gearyEntity = gearyOrNull(entity) ?: return
         val mob = entity as? LivingEntity ?: return
         val model = gearyEntity.get<Model>() ?: return
         model.hitId ?: return
@@ -118,9 +118,10 @@ object MobListener : Listener {
 
     /** Ride entities with [Rideable] component on right click. */
     @EventHandler
-    fun PlayerRightClickEntityEvent.rideOnRightClick() {
-        if (entity.has<Rideable>())
-            entity.addPassenger(player)
+    fun PlayerInteractEntityEvent.rideOnRightClick() {
+        val gearyEntity = gearyOrNull(rightClicked) ?: return
+        if (gearyEntity.has<Rideable>())
+            rightClicked.addPassenger(player)
     }
 
     /**
@@ -134,7 +135,7 @@ object MobListener : Listener {
             if (entity.scoreboardTags.contains("customMob")) {
                 entity.remove()
             } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                entity.get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
+                geary(entity).get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
                 entity.removeScoreboardTag("customMob2")
                 entity.addScoreboardTag("customMob3")
             } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
@@ -146,8 +147,9 @@ object MobListener : Listener {
 
     /** The magic method that lets you hit entities in their server side hitboxes. */
     //TODO right click doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do
+    //TODO ignore hits on the spoofed entity
     @EventHandler
-    fun PlayerInteractEvent.onLeftClick() { // TODO I'd like some way to ignore hits onto the disguised entity. Perhaps use a marker armorstand?
+    fun PlayerInteractEvent.rayTracedHitBoxInteractions() {
         val player = player
         if (leftClicked || rightClicked) {
             //shoot ray to simulate a left/right click, accounting for server-side custom mob hitboxes
@@ -161,14 +163,13 @@ object MobListener : Listener {
             ) { entity -> entity != player }
 
             //if we hit a custom mob, attack or fire an event
+            //TODO component for this
             trace?.hitEntity?.toMobzy()?.let { hit ->
                 if (leftClicked) {
                     isCancelled = true
                     player.toNMS().attack(hit.nmsEntity)
                 } else {
-                    //TODO no way there isn't already a spigot event for this? Not sure if that's why I made this custom
-                    // event originally
-                    PlayerRightClickEntityEvent(player, hit.entity).call()
+                    PlayerInteractEntityEvent(player, hit.entity).call()
                 }
             }
         }
@@ -177,7 +178,17 @@ object MobListener : Listener {
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
     @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {
-        if (entered.has<PreventRiding>())
+        val gearyEntity = gearyOrNull(entered) ?: return
+        if (gearyEntity.has<PreventRiding>())
             isCancelled = true
+    }
+
+    //TODO this is not currently working
+    @EventHandler
+    fun EntityDeathEvent.setExpOnDeath(){
+        val gearyEntity = gearyOrNull(entity) ?: return
+        gearyEntity.with<DeathLoot> { deathLoot ->
+            deathLoot.expToDrop()?.let { droppedExp = it }
+        }
     }
 }
