@@ -8,7 +8,6 @@ import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinde
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.CopyNBTSystem
-import com.mineinabyss.mobzy.ecs.systems.ProjectileShootingSystem
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
@@ -47,7 +46,6 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             systems(
                 WalkingAnimationSystem,
                 CopyNBTSystem(),
-                ProjectileShootingSystem(),
                 MobzyNMSTypeInjector,
             )
 

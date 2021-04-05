@@ -1,16 +1,18 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
 import com.mineinabyss.geary.ecs.api.GearyComponent
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.entities.createEntity
 import com.mineinabyss.geary.minecraft.spawnGeary
+import com.mineinabyss.idofront.destructure.component1
+import com.mineinabyss.idofront.destructure.component2
+import com.mineinabyss.idofront.destructure.component3
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.idofront.nms.pathfindergoals.doneNavigating
 import com.mineinabyss.idofront.nms.pathfindergoals.moveToEntity
 import com.mineinabyss.idofront.nms.pathfindergoals.stopNavigation
-import com.mineinabyss.mobzy.api.helpers.entity.distanceSqrTo
-import com.mineinabyss.mobzy.api.pathfindergoals.doneNavigating
-import com.mineinabyss.mobzy.api.pathfindergoals.moveToEntity
-import com.mineinabyss.mobzy.api.pathfindergoals.stopNavigation
+import com.mineinabyss.mobzy.api.nms.entity.shootDirection
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.Polymorphic
@@ -19,12 +21,14 @@ import kotlinx.serialization.Serializable
 import org.bukkit.entity.Creature
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
+import org.bukkit.entity.Snowball
 import kotlin.math.min
 import kotlin.math.pow
 
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
+    //TODO replace with serializable geary entity when that works
     val spawn: List<@Polymorphic GearyComponent>,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
@@ -36,7 +40,7 @@ class ThrowItemsBehavior(
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = ThrowItemsGoal(
         (mob as Creature),
-        spawn,
+        spawn.createEntity(),
         minChaseRad,
         minThrowRad,
         yOffset,
@@ -55,7 +59,7 @@ class ThrowItemsBehavior(
  */
 class ThrowItemsGoal(
     override val mob: Creature,
-    private val spawn: List<@Polymorphic GearyComponent>,
+    private val prefab: GearyEntity,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
     private val yOffset: Double,
@@ -96,12 +100,17 @@ class ThrowItemsGoal(
 
     /** Throws the mob's defined item at the [target]*/
     private fun throwItem(target: LivingEntity) {
-        mob.eyeLocation.spawnGeary(spawn.createEntity())
-
         repeat(count) {
-            spawn.createEntity().apply {
-                set(ProjectileShootAt(target.eyeLocation, speed, randomAngle))
-            }
+            val entity = mob.eyeLocation.spawnGeary(prefab) ?: return@repeat
+            val snowball = entity as? Snowball ?: return
+            val loc = entity.location
+            val (x, y, z) = loc
+
+            val targetLoc = target.eyeLocation
+            val dX = targetLoc.x - x
+            val dY = targetLoc.y - y - 0.4
+            val dZ = targetLoc.z - z
+            snowball.toNMS().shootDirection(dX, dY, dZ, speed, randomAngle)
         }
     }
 }
