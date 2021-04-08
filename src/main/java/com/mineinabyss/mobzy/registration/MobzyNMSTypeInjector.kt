@@ -45,8 +45,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
             attributeDefaultsField.isAccessible = true
 
             @Suppress("UNCHECKED_CAST")
-            val currentAttributes =
-                (attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
+            val currentAttributes = attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>
 
             val keyNamesToInject = customAttributes.map { it.key.keyName }
 

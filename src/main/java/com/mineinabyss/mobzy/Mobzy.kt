@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.minecraft.dsl.GearyLoadPhase
 import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
@@ -14,7 +15,6 @@ import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import com.okkero.skedule.schedule
 import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -42,6 +42,18 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         saveDefaultConfig()
         reloadConfig()
 
+        //Register events
+        registerEvents(
+            MobListener,
+            MobzyECSListener,
+            MobzyEventListener
+        )
+
+        //Register commands
+        MobzyCommands()
+
+        registerAddonWithMobzy()
+
         attachToGeary {
             systems(
                 WalkingAnimationSystem,
@@ -55,28 +67,15 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             autoscan<PathfinderComponent>()
 
             loadPrefabs(mobConfigDir)
-        }
 
-        MobzyPacketInterception.registerPacketInterceptors()
-        MobzyNMSTypeInjector //instantiate singleton
-        SpawnTask.startTask()
+            startup {
+                GearyLoadPhase.ENABLE {
+                    MobzyPacketInterception.registerPacketInterceptors()
+                    SpawnTask.startTask()
 
-        //Register events
-        registerEvents(
-            MobListener,
-            MobzyECSListener,
-            MobzyEventListener
-        )
-
-        //Register commands
-        MobzyCommands()
-
-        registerAddonWithMobzy()
-
-        //first tick only finishes when all plugins are loaded, which is when we activate addons
-        mobzy.schedule {
-            waitFor(1)
-            MobzyConfig.activateAddons()
+                    MobzyConfig.activateAddons()
+                }
+            }
         }
     }
 
