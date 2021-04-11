@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy.spawning.regions
 
-import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.mobzy.spawning.MobSpawn
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.EntityTypes
 import org.bukkit.Material
 
 /**
@@ -20,7 +19,7 @@ class SpawnRegion(
         SpawnRegistry += this
     }
 
-    fun getSpawnOfType(type: EntityTypes<*>): MobSpawn = spawns
-        .firstOrNull { it.entityType == type }
-        ?: error("Could not find ${type.typeName} from ${spawns.map { it.prefab }}")
+    fun getSpawnOfType(type: PrefabKey): MobSpawn = spawns
+        .firstOrNull { it.prefabKey == type }
+        ?: error("Could not find $type from ${spawns.map { it.prefab }}")
 }

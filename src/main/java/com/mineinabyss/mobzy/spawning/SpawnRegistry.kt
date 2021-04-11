@@ -1,9 +1,6 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.ecs.components.PrefabKey
-import com.mineinabyss.geary.ecs.prefab.PrefabManager
-import com.mineinabyss.idofront.nms.aliases.NMSEntityType
-import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_REGIONS
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
@@ -30,15 +27,11 @@ object SpawnRegistry {
      * Finds a [MobSpawn] in the form `"RegionName:MobName"` and will find the first mob of that type inside the region
      * of that name.
      */
-    fun findMobSpawn(spawn: String): MobSpawn =
-        (regionSpawns[spawn.substring(0, spawn.indexOf(':'))]
-            ?: error("Could not find registered region for $spawn"))
-            .getSpawnOfType(
-                PrefabManager[PrefabKey(
-                    mobzy.name,
-                    spawn.substring(spawn.indexOf(':') + 1)
-                )]?.get<NMSEntityType<*>>() ?: error("Could not find")
-            )
+    fun findMobSpawn(spawn: String): MobSpawn  {
+        val (regionName, prefabName) = spawn.split('.')
+        return (regionSpawns[regionName] ?: error("Could not find registered region for $spawn"))
+            .getSpawnOfType(PrefabKey.of(prefabName))
+    }
 
     /** Takes a list of spawn region names and converts to a list of [MobSpawn]s from those regions */
     fun List<ProtectedRegion>.getMobSpawnsForRegions(): List<MobSpawn> = this
