@@ -9,7 +9,6 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.spawning.spawn
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.toMobzy
@@ -25,7 +24,10 @@ import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
 import org.bukkit.Statistic
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.*
+import org.bukkit.entity.Ageable
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
+import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
@@ -181,25 +183,20 @@ object MobListener : Listener {
             isCancelled = true
     }
 
-    //TODO this is not currently working
     @EventHandler
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = gearyOrNull(entity) ?: return
         gearyEntity.with<DeathLoot> { deathLoot ->
             deathLoot.expToDrop()?.let { droppedExp = it }
 
-            //TODO only enable running commands when we prevent creative players from spawning entities w/ custom data
-//            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
-
+            drops.clear()
             val heldItem = entity.killer?.inventory?.itemInMainHand
             val looting = heldItem?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
             val fire = (heldItem?.enchantments?.get(Enchantment.FIRE_ASPECT) ?: 0) > 0
+            drops.addAll(deathLoot.drops.mapNotNull { it.chooseDrop(looting, fire) })
 
-            deathLoot.drops.toList().mapNotNull { it.chooseDrop(looting, fire) }.forEach {
-                entity.location.spawn<Item> {
-                    itemStack = it
-                }
-            }
+            //TODO only enable running commands when we prevent creative players from spawning entities w/ custom data
+//            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
         }
     }
 }
