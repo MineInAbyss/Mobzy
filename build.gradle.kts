@@ -51,7 +51,7 @@ dependencies {
     compileOnly(platform("com.mineinabyss:kotlinspice:${Deps.kotlinVersion}+"))
     compileOnly("com.github.okkero:skedule")
     compileOnly("org.nield:kotlin-statistics")
-    implementation("com.mineinabyss:idofront-nms:0.5.8")
+    implementation("com.mineinabyss:idofront-nms:0.5.9")
     compileOnly("com.mineinabyss:geary-spigot:0.3.29")
     compileOnly("com.mineinabyss:protocolburrito:0.1.12")
 
