@@ -14,7 +14,7 @@ open class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMons
     override fun createPathfinders() {
         addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false))
         addPathfinderGoal(3, FloatBehavior())
-        addPathfinderGoal(7, LandStrollBehavior())
+        addPathfinderGoal(7, RandomStrollLandBehavior())
         addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8.0f))
         addPathfinderGoal(8, RandomLookAroundBehavior())
 

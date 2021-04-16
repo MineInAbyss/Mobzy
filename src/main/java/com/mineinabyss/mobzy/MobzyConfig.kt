@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.components.PrefabKey
+import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
@@ -83,7 +83,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      */
     internal fun activateAddons() {
         //FIXME recursively deserializing something here I think (thread freezes forever)
-//        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
+        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
 
         MobzyNMSTypeInjector.injectDefaultAttributes()
         SpawnTask.startTask()
@@ -106,8 +106,6 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * them with the equivalent custom mob, transferring over the data.
      */
     private fun fixEntitiesAfterReload() {
-        val customEntityClass = CustomEntity::class.qualifiedName
-
         val num = Bukkit.getServer().worlds.map { world ->
             world.entities.filter {
                 //is a custom mob but the nms entity is no longer an instance of CustomMob (likely due to a reload)

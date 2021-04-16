@@ -28,8 +28,6 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     final override fun initPathfinder() = createPathfinders()
     override fun createPathfinders() = super.initPathfinder()
 
-    override fun die(damagesource: NMSDamageSource) = dieCustom(damagesource)
-
     private val scoreboardDisplayName =
         //TODO make sure this is properly formatting entityType name
         NMSChatMessage(nmsEntity.entityType.typeName.split('_').joinToString(" ") { it.capitalize() })

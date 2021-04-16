@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.prefab.PrefabByReferenceSerializer
+import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -47,7 +47,7 @@ import kotlin.reflect.KProperty
 @Serializable
 data class MobSpawn(
     @SerialName("reuse") private val _reuse: String? = null,
-    @SerialName("mob") private val _prefab: @Serializable(with = PrefabByReferenceSerializer::class) GearyEntity? = null,
+    @SerialName("mob") private val _prefabKey: PrefabKey? = null,
     @SerialName("min-amount") private val _minAmount: Int? = null,
     @SerialName("max-amount") private val _maxAmount: Int? = null,
     @SerialName("radius") private val _radius: Double? = null,
@@ -69,7 +69,8 @@ data class MobSpawn(
     @Transient
     val copyFrom: MobSpawn? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
-    val prefab: GearyEntity by getOrCopy { _prefab } ?: error("Mob must not be null")
+    val prefabKey: PrefabKey by getOrCopy { _prefabKey } ?: error("Mob prefab must not be null")
+    val prefab: GearyEntity by prefabKey.toEntity() ?: error("Prefab $prefabKey not found")
     val minAmount: Int by getOrCopy { _minAmount } ?: 1
     val maxAmount: Int by getOrCopy { _maxAmount } ?: 1
     val radius: Double by getOrCopy { _radius } ?: 0.0

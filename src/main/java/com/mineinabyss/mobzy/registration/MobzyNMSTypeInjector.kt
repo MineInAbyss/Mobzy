@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.ecs.components.*
+import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
@@ -45,8 +46,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
             attributeDefaultsField.isAccessible = true
 
             @Suppress("UNCHECKED_CAST")
-            val currentAttributes =
-                (attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>)
+            val currentAttributes = attributeDefaultsField.get(null) as Map<NMSEntityType<*>, NMSAttributeProvider>
 
             val keyNamesToInject = customAttributes.map { it.key.keyName }
 

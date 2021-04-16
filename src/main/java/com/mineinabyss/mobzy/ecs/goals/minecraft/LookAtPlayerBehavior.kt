@@ -11,7 +11,7 @@ import org.bukkit.entity.Mob
 @Serializable
 @SerialName("minecraft:behavior.look_at_player")
 data class LookAtPlayerBehavior(
-    val radius: Float,
+    val radius: Float = 6.0f,
     val startChance: Float = 0.02f
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalLookAtPlayer(mob.toNMS(), NMSPlayer::class.java, radius, startChance)
