@@ -1,6 +1,11 @@
 package com.mineinabyss.mobzy.spawning.conditions
 
-import com.mineinabyss.mobzy.api.nms.aliases.toNMS
+import com.mineinabyss.geary.ecs.api.conditions.GearyCondition
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.mobzy.spawning.SpawnDefinition
+import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
+import com.okkero.skedule.SynchronizationContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
@@ -10,12 +15,22 @@ import org.bukkit.Location
 class LocalGroupConditions(
     val max: Int,
     val radius: Double
-): LocationCondition {
-    override fun conditionsMet(on: Location): Boolean {
-        val localSpawns =  on.getNearbyEntities(radius, radius, radius).count {
-            it.toNMS().entityType == null
-        }
+) : GearyCondition() {
+    val GearyEntity.location by get<Location>()
+    val GearyEntity.spawnDef by get<SpawnDefinition>()
+    val GearyEntity.spawnInfo by get<SpawnInfo>()
 
-        return localSpawns < max
+    override fun GearyEntity.check(): Boolean {
+        //TODO considering we are now making this a suspend function, we could probably evaluate all mobs
+        // simultaneously, then only wait for the sync ones to finish off.
+        spawnInfo
+//        location.world?.apply {
+//            val localSpawns = getNearbyEntities(location, radius, radius, radius).count {
+//                it.toNMS().entityType == spawnDef.entityType
+//            }
+//
+//            if (localSpawns >= max) return false
+//        }
+        return true
     }
 }

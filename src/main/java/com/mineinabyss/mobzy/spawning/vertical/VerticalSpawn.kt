@@ -1,47 +1,66 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
+import org.bukkit.Chunk
 import org.bukkit.Location
 
 /**
  * A vertical strip inside a chunk, with x and z located at [loc], spanning from [minY] to [maxY].
  *
- * Will generate a list of [SpawnArea]s, from all air gaps within this vertical strip.
+ * Will generate a list of [SpawnInfo]s, from all air gaps within this vertical strip.
  */
-class VerticalSpawn(private val loc: Location, private var minY: Int, private var maxY: Int) {
-    val spawnAreas: List<SpawnArea> = findBlockPairs()
+object VerticalSpawn {
+    fun findGap(
+        chunk: Chunk,
+        minY: Int,
+        maxY: Int,
+    ): Pair<Location, Location> {
+        val x = (0..15).random()
+        val z = (0..15).random()
+        val startY = (minY..maxY).random() //TODO normal distribution random around player's y position
 
-    private fun findBlockPairs(): List<SpawnArea> {
-        maxY.coerceAtMost(255)
-        minY.coerceAtLeast(0)
+        //TODO getting the full chunk snapshot is by far the most inefficient step
+        val snapshot = chunk.chunkSnapshot
+        fun Int.getBlock() = snapshot.getBlockType(x, this, z)
 
-        val locations: MutableList<SpawnArea> = mutableListOf()
-        val highest = loc.world?.getHighestBlockAt(loc)?.location?.apply { y = y.coerceAtLeast(0.0) }
-            ?: return emptyList()
+        val startIsEmpty = startY.getBlock().isEmpty
 
-        if (highest.blockY !in minY..maxY) return locations
-        //add a gap from this location to the sky
-        if (highest.blockY != maxY)
-            locations.add(SpawnArea(highest.clone().apply { y = maxY.toDouble() }, highest.clone().add(0.0, 1.0, 0.0)))
+        class BlocLoc(val add: Int) {
+            lateinit var opposite: BlocLoc
+            var y = startY
+            var isEmpty: Boolean = startIsEmpty
+            var foundBlock = false
 
-        //everything below is by far the slowest part of the task, as it gets repeated a lot
-        val snapshot = highest.chunk.chunkSnapshot
+            fun next(): Boolean {
+                if (foundBlock) return false
 
-        //search for gaps and add them to the list as we go down
-        var top = highest //the top block of a section
-        val x = (highest.blockX % 16).let { if (it < 0) it + 16 else it }
-        val z = (highest.blockZ % 16).let { if (it < 0) it + 16 else it }
+                val nextIsEmpty = y.getBlock().isEmpty
 
-        var currentBlock = snapshot.getBlockType(x, highest.blockY, z)
-        (highest.blockY downTo minY).forEach { y ->
-            val nextBlock = snapshot.getBlockType(x, y, z)
-            if (currentBlock.isSolid) { //if went from solid to air
-                if (!nextBlock.isSolid)
-                    top = highest.clone().apply { this.y = y.toDouble() }
-            } else if (nextBlock.isSolid || highest.blockY == 1) //if went back to solid or reached the bottom of the world
-                locations.add(SpawnArea(top, highest.clone().apply { this.y = y.toDouble() + 1 }))
-            currentBlock = nextBlock
+                when {
+                    y !in (minY + 1) until maxY || isEmpty && !nextIsEmpty -> {
+                        foundBlock = true
+                        return false
+                    }
+                    !isEmpty && nextIsEmpty -> {
+                        opposite.foundBlock = true
+                        opposite.y = y
+                    }
+                }
+                isEmpty = nextIsEmpty
+                y += add
+                return true
+            }
         }
-        return locations
+
+        val up = BlocLoc(1)
+        val down = BlocLoc(-1)
+        up.opposite = down
+        down.opposite = up
+
+        while (up.next() && down.next()) {
+        }
+
+        return chunk.getBlock(x, down.y, z).location to
+                chunk.getBlock(x, up.y, z).location
     }
 }
 

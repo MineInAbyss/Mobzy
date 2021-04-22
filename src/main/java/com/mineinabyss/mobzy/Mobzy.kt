@@ -14,6 +14,7 @@ import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
+import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
@@ -46,7 +47,8 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         registerEvents(
             MobListener,
             MobzyECSListener,
-            MobzyEventListener
+            MobzyEventListener,
+            MobCountManager,
         )
 
         //Register commands
@@ -62,6 +64,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             )
 
             autoscanComponents()
+            autoscanConditions()
 
             // Autoscan the subclasses of PathfinderComponent
             autoscan<PathfinderComponent>()

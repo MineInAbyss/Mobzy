@@ -24,17 +24,17 @@ object SpawnRegistry {
     }
 
     /**
-     * Finds a [MobSpawn] in the form `"RegionName:MobName"` and will find the first mob of that type inside the region
+     * Finds a [SpawnDefinition] in the form `"RegionName:MobName"` and will find the first mob of that type inside the region
      * of that name.
      */
-    fun findMobSpawn(spawn: String): MobSpawn  {
+    fun findMobSpawn(spawn: String): SpawnDefinition  {
         val (regionName, prefabName) = spawn.split('.')
         return (regionSpawns[regionName] ?: error("Could not find registered region for $spawn"))
             .getSpawnOfType(PrefabKey.of(prefabName))
     }
 
-    /** Takes a list of spawn region names and converts to a list of [MobSpawn]s from those regions */
-    fun List<ProtectedRegion>.getMobSpawnsForRegions(): List<MobSpawn> = this
+    /** Takes a list of spawn region names and converts to a list of [SpawnDefinition]s from those regions */
+    fun List<ProtectedRegion>.getMobSpawnsForRegions(): List<SpawnDefinition> = this
         .filter { it.flags.containsKey(MZ_SPAWN_REGIONS) }
         .flatMap { it.getFlag(MZ_SPAWN_REGIONS)!!.split(",") }
         //up to this point, gets a list of the names of spawn areas in this region

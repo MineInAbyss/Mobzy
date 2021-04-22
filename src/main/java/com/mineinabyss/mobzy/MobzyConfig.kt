@@ -15,12 +15,14 @@ import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
 import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.spawning.MobCategory
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import kotlinx.serialization.Serializable
 import net.minecraft.server.v1_16_R2.EnumCreatureType
 import net.minecraft.server.v1_16_R2.NBTTagCompound
 import org.bukkit.Bukkit
+import java.util.*
 
 object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) {
     /**
@@ -42,10 +44,8 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         var maxCommandSpawns: Int = 50,
         var playerGroupRadius: Double = 128.0,
         var spawnTaskDelay: Long = 100,
-        var creatureTypeCaps: MutableMap<String, Int> = hashMapOf()
+        var creatureTypeCaps: MutableMap<MobCategory, Int> = mutableMapOf()
     )
-
-    val creatureTypes: List<String> = listOf("MONSTER", "CREATURE", "AMBIENT", "WATER_CREATURE", "MISC")
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
     val spawnCfgs: MutableList<SpawnConfig> = mutableListOf()
 
@@ -58,7 +58,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
      */
-    fun getCreatureTypeCap(creatureType: NMSCreatureType): Int = data.creatureTypeCaps[creatureType.toString()] ?: 0
+    fun getCreatureTypeCap(creatureType: MobCategory): Int = data.creatureTypeCaps[creatureType] ?: 0
 
     override fun ReloadScope.reload() {
         logSuccess("Reloading mobzy config")

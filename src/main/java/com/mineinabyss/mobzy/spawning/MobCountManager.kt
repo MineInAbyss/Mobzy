@@ -2,23 +2,26 @@ package com.mineinabyss.mobzy.spawning
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
-import com.mineinabyss.geary.ecs.GearyEntity
-import com.mineinabyss.geary.ecs.components.get
-import com.mineinabyss.geary.minecraft.store.gearyOrNull
-import com.mineinabyss.mobzy.ecs.components.initialization.MobCategory
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.minecraft.access.gearyOrNull
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import java.util.concurrent.atomic.AtomicInteger
 
-object MobCountManager {
-    val entities: MutableMap<MobCategories, MutableSet<GearyEntity>> = mutableMapOf()
+object MobCountManager: Listener {
+    val entities: MutableMap<MobCategory, AtomicInteger> = mutableMapOf()
 
+    @EventHandler
     fun EntityAddToWorldEvent.registerOnAdd() {
         val gearyEntity = gearyOrNull(entity) ?: return
-        val (category) = gearyEntity.get<MobCategory>() ?: return
-        entities.getOrPut(category) { mutableSetOf() }.add(gearyEntity)
+        val category = gearyEntity.get<MobCategory>() ?: return
+        entities.getOrPut(category) { AtomicInteger() }.getAndIncrement()
     }
 
+    @EventHandler
     fun EntityRemoveFromWorldEvent.unregisterOnRemove() {
         val gearyEntity = gearyOrNull(entity) ?: return
-        val (category) = gearyEntity.get<MobCategory>() ?: return
-        entities[category]?.remove(gearyEntity)
+        val category = gearyEntity.get<MobCategory>() ?: return
+        entities[category]?.getAndDecrement()
     }
 }

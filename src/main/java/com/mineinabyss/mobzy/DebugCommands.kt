@@ -60,9 +60,6 @@ internal fun Command.createDebugCommands() {
             Registered EntityTypes: ${MobzyNMSTypeInjector.typeNames}""".trimIndent()
         )
     }
-    "spawnregion"()?.playerAction {
-        player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
-    }
     "snapshot"()?.playerAction {
         val snapshot = player.location.chunk.chunkSnapshot
         val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }
