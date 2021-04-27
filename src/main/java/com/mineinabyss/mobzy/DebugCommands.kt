@@ -14,6 +14,22 @@ import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import kotlin.system.measureTimeMillis
 
 internal fun Command.createDebugCommands() {
+    "spawn" {
+        val miny by intArg()
+        val maxy by intArg()
+        playerAction {
+            val loc = player.location
+            val (min, max) = VerticalSpawn.findGap(
+                chunk = loc.chunk,
+                minY = miny,
+                maxY = maxy,
+                x = loc.blockX - (loc.chunk.x shl 4),
+                z = loc.blockZ - (loc.chunk.z shl 4),
+                startY = loc.blockY
+            )
+            sender.info("${min.y} and ${max.y}")
+        }
+    }
     "expire" {
         playerAction {
             geary(player.getNearbyEntities(5.0, 5.0, 5.0).first()).setRelationWithData<Expiry, Model>(Expiry(3000))

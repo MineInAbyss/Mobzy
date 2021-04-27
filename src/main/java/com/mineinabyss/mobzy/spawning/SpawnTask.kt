@@ -10,9 +10,7 @@ import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.SpawnTask.randomChunkNearby
 import com.mineinabyss.mobzy.spawning.SpawnTask.toPlayerGroups
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
-import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
-import com.okkero.skedule.BukkitSchedulerController
 import com.okkero.skedule.CoroutineTask
 import com.okkero.skedule.SynchronizationContext.*
 import com.okkero.skedule.schedule
@@ -85,35 +83,29 @@ object SpawnTask {
         val playerGroups = onlinePlayers.toPlayerGroups()
         val playerGroupCount = playerGroups.size
 
-        //don't run the task if we've hit all mob caps (might be better to run several loops for each mob type?
-//        if (MobCountManager.entities.none { (category, amount) ->
-//                amount.get() < MobzyConfig.getCreatureTypeCap(category) * playerGroupCount
-//            }) return
-
         //TODO sorted by least mobs around
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             val chunkSpawn: Chunk = playerGroup.randomChunkNearby ?: return@playerLoop
-            chunkSpawn.entities
-
+            val deniedCategories = MobCountManager.deniedCategories
             Engine.temporaryEntity { spawn ->
-                val (bottom, top) = VerticalSpawn.findGap(chunkSpawn, 0, 255)
-                val priorities = regionContainer.createQuery().getApplicableRegions(BukkitAdapter.adapt(bottom)).regions
+                val spawnInfo = VerticalSpawn.findGap(chunkSpawn, 0, 255)
+                val priorities = regionContainer.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
                     .sorted()
                     .filterWhenOverlapFlag()
                     .getMobSpawnsForRegions()
                     .associateWithTo(mutableMapOf()) { it.basePriority * Random.nextDouble() }
 
-                spawn.set(bottom)
-                spawn.set(SpawnInfo(bottom, top))
+                spawn.set(spawnInfo.bottom)
+                spawn.set(spawnInfo)
 
                 while (priorities.isNotEmpty()) {
                     val choice: SpawnDefinition = WeightedDice(priorities).roll()
                     spawn.set(choice)
 
-                    if (choice.conditionsMet(spawn)) {
+                    if (choice.prefab.get<MobCategory>() !in deniedCategories && choice.conditionsMet(spawn)) {
                         // Must spawn mobs in sync
                         mobzy.schedule(SYNC) {
-                            if (mobzy.isEnabled) choice.spawn(bottom)
+                            if (mobzy.isEnabled) choice.spawn(spawnInfo)
                         }
                         break
                     } else priorities.remove(choice)

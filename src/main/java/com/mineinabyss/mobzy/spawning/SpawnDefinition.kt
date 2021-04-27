@@ -70,7 +70,8 @@ data class SpawnDefinition(
         ?: error("Not type found for prefab in mob spawn")
 
     /** Given a [SpawnInfo] Spawns a number of entities defined in this [SpawnDefinition] at its location */
-    fun spawn(location: Location, spawns: Int = chooseSpawnAmount()): Int {
+    fun spawn(spawnInfo: SpawnInfo, spawns: Int = chooseSpawnAmount()): Int {
+        val location = spawnInfo.getSpawnFor(spawnPos)
         for (i in 0 until spawns) {
             val chosenLoc = if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
                 getSpawnInRadius(location, radius) ?: location
@@ -81,7 +82,9 @@ data class SpawnDefinition(
         return spawns
     }
 
-    fun conditionsMet(area: GearyEntity): Boolean = conditions.all { it.metFor(area) }
+    fun conditionsMet(area: GearyEntity): Boolean {
+        return conditions.all { it.metFor(area) }
+    }
 
     fun chooseSpawnAmount(): Int = amount.randomOrMin()
 

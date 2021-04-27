@@ -23,14 +23,6 @@ class LocalGroupConditions(
     override fun GearyEntity.check(): Boolean {
         //TODO considering we are now making this a suspend function, we could probably evaluate all mobs
         // simultaneously, then only wait for the sync ones to finish off.
-        spawnInfo
-//        location.world?.apply {
-//            val localSpawns = getNearbyEntities(location, radius, radius, radius).count {
-//                it.toNMS().entityType == spawnDef.entityType
-//            }
-//
-//            if (localSpawns >= max) return false
-//        }
-        return true
+        return spawnInfo.localMobs[spawnDef.entityType]?.get() ?: 0 < max
     }
 }

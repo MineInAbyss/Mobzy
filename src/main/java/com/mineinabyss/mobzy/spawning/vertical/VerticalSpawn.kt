@@ -13,11 +13,11 @@ object VerticalSpawn {
         chunk: Chunk,
         minY: Int,
         maxY: Int,
-    ): Pair<Location, Location> {
-        val x = (0..15).random()
-        val z = (0..15).random()
-        val startY = (minY..maxY).random() //TODO normal distribution random around player's y position
-
+        x: Int = (0..15).random(),
+        z: Int = (0..15).random(),
+        //TODO normal distribution random around player's y position
+        startY: Int = (minY..maxY).random(),
+    ): SpawnInfo {
         //TODO getting the full chunk snapshot is by far the most inefficient step
         val snapshot = chunk.chunkSnapshot
         fun Int.getBlock() = snapshot.getBlockType(x, this, z)
@@ -56,11 +56,10 @@ object VerticalSpawn {
         up.opposite = down
         down.opposite = up
 
-        while (up.next() && down.next()) {
+        while (up.next() || down.next()) {
         }
 
-        return chunk.getBlock(x, down.y, z).location to
-                chunk.getBlock(x, up.y, z).location
+        return SpawnInfo(chunk.getBlock(x, down.y, z).location, chunk.getBlock(x, up.y, z).location)
     }
 }
 

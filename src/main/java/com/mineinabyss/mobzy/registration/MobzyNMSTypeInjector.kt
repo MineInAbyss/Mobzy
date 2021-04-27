@@ -13,6 +13,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyTypeInjectionComponent
 import com.mineinabyss.mobzy.mobs.types.*
 import com.mineinabyss.mobzy.mobs.types.NPC
+import com.mineinabyss.mobzy.spawning.toMobCategory
 import net.minecraft.server.v1_16_R2.*
 import sun.misc.Unsafe
 import java.lang.reflect.Field
@@ -29,7 +30,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
 
     override fun GearyEntity.tick() {
         set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
-        //TODO concurrent modification exception
+        set(info.mobType ?: info.creatureType.toMobCategory())
         remove<MobzyTypeInjectionComponent>()
     }
 
