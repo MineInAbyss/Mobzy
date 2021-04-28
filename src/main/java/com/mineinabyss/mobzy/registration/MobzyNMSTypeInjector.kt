@@ -30,7 +30,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
 
     override fun GearyEntity.tick() {
         set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
-        set(info.mobType ?: info.creatureType.toMobCategory())
+        set(info.mobCategory ?: info.creatureType.toMobCategory())
         remove<MobzyTypeInjectionComponent>()
     }
 

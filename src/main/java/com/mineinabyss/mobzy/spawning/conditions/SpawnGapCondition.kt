@@ -8,8 +8,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
 
+/**
+ * # `mobzy:spawn.gap`
+ *
+ * Ensures that when a mob spawn happens, the gap of air blocks is within a [range] of heights.
+ */
 @Serializable
-@SerialName("gap")
+@SerialName("mobzy:spawn.gap")
 class SpawnGapCondition(
     @Serializable(with = IntRangeSerializer::class)
     val range: IntRange

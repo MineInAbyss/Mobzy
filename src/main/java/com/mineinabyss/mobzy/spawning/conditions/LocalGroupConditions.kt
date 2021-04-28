@@ -10,15 +10,21 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
 
+/**
+ * # `mobzy:spawn.local_group`
+ *
+ * Checks that no more than [max] Bukkit entities of the same type as this one are within [radius] blocks during a
+ * mob spawn.
+ */
 @Serializable
-@SerialName("group")
+@SerialName("mobzy:spawn.local_group")
 class LocalGroupConditions(
-    val max: Int,
-    val radius: Double
+    private val max: Int,
+    private val radius: Double
 ) : GearyCondition() {
-    val GearyEntity.location by get<Location>()
-    val GearyEntity.spawnDef by get<SpawnDefinition>()
-    val GearyEntity.spawnInfo by get<SpawnInfo>()
+    private val GearyEntity.location by get<Location>()
+    private val GearyEntity.spawnDef by get<SpawnDefinition>()
+    private val GearyEntity.spawnInfo by get<SpawnInfo>()
 
     override fun GearyEntity.check(): Boolean {
         //TODO considering we are now making this a suspend function, we could probably evaluate all mobs

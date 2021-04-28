@@ -9,11 +9,12 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.concurrent.atomic.AtomicInteger
 
-object MobCountManager: Listener {
+object MobCountManager : Listener {
     val categoryCounts: MutableMap<MobCategory, AtomicInteger> = mutableMapOf()
-    val deniedCategories: Set<MobCategory> get() =
+
+    fun getDeniedCategories(playerCount: Int): Set<MobCategory> =
         categoryCounts.filter { (category, count) ->
-            count.get() > MobzyConfig.getCreatureTypeCap(category) * Bukkit.getOnlinePlayers().count()
+            count.get() > MobzyConfig.getCreatureTypeCap(category) * Bukkit.getOnlinePlayers().count() * playerCount
         }.keys
 
     @EventHandler

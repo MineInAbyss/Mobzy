@@ -13,5 +13,5 @@ import kotlinx.serialization.Serializable
 class MobzyTypeInjectionComponent(
     val baseClass: String,
     val creatureType: NMSCreatureType,
-    val mobType: MobCategory? = null
+    val mobCategory: MobCategory? = null
 )

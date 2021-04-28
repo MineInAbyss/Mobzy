@@ -75,18 +75,17 @@ object SpawnTask {
 
 
     private fun runSpawnTask() {
-        //STEP 1: Get mobs
         val onlinePlayers = Bukkit.getOnlinePlayers()
         if (onlinePlayers.isEmpty()) return
 
-        //STEP 2: Every player group picks a random chunk around them
         val playerGroups = onlinePlayers.toPlayerGroups()
         val playerGroupCount = playerGroups.size
 
         //TODO sorted by least mobs around
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
+            // Every player group picks a random chunk around them
             val chunkSpawn: Chunk = playerGroup.randomChunkNearby ?: return@playerLoop
-            val deniedCategories = MobCountManager.deniedCategories
+            val deniedCategories = MobCountManager.getDeniedCategories(playerGroupCount)
             Engine.temporaryEntity { spawn ->
                 val spawnInfo = VerticalSpawn.findGap(chunkSpawn, 0, 255)
                 val priorities = regionContainer.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
