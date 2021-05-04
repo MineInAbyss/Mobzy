@@ -12,10 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger
 object MobCountManager : Listener {
     val categoryCounts: MutableMap<MobCategory, AtomicInteger> = mutableMapOf()
 
-    fun getDeniedCategories(playerCount: Int): Set<MobCategory> =
-        categoryCounts.filter { (category, count) ->
-            count.get() > MobzyConfig.getCreatureTypeCap(category) * Bukkit.getOnlinePlayers().count() * playerCount
-        }.keys
+    fun isCategoryAllowed(category: MobCategory, players: Int) =
+        categoryCounts[category]?.get() ?: 0 <= MobzyConfig.getCreatureTypeCap(category) * players
 
     @EventHandler
     fun EntityAddToWorldEvent.registerOnAdd() {

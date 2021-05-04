@@ -2,8 +2,13 @@ package com.mineinabyss.mobzy.spawning.vertical
 
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.spawning.SpawnDefinition.SpawnPosition
+import com.okkero.skedule.BukkitDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.bukkit.Location
+import org.bukkit.entity.Entity
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
@@ -18,19 +23,14 @@ import kotlin.random.Random
 data class SpawnInfo(
     val bottom: Location,
     val top: Location,
-    val searchRadius: Int = 5
+    val searchRadius: Double = 200.0
 ) {
     val localMobs: Map<NMSEntityType<*>, AtomicInteger> by lazy {
-        val map = mutableMapOf<NMSEntityType<*>, AtomicInteger>()
-        val world = bottom.world
-        val x = bottom.chunk.x
-        val z = bottom.chunk.z
-        for (i in -searchRadius..searchRadius) for (j in -searchRadius..searchRadius) {
-            for (entity in world.getChunkAt(x + i, z + j).entities) {
-                map.getOrPut(entity.toNMS().entityType, { AtomicInteger() }).incrementAndGet()
+        runBlocking {
+            withContext(BukkitDispatcher(mobzy)) {
+                bottom.getNearbyEntities(searchRadius, searchRadius, searchRadius).categorizeMobs()
             }
         }
-        map
     }
 
     //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
@@ -53,4 +53,12 @@ data class SpawnInfo(
         }
 
     override fun toString(): String = "SpawnArea: $bottom, $top"
+}
+
+fun Collection<Entity>.categorizeMobs(): Map<NMSEntityType<*>, AtomicInteger> {
+    val map = mutableMapOf<NMSEntityType<*>, AtomicInteger>()
+    forEach { entity ->
+        map.getOrPut(entity.toNMS().entityType, { AtomicInteger() }).incrementAndGet()
+    }
+    return map
 }

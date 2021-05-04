@@ -65,10 +65,11 @@ object SpawnTask {
                     e.printStackTrace()
                     stopTask()
                     return@schedule
+                } catch (e: RuntimeException) {
+                    e.printStackTrace()
                 }
                 yield()
             }
-
             stopTask()
         }
     }
@@ -85,10 +86,10 @@ object SpawnTask {
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             // Every player group picks a random chunk around them
             val chunkSpawn: Chunk = playerGroup.randomChunkNearby ?: return@playerLoop
-            val deniedCategories = MobCountManager.getDeniedCategories(playerGroupCount)
             Engine.temporaryEntity { spawn ->
                 val spawnInfo = VerticalSpawn.findGap(chunkSpawn, 0, 255)
-                val priorities = regionContainer.createQuery().getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
+                val priorities = regionContainer.createQuery()
+                    .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
                     .sorted()
                     .filterWhenOverlapFlag()
                     .getMobSpawnsForRegions()
@@ -100,8 +101,11 @@ object SpawnTask {
                 while (priorities.isNotEmpty()) {
                     val choice: SpawnDefinition = WeightedDice(priorities).roll()
                     spawn.set(choice)
+                    val category = choice.prefab.get<MobCategory>() ?: continue
 
-                    if (choice.prefab.get<MobCategory>() !in deniedCategories && choice.conditionsMet(spawn)) {
+                    if (MobCountManager.isCategoryAllowed(category, playerGroupCount) &&
+                        choice.conditionsMet(spawn)
+                    ) {
                         // Must spawn mobs in sync
                         mobzy.schedule(SYNC) {
                             if (mobzy.isEnabled) choice.spawn(spawnInfo)

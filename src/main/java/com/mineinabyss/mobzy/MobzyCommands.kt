@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
+import com.mineinabyss.geary.minecraft.access.BukkitEntityAccess
 import com.mineinabyss.geary.minecraft.components.of
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.commands.arguments.booleanArg
@@ -11,8 +12,11 @@ import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
+import com.mineinabyss.idofront.messaging.color
+import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.isOfType
@@ -20,7 +24,9 @@ import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -31,8 +37,14 @@ import kotlin.time.ExperimentalTime
 class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
-            ("reload" / "rl")(desc = "Reloads the configuration files")?.action {
-                MobzyConfig.reload(sender)
+            ("reload" / "rl")(desc = "Reloads the configuration files") {
+                "spawns" {
+                    MobzyConfig.reloadSpawns()
+                }
+
+                action {
+                    MobzyConfig.reload(sender)
+                }
             }
 
             commandGroup {
@@ -128,6 +140,15 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     }
                 }
             }
+            "stats" {
+                action {
+                    sender.info(MobCountManager.categoryCounts)
+                    sender.info(mobzy.server.worlds.flatMap { it.entities }.categorizeMobs()
+                        .entries
+                        .joinToString("\n") { (type, amount) -> "&7${type.typeName}&r: $amount".color() }
+                    )
+                }
+            }
         }
     }
 
@@ -140,7 +161,18 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     ): List<String> {
         return when {
             command.name != "mobzy" -> emptyList()
-            args.size <= 1 -> listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config")
+            args.size <= 1 -> listOf(
+                "spawn",
+                "info",
+                "remove",
+                "reload",
+                "fullreload",
+                "i",
+                "rm",
+                "s",
+                "config",
+                "stats"
+            )
                 .filter { it.startsWith(args[0]) }
             else -> {
                 val subCommand = args[0]

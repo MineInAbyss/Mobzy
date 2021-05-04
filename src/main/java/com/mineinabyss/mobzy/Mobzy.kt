@@ -76,7 +76,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
                     MobzyPacketInterception.registerPacketInterceptors()
                     SpawnTask.startTask()
 
-                    MobzyConfig.activateAddons()
+                    MobzyConfig.load()
                 }
             }
         }

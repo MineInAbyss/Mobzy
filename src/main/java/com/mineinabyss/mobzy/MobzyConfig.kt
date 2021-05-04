@@ -60,38 +60,46 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      */
     fun getCreatureTypeCap(creatureType: MobCategory): Int = data.creatureTypeCaps[creatureType] ?: 0
 
-    override fun ReloadScope.reload() {
-        logSuccess("Reloading mobzy config")
-
-        MobzyNMSTypeInjector.clear()
-        //TODO PrefabManager.clearFromPlugin(mobzy)
-
+    internal fun reloadSpawns() {
         spawnCfgs.clear()
         unregisterSpawns()
 
-        //TODO make attempt show a bit of stacktrace
-        attempt("Reactivating all addons") {
-            activateAddons()
-        }
-
-        sender.success("Successfully reloaded config")
-    }
-
-    /**
-     * Addons have registered themselves with the plugin at this point. We just need to parse their configs
-     * and create everything they need for them.
-     */
-    internal fun activateAddons() {
         //FIXME recursively deserializing something here I think (thread freezes forever)
         registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
+    }
 
-        MobzyNMSTypeInjector.injectDefaultAttributes()
-        SpawnTask.startTask()
+    override fun ReloadScope.unload() {
+        //TODO PrefabManager.clearFromPlugin(mobzy)
 
-        fixEntitiesAfterReload()
+        "Clear registered types" {
+            MobzyNMSTypeInjector.clear()
+        }
 
-        logSuccess("Registered addons: $registeredAddons")
-        logSuccess("Loaded types: ${MobzyNMSTypeInjector.typeNames}")
+        "Stop spawn task" {
+            SpawnTask.stopTask()
+        }
+    }
+    override fun ReloadScope.load() {
+        logSuccess("Loading Mobzy config")
+
+        "Inject mob attributes" {
+            MobzyNMSTypeInjector.injectDefaultAttributes()
+        }
+
+        "Load spawns" {
+            reloadSpawns()
+        }
+        "Start spawn task" {
+            SpawnTask.startTask()
+        }
+
+        "Fix old entities after reload" {
+            fixEntitiesAfterReload()
+        }
+
+        sender.success("Registered addons: $registeredAddons")
+        sender.success("Loaded types: ${MobzyNMSTypeInjector.typeNames}")
+        sender.success("Successfully loaded config")
     }
 
     /**
