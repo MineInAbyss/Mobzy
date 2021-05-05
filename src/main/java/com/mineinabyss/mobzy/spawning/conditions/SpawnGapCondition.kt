@@ -19,8 +19,8 @@ class SpawnGapCondition(
     @Serializable(with = IntRangeSerializer::class)
     val range: IntRange
 ) : GearyCondition() {
-    val GearyEntity.location by get<Location>()
-    val GearyEntity.spawnInfo by get<SpawnInfo>()
+    private val GearyEntity.location by get<Location>()
+    private val GearyEntity.spawnInfo by get<SpawnInfo>()
 
     override fun GearyEntity.check(): Boolean =
         spawnInfo.gap in range

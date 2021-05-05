@@ -57,9 +57,10 @@ object SpawnTask {
     fun startTask() {
         if (runningTask != null) return
         runningTask = mobzy.schedule(ASYNC) {
-            repeating(MobzyConfig.data.spawnTaskDelay)
+            repeating(MobzyConfig.data.spawnTaskDelay.inTicks)
             while (MobzyConfig.data.doMobSpawns) {
                 try {
+                    GlobalSpawnInfo.iterationNumber++
                     runSpawnTask()
                 } catch (e: NoClassDefFoundError) {
                     e.printStackTrace()
@@ -80,7 +81,7 @@ object SpawnTask {
         if (onlinePlayers.isEmpty()) return
 
         val playerGroups = onlinePlayers.toPlayerGroups()
-        val playerGroupCount = playerGroups.size
+        GlobalSpawnInfo.playerGroupCount = playerGroups.size
 
         //TODO sorted by least mobs around
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
@@ -101,11 +102,7 @@ object SpawnTask {
                 while (priorities.isNotEmpty()) {
                     val choice: SpawnDefinition = WeightedDice(priorities).roll()
                     spawn.set(choice)
-                    val category = choice.prefab.get<MobCategory>() ?: continue
-
-                    if (MobCountManager.isCategoryAllowed(category, playerGroupCount) &&
-                        choice.conditionsMet(spawn)
-                    ) {
+                    if (choice.conditionsMet(spawn)) {
                         // Must spawn mobs in sync
                         mobzy.schedule(SYNC) {
                             if (mobzy.isEnabled) choice.spawn(spawnInfo)

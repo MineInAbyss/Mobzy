@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger
 object MobCountManager : Listener {
     val categoryCounts: MutableMap<MobCategory, AtomicInteger> = mutableMapOf()
 
-    fun isCategoryAllowed(category: MobCategory, players: Int) =
-        categoryCounts[category]?.get() ?: 0 <= MobzyConfig.getCreatureTypeCap(category) * players
+    fun isCategoryAllowed(category: MobCategory) =
+        categoryCounts[category]?.get() ?: 0 <= MobzyConfig.getCreatureTypeCap(category) * GlobalSpawnInfo.playerGroupCount
 
     @EventHandler
     fun EntityAddToWorldEvent.registerOnAdd() {

@@ -3,16 +3,20 @@ package com.mineinabyss.mobzy.spawning
 import com.mineinabyss.geary.ecs.api.conditions.GearyCondition
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
+import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
+import com.mineinabyss.mobzy.spawning.conditions.EnoughSpaceCondition
+import com.mineinabyss.mobzy.spawning.conditions.SpawnCapCondition
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.capturedKClass
 import org.bukkit.Location
 import org.bukkit.util.Vector
 import kotlin.math.sign
@@ -39,13 +43,25 @@ data class SpawnDefinition(
     @SerialName("priority") private val _basePriority: Double? = null,
     @SerialName("spawnPos") private val _spawnPos: SpawnPosition? = null,
     @SerialName("conditions")
-    val _conditions: List<GearyCondition> = listOf()
+    val _conditions: List<GearyCondition> = listOf(),
+    val ignore: List<String> = listOf()
 ) {
+    companion object {
+        val defaultConditions = listOf(
+            SpawnCapCondition,
+//            EnoughSpaceCondition,
+        )
+    }
+
     @Transient
     val copyFrom: SpawnDefinition? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
+    // associateBy ensures we only have one instance of each condition and we take the overridden one
     @Transient
-    val conditions = (copyFrom?._conditions ?: listOf()) + _conditions
+    val conditions = ((copyFrom?._conditions ?: defaultConditions) + _conditions)
+        .associateBy { it::class }
+        .minus(ignore.map { Formats.yamlFormat.serializersModule.getPolymorphic(GearyCondition::class, it)?.descriptor?.capturedKClass })
+        .values
 
     @Transient
     val prefabKey: PrefabKey = getOrCopy { _prefabKey } ?: error("Mob prefab must not be null")

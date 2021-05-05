@@ -42,7 +42,7 @@ object VerticalSpawn {
                     }
                     !isEmpty && nextIsEmpty -> {
                         opposite.foundBlock = true
-                        opposite.y = y
+                        opposite.y = y - add
                     }
                 }
                 isEmpty = nextIsEmpty

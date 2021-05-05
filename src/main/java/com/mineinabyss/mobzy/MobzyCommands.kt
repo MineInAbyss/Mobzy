@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.minecraft.access.BukkitEntityAccess
 import com.mineinabyss.geary.minecraft.components.of
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.commands.arguments.booleanArg
@@ -24,12 +23,12 @@ import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
-import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import org.bukkit.entity.Entity
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -55,7 +54,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     val worlds = mobzy.server.worlds
                     var mobCount = 0
                     var entityCount = 0
-
+                    val entities = mutableSetOf<Entity>()
                     for (world in worlds) for (entity in world.entities) {
                         val tags = entity.scoreboardTags
                         val nmsEntity = entity.toNMS()
@@ -72,8 +71,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             val playerLoc = player.location
                             if (radius <= 0 || entity.world == playerLoc.world && entity.location.distance(playerLoc) < radius) {
                                 entityCount++
-
-                                if (!isInfo) entity.remove()
+                                if (isInfo) entities += entity
+                                else entity.remove()
                                 if (!tags.contains("additionalPart")) mobCount++
                             }
                         }
@@ -86,6 +85,15 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         ${if (radius <= 0) "in all loaded chunks." else "in a radius of $radius blocks."}
                         """.trimIndent().replace("\n", " "), '&'
                     )
+                    if (isInfo) {
+                        val categories = entities.categorizeMobs()
+                        if (categories.size > 1)
+                            sender.info(
+                                categories.entries
+                                    .sortedByDescending { it.value.get() }
+                                    .joinToString("\n") { (type, amount) -> "&7${type.typeName}&r: $amount".color() }
+                            )
+                    }
                 }
 
                 ("remove" / "rm")(desc = "Removes mobs")?.playerAction {
@@ -138,15 +146,6 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             sender.success("Config option doMobSpawns was already set to $enabled")
                         if (enabled) SpawnTask.startTask()
                     }
-                }
-            }
-            "stats" {
-                action {
-                    sender.info(MobCountManager.categoryCounts)
-                    sender.info(mobzy.server.worlds.flatMap { it.entities }.categorizeMobs()
-                        .entries
-                        .joinToString("\n") { (type, amount) -> "&7${type.typeName}&r: $amount".color() }
-                    )
                 }
             }
         }

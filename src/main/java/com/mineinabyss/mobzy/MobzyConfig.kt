@@ -10,6 +10,8 @@ import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.time.TimeSpan
+import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
@@ -39,11 +41,11 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     class Data(
         var debug: Boolean = false,
         var doMobSpawns: Boolean = false,
-        var minChunkSpawnRad: Int = 3,
-        var maxChunkSpawnRad: Int = 7,
-        var maxCommandSpawns: Int = 50,
-        var playerGroupRadius: Double = 128.0,
-        var spawnTaskDelay: Long = 100,
+        var minChunkSpawnRad: Int,
+        var maxChunkSpawnRad: Int,
+        var maxCommandSpawns: Int,
+        var playerGroupRadius: Double,
+        var spawnTaskDelay: TimeSpan,
         var creatureTypeCaps: MutableMap<MobCategory, Int> = mutableMapOf()
     )
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()

@@ -4,6 +4,7 @@ import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.ecs.components.*
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
+import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
@@ -29,13 +30,20 @@ object MobzyNMSTypeInjector : TickingSystem() {
     private val key by get<PrefabKey>()
 
     override fun GearyEntity.tick() {
-        set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
+        val nmsEntityType = inject(key.name, info, get<MobAttributes>() ?: MobAttributes())
+        set(nmsEntityType)
         set(info.mobCategory ?: info.creatureType.toMobCategory())
         remove<MobzyTypeInjectionComponent>()
+
+        typeToPrefabMap[nmsEntityType.keyName] = key
     }
 
     val typeNames get() = _types.keys.toList()
     private val _types: MutableMap<String, NMSEntityType<*>> = mutableMapOf()
+    private val typeToPrefabMap = mutableMapOf<String, PrefabKey>()
+
+    fun getPrefabForType(nmsEntityType: NMSEntityType<*>): PrefabKey? =
+        typeToPrefabMap[nmsEntityType.keyName]
 
     private val customAttributes = mutableMapOf<NMSEntityType<*>, AttributeProvider>()
 
@@ -109,3 +117,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
 
 //TODO try to reduce usage around code, should really only be done in one central place
 internal fun String.toEntityTypeName() = toLowerCase().replace(" ", "_")
+
+fun NMSEntityType<*>.toPrefab(): GearyEntity? {
+    return PrefabManager[MobzyNMSTypeInjector.getPrefabForType(this) ?: return null]
+}

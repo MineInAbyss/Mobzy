@@ -1,5 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
+import com.mineinabyss.idofront.location.down
+import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.mobzy
@@ -48,8 +50,8 @@ data class SpawnInfo(
         when (position) {
             //pick some position between the bottom and top when spawn position is in air
             SpawnPosition.AIR -> bottom.clone().apply { if (gap > 1) y = Random.nextInt(gap - 1).toDouble() }
-            SpawnPosition.GROUND -> bottom.clone()
-            SpawnPosition.OVERHANG -> top.clone()
+            SpawnPosition.GROUND -> bottom.clone().up(1)
+            SpawnPosition.OVERHANG -> top.clone().down(1)
         }
 
     override fun toString(): String = "SpawnArea: $bottom, $top"
