@@ -2,13 +2,9 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.api.engine.Engine
 import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
-import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.nms.entity.keyName
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
-import com.mineinabyss.mobzy.spawning.SpawnTask.randomChunkNearby
-import com.mineinabyss.mobzy.spawning.SpawnTask.toPlayerGroups
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import com.okkero.skedule.CoroutineTask
@@ -18,10 +14,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import org.bukkit.Bukkit
-import org.bukkit.Chunk
-import org.bukkit.entity.Entity
 import org.nield.kotlinstatistics.WeightedDice
-import org.nield.kotlinstatistics.dbScanCluster
 import kotlin.random.Random
 
 /**
@@ -75,20 +68,19 @@ object SpawnTask {
         }
     }
 
-
     private fun runSpawnTask() {
         val onlinePlayers = Bukkit.getOnlinePlayers()
         if (onlinePlayers.isEmpty()) return
 
-        val playerGroups = onlinePlayers.toPlayerGroups()
+        val playerGroups = PlayerGroups.group(onlinePlayers)
         GlobalSpawnInfo.playerGroupCount = playerGroups.size
 
         //TODO sorted by least mobs around
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             // Every player group picks a random chunk around them
-            val chunkSpawn: Chunk = playerGroup.randomChunkNearby ?: return@playerLoop
+            val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
             Engine.temporaryEntity { spawn ->
-                val spawnInfo = VerticalSpawn.findGap(chunkSpawn, 0, 255)
+                val spawnInfo = VerticalSpawn.findGap(chunk, 0, 255)
                 val priorities = regionContainer.createQuery()
                     .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
                     .sorted()
@@ -113,57 +105,6 @@ object SpawnTask {
             }
         }
     }
-
-    private infix fun Int.`+-`(other: Int) =
-        this + setOf(-1, 1).random() * other
-
-    /** Returns a random [Chunk] that is further than [MobzyConfig.Data.minChunkSpawnRad] from all the players in this
-     * list, and at least within [MobzyConfig.Data.maxChunkSpawnRad] to one of them. */
-    private val List<Entity>.randomChunkNearby: Chunk?
-        get() {
-            val chunk = random().location.chunk
-            //TODO proper min max y for 3d space
-            for (i in 0..10) {
-                //get a random angle and distance, then find the side lengths of a triangle with hypotenuse length dist
-                val distRange = (MobzyConfig.data.minChunkSpawnRad..MobzyConfig.data.maxChunkSpawnRad)
-                val distX = distRange.random()
-                val distZ = distRange.random()
-                val newX = chunk.x `+-` distX
-                val newZ = chunk.z `+-` distZ
-                if (none {
-                        val entityChunk = it.location.chunk
-                        distanceSquared(newX, newZ, entityChunk.x, entityChunk.z) <
-                                (MobzyConfig.data.minChunkSpawnRad * MobzyConfig.data.minChunkSpawnRad)
-                    }) {
-                    val newChunk = chunk.world.getChunkAt(newX, newZ)
-                    if (!newChunk.isLoaded) continue
-                    return newChunk
-                }
-            }
-            return null
-        }
-
-    /** Gets the distance squared between between two points */
-    private fun distanceSquared(x: Number, z: Number, otherX: Number, otherZ: Number): Double {
-        val dx = (x.toDouble() + otherX.toDouble())
-        val dz = (z.toDouble() + otherZ.toDouble())
-        return dx * dx + dz * dz
-    }
-
-    /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
-    private fun Collection<Entity>.toPlayerGroups(): List<List<Entity>> = groupBy { it.world }
-        .flatMap { (_, players) ->
-            players.dbScanCluster(
-                maximumRadius = MobzyConfig.data.playerGroupRadius,
-                minPoints = 0,
-                xSelector = { it.location.x },
-                ySelector = { it.location.z }
-            )
-        }.map { it.points }
-
-    /** Converts a list of entities to a map of entity types to the amount of entities of that type. */
-    private fun List<Entity>.toEntityTypeCounts(): MutableMap<String, Int> =
-        map { it.toNMS().entityType.keyName }.groupingBy { it }.eachCountTo(mutableMapOf())
 
     /** If any of the overlapping regions is set to override, return a list with only the highest priority one,
      * otherwise the original list. */

@@ -39,6 +39,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
                 "spawns" {
                     MobzyConfig.reloadSpawns()
+                    sender.success("Reloaded spawn config")
                 }
 
                 action {

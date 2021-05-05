@@ -8,7 +8,6 @@ import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
-import com.mineinabyss.mobzy.spawning.conditions.EnoughSpaceCondition
 import com.mineinabyss.mobzy.spawning.conditions.SpawnCapCondition
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
@@ -58,7 +57,7 @@ data class SpawnDefinition(
 
     // associateBy ensures we only have one instance of each condition and we take the overridden one
     @Transient
-    val conditions = ((copyFrom?._conditions ?: defaultConditions) + _conditions)
+    val conditions: Collection<GearyCondition> = ((copyFrom?.conditions ?: defaultConditions) + _conditions)
         .associateBy { it::class }
         .minus(ignore.map { Formats.yamlFormat.serializersModule.getPolymorphic(GearyCondition::class, it)?.descriptor?.capturedKClass })
         .values

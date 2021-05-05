@@ -10,8 +10,8 @@ import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.time.TimeSpan
-import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
@@ -30,7 +30,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     /**
      * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
      * @property doMobSpawns whether custom mob spawning enabled
-     * @property minChunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
+     * @property chunkSpawnRad the minimum number of chunks away from the player in which a mob can spawn
      * @property maxChunkSpawnRad the maximum number of chunks away from the player in which a mob can spawn
      * @property maxCommandSpawns the maximum number of mobs to spawn with /mobzy spawn
      * @property playerGroupRadius the radius around which players will count mobs towards the local mob cap
@@ -41,13 +41,14 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     class Data(
         var debug: Boolean = false,
         var doMobSpawns: Boolean = false,
-        var minChunkSpawnRad: Int,
-        var maxChunkSpawnRad: Int,
+        @Serializable(with = IntRangeSerializer::class)
+        var chunkSpawnRad: IntRange,
         var maxCommandSpawns: Int,
         var playerGroupRadius: Double,
         var spawnTaskDelay: TimeSpan,
         var creatureTypeCaps: MutableMap<MobCategory, Int> = mutableMapOf()
     )
+
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
     val spawnCfgs: MutableList<SpawnConfig> = mutableListOf()
 
@@ -81,6 +82,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
             SpawnTask.stopTask()
         }
     }
+
     override fun ReloadScope.load() {
         logSuccess("Loading Mobzy config")
 

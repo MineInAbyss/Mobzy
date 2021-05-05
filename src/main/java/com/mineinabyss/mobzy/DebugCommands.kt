@@ -12,13 +12,18 @@ import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.time.seconds
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
-import com.mineinabyss.mobzy.spawning.MobCountManager
-import com.mineinabyss.mobzy.spawning.SpawnRegistry
+import com.mineinabyss.mobzy.spawning.PlayerGroups
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
+import org.bukkit.Bukkit
 import kotlin.system.measureTimeMillis
 
 internal fun Command.createDebugCommands() {
     "spawn" {
+        "groups" {
+            action {
+                sender.info(PlayerGroups.group(Bukkit.getOnlinePlayers()))
+            }
+        }
         "conditions" {
             val spawnName by stringArg()
 
