@@ -15,9 +15,6 @@ repositories {
 val serverVersion: String by project
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:$serverVersion") //Spigot
-    compileOnly("org.spigotmc:spigot:$serverVersion") // NMS
-
     implementation("com.squareup:kotlinpoet:1.8.0")
     implementation("com.squareup:kotlinpoet-metadata:1.8.0")
     implementation("com.squareup:kotlinpoet-metadata-specs:1.8.0")

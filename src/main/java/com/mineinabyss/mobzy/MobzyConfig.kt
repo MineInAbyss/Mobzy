@@ -21,8 +21,8 @@ import com.mineinabyss.mobzy.spawning.MobCategory
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.EnumCreatureType
-import net.minecraft.server.v1_16_R2.NBTTagCompound
+import net.minecraft.server.v1_16_R3.EnumCreatureType
+import net.minecraft.server.v1_16_R3.NBTTagCompound
 import org.bukkit.Bukkit
 import java.util.*
 

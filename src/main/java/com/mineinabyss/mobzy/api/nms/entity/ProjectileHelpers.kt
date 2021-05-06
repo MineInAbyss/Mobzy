@@ -1,14 +1,11 @@
 package com.mineinabyss.mobzy.api.nms.entity
 
-import net.minecraft.server.v1_16_R2.Entity.c
-import net.minecraft.server.v1_16_R2.IProjectile
-import net.minecraft.server.v1_16_R2.MathHelper
-import net.minecraft.server.v1_16_R2.Vec3D
+import net.minecraft.server.v1_16_R3.IProjectile
+import net.minecraft.server.v1_16_R3.Vec3D
 import org.bukkit.util.Vector
 import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.random.Random
-
 
 /**
  * Shoot the projectile towards a direction, with a certain speed and randomness
@@ -21,7 +18,7 @@ import kotlin.random.Random
 //TODO: Implement the entity deltaPosition ticking ourselves at some point, to circumvent NMS.
 fun IProjectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float, randomAngle: Double) {
     val directionVector = Vector(dX, dY, dZ).normalize()
-    if(randomAngle != 0.0) {
+    if (randomAngle != 0.0) {
         directionVector.rotateAroundX(Random.nextDouble(-randomAngle, randomAngle).toRadians())
         directionVector.rotateAroundY(Random.nextDouble(-randomAngle, randomAngle).toRadians())
         directionVector.rotateAroundZ(Random.nextDouble(-randomAngle, randomAngle).toRadians())

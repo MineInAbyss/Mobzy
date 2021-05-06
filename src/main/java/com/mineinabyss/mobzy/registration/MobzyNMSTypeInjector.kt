@@ -15,7 +15,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.MobzyTypeInjectionCom
 import com.mineinabyss.mobzy.mobs.types.*
 import com.mineinabyss.mobzy.mobs.types.NPC
 import com.mineinabyss.mobzy.spawning.toMobCategory
-import net.minecraft.server.v1_16_R2.*
+import net.minecraft.server.v1_16_R3.*
 import sun.misc.Unsafe
 import java.lang.reflect.Field
 import kotlin.collections.set

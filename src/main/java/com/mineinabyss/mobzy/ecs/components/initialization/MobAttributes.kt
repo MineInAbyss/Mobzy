@@ -3,10 +3,10 @@ package com.mineinabyss.mobzy.ecs.components.initialization
 import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import com.mineinabyss.idofront.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.idofront.nms.typeinjection.NMSAttributes
+import com.mineinabyss.idofront.nms.typeinjection.NMSGenericAttributes
 import com.mineinabyss.idofront.nms.typeinjection.set
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.GenericAttributes
 
 @Serializable
 @SerialName("mobzy:attributes")
@@ -31,17 +31,17 @@ data class MobAttributes(
 ) {
 
     fun toNMSBuilder(): NMSAttributeBuilder = NMSAttributes.forEntityInsentient()
-        .set(GenericAttributes.ARMOR, armor)
-        .set(GenericAttributes.ARMOR_TOUGHNESS, armorToughness)
-        .set(GenericAttributes.ATTACK_DAMAGE, attackDamage)
-        .set(GenericAttributes.ATTACK_KNOCKBACK, attackKnockback)
-        .set(GenericAttributes.ATTACK_SPEED, attackSpeed)
-        .set(GenericAttributes.FLYING_SPEED, flyingSpeed)
-        .set(GenericAttributes.FOLLOW_RANGE, followRange)
-        .set(GenericAttributes.JUMP_STRENGTH, jumpStrength)
-        .set(GenericAttributes.KNOCKBACK_RESISTANCE, knockbackResistance)
-        .set(GenericAttributes.LUCK, luck)
-        .set(GenericAttributes.MAX_HEALTH, maxHealth)
-        .set(GenericAttributes.MOVEMENT_SPEED, movementSpeed)
-        .set(GenericAttributes.SPAWN_REINFORCEMENTS, spawnReinforcements)
+        .set(NMSGenericAttributes.ARMOR, armor)
+        .set(NMSGenericAttributes.ARMOR_TOUGHNESS, armorToughness)
+        .set(NMSGenericAttributes.ATTACK_DAMAGE, attackDamage)
+        .set(NMSGenericAttributes.ATTACK_KNOCKBACK, attackKnockback)
+        .set(NMSGenericAttributes.ATTACK_SPEED, attackSpeed)
+        .set(NMSGenericAttributes.FLYING_SPEED, flyingSpeed)
+        .set(NMSGenericAttributes.FOLLOW_RANGE, followRange)
+        .set(NMSGenericAttributes.JUMP_STRENGTH, jumpStrength)
+        .set(NMSGenericAttributes.KNOCKBACK_RESISTANCE, knockbackResistance)
+        .set(NMSGenericAttributes.LUCK, luck)
+        .set(NMSGenericAttributes.MAX_HEALTH, maxHealth)
+        .set(NMSGenericAttributes.MOVEMENT_SPEED, movementSpeed)
+        .set(NMSGenericAttributes.SPAWN_REINFORCEMENTS, spawnReinforcements)
 }

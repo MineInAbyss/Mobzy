@@ -5,8 +5,8 @@ import com.mineinabyss.idofront.nms.entity.reachDistance
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.EntityLiving
-import net.minecraft.server.v1_16_R2.PathfinderGoalMeleeAttack
+import net.minecraft.server.v1_16_R3.EntityLiving
+import net.minecraft.server.v1_16_R3.PathfinderGoalMeleeAttack
 import org.bukkit.entity.Creature
 import org.bukkit.entity.Mob
 

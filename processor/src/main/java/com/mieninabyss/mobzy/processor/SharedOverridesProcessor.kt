@@ -1,12 +1,12 @@
 package com.mieninabyss.mobzy.processor
 
 import com.google.auto.service.AutoService
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.nms.aliases.NMSWorld
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.classinspector.elements.ElementsClassInspector
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.specs.toTypeSpec
-import net.minecraft.server.v1_16_R2.EntityTypes
-import net.minecraft.server.v1_16_R2.World
 import java.io.File
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
@@ -68,8 +68,8 @@ class SharedOverridesProcessor : AbstractProcessor() {
         val newClass = TypeSpec.classBuilder(fileName)
                 .superclass(targetMirror.asTypeName())
                 .primaryConstructor(FunSpec.constructorBuilder()
-                        .addParameter("world", World::class)
-                        .addParameter("type", typeOf<EntityTypes<*>>().asTypeName())
+                        .addParameter("world", NMSWorld::class)
+                        .addParameter("type", typeOf<NMSEntityType<*>>().asTypeName())
                         .build())
                 .addSuperclassConstructorParameter("type as EntityTypes<$targetMirror>, world".replace(' ', '·')) //https://github.com/square/kotlinpoet#spaces-wrap-by-default
                 .addSuperinterfaces(baseSpec.superinterfaces.map { it.key })

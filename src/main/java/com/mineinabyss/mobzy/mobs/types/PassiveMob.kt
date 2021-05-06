@@ -3,9 +3,9 @@ package com.mineinabyss.mobzy.mobs.types
 import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
-import net.minecraft.server.v1_16_R2.EntityAgeable
-import net.minecraft.server.v1_16_R2.EntityAnimal
-import net.minecraft.server.v1_16_R2.WorldServer
+import net.minecraft.server.v1_16_R3.EntityAgeable
+import net.minecraft.server.v1_16_R3.EntityAnimal
+import net.minecraft.server.v1_16_R3.WorldServer
 
 @GenerateFromBase(base = MobBase::class, createFor = [EntityAnimal::class])
 open class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnimal(world, type) {

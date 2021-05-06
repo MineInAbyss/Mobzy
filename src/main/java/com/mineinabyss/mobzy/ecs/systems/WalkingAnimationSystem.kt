@@ -5,9 +5,9 @@ import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.idofront.nms.aliases.BukkitEntity
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
-import net.minecraft.server.v1_16_R2.EnumItemSlot
-import net.minecraft.server.v1_16_R2.Vec3D
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
+import net.minecraft.server.v1_16_R3.EnumItemSlot
+import net.minecraft.server.v1_16_R3.Vec3D
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 
 object WalkingAnimationSystem : TickingSystem(interval = 10) {

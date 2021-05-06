@@ -4,8 +4,8 @@ import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.EntityHuman
-import net.minecraft.server.v1_16_R2.PathfinderGoalNearestAttackableTarget
+import net.minecraft.server.v1_16_R3.EntityHuman
+import net.minecraft.server.v1_16_R3.PathfinderGoalNearestAttackableTarget
 import org.bukkit.entity.Mob
 
 @Serializable

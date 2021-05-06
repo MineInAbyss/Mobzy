@@ -4,10 +4,10 @@ import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.PathfinderGoalTempt
-import net.minecraft.server.v1_16_R2.RecipeItemStack
+import net.minecraft.server.v1_16_R3.PathfinderGoalTempt
+import net.minecraft.server.v1_16_R3.RecipeItemStack
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack
 import org.bukkit.entity.Creature
 import org.bukkit.entity.Mob
 import org.bukkit.inventory.ItemStack

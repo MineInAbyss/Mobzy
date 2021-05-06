@@ -3,8 +3,8 @@ package com.mineinabyss.mobzy.mobs.types
 import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
-import net.minecraft.server.v1_16_R2.ControllerMoveFlying
-import net.minecraft.server.v1_16_R2.EntityFlying
+import net.minecraft.server.v1_16_R3.ControllerMoveFlying
+import net.minecraft.server.v1_16_R3.EntityFlying
 
 @GenerateFromBase(base = MobBase::class, createFor = [EntityFlying::class])
 open class FlyingMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFlying(world, type) {

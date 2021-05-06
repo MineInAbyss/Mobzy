@@ -1,3 +1,4 @@
+import com.mineinabyss.mineInAbyss
 import com.mineinabyss.sharedSetup
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -15,10 +16,16 @@ plugins {
 
 sharedSetup()
 
+val kotlinVersion: String by project
+val serverVersion: String by project
+
 allprojects {
+    apply(plugin = "kotlin")
+
     repositories {
         maven("https://papermc.io/repo/repository/maven-public/")
         maven("https://repo.codemc.io/repository/nms/")
+        mineInAbyss()
     }
 
     tasks.withType<KotlinCompile> {
@@ -29,6 +36,12 @@ allprojects {
             )
         }
     }
+
+    dependencies {
+        compileOnly("com.destroystokyo.paper:paper-api:$serverVersion")
+        compileOnly("com.destroystokyo.paper:paper:$serverVersion") // NMS
+        implementation("com.mineinabyss:idofront-nms:0.6.12")
+    }
 }
 
 repositories {
@@ -37,23 +50,16 @@ repositories {
     maven("https://erethon.de/repo/") //HeadLib
     maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
     maven("https://maven.sk89q.com/repo/") //WorldGuard/Edit
-    maven("https://repo.mineinabyss.com/releases")
     maven("https://jitpack.io")
 //    mavenLocal()
 }
 
-val kotlinVersion: String by project
-val serverVersion: String by project
-
 dependencies {
-    compileOnly("com.destroystokyo.paper:paper-api:${serverVersion}")
-    compileOnly("com.destroystokyo.paper:paper:${serverVersion}") // NMS
     compileOnly(kotlin("stdlib-jdk8"))
 
     compileOnly(platform("com.mineinabyss:kotlinspice:${kotlinVersion}+"))
     compileOnly("com.github.okkero:skedule")
     compileOnly("org.nield:kotlin-statistics")
-    implementation("com.mineinabyss:idofront-nms:0.5.9")
     compileOnly("com.mineinabyss:geary-spigot:0.3.29")
     compileOnly("com.mineinabyss:protocolburrito:0.1.12")
 
