@@ -1,5 +1,4 @@
-import com.mineinabyss.miaSharedSetup
-import com.mineinabyss.mobzy.Deps
+import com.mineinabyss.sharedSetup
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -7,14 +6,14 @@ plugins {
     idea
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    kotlin("jvm") version com.mineinabyss.mobzy.Deps.kotlinVersion
-    kotlin("plugin.serialization") version com.mineinabyss.mobzy.Deps.kotlinVersion
-    kotlin("kapt") version com.mineinabyss.mobzy.Deps.kotlinVersion
+    kotlin("jvm")
+    kotlin("plugin.serialization")
+    kotlin("kapt")
     id("org.jetbrains.dokka") version "1.4.30"
-    id("com.mineinabyss.shared-gradle") version "0.0.3"
+    id("com.mineinabyss.shared-gradle") version "0.0.6"
 }
 
-miaSharedSetup()
+sharedSetup()
 
 allprojects {
     repositories {
@@ -43,12 +42,15 @@ repositories {
 //    mavenLocal()
 }
 
+val kotlinVersion: String by project
+val serverVersion: String by project
+
 dependencies {
-    compileOnly("com.destroystokyo.paper:paper-api:${Deps.serverVersion}")
-    compileOnly("com.destroystokyo.paper:paper:${Deps.serverVersion}") // NMS
+    compileOnly("com.destroystokyo.paper:paper-api:${serverVersion}")
+    compileOnly("com.destroystokyo.paper:paper:${serverVersion}") // NMS
     compileOnly(kotlin("stdlib-jdk8"))
 
-    compileOnly(platform("com.mineinabyss:kotlinspice:${Deps.kotlinVersion}+"))
+    compileOnly(platform("com.mineinabyss:kotlinspice:${kotlinVersion}+"))
     compileOnly("com.github.okkero:skedule")
     compileOnly("org.nield:kotlin-statistics")
     implementation("com.mineinabyss:idofront-nms:0.5.9")
