@@ -49,7 +49,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             MobListener,
             MobzyECSListener,
             MobzyEventListener,
-            ModelEngineSystem(),
+            ModelEngineSystem,
             MobCountManager,
         )
 

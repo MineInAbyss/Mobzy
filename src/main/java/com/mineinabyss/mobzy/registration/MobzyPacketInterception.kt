@@ -1,16 +1,14 @@
 package com.mineinabyss.mobzy.registration
 
 import com.comphenix.protocol.PacketType.Play.Server
-import com.mineinabyss.geary.ecs.components.CopyToInstances
-import com.mineinabyss.geary.minecraft.access.geary
-import com.mineinabyss.mobzy.api.isCustomMob
+import com.mineinabyss.geary.minecraft.access.BukkitAssociations
+import com.mineinabyss.geary.minecraft.access.gearyOrNull
+import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.enums.PacketEntityType
 import com.mineinabyss.protocolburrito.packets.PacketEntityLook
-import com.mineinabyss.protocolburrito.packets.PacketSpawnEntity
 import com.mineinabyss.protocolburrito.packets.PacketSpawnEntityLiving
-import org.bukkit.entity.EntityType
 
 object MobzyPacketInterception {
     fun registerPacketInterceptors() {
@@ -18,18 +16,8 @@ object MobzyPacketInterception {
             //send zombie as entity type for custom mobs
             onSend(Server.SPAWN_ENTITY_LIVING) {
                 PacketSpawnEntityLiving(packet).apply {
-                    if (entity(entityUUID)?.isCustomMob == true)
+                    if (BukkitAssociations[entityUUID]?.has<Model>() == true)
                         type = PacketEntityType.ZOMBIE.id
-                }
-            }
-
-            onSend(Server.SPAWN_ENTITY) {
-                PacketSpawnEntity(packet).apply{
-                    geary(entity(entityId)).with<CopyToInstances>{
-                        //FIXME ProtocolBurrito doesn't work because of an NMS inconsistency here
-                        //TODO make a component to allow overriding the type here
-                        packet.entityTypeModifier.write(0, EntityType.SNOWBALL)
-                    }
                 }
             }
 
@@ -42,10 +30,13 @@ object MobzyPacketInterception {
                 Server.ENTITY_TELEPORT
             ) {
                 PacketEntityLook(packet).apply {
-                    if (entity(entityId).isCustomMob) //check mob involved
+                    //TODO change entity(entityId) to return nullable in ProtocolBurrito
+                    val entity = getEntityFromID(player.world, entityId) ?: return@apply
+                    if (gearyOrNull(entity)?.has<Model>() == true) //check mob involved
                         pitch = 0
                 }
             }
+
 
             //TODO if entity has custom sound effects component, prevent entity sound packets
             // Uncomment when new sound system is ready

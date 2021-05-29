@@ -40,7 +40,7 @@ allprojects {
     dependencies {
         compileOnly("com.destroystokyo.paper:paper-api:$serverVersion")
         compileOnly("com.destroystokyo.paper:paper:$serverVersion") // NMS
-        implementation("com.mineinabyss:idofront-nms:0.6.12")
+        implementation("com.mineinabyss:idofront-nms:0.6.13")
     }
 }
 
@@ -51,6 +51,7 @@ repositories {
     maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
     maven("https://maven.sk89q.com/repo/") //WorldGuard/Edit
     maven("https://jitpack.io")
+    maven("https://mvn.lumine.io/repository/maven-releases/")
 //    mavenLocal()
 }
 
@@ -66,6 +67,7 @@ dependencies {
     compileOnly("de.erethon:headlib:3.0.2")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.5.0")
+    compileOnly("com.ticxo.modelengine:api:R2.1.6")
 
     compileOnly(project(":processor"))
     kapt(project(":processor"))

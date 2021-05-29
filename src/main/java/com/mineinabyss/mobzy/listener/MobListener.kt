@@ -29,6 +29,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
@@ -183,7 +184,7 @@ object MobListener : Listener {
             isCancelled = true
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = gearyOrNull(entity) ?: return
         gearyEntity.with<DeathLoot> { deathLoot ->
