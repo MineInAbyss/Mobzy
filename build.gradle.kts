@@ -61,7 +61,7 @@ dependencies {
     compileOnly(platform("com.mineinabyss:kotlinspice:${kotlinVersion}+"))
     compileOnly("com.github.okkero:skedule")
     compileOnly("org.nield:kotlin-statistics")
-    compileOnly("com.mineinabyss:geary-spigot:0.3.29")
+    compileOnly("com.mineinabyss:geary-spigot:0.5.45")
     compileOnly("com.mineinabyss:protocolburrito:0.1.12")
 
     compileOnly("de.erethon:headlib:3.0.2")

@@ -82,7 +82,7 @@ data class SpawnDefinition(
 
     @Transient
     val entityType: NMSEntityType<*> = prefab.get<NMSEntityType<*>>()
-        ?: error("Not type found for prefab in mob spawn")
+        ?: error("No entity type found for prefab $prefabKey in mob spawn")
 
     /** Given a [SpawnInfo] Spawns a number of entities defined in this [SpawnDefinition] at its location */
     fun spawn(spawnInfo: SpawnInfo, spawns: Int = chooseSpawnAmount()): Int {

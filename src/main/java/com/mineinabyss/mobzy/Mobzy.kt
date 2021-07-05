@@ -76,7 +76,6 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             startup {
                 GearyLoadPhase.ENABLE {
                     MobzyPacketInterception.registerPacketInterceptors()
-                    SpawnTask.startTask()
 
                     MobzyConfig.load()
                 }

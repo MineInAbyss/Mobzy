@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.ecs.components.*
+import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
@@ -26,14 +27,14 @@ import kotlin.collections.set
  */
 @Suppress("ObjectPropertyName")
 object MobzyNMSTypeInjector : TickingSystem() {
-    private val info by get<MobzyTypeInjectionComponent>()
-    private val key by get<PrefabKey>()
+    private val QueryResult.info by get<MobzyTypeInjectionComponent>()
+    private val QueryResult.key by get<PrefabKey>()
 
-    override fun GearyEntity.tick() {
-        val nmsEntityType = inject(key.name, info, get<MobAttributes>() ?: MobAttributes())
-        set(nmsEntityType)
-        set(info.mobCategory ?: info.creatureType.toMobCategory())
-        remove<MobzyTypeInjectionComponent>()
+    override fun QueryResult.tick() {
+        val nmsEntityType = inject(key.name, info, entity.get<MobAttributes>() ?: MobAttributes())
+        entity.set(nmsEntityType)
+        entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
+        entity.remove<MobzyTypeInjectionComponent>()
 
         typeToPrefabMap[nmsEntityType.keyName] = key
     }
