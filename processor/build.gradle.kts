@@ -1,18 +1,13 @@
 plugins {
+    id("com.mineinabyss.conventions.papermc")
     `java-library`
     kotlin("jvm")
     kotlin("kapt")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
 repositories {
     mavenCentral()
 }
-
-val serverVersion: String by project
 
 dependencies {
     implementation("com.squareup:kotlinpoet:1.8.0")

@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.api.nms.entity
 
-import net.minecraft.server.v1_16_R3.IProjectile
-import net.minecraft.server.v1_16_R3.Vec3D
+import net.minecraft.world.entity.projectile.IProjectile
+import net.minecraft.world.phys.Vec3D
 import org.bukkit.util.Vector
 import kotlin.math.atan2
 import kotlin.math.sqrt
@@ -30,10 +30,13 @@ fun IProjectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float,
 
     // NMS stuff for orienting the projectile model towards the target
     val horizontalDistanceSqrt = sqrt(directionVector.x * directionVector.x + directionVector.z * directionVector.z)
-    yaw = Math.toDegrees(atan2(directionVector.x, directionVector.z)).toFloat()
-    pitch = Math.toDegrees(atan2(directionVector.y, horizontalDistanceSqrt)).toFloat()
-    lastYaw = yaw
-    lastPitch = pitch
+    setYawPitch(
+        Math.toDegrees(atan2(directionVector.x, directionVector.z)).toFloat(),
+        Math.toDegrees(atan2(directionVector.y, horizontalDistanceSqrt)).toFloat()
+    )
+        //TODO verify this is no longer needed
+//    lastYaw = yRot
+//    lastPitch = xRot
 }
 
 internal fun Double.toRadians(): Double {

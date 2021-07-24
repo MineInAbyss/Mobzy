@@ -9,6 +9,7 @@ import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
+import com.mineinabyss.idofront.nms.aliases.NMSDataContainer
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.time.TimeSpan
@@ -21,8 +22,6 @@ import com.mineinabyss.mobzy.spawning.MobCategory
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.unregisterSpawns
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R3.EnumCreatureType
-import net.minecraft.server.v1_16_R3.NBTTagCompound
 import org.bukkit.Bukkit
 import java.util.*
 
@@ -127,7 +126,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
                 val prefab = geary(oldEntity).get<PrefabKey>() ?: return@onEach //TODO handle better or error
                 geary(oldEntity.location.spawnGeary(prefab) ?: return@onEach) {
                     decodeComponentsFrom(oldEntity.persistentDataContainer)
-                    set(CopyNBT(NBTTagCompound().apply { oldEntity.toNMS().save(this) }))
+                    set(CopyNBT(NMSDataContainer().apply { oldEntity.toNMS().save(this) }))
                 }
                 oldEntity.remove()
             }.count()

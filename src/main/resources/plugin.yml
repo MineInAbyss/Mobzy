@@ -1,9 +1,9 @@
 name: Mobzy
 version: ${plugin_version}
 author: Offz
-main: com.mineinabyss.mobzy.Mobzy
+main: com.mineinabyss.mobzy.MobzyPlugin
 api-version: 1.16
-depend: [Geary, WorldGuard, ProtocolLib, ProtocolBurrito, KotlinSpice]
+depend: [Geary, WorldGuard, ProtocolLib, ProtocolBurrito]
 
 prefix: Mobzy
 description: A custom entities API

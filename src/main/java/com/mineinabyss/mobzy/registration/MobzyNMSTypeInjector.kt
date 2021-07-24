@@ -14,9 +14,9 @@ import com.mineinabyss.idofront.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyTypeInjectionComponent
 import com.mineinabyss.mobzy.mobs.types.*
-import com.mineinabyss.mobzy.mobs.types.NPC
 import com.mineinabyss.mobzy.spawning.toMobCategory
-import net.minecraft.server.v1_16_R3.*
+import net.minecraft.world.entity.ai.attributes.AttributeDefaults
+import net.minecraft.world.entity.ai.attributes.AttributeProvider
 import sun.misc.Unsafe
 import java.lang.reflect.Field
 import kotlin.collections.set
@@ -89,8 +89,8 @@ object MobzyNMSTypeInjector : TickingSystem() {
     ): NMSEntityType<*> {
         val init = mobBaseClasses[prefabInfo.baseClass] ?: error("Not a valid parent class: ${prefabInfo.baseClass}")
         val mobID = name.toEntityTypeName()
-        val injected: NMSEntityType<Entity> =
-            (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
+        val injected: NMSEntityType<NMSEntity> =
+            (NMSEntityTypeFactory<NMSEntity> { entityType, world -> init(entityType, world) })
                 .builderForCreatureType(prefabInfo.creatureType)
                 .withSize(attributes.width, attributes.height)
                 .apply {

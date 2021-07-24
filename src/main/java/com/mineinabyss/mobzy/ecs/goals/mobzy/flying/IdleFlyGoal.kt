@@ -21,7 +21,7 @@ class IdleFlyBehavior : PathfinderComponent() {
     override fun build(mob: Mob) = IdleFlyGoal(mob)
 }
 
-open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 100, type = Type.MOVE) {
+open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 100, type = Type.a /* MOVE */) {
     protected var targetLoc: Location? = null
 
     //if there isn't an operation to move somewhere, we can start looking for somewhere to fly

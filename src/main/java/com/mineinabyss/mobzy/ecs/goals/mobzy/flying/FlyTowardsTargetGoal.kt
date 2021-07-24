@@ -17,7 +17,7 @@ class FlyTowardsTargetBehavior : PathfinderComponent() {
     override fun build(mob: Mob) = FlyTowardsTargetGoal(mob)
 }
 
-class FlyTowardsTargetGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 10, type = Type.MOVE) {
+class FlyTowardsTargetGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 10, type = Type.a /* MOVE */) {
     override fun shouldExecute(): Boolean = (mob.target != null)
 
     override fun shouldKeepExecuting(): Boolean = shouldExecute()

@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.ecs.events
 
 import com.destroystokyo.paper.event.entity.ProjectileCollideEvent
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.components.Target
 import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.access.gearyOrNull
-import com.mineinabyss.geary.minecraft.events.event
+import com.mineinabyss.geary.minecraft.components.event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -15,7 +16,8 @@ object MobzyEventListener : Listener {
     @EventHandler(ignoreCancelled = true)
     fun ProjectileCollideEvent.onCollision() {
         val gearyEntity = gearyOrNull(entity) ?: return
-
+        com.mineinabyss.geary.ecs.api.entities.GearyEntity
+        GearyEntity
         gearyEntity.set(Target(geary(collidedWith)))
 
         event(gearyEntity, "projectileHit")

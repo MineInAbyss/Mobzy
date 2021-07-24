@@ -5,8 +5,8 @@ import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R3.EntityAnimal
-import net.minecraft.server.v1_16_R3.PathfinderGoalFollowParent
+import net.minecraft.world.entity.ai.goal.PathfinderGoalFollowParent
+import net.minecraft.world.entity.animal.EntityAnimal
 import org.bukkit.entity.Mob
 
 @Serializable

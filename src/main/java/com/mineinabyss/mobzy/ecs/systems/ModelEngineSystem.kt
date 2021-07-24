@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.ecs.systems
 
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
-import com.mineinabyss.idofront.nms.aliases.BukkitEntity
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.ticxo.modelengine.api.ModelEngineAPI
 import com.ticxo.modelengine.api.model.ModeledEntity
