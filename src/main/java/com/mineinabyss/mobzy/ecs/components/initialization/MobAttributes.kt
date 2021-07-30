@@ -3,10 +3,10 @@ package com.mineinabyss.mobzy.ecs.components.initialization
 import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import com.mineinabyss.idofront.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.idofront.nms.typeinjection.NMSAttributes
+import com.mineinabyss.idofront.nms.typeinjection.NMSGenericAttributes
 import com.mineinabyss.idofront.nms.typeinjection.set
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.GenericAttributes
 
 @Serializable
 @SerialName("mobzy:attributes")
@@ -31,17 +31,17 @@ data class MobAttributes(
 ) {
 
     fun toNMSBuilder(): NMSAttributeBuilder = NMSAttributes.forEntityInsentient()
-        .set(GenericAttributes.ARMOR, armor)
-        .set(GenericAttributes.ARMOR_TOUGHNESS, armorToughness)
-        .set(GenericAttributes.ATTACK_DAMAGE, attackDamage)
-        .set(GenericAttributes.ATTACK_KNOCKBACK, attackKnockback)
-        .set(GenericAttributes.ATTACK_SPEED, attackSpeed)
-        .set(GenericAttributes.FLYING_SPEED, flyingSpeed)
-        .set(GenericAttributes.FOLLOW_RANGE, followRange)
-        .set(GenericAttributes.JUMP_STRENGTH, jumpStrength)
-        .set(GenericAttributes.KNOCKBACK_RESISTANCE, knockbackResistance)
-        .set(GenericAttributes.LUCK, luck)
-        .set(GenericAttributes.MAX_HEALTH, maxHealth)
-        .set(GenericAttributes.MOVEMENT_SPEED, movementSpeed)
-        .set(GenericAttributes.SPAWN_REINFORCEMENTS, spawnReinforcements)
+        .set(NMSGenericAttributes.a, maxHealth)
+        .set(NMSGenericAttributes.b, followRange)
+        .set(NMSGenericAttributes.c, knockbackResistance)
+        .set(NMSGenericAttributes.d, movementSpeed)
+        .set(NMSGenericAttributes.e, flyingSpeed)
+        .set(NMSGenericAttributes.f, attackDamage)
+        .set(NMSGenericAttributes.g, attackKnockback)
+        .set(NMSGenericAttributes.h, attackSpeed)
+        .set(NMSGenericAttributes.i, armor)
+        .set(NMSGenericAttributes.j, armorToughness)
+        .set(NMSGenericAttributes.k, luck)
+        .set(NMSGenericAttributes.l, spawnReinforcements)
+        .set(NMSGenericAttributes.m, jumpStrength)
 }

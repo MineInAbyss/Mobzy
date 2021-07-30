@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.ecs.systems
 
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
+import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
-import com.mineinabyss.idofront.nms.aliases.BukkitEntity
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
 
 /**
@@ -15,12 +15,12 @@ import com.mineinabyss.mobzy.ecs.components.CopyNBT
  * TODO MAKE SURE IT ACTUALLY DOES COPY THE PDC!
  */
 class CopyNBTSystem : TickingSystem() {
-    private val nbt by get<CopyNBT>()
-    private val entity by get<BukkitEntity>()
+    private val QueryResult.nbt by get<CopyNBT>()
+    private val QueryResult.bukkitEntity by get<BukkitEntity>()
 
-    override fun GearyEntity.tick() {
-        entity.toNMS().load(nbt.compound)
-        decodeComponentsFrom(entity.persistentDataContainer)
-        remove<CopyNBT>()
+    override fun QueryResult.tick() {
+        bukkitEntity.toNMS().load(nbt.compound)
+        entity.decodeComponentsFrom(bukkitEntity.persistentDataContainer)
+        entity.remove<CopyNBT>()
     }
 }

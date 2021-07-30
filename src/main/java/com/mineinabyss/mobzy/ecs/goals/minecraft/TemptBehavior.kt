@@ -1,14 +1,14 @@
 package com.mineinabyss.mobzy.ecs.goals.minecraft
 
+import com.mineinabyss.idofront.nms.aliases.NMSEntityCreature
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.PathfinderGoalTempt
-import net.minecraft.server.v1_16_R2.RecipeItemStack
+import net.minecraft.world.entity.ai.goal.PathfinderGoalTempt
+import net.minecraft.world.item.crafting.RecipeItemStack
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
-import org.bukkit.entity.Creature
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 import org.bukkit.inventory.ItemStack
 
@@ -20,12 +20,11 @@ class TemptBehavior(
     val losesInterest: Boolean = false
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = PathfinderGoalTempt(
-        (mob as Creature).toNMS(),
+        mob.toNMS<NMSEntityCreature>(),
         speed,
+        items.map { ItemStack(it) }.toNMSRecipeItemStack(),
         losesInterest,
-        items.map { ItemStack(it) }.toNMSRecipeItemStack()
     )
-
 }
 
 fun Collection<ItemStack>.toNMSRecipeItemStack(): RecipeItemStack =

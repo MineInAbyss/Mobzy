@@ -1,22 +1,48 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.components.Expiry
-import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
+import com.mineinabyss.idofront.commands.arguments.stringArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.spawning.PlayerGroups
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
+import org.bukkit.Bukkit
 import kotlin.system.measureTimeMillis
 
 internal fun Command.createDebugCommands() {
-    "expire" {
-        playerAction {
-            geary(player.getNearbyEntities(5.0, 5.0, 5.0).first()).setRelationWithData<Expiry, Model>(Expiry(3000))
+    "spawn" {
+        "groups" {
+            action {
+                sender.info(PlayerGroups.group(Bukkit.getOnlinePlayers()))
+            }
+        }
+        "conditions" {
+            val spawnName by stringArg()
+
+            playerAction {
+                //TODO list all failed conditions
+//                SpawnRegistry.findMobSpawn(spawnName).conditionsMet()
+            }
+        }
+        "find" {
+            val miny by intArg()
+            val maxy by intArg()
+            playerAction {
+                val loc = player.location
+                val (min, max) = VerticalSpawn.findGap(
+                    chunk = loc.chunk,
+                    minY = miny,
+                    maxY = maxy,
+                    x = loc.blockX - (loc.chunk.x shl 4),
+                    z = loc.blockZ - (loc.chunk.z shl 4),
+                    startY = loc.blockY
+                )
+                sender.info("${min.y} and ${max.y}")
+            }
         }
     }
     "pdc" {
@@ -59,9 +85,6 @@ internal fun Command.createDebugCommands() {
             Registered addons: ${MobzyConfig.registeredAddons}
             Registered EntityTypes: ${MobzyNMSTypeInjector.typeNames}""".trimIndent()
         )
-    }
-    "spawnregion"()?.playerAction {
-        player.info(VerticalSpawn(player.location, 0, 255).spawnAreas.toString())
     }
     "snapshot"()?.playerAction {
         val snapshot = player.location.chunk.chunkSnapshot

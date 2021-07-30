@@ -22,7 +22,7 @@ class TargetAttacker(
 class TargetAttackerGoal(
     override val mob: Mob,
     private val range: Double
-) : MobzyPathfinderGoal(type = Type.TARGET) {
+) : MobzyPathfinderGoal(type = Type.d /* TARGET */) {
     private lateinit var playerDamager: Player
 
     override fun shouldExecute(): Boolean {

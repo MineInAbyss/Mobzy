@@ -4,26 +4,29 @@ import com.mineinabyss.geary.minecraft.dsl.GearyLoadPhase
 import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.registerEvents
+import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.CopyNBTSystem
+import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
+import com.mineinabyss.mobzy.listener.GearySpawningListener
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
-import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.mineinabyss.mobzy.spawning.MobCountManager
 import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import kotlin.time.ExperimentalTime
 
-/** Gets [Mobzy] via Bukkit once, then sends that reference back afterwards */
-val mobzy: Mobzy by lazy { JavaPlugin.getPlugin(Mobzy::class.java) }
+/** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
+val mobzy: MobzyPlugin by lazy { JavaPlugin.getPlugin(MobzyPlugin::class.java) }
 
-class Mobzy : JavaPlugin(), MobzyAddon {
+class MobzyPlugin : JavaPlugin(), MobzyAddon {
     override val mobConfigDir = File(dataFolder, "mobs")
     override val spawnConfig = File(dataFolder, "spawns.yml")
 
@@ -37,6 +40,8 @@ class Mobzy : JavaPlugin(), MobzyAddon {
     @ExperimentalCommandDSL
     @ExperimentalTime
     override fun onEnable() {
+        LibraryLoaderInjector.inject(this)
+
         //Plugin startup logic
         logger.info("On enable has been called")
         saveDefaultConfig()
@@ -46,7 +51,10 @@ class Mobzy : JavaPlugin(), MobzyAddon {
         registerEvents(
             MobListener,
             MobzyECSListener,
-            MobzyEventListener
+            MobzyEventListener,
+            ModelEngineSystem,
+            MobCountManager,
+            GearySpawningListener,
         )
 
         //Register commands
@@ -62,6 +70,7 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             )
 
             autoscanComponents()
+            autoscanConditions()
 
             // Autoscan the subclasses of PathfinderComponent
             autoscan<PathfinderComponent>()
@@ -71,9 +80,8 @@ class Mobzy : JavaPlugin(), MobzyAddon {
             startup {
                 GearyLoadPhase.ENABLE {
                     MobzyPacketInterception.registerPacketInterceptors()
-                    SpawnTask.startTask()
 
-                    MobzyConfig.activateAddons()
+                    MobzyConfig.load()
                 }
             }
         }

@@ -7,10 +7,10 @@ import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.idofront.nms.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.ecs.goals.minecraft.LookAtPlayerBehavior
-import net.minecraft.server.v1_16_R2.DamageSource
-import net.minecraft.server.v1_16_R2.EnumMoveType
-import net.minecraft.server.v1_16_R2.PathfinderGoalRandomLookaround
-import net.minecraft.server.v1_16_R2.Vec3D
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.EnumMoveType
+import net.minecraft.world.entity.ai.goal.PathfinderGoalRandomLookaround
+import net.minecraft.world.phys.Vec3D
 
 class NPC(type: NMSEntityType<*>, world: NMSWorld) : PassiveMob(type, world) {
     //Stop from being pushed around

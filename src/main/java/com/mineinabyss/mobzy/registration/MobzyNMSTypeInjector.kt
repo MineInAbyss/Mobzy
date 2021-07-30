@@ -3,7 +3,9 @@ package com.mineinabyss.mobzy.registration
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.ecs.components.*
+import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
+import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
@@ -12,8 +14,9 @@ import com.mineinabyss.idofront.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyTypeInjectionComponent
 import com.mineinabyss.mobzy.mobs.types.*
-import com.mineinabyss.mobzy.mobs.types.NPC
-import net.minecraft.server.v1_16_R2.*
+import com.mineinabyss.mobzy.spawning.toMobCategory
+import net.minecraft.world.entity.ai.attributes.AttributeDefaults
+import net.minecraft.world.entity.ai.attributes.AttributeProvider
 import sun.misc.Unsafe
 import java.lang.reflect.Field
 import kotlin.collections.set
@@ -24,17 +27,24 @@ import kotlin.collections.set
  */
 @Suppress("ObjectPropertyName")
 object MobzyNMSTypeInjector : TickingSystem() {
-    private val info by get<MobzyTypeInjectionComponent>()
-    private val key by get<PrefabKey>()
+    private val QueryResult.info by get<MobzyTypeInjectionComponent>()
+    private val QueryResult.key by get<PrefabKey>()
 
-    override fun GearyEntity.tick() {
-        set(inject(key.name, info, get<MobAttributes>() ?: MobAttributes()))
-        //TODO concurrent modification exception
-        remove<MobzyTypeInjectionComponent>()
+    override fun QueryResult.tick() {
+        val nmsEntityType = inject(key.name, info, entity.get<MobAttributes>() ?: MobAttributes())
+        entity.set(nmsEntityType)
+        entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
+        entity.remove<MobzyTypeInjectionComponent>()
+
+        typeToPrefabMap[nmsEntityType.keyName] = key
     }
 
     val typeNames get() = _types.keys.toList()
     private val _types: MutableMap<String, NMSEntityType<*>> = mutableMapOf()
+    private val typeToPrefabMap = mutableMapOf<String, PrefabKey>()
+
+    fun getPrefabForType(nmsEntityType: NMSEntityType<*>): PrefabKey? =
+        typeToPrefabMap[nmsEntityType.keyName]
 
     private val customAttributes = mutableMapOf<NMSEntityType<*>, AttributeProvider>()
 
@@ -79,8 +89,8 @@ object MobzyNMSTypeInjector : TickingSystem() {
     ): NMSEntityType<*> {
         val init = mobBaseClasses[prefabInfo.baseClass] ?: error("Not a valid parent class: ${prefabInfo.baseClass}")
         val mobID = name.toEntityTypeName()
-        val injected: NMSEntityType<Entity> =
-            (NMSEntityTypeFactory<Entity> { entityType, world -> init(entityType, world) })
+        val injected: NMSEntityType<NMSEntity> =
+            (NMSEntityTypeFactory<NMSEntity> { entityType, world -> init(entityType, world) })
                 .builderForCreatureType(prefabInfo.creatureType)
                 .withSize(attributes.width, attributes.height)
                 .apply {
@@ -108,3 +118,7 @@ object MobzyNMSTypeInjector : TickingSystem() {
 
 //TODO try to reduce usage around code, should really only be done in one central place
 internal fun String.toEntityTypeName() = toLowerCase().replace(" ", "_")
+
+fun NMSEntityType<*>.toPrefab(): GearyEntity? {
+    return PrefabManager[MobzyNMSTypeInjector.getPrefabForType(this) ?: return null]
+}

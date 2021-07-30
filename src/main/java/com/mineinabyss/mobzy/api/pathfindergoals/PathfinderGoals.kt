@@ -5,6 +5,8 @@ package com.mineinabyss.mobzy.api.pathfindergoals
 import com.mineinabyss.idofront.nms.aliases.NMSEntityInsentient
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.pathfindergoals.add
+import com.mineinabyss.idofront.nms.pathfindergoals.goalSelector
+import com.mineinabyss.idofront.nms.pathfindergoals.targetSelector
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 
 fun NMSEntityInsentient.addPathfinderGoal(priority: Int, goal: PathfinderComponent) =

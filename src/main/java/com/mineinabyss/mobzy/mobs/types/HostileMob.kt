@@ -7,7 +7,7 @@ import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.ecs.goals.minecraft.*
 import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetNearbyPlayer
-import net.minecraft.server.v1_16_R2.EntityMonster
+import net.minecraft.world.entity.monster.EntityMonster
 
 @GenerateFromBase(base = MobBase::class, createFor = [EntityMonster::class])
 open class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMonster(world, type) {

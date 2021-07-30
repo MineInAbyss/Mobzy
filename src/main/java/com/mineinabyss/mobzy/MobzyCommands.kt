@@ -11,8 +11,11 @@ import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
+import com.mineinabyss.idofront.messaging.color
+import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomEntity
 import com.mineinabyss.mobzy.api.isOfType
@@ -21,9 +24,11 @@ import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import org.bukkit.entity.Entity
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -31,8 +36,15 @@ import kotlin.time.ExperimentalTime
 class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
-            ("reload" / "rl")(desc = "Reloads the configuration files")?.action {
-                MobzyConfig.reload(sender)
+            ("reload" / "rl")(desc = "Reloads the configuration files") {
+                "spawns" {
+                    MobzyConfig.reloadSpawns()
+                    sender.success("Reloaded spawn config")
+                }
+
+                action {
+                    MobzyConfig.reload(sender)
+                }
             }
 
             commandGroup {
@@ -43,7 +55,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     val worlds = mobzy.server.worlds
                     var mobCount = 0
                     var entityCount = 0
-
+                    val entities = mutableSetOf<Entity>()
                     for (world in worlds) for (entity in world.entities) {
                         val tags = entity.scoreboardTags
                         val nmsEntity = entity.toNMS()
@@ -60,8 +72,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             val playerLoc = player.location
                             if (radius <= 0 || entity.world == playerLoc.world && entity.location.distance(playerLoc) < radius) {
                                 entityCount++
-
-                                if (!isInfo) entity.remove()
+                                if (isInfo) entities += entity
+                                else entity.remove()
                                 if (!tags.contains("additionalPart")) mobCount++
                             }
                         }
@@ -74,6 +86,15 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         ${if (radius <= 0) "in all loaded chunks." else "in a radius of $radius blocks."}
                         """.trimIndent().replace("\n", " "), '&'
                     )
+                    if (isInfo) {
+                        val categories = entities.categorizeMobs()
+                        if (categories.size > 1)
+                            sender.info(
+                                categories.entries
+                                    .sortedByDescending { it.value.get() }
+                                    .joinToString("\n") { (type, amount) -> "&7${type.typeName}&r: $amount".color() }
+                            )
+                    }
                 }
 
                 ("remove" / "rm")(desc = "Removes mobs")?.playerAction {
@@ -140,7 +161,18 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     ): List<String> {
         return when {
             command.name != "mobzy" -> emptyList()
-            args.size <= 1 -> listOf("spawn", "info", "remove", "reload", "fullreload", "i", "rm", "s", "config")
+            args.size <= 1 -> listOf(
+                "spawn",
+                "info",
+                "remove",
+                "reload",
+                "fullreload",
+                "i",
+                "rm",
+                "s",
+                "config",
+                "stats"
+            )
                 .filter { it.startsWith(args[0]) }
             else -> {
                 val subCommand = args[0]

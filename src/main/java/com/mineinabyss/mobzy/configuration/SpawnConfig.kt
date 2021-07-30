@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy.configuration
 
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
+import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import kotlinx.serialization.Serializable
@@ -14,11 +15,7 @@ class SpawnConfig(
     plugin: Plugin
 ) : IdofrontConfig<SpawnConfig.Data>(
     plugin, Data.serializer(), file,
-    format = Yaml(
-        configuration = YamlConfiguration(
-            extensionDefinitionPrefix = "x-"
-        )
-    )
+    format = Formats.yamlFormat
 ) {
     @Serializable
     class Data(

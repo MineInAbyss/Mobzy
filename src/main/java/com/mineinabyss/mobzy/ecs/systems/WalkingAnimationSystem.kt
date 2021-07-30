@@ -1,23 +1,23 @@
 package com.mineinabyss.mobzy.ecs.systems
 
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
-import com.mineinabyss.idofront.nms.aliases.BukkitEntity
+import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
-import net.minecraft.server.v1_16_R2.EnumItemSlot
-import net.minecraft.server.v1_16_R2.Vec3D
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack
+import net.minecraft.world.entity.EnumItemSlot
+import net.minecraft.world.phys.Vec3D
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 
 object WalkingAnimationSystem : TickingSystem(interval = 10) {
-    private val model by get<Model>()
-    private val mob by get<BukkitEntity>()
+    private val QueryResult.model by get<Model>()
+    private val QueryResult.mob by get<BukkitEntity>()
 
-    override fun GearyEntity.tick() {
+    override fun QueryResult.tick() {
         val mob = mob as? Mob ?: return
 
-        val headItem = mob.toNMS().getEquipment(EnumItemSlot.HEAD)
+        val headItem = mob.toNMS().getEquipment(EnumItemSlot.f /* HEAD */)
         val meta = CraftItemStack.getItemMeta(headItem) ?: return
         val modelId = meta.customModelData
         if (modelId != model.hitId) {

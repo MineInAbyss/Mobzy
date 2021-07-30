@@ -4,7 +4,7 @@ import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.server.v1_16_R2.PathfinderGoalHurtByTarget
+import net.minecraft.world.entity.ai.goal.target.PathfinderGoalHurtByTarget
 import org.bukkit.entity.Creature
 import org.bukkit.entity.Mob
 
