@@ -12,18 +12,15 @@ import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.CopyNBTSystem
 import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
-import com.mineinabyss.mobzy.listener.GearyAttemptMinecraftSpawnListener
+import com.mineinabyss.mobzy.listener.GearySpawningListener
 import com.mineinabyss.mobzy.listener.MobListener
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.MobCountManager
-import io.github.slimjar.app.builder.ApplicationBuilder
-import io.github.slimjar.injector.loader.UnsafeInjectable
 import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
-import java.net.URLClassLoader
 import kotlin.time.ExperimentalTime
 
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
@@ -43,7 +40,6 @@ class MobzyPlugin : JavaPlugin(), MobzyAddon {
     @ExperimentalCommandDSL
     @ExperimentalTime
     override fun onEnable() {
-        logger.info("Downloading dependencies.")
         LibraryLoaderInjector.inject(this)
 
         //Plugin startup logic
@@ -58,7 +54,7 @@ class MobzyPlugin : JavaPlugin(), MobzyAddon {
             MobzyEventListener,
             ModelEngineSystem,
             MobCountManager,
-            GearyAttemptMinecraftSpawnListener,
+            GearySpawningListener,
         )
 
         //Register commands
