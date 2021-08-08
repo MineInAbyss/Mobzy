@@ -25,12 +25,12 @@ import kotlin.random.Random
  * A class describing information about
  *
  * @property entityType The the type of entity to spawn.
- * @property minAmount The minimum number of entities to spawn.
- * @property maxAmount The maximum number of entities to spawn.
+ * @property amount The range of number of entities to spawn.
  * @property radius The radius in which to spawn multiple entities in. Will randomly distribute them within the radius.
  * @property basePriority The base importance of this spawn. Increasing it will increase the likelihood of this spawn to
  * be chosen when compared to other spawns.
  * @property spawnPos Whether the mob should be spawned directly on the ground, in air, or under cliffs.
+ * @property approximateLimit An approximate limit to number of mobs of this type that can spawn. There can be at most [amount]-1 additional mobs unless manually summoned.
  */
 @Serializable
 data class SpawnDefinition(
@@ -41,6 +41,7 @@ data class SpawnDefinition(
     @SerialName("radius") private val _radius: Double? = null,
     @SerialName("priority") private val _basePriority: Double? = null,
     @SerialName("spawnPos") private val _spawnPos: SpawnPosition? = null,
+    @SerialName("approxLimit") private val _approxLimit: Int? = null,
     @SerialName("conditions")
     val _conditions: List<GearyCondition> = listOf(),
     val ignore: List<String> = listOf()
@@ -50,6 +51,7 @@ data class SpawnDefinition(
             SpawnCapCondition,
 //            EnoughSpaceCondition,
         )
+        const val NO_LIMIT = -1;
     }
 
     @Transient
@@ -57,10 +59,16 @@ data class SpawnDefinition(
 
     // associateBy ensures we only have one instance of each condition and we take the overridden one
     @Transient
-    val conditions: Collection<GearyCondition> = ((copyFrom?.conditions ?: defaultConditions) + _conditions)
-        .associateBy { it::class }
-        .minus(ignore.map { Formats.yamlFormat.serializersModule.getPolymorphic(GearyCondition::class, it)?.descriptor?.capturedKClass })
-        .values
+    val conditions: Collection<GearyCondition> =
+        ((copyFrom?.conditions ?: defaultConditions) + _conditions)
+            .associateBy { it::class }
+            .minus(ignore.map {
+                Formats.yamlFormat.serializersModule.getPolymorphic(
+                    GearyCondition::class,
+                    it
+                )?.descriptor?.capturedKClass
+            })
+            .values
 
     @Transient
     val prefabKey: PrefabKey = getOrCopy { _prefabKey } ?: error("Mob prefab must not be null")
@@ -70,6 +78,9 @@ data class SpawnDefinition(
 
     @Transient
     val amount: IntRange = getOrCopy { _amount } ?: 1..1
+
+    @Transient
+    val approximateLimit: Int = getOrCopy { _approxLimit } ?: NO_LIMIT
 
     @Transient
     val radius: Double = getOrCopy { _radius } ?: 0.0
@@ -137,5 +148,6 @@ data class SpawnDefinition(
 
     // Hacky stuff for the `reuse` keyword
     /** Uses a value from [copyFrom] unless overridden in this spawn. */
-    private inline fun <T> getOrCopy(prop: SpawnDefinition.() -> T) = this.prop() ?: copyFrom?.prop()
+    private inline fun <T> getOrCopy(prop: SpawnDefinition.() -> T) =
+        this.prop() ?: copyFrom?.prop()
 }

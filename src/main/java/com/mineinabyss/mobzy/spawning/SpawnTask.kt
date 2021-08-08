@@ -2,9 +2,16 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.api.engine.Engine
 import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
+import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
+import com.mineinabyss.geary.ecs.prefab.PrefabKey
+import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.*
+import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_OVERLAP
+import com.mineinabyss.mobzy.spawning.SpawnDefinition.Companion.NO_LIMIT
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
+import com.mineinabyss.mobzy.spawning.SpawnTask.MobQuery.prefabKey
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import com.okkero.skedule.CoroutineTask
@@ -42,6 +49,14 @@ object SpawnTask {
 
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
 
+    object MobQuery : Query() {
+        init {
+            has<BukkitEntity>()
+        }
+
+        val QueryResult.prefabKey by get<PrefabKey>()
+    }
+
     fun stopTask() {
         runningTask?.cancel()
         runningTask = null
@@ -75,6 +90,8 @@ object SpawnTask {
         val playerGroups = PlayerGroups.group(onlinePlayers)
         GlobalSpawnInfo.playerGroupCount = playerGroups.size
 
+        val mobCounts = MobQuery.groupingBy { it.prefabKey }.eachCount()
+
         //TODO sorted by least mobs around
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             // Every player group picks a random chunk around them
@@ -86,6 +103,10 @@ object SpawnTask {
                     .sorted()
                     .filterWhenOverlapFlag()
                     .getMobSpawnsForRegions()
+                    .filter {
+                        it.approximateLimit == NO_LIMIT || (mobCounts[it.prefabKey]
+                            ?: 0) < it.approximateLimit
+                    }
                     .associateWithTo(mutableMapOf()) { it.basePriority * Random.nextDouble() }
 
                 spawn.set(spawnInfo.bottom)
@@ -109,7 +130,11 @@ object SpawnTask {
     /** If any of the overlapping regions is set to override, return a list with only the highest priority one,
      * otherwise the original list. */
     private fun List<ProtectedRegion>.filterWhenOverlapFlag(): List<ProtectedRegion> =
-        firstOrNull { region -> region.flags.containsKey(MZ_SPAWN_OVERLAP) && region.getFlag(MZ_SPAWN_OVERLAP) == "override" }
+        firstOrNull { region ->
+            region.flags.containsKey(MZ_SPAWN_OVERLAP) && region.getFlag(
+                MZ_SPAWN_OVERLAP
+            ) == "override"
+        }
             ?.let {
                 return listOf(it)
             } ?: this
