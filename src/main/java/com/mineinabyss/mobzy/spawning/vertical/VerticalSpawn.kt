@@ -15,7 +15,6 @@ object VerticalSpawn {
         maxY: Int,
         x: Int = (0..15).random(),
         z: Int = (0..15).random(),
-        //TODO normal distribution random around player's y position
         startY: Int = (minY..maxY).random(),
     ): SpawnInfo {
         //TODO getting the full chunk snapshot is by far the most inefficient step

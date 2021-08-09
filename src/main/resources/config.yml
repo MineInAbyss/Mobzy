@@ -12,3 +12,4 @@ creatureTypeCaps:
   MISC: 5
   AMBIENT: 0
 playerGroupRadius: 128.0
+spawnHeightRange: 150

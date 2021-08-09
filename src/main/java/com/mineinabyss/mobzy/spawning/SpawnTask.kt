@@ -13,8 +13,10 @@ import com.okkero.skedule.schedule
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
+import org.apache.commons.math3.analysis.function.Gaussian
 import org.bukkit.Bukkit
 import org.nield.kotlinstatistics.WeightedDice
+import java.lang.Double.max
 import kotlin.random.Random
 
 /**
@@ -77,10 +79,16 @@ object SpawnTask {
 
         //TODO sorted by least mobs around
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
+            val heights = playerGroup.map { it.location.y.toInt() }
+            val world = playerGroup.first().world
+            val heightRange = MobzyConfig.data.spawnHeightRange
+            val min = (heights.minOrNull()!! - heightRange).coerceAtLeast(world.minHeight)
+            val max = (heights.maxOrNull()!! + heightRange).coerceAtMost(world.maxHeight - 1)
+
             // Every player group picks a random chunk around them
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
             Engine.temporaryEntity { spawn ->
-                val spawnInfo = VerticalSpawn.findGap(chunk, 0, 255)
+                val spawnInfo = VerticalSpawn.findGap(chunk, min, max)
                 val priorities = regionContainer.createQuery()
                     .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
                     .sorted()

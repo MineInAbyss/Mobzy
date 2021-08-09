@@ -35,6 +35,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
      * @property playerGroupRadius the radius around which players will count mobs towards the local mob cap
      * @property spawnTaskDelay the delay in ticks between each attempted mob spawn
      * @property creatureTypeCaps Per-player mob caps for spawning of [NMSCreatureType]s on the server.
+     * @property spawnHeightRange The maximum amount above or below players that mobs can spawn.
      */
     @Serializable
     class Data(
@@ -45,7 +46,8 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         var maxCommandSpawns: Int,
         var playerGroupRadius: Double,
         var spawnTaskDelay: TimeSpan,
-        var creatureTypeCaps: MutableMap<MobCategory, Int> = mutableMapOf()
+        var creatureTypeCaps: MutableMap<MobCategory, Int> = mutableMapOf(),
+        var spawnHeightRange: Int,
     )
 
     val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
