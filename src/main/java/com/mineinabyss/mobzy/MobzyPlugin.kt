@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy
 import com.mineinabyss.geary.minecraft.dsl.GearyLoadPhase
 import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
+import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
@@ -52,10 +53,12 @@ class MobzyPlugin : JavaPlugin(), MobzyAddon {
             MobListener,
             MobzyECSListener,
             MobzyEventListener,
-            ModelEngineSystem,
             MobCountManager,
             GearySpawningListener,
         )
+
+        if(isPluginEnabled("ModelEngine"))
+            registerEvents(ModelEngineSystem)
 
         //Register commands
         MobzyCommands()

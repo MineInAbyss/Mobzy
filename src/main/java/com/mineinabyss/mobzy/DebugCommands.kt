@@ -8,6 +8,7 @@ import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.PlayerGroups
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Bukkit
@@ -15,6 +16,11 @@ import kotlin.system.measureTimeMillis
 
 internal fun Command.createDebugCommands() {
     "spawn" {
+        "categoryCounts" {
+            action {
+                sender.info(MobCountManager.categoryCounts)
+            }
+        }
         "groups" {
             action {
                 sender.info(PlayerGroups.group(Bukkit.getOnlinePlayers()))
