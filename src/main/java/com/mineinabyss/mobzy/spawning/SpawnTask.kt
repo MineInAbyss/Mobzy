@@ -7,14 +7,16 @@ import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
+import com.okkero.skedule.CoroutineTask
 import com.okkero.skedule.SynchronizationContext.*
 import com.okkero.skedule.schedule
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
+import org.apache.commons.math3.analysis.function.Gaussian
 import org.bukkit.Bukkit
-import org.bukkit.scheduler.BukkitTask
 import org.nield.kotlinstatistics.WeightedDice
+import java.lang.Double.max
 import kotlin.random.Random
 
 /**
@@ -38,7 +40,7 @@ import kotlin.random.Random
  * the chosen region
  */
 object SpawnTask {
-    private var runningTask: BukkitTask? = null
+    private var runningTask: CoroutineTask? = null
 
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
 
@@ -49,23 +51,23 @@ object SpawnTask {
 
     fun startTask() {
         if (runningTask != null) return
-
-        runningTask = Bukkit.getScheduler().runTaskTimerAsynchronously(mobzy, Runnable {
-            if (!MobzyConfig.data.doMobSpawns) {
-                stopTask()
-                return@Runnable
+        runningTask = mobzy.schedule(ASYNC) {
+            repeating(MobzyConfig.data.spawnTaskDelay.inTicks)
+            while (MobzyConfig.data.doMobSpawns) {
+                try {
+                    GlobalSpawnInfo.iterationNumber++
+                    runSpawnTask()
+                } catch (e: NoClassDefFoundError) {
+                    e.printStackTrace()
+                    stopTask()
+                    return@schedule
+                } catch (e: RuntimeException) {
+                    e.printStackTrace()
+                }
+                yield()
             }
-            try {
-                GlobalSpawnInfo.iterationNumber++
-                runSpawnTask()
-            } catch (e: NoClassDefFoundError) {
-                e.printStackTrace()
-                stopTask()
-                return@Runnable
-            } catch (e: RuntimeException) {
-                e.printStackTrace()
-            }
-        }, 0L, MobzyConfig.data.spawnTaskDelay.inTicks)
+            stopTask()
+        }
     }
 
     private fun runSpawnTask() {
