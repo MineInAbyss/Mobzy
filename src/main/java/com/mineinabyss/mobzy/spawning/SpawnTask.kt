@@ -52,7 +52,6 @@ object SpawnTask {
     fun startTask() {
         if (runningTask != null) return
         runningTask = mobzy.schedule(ASYNC) {
-            repeating(MobzyConfig.data.spawnTaskDelay.inTicks)
             while (MobzyConfig.data.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
@@ -64,7 +63,7 @@ object SpawnTask {
                 } catch (e: RuntimeException) {
                     e.printStackTrace()
                 }
-                yield()
+                waitFor(MobzyConfig.data.spawnTaskDelay.inTicks)
             }
             stopTask()
         }

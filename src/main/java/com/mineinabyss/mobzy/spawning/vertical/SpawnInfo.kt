@@ -8,6 +8,8 @@ import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.spawning.SpawnDefinition.SpawnPosition
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import java.util.concurrent.atomic.AtomicInteger
@@ -32,7 +34,11 @@ data class SpawnInfo(
 
     private val searchRadiusSquared = searchRadius * searchRadius
 
+    //TODO more efficiently finding all ECS entities nearby
     val localMobs: Map<NMSEntityType<*>, AtomicInteger> by lazy {
+        runBlocking {
+            delay(500L)
+        }
         NearbyQuery.run { map { it.bukkit }.filter { it.location.distanceSquared(bottom) < searchRadiusSquared } }
             .categorizeMobs()
     }
