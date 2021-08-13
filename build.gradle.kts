@@ -66,8 +66,8 @@ dependencies {
     kapt(project(":processor"))
 
     // Testing
-    testImplementation("io.papermc.paper:paper-api:$serverVersion") //TODO add to papermc conventions
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.7.0") { isTransitive = false }
+//    testImplementation("io.papermc.paper:paper-api:$serverVersion") //TODO add to papermc conventions
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.7.0")// { isTransitive = false }
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     testImplementation("com.charleskorn.kaml:kaml")
 }

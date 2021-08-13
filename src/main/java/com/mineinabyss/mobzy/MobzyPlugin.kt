@@ -29,15 +29,7 @@ import kotlin.time.ExperimentalTime
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
 val mobzy: JavaPlugin by lazy { JavaPlugin.getPlugin(MobzyPlugin::class.java) }
 
-class MobzyPlugin : JavaPlugin, MobzyAddon {
-    constructor() : super()
-    protected constructor(
-        loader: JavaPluginLoader,
-        description: PluginDescriptionFile,
-        dataFolder: File,
-        file: File
-    ) : super(loader, description, dataFolder, file)
-
+class MobzyPlugin : JavaPlugin(), MobzyAddon {
     override val mobConfigDir = File(dataFolder, "mobs")
     override val spawnConfig = File(dataFolder, "spawns.yml")
 

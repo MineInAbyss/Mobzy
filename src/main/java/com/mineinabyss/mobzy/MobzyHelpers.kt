@@ -12,7 +12,7 @@ fun <T> T.debugVal(message: String = ""): T = debug("$message $this").let { this
  *
  * @param message the message to be sent
  */
-fun debug(message: String, colorChar: Char? = null) {
+fun debug(message: Any, colorChar: Char? = null) {
     if (mobzyConfig.debug) logInfo(message, colorChar)
 }
 

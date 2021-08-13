@@ -8,6 +8,7 @@ import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
+import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.spawning.conditions.SpawnCapCondition
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
@@ -59,7 +60,12 @@ data class SpawnDefinition(
     @Transient
     val conditions: Collection<GearyCondition> = ((copyFrom?.conditions ?: defaultConditions) + _conditions)
         .associateBy { it::class }
-        .minus(ignore.map { Formats.yamlFormat.serializersModule.getPolymorphic(GearyCondition::class, it)?.descriptor?.capturedKClass })
+        .minus(ignore.map {
+            Formats.yamlFormat.serializersModule.getPolymorphic(
+                GearyCondition::class,
+                it
+            )?.descriptor?.capturedKClass
+        })
         .values
 
     @Transient
@@ -98,7 +104,11 @@ data class SpawnDefinition(
     }
 
     fun conditionsMet(area: GearyEntity): Boolean {
-        return conditions.all { it.metFor(area) }
+        return conditions.all { it.metFor(area) }.apply {
+            if (!this) debug(conditions
+                .filter { !it.metFor(area) }
+                .map { it::class.simpleName })
+        }
     }
 
     fun chooseSpawnAmount(): Int = amount.randomOrMin()

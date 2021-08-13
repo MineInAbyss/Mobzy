@@ -21,7 +21,7 @@ object VerticalSpawn {
         val snapshot = chunk.chunkSnapshot
         fun Int.getBlock() = snapshot.getBlockType(x, this, z)
 
-        val startIsEmpty = startY.getBlock().isEmpty
+        val startIsEmpty = startY.getBlock().isAir
 
         class BlocLoc(val add: Int) {
             lateinit var opposite: BlocLoc
@@ -38,7 +38,7 @@ object VerticalSpawn {
                     return false
                 }
 
-                val nextIsEmpty = y.getBlock().isEmpty
+                val nextIsEmpty = y.getBlock().isAir
 
                 when {
                     isEmpty && !nextIsEmpty -> {

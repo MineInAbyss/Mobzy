@@ -43,5 +43,11 @@ internal class VerticalSpawnTest : BukkitTest() {
         findGapAt(15, 127, 20) shouldBe gap(15, 20)
         findGapAt(20, 40, 20) shouldBe gap(21, 40)
         findGapAt(40, 50, 45) shouldBe gap(40, 50)
+
+        // Water
+        world.getBlockAt(0, 10, 0).type = Material.WATER
+        world.getBlockAt(0, 9, 0).type = Material.WATER
+        findGapAt(0, 127, 0) shouldBe gap(10, 20)
+        findGapAt(0, 127, 15) shouldBe gap(10, 20)
     }
 }
