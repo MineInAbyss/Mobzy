@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.google.common.math.IntMath.pow
-import com.mineinabyss.mobzy.MobzyConfig
+import com.mineinabyss.mobzy.mobzyConfig
 import org.bukkit.Chunk
 import org.bukkit.entity.Entity
 import org.nield.kotlinstatistics.dbScanCluster
@@ -12,7 +12,7 @@ object PlayerGroups {
         .groupBy { it.world }
         .flatMap { (_, players) ->
             players.dbScanCluster(
-                maximumRadius = MobzyConfig.data.playerGroupRadius,
+                maximumRadius = mobzyConfig.playerGroupRadius,
                 minPoints = 0,
                 xSelector = { it.location.x },
                 ySelector = { it.location.z }
@@ -24,20 +24,20 @@ object PlayerGroups {
     private infix fun Int.`+-`(other: Int) =
         this + setOf(-1, 1).random() * other
 
-    /** Returns a random [Chunk] that is further than [MobzyConfig.Data.chunkSpawnRad] from all the players in this
-     * list, and at least within [MobzyConfig.Data.maxChunkSpawnRad] to one of them. */
+    /** Returns a random [Chunk] that is further than [mobzyConfig.Data.chunkSpawnRad] from all the players in this
+     * list, and at least within [mobzyConfig.Data.maxChunkSpawnRad] to one of them. */
     fun randomChunkNear(group: List<Entity>): Chunk? {
         val chunk = group.random().location.chunk
-        val positions = group.map { it.chunk.x to it.chunk.z }
+        val positions = group.mapTo(mutableSetOf()) { it.location.chunk.x to it.location.chunk.z }
         //TODO proper min max y for 3d space
         for (i in 0..10) {
-            val distX = MobzyConfig.data.chunkSpawnRad.random()
-            val distZ = MobzyConfig.data.chunkSpawnRad.random()
+            val distX = mobzyConfig.chunkSpawnRad.random()
+            val distZ = mobzyConfig.chunkSpawnRad.random()
             val newX = chunk.x `+-` distX
             val newZ = chunk.z `+-` distZ
             if (
                 positions.none { (x, z) ->
-                    distanceSquared(newX, newZ, x, z) < pow(MobzyConfig.data.chunkSpawnRad.first, 2)
+                    distanceSquared(newX, newZ, x, z) < pow(mobzyConfig.chunkSpawnRad.first, 2)
                 }
             ) {
                 val newChunk = chunk.world.getChunkAt(newX, newZ)

@@ -20,14 +20,24 @@ import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import kotlinx.serialization.InternalSerializationApi
+import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.plugin.java.JavaPluginLoader
 import java.io.File
 import kotlin.time.ExperimentalTime
 
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
-val mobzy: MobzyPlugin by lazy { JavaPlugin.getPlugin(MobzyPlugin::class.java) }
+val mobzy: JavaPlugin by lazy { JavaPlugin.getPlugin(MobzyPlugin::class.java) }
 
-class MobzyPlugin : JavaPlugin(), MobzyAddon {
+class MobzyPlugin : JavaPlugin, MobzyAddon {
+    constructor() : super()
+    protected constructor(
+        loader: JavaPluginLoader,
+        description: PluginDescriptionFile,
+        dataFolder: File,
+        file: File
+    ) : super(loader, description, dataFolder, file)
+
     override val mobConfigDir = File(dataFolder, "mobs")
     override val spawnConfig = File(dataFolder, "spawns.yml")
 
@@ -57,7 +67,7 @@ class MobzyPlugin : JavaPlugin(), MobzyAddon {
             GearySpawningListener,
         )
 
-        if(isPluginEnabled("ModelEngine"))
+        if (isPluginEnabled("ModelEngine"))
             registerEvents(ModelEngineSystem)
 
         //Register commands

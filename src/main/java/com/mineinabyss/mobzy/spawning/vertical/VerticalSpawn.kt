@@ -32,10 +32,16 @@ object VerticalSpawn {
             fun next(): Boolean {
                 if (foundBlock) return false
 
+                if(y !in minY..maxY) {
+                    y -= add
+                    foundBlock=true
+                    return false
+                }
+
                 val nextIsEmpty = y.getBlock().isEmpty
 
                 when {
-                    y !in (minY + 1) until maxY || isEmpty && !nextIsEmpty -> {
+                    isEmpty && !nextIsEmpty -> {
                         foundBlock = true
                         return false
                     }
@@ -55,8 +61,10 @@ object VerticalSpawn {
         up.opposite = down
         down.opposite = up
 
-        while (up.next() || down.next()) {
-        }
+        do {
+            val searchUp = up.next()
+            val searchDown = down.next()
+        } while(searchUp || searchDown)
 
         return SpawnInfo(chunk.getBlock(x, down.y, z).location, chunk.getBlock(x, up.y, z).location)
     }

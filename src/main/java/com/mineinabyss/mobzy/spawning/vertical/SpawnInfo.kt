@@ -62,7 +62,7 @@ data class SpawnInfo(
             SpawnPosition.OVERHANG -> top.clone().down(1)
         }
 
-    override fun toString(): String = "SpawnArea: $bottom, $top"
+    override fun toString(): String = "SpawnInfo: $bottom, $top"
 }
 
 fun Collection<Entity>.categorizeMobs(): Map<NMSEntityType<*>, AtomicInteger> {

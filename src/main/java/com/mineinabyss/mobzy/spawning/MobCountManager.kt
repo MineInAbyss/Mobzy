@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.mineinabyss.geary.minecraft.access.gearyOrNull
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftLoadEvent
 import com.mineinabyss.mobzy.MobzyConfig
+import com.mineinabyss.mobzy.mobzyConfig
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.concurrent.atomic.AtomicInteger

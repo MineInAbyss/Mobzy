@@ -1,10 +1,13 @@
 import com.mineinabyss.mineInAbyss
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val serverVersion: String by project
+
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.publication")
+    id("com.mineinabyss.conventions.testing")
     kotlin("plugin.serialization")
     kotlin("kapt")
 }
@@ -61,6 +64,12 @@ dependencies {
     // Annotation processing
     compileOnly(project(":processor"))
     kapt(project(":processor"))
+
+    // Testing
+    testImplementation("io.papermc.paper:paper-api:$serverVersion") //TODO add to papermc conventions
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.7.0") { isTransitive = false }
+    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    testImplementation("com.charleskorn.kaml:kaml")
 }
 
 tasks {

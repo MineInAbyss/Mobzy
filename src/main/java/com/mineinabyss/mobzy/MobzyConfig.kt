@@ -25,6 +25,8 @@ import kotlinx.serialization.Serializable
 import org.bukkit.Bukkit
 import java.util.*
 
+val mobzyConfig get() = MobzyConfig.data
+
 object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) {
     /**
      * @property debug whether the plugin is in a debug state (used primarily for broadcasting messages)
