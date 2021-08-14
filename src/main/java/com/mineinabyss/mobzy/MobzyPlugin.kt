@@ -20,9 +20,7 @@ import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import kotlinx.serialization.InternalSerializationApi
-import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.plugin.java.JavaPluginLoader
 import java.io.File
 import kotlin.time.ExperimentalTime
 

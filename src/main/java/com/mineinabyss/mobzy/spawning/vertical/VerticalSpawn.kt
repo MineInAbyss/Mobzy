@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
 import org.bukkit.Chunk
+import org.bukkit.ChunkSnapshot
 import org.bukkit.Location
 
 /**
@@ -11,14 +12,14 @@ import org.bukkit.Location
 object VerticalSpawn {
     fun findGap(
         chunk: Chunk,
+        //TODO getting the full chunk snapshot is by far the most inefficient step
+        snapshot: ChunkSnapshot = chunk.chunkSnapshot,
         minY: Int,
         maxY: Int,
         x: Int = (0..15).random(),
         z: Int = (0..15).random(),
         startY: Int = (minY..maxY).random(),
     ): SpawnInfo {
-        //TODO getting the full chunk snapshot is by far the most inefficient step
-        val snapshot = chunk.chunkSnapshot
         fun Int.getBlock() = snapshot.getBlockType(x, this, z)
 
         val startIsEmpty = startY.getBlock().isAir

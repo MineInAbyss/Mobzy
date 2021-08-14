@@ -85,7 +85,8 @@ object SpawnTask {
             // Every player group picks a random chunk around them
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
             Engine.temporaryEntity { spawn ->
-                val spawnInfo = VerticalSpawn.findGap(chunk, min, max)
+                val chunkSnapshot = chunk.chunkSnapshot
+                val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
                 val priorities = regionContainer.createQuery()
                     .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
                     .sorted()
@@ -93,6 +94,7 @@ object SpawnTask {
                     .getMobSpawnsForRegions()
                     .associateWithTo(mutableMapOf()) { it.basePriority * Random.nextDouble() }
 
+//                spawn.set(SubChunkBlockComposition(chunkSnapshot, spawnInfo.bottom.blockY))
                 spawn.set(spawnInfo.bottom)
                 spawn.set(spawnInfo)
 

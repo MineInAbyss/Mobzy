@@ -10,14 +10,15 @@ import org.bukkit.event.Listener
 
 
 object ModelEngineSystem : Listener {
-    private val modelManager get() = ModelEngineAPI.api.modelManager
+    private val modelManager = runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
 
-    fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager.getModeledEntity(uniqueId)
+    fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager?.getModeledEntity(uniqueId)
 
     @EventHandler
     fun GearyMinecraftSpawnEvent.registerModelEngine() {
         val model = entity.get<ModelEngineComponent>() ?: return
         val bukkit = entity.get<BukkitEntity>() ?: return
+        if(modelManager == null) return
         val modelEntity = bukkit.toModelEntity() ?: modelManager.createModeledEntity(bukkit)
 
         val createdModel = modelManager.createActiveModel(model.modelId).apply {

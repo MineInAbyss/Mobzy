@@ -1,5 +1,7 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.api.engine.Engine
+import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.stringArg
@@ -10,9 +12,12 @@ import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.PlayerGroups
+import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Bukkit
 import kotlin.system.measureTimeMillis
+
+fun Int.toChunkLoc() = (this % 16).let { if (it < 0) it + 16 else it }
 
 internal fun Command.createDebugCommands() {
     "spawn" {
@@ -30,6 +35,26 @@ internal fun Command.createDebugCommands() {
             val spawnName by stringArg()
 
             playerAction {
+                val loc = player.location
+                val x = loc.blockX.toChunkLoc()
+                val z = loc.blockZ.toChunkLoc()
+                val spawnInfo = VerticalSpawn.findGap(
+                    player.location.chunk,
+                    minY = -256,
+                    maxY = 255,
+                    x = x,
+                    z = z,
+                    startY = loc.blockY
+                )
+                val spawnDef = SpawnRegistry.findMobSpawn(spawnName)
+                Engine.temporaryEntity { spawnEntity ->
+                    spawnEntity.set(spawnInfo)
+                    spawnEntity.set(spawnInfo.bottom)
+                    spawnEntity.set(spawnDef)
+                    player.info(spawnDef.conditions
+                        .filter { !it.metFor(spawnEntity) }
+                        .map { it::class.simpleName })
+                }
                 //TODO list all failed conditions
 //                SpawnRegistry.findMobSpawn(spawnName).conditionsMet()
             }
