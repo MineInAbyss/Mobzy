@@ -182,8 +182,7 @@ object MobListener : Listener {
                 deathLoot.expToDrop()?.let { droppedExp = it }
                 val heldItem = entity.killer?.inventory?.itemInMainHand
                 val looting = heldItem?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
-                val fire = (heldItem?.enchantments?.get(Enchantment.FIRE_ASPECT) ?: 0) > 0
-                drops.addAll(deathLoot.drops.mapNotNull { it.chooseDrop(looting, fire) })
+                drops.addAll(deathLoot.drops.mapNotNull { it.chooseDrop(looting, entity.fireTicks > 0) })
 
                 //TODO only enable running commands when we prevent creative players from spawning entities w/ custom data
 //            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
