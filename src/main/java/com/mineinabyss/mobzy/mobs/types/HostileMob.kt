@@ -25,7 +25,7 @@ open class HostileMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityMons
 
     init {
         addScoreboardTag("hostileMob")
-        entity.removeWhenFarAway = true
+        entity.removeWhenFarAway = false
         attributeMap
     }
 }

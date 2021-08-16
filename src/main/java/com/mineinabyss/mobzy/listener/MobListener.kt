@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.listener
 
-import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.access.gearyOrNull
 import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
@@ -37,7 +36,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
-import org.bukkit.event.world.ChunkLoadEvent
+import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -125,24 +124,12 @@ object MobListener : Listener {
             rightClicked.addPassenger(player)
     }
 
-    /**
-     * Remove all old entities, which still contain the original `customMob` tag.
-     *
-     * Update `customMob2` entities with old damage values for models to the new custom-model-data tag.
-     */
     @EventHandler
-    fun ChunkLoadEvent.onChunkLoad() {
+    fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
         for (entity in chunk.entities) {
-            if (entity.scoreboardTags.contains("customMob")) {
-                entity.remove()
-            } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                geary(entity).get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
-                entity.removeScoreboardTag("customMob2")
-                entity.addScoreboardTag("customMob3")
-            } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
+            if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
                 (entity as LivingEntity).removeWhenFarAway = true
             }
-            //TODO: Do we need to despawn non-monster entities?
         }
     }
 

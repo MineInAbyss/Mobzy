@@ -44,6 +44,7 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
         makeSound(super.getSoundHurt(damagesource)) { hurt }
 
     init {
+        entity.removeWhenFarAway = false
         entity.addScoreboardTag(CustomEntity.ENTITY_VERSION)
     }
 }

@@ -46,7 +46,7 @@ internal fun Command.createDebugCommands() {
                     z = z,
                     startY = loc.blockY
                 )
-                val spawnDef = SpawnRegistry.findMobSpawn(spawnName)
+                val spawnDef = SpawnRegistry.findMobSpawn(spawnName.replace("_", " "))
                 Engine.temporaryEntity { spawnEntity ->
                     spawnEntity.set(spawnInfo)
                     spawnEntity.set(spawnInfo.bottom)
