@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.registration
 
 import com.comphenix.protocol.PacketType.Play.Server
-import com.mineinabyss.geary.minecraft.access.BukkitAssociations
+import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.access.gearyOrNull
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
@@ -9,6 +9,7 @@ import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.enums.PacketEntityType
 import com.mineinabyss.protocolburrito.packets.PacketEntityLook
 import com.mineinabyss.protocolburrito.packets.PacketSpawnEntityLiving
+import org.bukkit.Bukkit
 
 object MobzyPacketInterception {
     fun registerPacketInterceptors() {
@@ -16,7 +17,8 @@ object MobzyPacketInterception {
             //send zombie as entity type for custom mobs
             onSend(Server.SPAWN_ENTITY_LIVING) {
                 PacketSpawnEntityLiving(packet).apply {
-                    if (BukkitAssociations[entityUUID]?.has<Model>() == true)
+                    val entity = Bukkit.getEntity(entityUUID) ?: return@apply
+                    if (geary(entity).has<Model>())
                         type = PacketEntityType.ZOMBIE.id
                 }
             }

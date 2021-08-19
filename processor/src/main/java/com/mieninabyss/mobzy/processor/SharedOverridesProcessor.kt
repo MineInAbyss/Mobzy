@@ -23,7 +23,7 @@ annotation class GenerateFromBase(val base: KClass<*>, val createFor: Array<KCla
 
 @Suppress("unused")
 @AutoService(Processor::class)
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_16)
 @SupportedOptions(SharedOverridesProcessor.KAPT_KOTLIN_GENERATED_OPTION_NAME)
 @ExperimentalStdlibApi
 @KotlinPoetMetadataPreview

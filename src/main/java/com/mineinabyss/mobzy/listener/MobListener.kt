@@ -126,11 +126,9 @@ object MobListener : Listener {
 
     @EventHandler
     fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
-        for (entity in chunk.entities) {
-            if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
-                (entity as LivingEntity).removeWhenFarAway = true
-            }
-        }
+        for (entity in chunk.entities)
+            if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed)
+                entity.remove()
     }
 
     /** The magic method that lets you hit entities in their server side hitboxes. */
