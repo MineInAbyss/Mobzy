@@ -124,15 +124,6 @@ internal fun Command.createDebugCommands() {
             sender.info(player.getNearbyEntities(rad, rad, rad).count())
         }
     }
-    ("configinfo" / "cfginfo")(desc = "Information about the current state of the plugin")?.action {
-        sender.info(
-            """
-            LOG OF CURRENTLY REGISTERED STUFF:
-            Spawn configs: ${MobzyConfig.spawnCfgs}
-            Registered addons: ${MobzyConfig.registeredAddons}
-            Registered EntityTypes: ${MobzyNMSTypeInjector.typeNames}""".trimIndent()
-        )
-    }
     "snapshot"()?.playerAction {
         val snapshot = player.location.chunk.chunkSnapshot
         val x = (player.location.blockX % 16).let { if (it < 0) it + 16 else it }

@@ -4,6 +4,7 @@ import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
 import com.mineinabyss.idofront.nms.aliases.NMSWorldServer
+import net.minecraft.server.level.WorldServer
 import net.minecraft.world.entity.EntityAgeable
 import net.minecraft.world.entity.animal.EntityAnimal
 
@@ -18,7 +19,7 @@ open class PassiveMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityAnim
 //        addPathfinderGoal(7, PathfinderGoalLookAtPlayer(this, EntityPlayer::class.java, 6.0f))
     }
 
-    override fun createChild(p0: NMSWorldServer?, p1: EntityAgeable?): EntityAgeable? = null
+    override fun createChild(worldServer: WorldServer, entityAgeable: EntityAgeable): EntityAgeable? = null
 
     init {
         addScoreboardTag("passiveMob")

@@ -1,12 +1,10 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.minecraft.dsl.GearyLoadPhase
-import com.mineinabyss.geary.minecraft.dsl.attachToGeary
+import com.mineinabyss.geary.minecraft.dsl.gearyAddon
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
-import com.mineinabyss.mobzy.api.registerAddonWithMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
@@ -27,19 +25,15 @@ import kotlin.time.ExperimentalTime
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
 val mobzy: JavaPlugin by lazy { JavaPlugin.getPlugin(MobzyPlugin::class.java) }
 
-class MobzyPlugin : JavaPlugin(), MobzyAddon {
-    override val mobConfigDir = File(dataFolder, "mobs")
-    override val spawnConfig = File(dataFolder, "spawns.yml")
+class MobzyPlugin : JavaPlugin() {
 
     override fun onLoad() {
         logger.info("On load has been called")
-
         MobzyWorldguard.registerFlags()
     }
 
     @InternalSerializationApi
     @ExperimentalCommandDSL
-    @ExperimentalTime
     override fun onEnable() {
         LibraryLoaderInjector.inject(this)
 
@@ -63,9 +57,7 @@ class MobzyPlugin : JavaPlugin(), MobzyAddon {
         //Register commands
         MobzyCommands()
 
-        registerAddonWithMobzy()
-
-        attachToGeary {
+        gearyAddon {
             systems(
                 WalkingAnimationSystem,
                 CopyNBTSystem(),
@@ -78,16 +70,13 @@ class MobzyPlugin : JavaPlugin(), MobzyAddon {
             // Autoscan the subclasses of PathfinderComponent
             autoscan<PathfinderComponent>()
 
-            loadPrefabs(mobConfigDir)
-
-            startup {
-                GearyLoadPhase.ENABLE {
-                    MobzyPacketInterception.registerPacketInterceptors()
-
-                    MobzyConfig.load()
-                }
+            postLoad {
+                MobzyNMSTypeInjector.doTick()
+                MobzyConfig.load()
             }
         }
+
+        MobzyPacketInterception.registerPacketInterceptors()
     }
 
     override fun onDisable() { // Plugin shutdown logic

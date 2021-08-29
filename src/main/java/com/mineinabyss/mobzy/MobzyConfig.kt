@@ -52,14 +52,6 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
         var spawnHeightRange: Int,
     )
 
-    val registeredAddons: MutableList<MobzyAddon> = mutableListOf()
-    val spawnCfgs: MutableList<SpawnConfig> = mutableListOf()
-
-    override fun save() {
-        super.save()
-        spawnCfgs.forEach { it.save() }
-    }
-
     /**
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
@@ -67,11 +59,7 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
     fun getCreatureTypeCap(creatureType: MobCategory): Int = data.creatureTypeCaps[creatureType] ?: 0
 
     internal fun reloadSpawns() {
-        spawnCfgs.clear()
         unregisterSpawns()
-
-        //FIXME recursively deserializing something here I think (thread freezes forever)
-        registeredAddons.forEach { spawnCfgs += it.loadSpawns() }
     }
 
     override fun ReloadScope.unload() {
@@ -104,7 +92,6 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
             fixEntitiesAfterReload()
         }
 
-        sender.success("Registered addons: $registeredAddons")
         sender.success("Loaded types: ${MobzyNMSTypeInjector.typeNames}")
         sender.success("Successfully loaded config")
     }

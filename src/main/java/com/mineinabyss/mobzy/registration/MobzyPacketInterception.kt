@@ -34,7 +34,7 @@ object MobzyPacketInterception {
                     //TODO change entity(entityId) to return nullable in ProtocolBurrito
                     val entity = getEntityFromID(player.world, entityId) ?: return@apply
                     if (gearyOrNull(entity)?.has<Model>() == true) //check mob involved
-                        yRot = 0
+                        xRot = 0
                 }
             }
 

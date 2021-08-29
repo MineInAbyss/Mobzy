@@ -17,6 +17,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
+import com.mineinabyss.mobzy.mobs.types.NPC
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
@@ -26,7 +27,6 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Ageable
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
-import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -127,6 +127,7 @@ object MobListener : Listener {
     @EventHandler
     fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
         for (entity in chunk.entities)
+            //TODO No unload component
             if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed)
                 entity.remove()
     }

@@ -24,3 +24,6 @@ pluginManagement {
 rootProject.name = "mobzy"
 
 include("processor")
+
+includeBuild("../Geary")
+includeBuild("../Idofront")

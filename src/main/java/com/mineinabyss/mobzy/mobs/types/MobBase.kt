@@ -29,8 +29,8 @@ abstract class MobBase : NMSEntityInsentient(error(""), error("")), CustomMob {
     override fun createPathfinders() = super.initPathfinder()
 
     private val scoreboardDisplayName =
-        //TODO make sure this is properly formatting entityType name
-        NMSChatMessage(nmsEntity.entityType.typeName.split('_').joinToString(" ") { it.capitalize() })
+        NMSChatMessage(nmsEntity.entityType.typeName
+            .split('_').joinToString(" ") { it.replaceFirstChar(Char::uppercase) })
 
     //TODO if we can override the name in the entity type, this will read it from there
     override fun getScoreboardDisplayName() = scoreboardDisplayName

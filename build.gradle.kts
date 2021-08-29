@@ -2,6 +2,7 @@ import com.mineinabyss.mineInAbyss
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val serverVersion: String by project
+val idofrontVersion: String by project
 
 plugins {
     id("com.mineinabyss.conventions.kotlin")
@@ -28,7 +29,7 @@ allprojects {
     }
 
     dependencies {
-        implementation("com.mineinabyss:idofront-nms:1.17.1-0.6.23") {
+        implementation("com.mineinabyss:idofront-nms:$idofrontVersion") {
             exclude(group = "io.github.slimjar")
         }
     }
@@ -75,5 +76,9 @@ dependencies {
 tasks {
     shadowJar {
         archiveBaseName.set("Mobzy")
+    }
+
+    build {
+        dependsOn(gradle.includedBuild("Geary").task(":build"))
     }
 }

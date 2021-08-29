@@ -1,13 +1,14 @@
 package com.mineinabyss.mobzy.listener
 
 import com.mineinabyss.geary.ecs.entities.addPrefab
-import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.geary.minecraft.events.GearyAttemptMinecraftSpawnEvent
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftPreLoadEvent
+import com.mineinabyss.geary.minecraft.toPrefabKey
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
-import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.idofront.nms.entity.typeNamespacedKey
 import com.mineinabyss.idofront.nms.spawnEntity
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
@@ -22,8 +23,9 @@ object GearySpawningListener : Listener {
     }
 
     @EventHandler
-    fun GearyMinecraftPreLoadEvent.addNMSTypeNameAsPrefab(){
-        PrefabManager[PrefabKey("mobzy", bukkitEntity.typeName)]?.let {
+    fun GearyMinecraftPreLoadEvent.addNMSTypeNameAsPrefab() {
+        if (bukkitEntity is Player) return
+        PrefabManager[bukkitEntity.typeNamespacedKey.toPrefabKey()]?.let {
             entity.addPrefab(it)
         }
     }
