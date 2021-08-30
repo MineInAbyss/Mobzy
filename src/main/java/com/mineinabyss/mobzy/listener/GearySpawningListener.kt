@@ -8,6 +8,7 @@ import com.mineinabyss.geary.minecraft.toPrefabKey
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.entity.typeNamespacedKey
 import com.mineinabyss.idofront.nms.spawnEntity
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,7 +19,10 @@ object GearySpawningListener : Listener {
     fun GearyAttemptMinecraftSpawnEvent.attemptSpawnViaNMS() {
         if (bukkitEntity == null)
             bukkitEntity = prefab.get<NMSEntityType<*>>()?.let { type ->
-                location.spawnEntity(type, spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM)
+                location.spawnEntity(type, spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM)?.apply {
+                    //TODO convert to component?
+                    addScoreboardTag(CustomEntity.ENTITY_VERSION)
+                }
             }
     }
 

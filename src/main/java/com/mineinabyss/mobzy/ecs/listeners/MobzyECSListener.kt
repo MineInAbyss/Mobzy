@@ -6,8 +6,10 @@ import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.pathfindergoals.addPathfinderGoal
 import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
+import com.mineinabyss.mobzy.ecs.components.RemoveWhenFarAway
 import com.mineinabyss.mobzy.ecs.components.initialization.ItemModel
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Snowball
 import org.bukkit.event.EventHandler
@@ -38,5 +40,11 @@ object MobzyECSListener : Listener {
                 is Snowball -> bukkit.item = modelItem
             }
         }
+    }
+
+    @EventHandler
+    fun GearyMinecraftSpawnEvent.setRemoveWhenFarAway() {
+        val bukkit = entity.toBukkit<LivingEntity>() ?: return
+        bukkit.removeWhenFarAway = entity.has<RemoveWhenFarAway>()
     }
 }

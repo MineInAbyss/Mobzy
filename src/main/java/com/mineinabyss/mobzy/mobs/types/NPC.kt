@@ -14,24 +14,22 @@ import net.minecraft.world.phys.Vec3D
 
 class NPC(type: NMSEntityType<*>, world: NMSWorld) : PassiveMob(type, world) {
     //Stop from being pushed around
-    override fun move(enummovetype: EnumMoveType?, vec3d: Vec3D?) = Unit
-
+    override fun move(movementType: EnumMoveType, movement: Vec3D) = Unit
     override fun collide(entity: NMSEntity) = Unit
 
     //Prevent NPCs from getting damaged by anything
     override fun damageEntity(damagesource: DamageSource, f: Float) = false
 
-    override fun createPathfinders() {
+    override fun initPathfinder() {
         addPathfinderGoal(2, PathfinderGoalRandomLookaround(this))
         addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8f).build(this.toBukkit()))
     }
 
     init {
         //TODO CustomName component perhaps?
-        entity.customName = nmsEntity.entityType.typeName
+        toBukkit().customName = entityType.typeName
         customNameVisible = true
         isInvulnerable = true
-        entity.removeWhenFarAway = false
         addScoreboardTag("npc")
     }
 }

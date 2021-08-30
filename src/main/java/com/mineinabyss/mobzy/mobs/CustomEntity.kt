@@ -1,11 +1,17 @@
 package com.mineinabyss.mobzy.mobs
 
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.minecraft.access.BukkitAssociations
+import com.mineinabyss.geary.minecraft.access.BukkitEntityAssociations
 import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSSound
 import com.mineinabyss.idofront.nms.aliases.toBukkit
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import org.bukkit.SoundCategory
+import org.bukkit.entity.Entity
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataHolder
 import kotlin.random.Random
@@ -29,29 +35,30 @@ interface CustomEntity : PersistentDataHolder {
 
     override fun getPersistentDataContainer(): PersistentDataContainer = entity.persistentDataContainer
 
-    //TODO think of a better place to put this, something less inheritance-ey
-    fun makeSound(sound: String) {
-        val sounds = geary(entity).get<Sounds>()
-        val volume = sounds?.volume ?: 1.0f
-        val pitch = sounds?.pitch ?: 1.0
-        val pitchRange = sounds?.pitchRange ?: 0.2
-
-        entity.world.playSound(
-            entity.location,
-            sound,
-            SoundCategory.NEUTRAL,
-            volume,
-            (pitch + (Random.nextDouble(-pitchRange, pitchRange))).toFloat()
-        )
-    }
-
-    /** Plays a sound effect at the mob's location and returns null */
-    fun makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
-        makeSound(geary(entity).get<Sounds>()?.sound() ?: return default)
-        return null
-    }
-
     companion object {
         const val ENTITY_VERSION = "customMob3"
     }
 }
+
+/** Plays a sound effect at the mob's location and returns null */
+fun NMSEntity.makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
+    val entity = geary
+    entity.makeSound(entity.get<Sounds>()?.sound() ?: return default)
+    return null
+}
+
+//TODO think of a better place to put this, something less inheritance-ey
+fun GearyEntity.makeSound(sound: String) {
+    val bukkit = toBukkit() ?: return
+    val sounds = get() ?: Sounds()
+
+    bukkit.world.playSound(
+        bukkit.location,
+        sound,
+        SoundCategory.NEUTRAL,
+        sounds.volume,
+        (sounds.pitch + (Random.nextDouble(-sounds.pitchRange, sounds.pitchRange))).toFloat()
+    )
+}
+
+val NMSEntity.geary: GearyEntity get() = geary(toBukkit())

@@ -10,7 +10,6 @@ plugins {
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
     kotlin("plugin.serialization")
-    kotlin("kapt")
 }
 
 allprojects {
@@ -47,7 +46,7 @@ dependencies {
     // Other plugins
     compileOnly("com.mineinabyss:geary-platform-papermc:0.6.49")
     compileOnly("com.mineinabyss:geary-commons-papermc:0.1.2")
-    compileOnly("com.mineinabyss:protocolburrito:0.2.24")
+    compileOnly("com.mineinabyss:protocolburrito:0.2.25")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2") { exclude(group = "org.bukkit") }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.5.0")
     compileOnly("com.ticxo.modelengine:api:R2.1.6")
@@ -61,10 +60,6 @@ dependencies {
     // Shaded
     implementation("com.github.DRE2N:HeadLib:7e2d443678")
     slim("org.nield:kotlin-statistics")
-
-    // Annotation processing
-    compileOnly(project(":processor"))
-    kapt(project(":processor"))
 
     // Testing
 //    testImplementation("io.papermc.paper:paper-api:$serverVersion") //TODO add to papermc conventions
@@ -80,5 +75,14 @@ tasks {
 
     build {
         dependsOn(gradle.includedBuild("Geary").task(":build"))
+    }
+}
+
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
     }
 }

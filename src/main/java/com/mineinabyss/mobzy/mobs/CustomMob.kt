@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.idofront.nms.aliases.NMSEntityInsentient
-import com.mineinabyss.mobzy.mobs.types.MobBase
 import org.bukkit.entity.Mob
 
 /**
@@ -13,15 +12,8 @@ import org.bukkit.entity.Mob
  * annotation processor.
  *
  * @see MobBase
- *
- * @property killScore The score with which a player should be rewarded with when the current entity is killed.
  */
 interface CustomMob : CustomEntity {
     override val nmsEntity: NMSEntityInsentient
     override val entity: Mob
-
-    val killScore: Int
-
-    /** A function to implement pathfinders that should be added to all entities of this type. */
-    fun createPathfinders()
 }
