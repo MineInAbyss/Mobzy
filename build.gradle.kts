@@ -9,6 +9,7 @@ plugins {
     id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
+    id("io.github.0ffz.github-packages") version "1.2.1"
     kotlin("plugin.serialization")
 }
 
@@ -35,6 +36,7 @@ allprojects {
 }
 
 repositories {
+    githubPackage("kyonifer")
     mavenCentral()
     maven("https://maven.sk89q.com/repo/") //WorldGuard/Edit
     maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
@@ -42,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(kotlin("stdlib-jdk8"))
+    slim(kotlin("stdlib-jdk8"))
     // Other plugins
     compileOnly("com.mineinabyss:geary-platform-papermc:0.6.49")
     compileOnly("com.mineinabyss:geary-commons-papermc:0.1.2")
@@ -52,10 +54,10 @@ dependencies {
     compileOnly("com.ticxo.modelengine:api:R2.1.6")
 
     // From Geary
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    compileOnly("com.charleskorn.kaml:kaml")
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-    compileOnly("com.github.okkero:skedule")
+    slim("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    slim("com.charleskorn.kaml:kaml")
+    slim("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
+    slim("com.github.okkero:skedule")
 
     // Shaded
     implementation("com.github.DRE2N:HeadLib:7e2d443678")
@@ -75,14 +77,5 @@ tasks {
 
     build {
         dependsOn(gradle.includedBuild("Geary").task(":build"))
-    }
-}
-
-kotlin {
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
-    }
-    sourceSets.test {
-        kotlin.srcDir("build/generated/ksp/test/kotlin")
     }
 }

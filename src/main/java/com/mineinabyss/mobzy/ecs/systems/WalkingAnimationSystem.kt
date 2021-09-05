@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3D
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 
-object WalkingAnimationSystem : TickingSystem(interval = 10) {
+class WalkingAnimationSystem : TickingSystem(interval = 10) {
     private val QueryResult.model by get<Model>()
     private val QueryResult.mob by get<BukkitEntity>()
 

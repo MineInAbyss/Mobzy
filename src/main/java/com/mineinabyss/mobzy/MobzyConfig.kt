@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.geary.minecraft.access.toGeary
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
 import com.mineinabyss.idofront.config.IdofrontConfig
@@ -114,8 +114,8 @@ object MobzyConfig : IdofrontConfig<MobzyConfig.Data>(mobzy, Data.serializer()) 
                 it.scoreboardTags.contains(CustomEntity.ENTITY_VERSION) && !it.isCustomEntity
             }.onEach { oldEntity ->
                 //spawn a replacement entity and copy this entity's NBT over to it
-                val prefab = geary(oldEntity).get<PrefabKey>() ?: return@onEach //TODO handle better or error
-                geary(oldEntity.location.spawnGeary(prefab) ?: return@onEach) {
+                val prefab = oldEntity.toGeary().get<PrefabKey>() ?: return@onEach //TODO handle better or error
+                (oldEntity.location.spawnGeary(prefab) ?: return@onEach).toGeary {
                     decodeComponentsFrom(oldEntity.persistentDataContainer)
                     set(CopyNBT(NMSDataContainer().apply { oldEntity.toNMS().save(this) }))
                 }

@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
-import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.geary.minecraft.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityTargetEvent
 class TargetAttacker(
     private val range: Double? = null
 ) : PathfinderComponent() {
-    override fun build(mob: Mob) = TargetAttackerGoal(mob, range ?: geary(mob).get<MobAttributes>()?.followRange ?: 0.0)
+    override fun build(mob: Mob) = TargetAttackerGoal(mob, range ?: mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0)
 }
 
 class TargetAttackerGoal(

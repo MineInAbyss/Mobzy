@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.listener
 
-import com.mineinabyss.geary.minecraft.access.gearyOrNull
 import com.mineinabyss.geary.minecraft.access.toBukkit
+import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.minecraft.access.toGearyOrNull
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
@@ -9,15 +10,14 @@ import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
-import com.mineinabyss.mobzy.api.isCustomMob
 import com.mineinabyss.mobzy.api.toMobzy
+import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
-import com.mineinabyss.mobzy.mobs.types.NPC
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
@@ -59,7 +59,7 @@ object MobListener : Listener {
     /** Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect. */
     @EventHandler(ignoreCancelled = true)
     fun EntityDamageEvent.onHit() {
-        val gearyEntity = gearyOrNull(entity) ?: return
+        val gearyEntity = entity.toGearyOrNull() ?: return
         val mob = entity as? LivingEntity ?: return
         val model = gearyEntity.get<Model>() ?: return
         model.hitId ?: return
@@ -119,17 +119,18 @@ object MobListener : Listener {
     /** Ride entities with [Rideable] component on right click. */
     @EventHandler
     fun PlayerInteractEntityEvent.rideOnRightClick() {
-        val gearyEntity = gearyOrNull(rightClicked) ?: return
+        val gearyEntity = rightClicked.toGearyOrNull() ?: return
         if (gearyEntity.has<Rideable>())
             rightClicked.addPassenger(player)
     }
 
     @EventHandler
     fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
-        for (entity in chunk.entities)
-            //TODO No unload component
-            if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed)
+        for (entity in chunk.entities) {
+            val removeOnUnload = entity.toGeary().get<RemoveOnChunkUnload>() ?: continue
+            if (!(removeOnUnload.keepIfRenamed && entity.isCustomAndRenamed))
                 entity.remove()
+        }
     }
 
     /** The magic method that lets you hit entities in their server side hitboxes. */
@@ -165,14 +166,14 @@ object MobListener : Listener {
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
     @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {
-        val gearyEntity = gearyOrNull(entered) ?: return
+        val gearyEntity = entered.toGearyOrNull() ?: return
         if (gearyEntity.has<PreventRiding>())
             isCancelled = true
     }
 
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
-        val gearyEntity = gearyOrNull(entity) ?: return
+        val gearyEntity = entity.toGearyOrNull() ?: return
         gearyEntity.with<DeathLoot> { deathLoot ->
             drops.clear()
             droppedExp = 0

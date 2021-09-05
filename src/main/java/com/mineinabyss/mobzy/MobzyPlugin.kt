@@ -1,13 +1,16 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.minecraft.dsl.GearyLoadPhase
 import com.mineinabyss.geary.minecraft.dsl.gearyAddon
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
+import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
+import com.mineinabyss.mobzy.ecs.systems.AddPrefabsListener
 import com.mineinabyss.mobzy.ecs.systems.CopyNBTSystem
 import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
@@ -17,10 +20,9 @@ import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.MobCountManager
+import com.mineinabyss.protocolburrito.dsl.protocolManager
 import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
-import java.io.File
-import kotlin.time.ExperimentalTime
 
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
 val mobzy: JavaPlugin by lazy { JavaPlugin.getPlugin(MobzyPlugin::class.java) }
@@ -32,10 +34,9 @@ class MobzyPlugin : JavaPlugin() {
         MobzyWorldguard.registerFlags()
     }
 
-    @InternalSerializationApi
     @ExperimentalCommandDSL
     override fun onEnable() {
-        LibraryLoaderInjector.inject(this)
+        IdofrontSlimjar.loadGlobally(this)
 
         //Plugin startup logic
         logger.info("On enable has been called")
@@ -49,6 +50,7 @@ class MobzyPlugin : JavaPlugin() {
             MobzyEventListener,
             MobCountManager,
             GearySpawningListener,
+            AddPrefabsListener(),
         )
 
         if (isPluginEnabled("ModelEngine"))
@@ -59,7 +61,7 @@ class MobzyPlugin : JavaPlugin() {
 
         gearyAddon {
             systems(
-                WalkingAnimationSystem,
+                WalkingAnimationSystem(),
                 CopyNBTSystem(),
                 MobzyNMSTypeInjector,
             )
@@ -70,9 +72,10 @@ class MobzyPlugin : JavaPlugin() {
             // Autoscan the subclasses of PathfinderComponent
             autoscan<PathfinderComponent>()
 
-            postLoad {
-                MobzyNMSTypeInjector.doTick()
-                MobzyConfig.load()
+            startup {
+                GearyLoadPhase.ENABLE {
+                    MobzyConfig.load()
+                }
             }
         }
 

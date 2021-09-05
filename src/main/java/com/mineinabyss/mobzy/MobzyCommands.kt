@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.geary.minecraft.toPrefabKey
 import com.mineinabyss.idofront.commands.arguments.booleanArg
@@ -20,7 +19,6 @@ import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.idofront.nms.entity.typeNamespacedKey
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
 import com.mineinabyss.mobzy.api.isCustomEntity
-import com.mineinabyss.mobzy.api.isOfType
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
@@ -202,9 +200,9 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         mobs.addAll(MobzyTypesQuery.map { it.key.toString() })
                         mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
                         return mobs.filter {
-                                val arg = args[1].toLowerCase()
-                                it.startsWith(arg) || it.substringAfter(":").startsWith(arg)
-                            }
+                            val arg = args[1].toLowerCase()
+                            it.startsWith(arg) || it.substringAfter(":").startsWith(arg)
+                        }
                     }
                 return if (subCommand == "config") listOf("mobs", "spawns", "domobspawns")
                     .filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }

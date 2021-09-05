@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mineinabyss.geary.minecraft.geary
 import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds

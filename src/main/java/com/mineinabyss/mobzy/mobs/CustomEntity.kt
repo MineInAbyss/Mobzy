@@ -1,17 +1,13 @@
 package com.mineinabyss.mobzy.mobs
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.minecraft.access.BukkitAssociations
-import com.mineinabyss.geary.minecraft.access.BukkitEntityAssociations
-import com.mineinabyss.geary.minecraft.access.geary
 import com.mineinabyss.geary.minecraft.access.toBukkit
+import com.mineinabyss.geary.minecraft.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSSound
 import com.mineinabyss.idofront.nms.aliases.toBukkit
-import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import org.bukkit.SoundCategory
-import org.bukkit.entity.Entity
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataHolder
 import kotlin.random.Random
@@ -61,4 +57,4 @@ fun GearyEntity.makeSound(sound: String) {
     )
 }
 
-val NMSEntity.geary: GearyEntity get() = geary(toBukkit())
+val NMSEntity.geary: GearyEntity get() = toBukkit().toGeary()

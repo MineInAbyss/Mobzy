@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 
-import com.mineinabyss.geary.minecraft.access.geary
+import com.mineinabyss.geary.minecraft.access.toGeary
 import com.mineinabyss.idofront.nms.entity.canReach
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
@@ -23,7 +23,7 @@ class FlyDamageTargetGoal(override val mob: Mob) : MobzyPathfinderGoal() {
     override fun execute() {
         restartCooldown()
         val target = mob.target ?: return
-        val attackDamage: Double = geary(mob).get<MobAttributes>()?.attackDamage ?: return
+        val attackDamage: Double = mob.toGeary().get<MobAttributes>()?.attackDamage ?: return
         //if within range, harm
         if (mob.canReach(target)) target.damage(attackDamage, mob)
     }

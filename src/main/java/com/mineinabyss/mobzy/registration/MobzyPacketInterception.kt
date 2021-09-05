@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.registration
 
 import com.comphenix.protocol.PacketType.Play.Server
-import com.mineinabyss.geary.minecraft.access.geary
-import com.mineinabyss.geary.minecraft.access.gearyOrNull
+import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.minecraft.access.toGearyOrNull
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
@@ -20,7 +20,7 @@ object MobzyPacketInterception {
                 Server.SPAWN_ENTITY_LIVING
             ) {
                 val entity = Bukkit.getEntity(uuid) ?: return@onSend
-                if (geary(entity).has<Model>())
+                if (entity.toGeary().has<Model>())
                     type = PacketEntityType.ZOMBIE.id
             }
 
@@ -35,7 +35,7 @@ object MobzyPacketInterception {
             ) {
                 //TODO change entity(entityId) to return nullable in ProtocolBurrito
                 val entity = getEntityFromID(it.player.world, entityId) ?: return@onSend
-                if (gearyOrNull(entity)?.has<Model>() == true) //check mob involved
+                if (entity.toGearyOrNull()?.has<Model>() == true) //check mob involved
                     xRot = 0
             }
 

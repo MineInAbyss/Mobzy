@@ -5,11 +5,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * > mobzy:remove_when_far_away
+ * > mobzy:remove_on_chunk_unload
  *
- * Specifies this entity should get removed when it is far away from any player.
+ * Specifies this entity should be completely removed when the chunk it is in unloads.
  */
 @Serializable
-@SerialName("mobzy:remove_when_far_away")
+@SerialName("mobzy:remove_on_chunk_unload")
 @AutoscanComponent
-class RemoveWhenFarAway
+data class RemoveOnChunkUnload(
+    val keepIfRenamed: Boolean = true
+)
