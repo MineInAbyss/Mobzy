@@ -10,7 +10,7 @@ import org.bukkit.event.Listener
 
 
 object ModelEngineSystem : Listener {
-    private val modelManager = runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
+    private val modelManager by lazy { runCatching { ModelEngineAPI.api.modelManager }.getOrNull() }
 
     fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager?.getModeledEntity(uniqueId)
 
@@ -19,9 +19,9 @@ object ModelEngineSystem : Listener {
         val model = entity.get<ModelEngineComponent>() ?: return
         val bukkit = entity.get<BukkitEntity>() ?: return
         if(modelManager == null) return
-        val modelEntity = bukkit.toModelEntity() ?: modelManager.createModeledEntity(bukkit)
+        val modelEntity = bukkit.toModelEntity() ?: modelManager?.createModeledEntity(bukkit) ?: return
 
-        val createdModel = modelManager.createActiveModel(model.modelId).apply {
+        val createdModel = modelManager?.createActiveModel(model.modelId)?.apply {
             setDamageTint(model.damageTint)
         }
         modelEntity.addActiveModel(createdModel)
