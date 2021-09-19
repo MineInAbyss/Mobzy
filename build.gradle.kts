@@ -47,6 +47,7 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2") { exclude(group = "org.bukkit") }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.5.0")
     compileOnly("com.ticxo.modelengine:api:R2.1.6")
+    compileOnly("com.mineinabyss:looty:0.3.19")
 
     // From Geary
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
