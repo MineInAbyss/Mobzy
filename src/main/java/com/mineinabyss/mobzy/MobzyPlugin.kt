@@ -5,13 +5,14 @@ import com.mineinabyss.geary.minecraft.dsl.attachToGeary
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
+import com.mineinabyss.idofront.plugin.registerService
+import com.mineinabyss.idofront.serialization.SerializablePrefabItemService
 import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
 import com.mineinabyss.mobzy.api.registerAddonWithMobzy
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.CopyNBTSystem
-import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem
 import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
 import com.mineinabyss.mobzy.listener.GearySpawningListener
 import com.mineinabyss.mobzy.listener.MobListener
@@ -62,6 +63,10 @@ class MobzyPlugin : JavaPlugin(), MobzyAddon {
 
         //Register commands
         MobzyCommands()
+
+        if (isPluginEnabled("Looty")) {
+            registerService<SerializablePrefabItemService>(MobzySerializablePrefabItemService)
+        }
 
         registerAddonWithMobzy()
 
