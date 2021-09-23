@@ -7,6 +7,7 @@ import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.idofront.nms.pathfindergoals.moveTo
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem.toModelEntity
 import com.mineinabyss.mobzy.ecs.systems.lengthSqr
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
@@ -42,6 +43,8 @@ open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 1
         if (!loc.block.isPassable) return
         targetLoc = loc
         //TODO make a wrapper for the controller and figure out the difference between it and navigation
+
+        mob.toModelEntity()?.allActiveModel?.values?.forEach { it.addState("fly", 0, 0, 1.0) }
     }
 
     override fun executeWhenCooledDown() {

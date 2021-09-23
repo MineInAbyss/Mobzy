@@ -10,7 +10,7 @@ import org.bukkit.event.Listener
 
 
 object ModelEngineSystem : Listener {
-    private val modelManager = runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
+    private val modelManager by lazy { runCatching { ModelEngineAPI.api.modelManager }.getOrThrow() }
 
     fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager?.getModeledEntity(uniqueId)
 
