@@ -39,7 +39,7 @@ data class SpawnInfo(
         runBlocking {
             delay(500L)
         }
-        NearbyQuery.run { map { it.bukkit }.filter { it.location.distanceSquared(bottom) < searchRadiusSquared } }
+        NearbyQuery.run { map { it.bukkit }.filter { it.location.world == bottom.world && it.location.distanceSquared(bottom) < searchRadiusSquared } }
             .categorizeMobs()
     }
 
