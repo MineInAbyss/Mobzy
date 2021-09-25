@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.ecs.components.death
 
 import com.mineinabyss.idofront.messaging.color
-import com.mineinabyss.idofront.recpies.addCookingRecipes
+import com.mineinabyss.idofront.recipes.addCookingRecipes
+
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.mobzy.mobzy
 import kotlinx.serialization.Serializable
