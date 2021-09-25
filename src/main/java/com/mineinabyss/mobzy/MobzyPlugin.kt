@@ -6,6 +6,8 @@ import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
+import com.mineinabyss.idofront.plugin.registerService
+import com.mineinabyss.idofront.serialization.SerializablePrefabItemService
 import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
@@ -58,6 +60,9 @@ class MobzyPlugin : JavaPlugin() {
 
         //Register commands
         MobzyCommands()
+
+        if (isPluginEnabled("Looty"))
+            registerService<SerializablePrefabItemService>(MobzySerializablePrefabItemService)
 
         gearyAddon {
             systems(
