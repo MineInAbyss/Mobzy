@@ -5,10 +5,9 @@ import com.mineinabyss.geary.minecraft.dsl.gearyAddon
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
-import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import com.mineinabyss.idofront.plugin.registerService
 import com.mineinabyss.idofront.serialization.SerializablePrefabItemService
-import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
+import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
@@ -22,8 +21,6 @@ import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.MobCountManager
-import com.mineinabyss.protocolburrito.dsl.protocolManager
-import kotlinx.serialization.InternalSerializationApi
 import org.bukkit.plugin.java.JavaPlugin
 
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
@@ -38,7 +35,7 @@ class MobzyPlugin : JavaPlugin() {
 
     @ExperimentalCommandDSL
     override fun onEnable() {
-        IdofrontSlimjar.loadGlobally(this)
+        IdofrontSlimjar.loadToLibraryLoader(this)
 
         //Plugin startup logic
         logger.info("On enable has been called")
