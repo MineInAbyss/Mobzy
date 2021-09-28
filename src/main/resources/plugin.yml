@@ -4,7 +4,7 @@ author: Offz
 main: com.mineinabyss.mobzy.MobzyPlugin
 api-version: 1.16
 depend: [Geary, WorldGuard, ProtocolLib, ProtocolBurrito]
-softdepend: [ Looty ]
+softdepend: [ Looty, ModelEngine ]
 
 prefix: Mobzy
 description: A custom entities API
