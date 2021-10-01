@@ -1,4 +1,3 @@
-import com.mineinabyss.mineInAbyss
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val serverVersion: String by project
@@ -7,9 +6,10 @@ val idofrontVersion: String by project
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
+    id("com.mineinabyss.conventions.slimjar")
+    id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
-    id("io.github.0ffz.github-packages") version "1.2.1"
     kotlin("plugin.serialization")
 }
 
@@ -25,7 +25,7 @@ allprojects {
     }
 
     repositories {
-        mineInAbyss()
+        maven("https://repo.mineinabyss.com")
     }
 
     dependencies {
@@ -36,7 +36,6 @@ allprojects {
 }
 
 repositories {
-    githubPackage("kyonifer")
     mavenCentral()
     maven("https://maven.sk89q.com/repo/") //WorldGuard/Edit
     maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
@@ -66,7 +65,7 @@ dependencies {
 
     // Testing
 //    testImplementation("io.papermc.paper:paper-api:$serverVersion") //TODO add to papermc conventions
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.7.0")// { isTransitive = false }
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.10.1")// { isTransitive = false }
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     testImplementation("com.charleskorn.kaml:kaml")
 }
@@ -74,9 +73,5 @@ dependencies {
 tasks {
     shadowJar {
         archiveBaseName.set("Mobzy")
-    }
-
-    build {
-        dependsOn(gradle.includedBuild("Geary").task(":build"))
     }
 }
