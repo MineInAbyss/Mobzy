@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.mobs.types
 import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.geary
 import com.mineinabyss.mobzy.mobs.makeSound
 import net.minecraft.network.chat.IChatBaseComponent
@@ -12,7 +13,7 @@ import net.minecraft.world.entity.animal.EntityFishSchool
 //@GenerateFromBase(base = MobBase::class, createFor = [EntityFishSchool::class])
 open class FishMob(
     type: NMSEntityType<*>, world: NMSWorld
-) : EntityFishSchool(type as EntityTypes<out EntityFishSchool>, world) {
+) : EntityFishSchool(type as EntityTypes<out EntityFishSchool>, world), CustomEntity {
     //bucket you get from picking up fish (we disable this interaction anyways)
     override fun getBucketItem(): NMSItemStack =
         NMSItemStack(NMSItems.nX) //Water Bucket TODO let protocolburrito wrap this kinda stuff

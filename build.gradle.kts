@@ -1,3 +1,4 @@
+import Com_mineinabyss_conventions_platform_gradle.Deps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val serverVersion: String by project
@@ -21,6 +22,7 @@ allprojects {
             freeCompilerArgs = listOf(
                 "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
             )
+            jvmTarget = "16"
         }
     }
 
@@ -54,24 +56,25 @@ dependencies {
     compileOnly("com.mineinabyss:looty:0.3.19")
 
     // From Geary
-    slim("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    slim("com.charleskorn.kaml:kaml")
-    slim("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-    slim("com.github.okkero:skedule")
+    slim(Deps.kotlinx.serialization.json)
+    slim(Deps.kotlinx.serialization.kaml)
+    slim(Deps.kotlinx.coroutines)
+    slim(Deps.minecraft.skedule)
 
     // Shaded
     implementation("com.github.DRE2N:HeadLib:7e2d443678")
-    slim("org.nield:kotlin-statistics")
+    implementation(Deps.`kotlin-statistics`)
 
     // Testing
 //    testImplementation("io.papermc.paper:paper-api:$serverVersion") //TODO add to papermc conventions
     testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.10.1")// { isTransitive = false }
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    testImplementation("com.charleskorn.kaml:kaml")
+    testImplementation(Deps.kotlinx.serialization.kaml)
 }
 
 tasks {
     shadowJar {
         archiveBaseName.set("Mobzy")
+        relocate("com.mineinabyss.idofront", "com.mineinabyss.idofront.${project.group}.${project.name}")
     }
 }

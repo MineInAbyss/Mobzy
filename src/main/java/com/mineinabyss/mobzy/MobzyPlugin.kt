@@ -35,7 +35,7 @@ class MobzyPlugin : JavaPlugin() {
 
     @ExperimentalCommandDSL
     override fun onEnable() {
-        IdofrontSlimjar.loadToLibraryLoader(this)
+        IdofrontSlimjar.loadGlobally(this)
 
         //Plugin startup logic
         logger.info("On enable has been called")

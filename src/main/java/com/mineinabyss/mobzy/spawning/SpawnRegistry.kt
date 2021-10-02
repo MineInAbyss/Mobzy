@@ -1,11 +1,14 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
+import com.mineinabyss.geary.ecs.prefab.PrefabManager
+import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.mobzy.configuration.SpawnConfig
 import com.mineinabyss.mobzy.registration.MobzyWorldguard.MZ_SPAWN_REGIONS
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
-import java.util.*
 
 /**
  * A singleton for keeping track of registered [SpawnRegion]s. Used for the mob spawning system
@@ -18,6 +21,17 @@ object SpawnRegistry {
     /** Clears [regionSpawns] */
     fun unregisterSpawns() = regionSpawns.clear()
 
+    object SpawnConfigs : Query() {
+        val QueryResult.config by get<SpawnConfig>()
+    }
+
+    fun reloadSpawns() {
+        unregisterSpawns()
+        SpawnConfigs.apply {
+            forEach { PrefabManager.reread(it.entity) }
+        }
+    }
+
     /** Register the specified [SpawnRegion] */
     operator fun plusAssign(region: SpawnRegion) {
         regionSpawns += region.name to region
@@ -27,7 +41,7 @@ object SpawnRegistry {
      * Finds a [SpawnDefinition] in the form `"RegionName:MobName"` and will find the first mob of that type inside the region
      * of that name.
      */
-    fun findMobSpawn(spawn: String): SpawnDefinition  {
+    fun findMobSpawn(spawn: String): SpawnDefinition {
         val (regionName, prefabName) = spawn.split('.')
         return (regionSpawns[regionName] ?: error("Could not find registered region for $spawn"))
             .getSpawnOfType(PrefabKey.of(prefabName))

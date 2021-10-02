@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.idofront.messaging.logInfo
-import com.mineinabyss.mobzy.api.isCustomEntity
+import com.mineinabyss.mobzy.api.extendsCustomClass
 import com.mineinabyss.mobzy.mobs.CustomEntity
 import org.bukkit.Chunk
 
@@ -20,4 +20,4 @@ fun debug(message: Any, colorChar: Char? = null) {
 val List<Chunk>.customMobs get() = flatMap { it.customEntities }
 
 /** A list of all the [CustomEntity]s in this chunk. */
-val Chunk.customEntities get() = entities.filter { it.isCustomEntity }
+val Chunk.customEntities get() = entities.filter { it.extendsCustomClass }

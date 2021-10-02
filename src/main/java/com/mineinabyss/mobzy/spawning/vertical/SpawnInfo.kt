@@ -7,7 +7,7 @@ import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
-import com.mineinabyss.mobzy.spawning.SpawnDefinition.SpawnPosition
+import com.mineinabyss.mobzy.spawning.SpawnPosition
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.bukkit.Location

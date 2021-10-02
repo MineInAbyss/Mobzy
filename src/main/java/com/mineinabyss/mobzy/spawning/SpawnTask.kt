@@ -75,6 +75,7 @@ object SpawnTask {
         GlobalSpawnInfo.playerGroupCount = playerGroups.size
 
         //TODO sorted by least mobs around
+        //TODO i think it cant find slimjar classes cause not loaded into system classloader
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             val heights = playerGroup.map { it.location.y.toInt() }
             val world = playerGroup.first().world

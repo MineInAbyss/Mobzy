@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.ecs.listeners
 
+import com.mineinabyss.geary.ecs.api.entities.with
 import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftLoadEvent
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
@@ -34,7 +35,7 @@ object MobzyECSListener : Listener {
 
     @EventHandler
     fun GearyMinecraftSpawnEvent.setItemModel() {
-        entity.with<ItemModel> { (model) ->
+        entity.with { (model): ItemModel ->
             val modelItem = model.toItemStack()
             when (val bukkit = entity.toBukkit()) {
                 is Snowball -> bukkit.item = modelItem

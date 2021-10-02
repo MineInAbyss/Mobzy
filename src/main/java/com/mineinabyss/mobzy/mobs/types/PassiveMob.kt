@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.mobs.types
 import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.geary
 import com.mineinabyss.mobzy.mobs.makeSound
 import net.minecraft.network.chat.IChatBaseComponent
@@ -13,7 +14,7 @@ import net.minecraft.world.entity.animal.EntityAnimal
 
 open class PassiveMob(
     type: NMSEntityType<*>, world: NMSWorld
-) : EntityAnimal(type as EntityTypes<out EntityAnimal>, world) {
+) : EntityAnimal(type as EntityTypes<out EntityAnimal>, world), CustomEntity {
 
     override fun createChild(worldServer: WorldServer, entityAgeable: EntityAgeable): EntityAgeable? = null
 

@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.mobs.types
 import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.geary
 import com.mineinabyss.mobzy.mobs.makeSound
 import net.minecraft.network.chat.IChatBaseComponent
@@ -12,7 +13,7 @@ import net.minecraft.world.entity.ai.control.ControllerMoveFlying
 
 class FlyingMob(
     type: NMSEntityType<*>, world: NMSWorld
-) : EntityFlying(type as EntityTypes<out EntityFlying>, world) {
+) : EntityFlying(type as EntityTypes<out EntityFlying>, world), CustomEntity {
     init {
         //TODO movement controller is being wacko with speed limits
         bM /* ControllerMove */ = ControllerMoveFlying(this, 1, false) /*MZControllerMoveFlying(this)*/

@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.listener
 
+import com.mineinabyss.geary.ecs.api.entities.with
 import com.mineinabyss.geary.minecraft.access.toBukkit
 import com.mineinabyss.geary.minecraft.access.toGeary
 import com.mineinabyss.geary.minecraft.access.toGearyOrNull
@@ -10,7 +11,6 @@ import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
-import com.mineinabyss.mobzy.api.toMobzy
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -88,8 +88,8 @@ object MobListener : Listener {
         val mob = entity.toBukkit<Mob>() ?: return
 
         //add depth strider item on feet to simulate faster water speed TODO do this better
-        entity.with<IncreasedWaterSpeed> { (level) ->
-            mob.equipment?.apply {
+        entity.with { (level): IncreasedWaterSpeed ->
+            mob.equipment.apply {
                 boots = ItemStack(Material.STONE).editItemMeta {
                     isUnbreakable = true
                     addEnchant(Enchantment.DEPTH_STRIDER, level, true)
@@ -98,8 +98,8 @@ object MobListener : Listener {
         }
 
         //add equipment
-        entity.with<Equipment> { equipment ->
-            mob.equipment?.apply {
+        entity.with { equipment: Equipment ->
+            mob.equipment.apply {
                 equipment.helmet?.toItemStack()?.let { helmet = it }
                 equipment.chestplate?.toItemStack()?.let { chestplate = it }
                 equipment.leggings?.toItemStack()?.let { leggings = it }
@@ -108,10 +108,10 @@ object MobListener : Listener {
         }
 
         //create an item based on model ID in head slot if entity will be using itself for the model
-        entity.with<Model> { model ->
+        entity.with { model: Model ->
             if (model.small && mob is Ageable) mob.setBaby()
             //TODO model.giant property which would send packets for giant instead of zombie
-            mob.equipment?.helmet = model.modelItemStack
+            mob.equipment.helmet = model.modelItemStack
             mob.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
         }
     }
@@ -152,12 +152,12 @@ object MobListener : Listener {
 
             //if we hit a custom mob, attack or fire an event
             //TODO component for this
-            trace?.hitEntity?.toMobzy()?.let { hit ->
+            trace?.hitEntity?.let { hit ->
                 if (leftClicked) {
                     isCancelled = true
-                    player.toNMS().attack(hit.nmsEntity)
+                    player.toNMS().attack(hit.toNMS())
                 } else {
-                    PlayerInteractEntityEvent(player, hit.entity).call()
+                    PlayerInteractEntityEvent(player, hit).call()
                 }
             }
         }

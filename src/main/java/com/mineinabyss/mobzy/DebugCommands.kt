@@ -12,7 +12,6 @@ import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.PlayerGroups
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
@@ -103,11 +102,11 @@ internal fun Command.createDebugCommands() {
 
     "benchmark" {
         "nearby" {
-            val rad by intArg()
+            val radius by intArg()
             val i by intArg { default = 10000 }
             playerAction {
                 measureTimeMillis {
-                    val rad = rad.toDouble()
+                    val rad = radius.toDouble()
                     repeat(i) {
                         player.getNearbyEntities(rad, rad, rad).count()
                     }

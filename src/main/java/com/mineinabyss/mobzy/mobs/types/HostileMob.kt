@@ -7,6 +7,7 @@ import com.mineinabyss.mobzy.api.pathfindergoals.addTargetSelector
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.goals.minecraft.*
 import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetNearbyPlayer
+import com.mineinabyss.mobzy.mobs.CustomEntity
 import com.mineinabyss.mobzy.mobs.geary
 import com.mineinabyss.mobzy.mobs.makeSound
 import net.minecraft.network.chat.IChatBaseComponent
@@ -15,7 +16,7 @@ import net.minecraft.world.entity.monster.EntityMonster
 
 open class HostileMob(
     type: NMSEntityType<*>, world: NMSWorld
-) : EntityMonster(type as EntityTypes<out EntityMonster>, world) {
+) : EntityMonster(type as EntityTypes<out EntityMonster>, world), CustomEntity {
     override fun initPathfinder() {
         addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false))
         addPathfinderGoal(3, FloatBehavior())

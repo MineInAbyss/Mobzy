@@ -8,29 +8,13 @@ import com.mineinabyss.idofront.nms.aliases.NMSSound
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import org.bukkit.SoundCategory
-import org.bukkit.persistence.PersistentDataContainer
-import org.bukkit.persistence.PersistentDataHolder
 import kotlin.random.Random
 
 /**
- * A class for linking Bukkit entities to Geary entities. This is meant for Mobzy's own custom entities to use to
- * share common code. We can't use an abstract class yet since we need our entities to extend existing NMS ones.
- *
- * @property id The ID within Geary's ECS for this entity.
- * This should always be implemented as `Engine.getNextId()`.
- * @property nmsEntity The NMS equivalent of this geary entity.
- * @property entity The bukkit equivalent of this geary entity.
- *
- * @see CustomMob
+ * An interface that should be used by all custom mobs that use a custom class within Minecraft's entity
+ * hierarchy.
  */
-interface CustomEntity : PersistentDataHolder {
-    //TODO try to get geary entity without going thru hashmap every time
-
-    val nmsEntity: NMSEntity
-    val entity get() = nmsEntity.toBukkit()
-
-    override fun getPersistentDataContainer(): PersistentDataContainer = entity.persistentDataContainer
-
+interface CustomEntity {
     companion object {
         const val ENTITY_VERSION = "customMob3"
     }
