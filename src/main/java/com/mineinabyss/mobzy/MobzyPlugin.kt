@@ -64,9 +64,11 @@ class MobzyPlugin : JavaPlugin() {
         gearyAddon {
             systems(
                 WalkingAnimationSystem(),
-                CopyNBTSystem(),
-                MobzyNMSTypeInjector,
             )
+
+            //Component event listeners
+            MobzyNMSTypeInjector.track()
+            CopyNBTSystem().track()
 
             autoscanComponents()
             autoscanConditions()

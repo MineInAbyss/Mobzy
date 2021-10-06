@@ -2,13 +2,12 @@ package com.mineinabyss.mobzy.registration
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.relations.Processed
-import com.mineinabyss.geary.ecs.api.relations.Relation
-import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.geary.ecs.components.*
 import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.geary.ecs.query.events.ComponentAddSystem
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
@@ -36,18 +35,19 @@ object MobzyTypesQuery : Query({
  * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
  */
 @Suppress("ObjectPropertyName")
-object MobzyNMSTypeInjector : TickingSystem(init = {
-    not { has(Relation.of<Processed, PrefabKey>()) }
-    has<Prefab>()
-}) {
-    private val QueryResult.info by get<MobzyType>()
-    private val QueryResult.key by get<PrefabKey>()
+object MobzyNMSTypeInjector : ComponentAddSystem() {
+    private val GearyEntity.info by get<MobzyType>()
+    private val GearyEntity.key by get<PrefabKey>()
 
-    override fun QueryResult.tick() {
-        val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
-        entity.set(nmsEntityType)
-        entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
-        entity.setRelation<Processed, MobzyType>(Processed, data = true)
+    init {
+        has<Prefab>()
+    }
+
+    override fun GearyEntity.run() {
+        val nmsEntityType = inject(key, info, get() ?: MobAttributes())
+        set(nmsEntityType)
+        set(info.mobCategory ?: info.creatureType.toMobCategory())
+        setRelation<Processed, MobzyType>(Processed, data = true)
 
         typeToPrefabMap[nmsEntityType.keyName] = key
     }
