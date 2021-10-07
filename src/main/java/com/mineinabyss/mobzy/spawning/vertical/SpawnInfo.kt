@@ -1,14 +1,15 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
+import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
+import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.spawning.SpawnDefinition.SpawnPosition
-import com.okkero.skedule.BukkitDispatcher
+import com.mineinabyss.idofront.typealiases.BukkitEntity
+import com.mineinabyss.mobzy.spawning.SpawnPosition
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import java.util.concurrent.atomic.AtomicInteger
@@ -27,12 +28,19 @@ data class SpawnInfo(
     val top: Location,
     val searchRadius: Double = 200.0
 ) {
+    object NearbyQuery : Query() {
+        val QueryResult.bukkit by get<BukkitEntity>()
+    }
+
+    private val searchRadiusSquared = searchRadius * searchRadius
+
+    //TODO more efficiently finding all ECS entities nearby
     val localMobs: Map<NMSEntityType<*>, AtomicInteger> by lazy {
         runBlocking {
-            withContext(BukkitDispatcher(mobzy)) {
-                bottom.getNearbyEntities(searchRadius, searchRadius, searchRadius).categorizeMobs()
-            }
+            delay(500L)
         }
+        NearbyQuery.run { map { it.bukkit }.filter { it.location.world == bottom.world && it.location.distanceSquared(bottom) < searchRadiusSquared } }
+            .categorizeMobs()
     }
 
     //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
@@ -54,13 +62,13 @@ data class SpawnInfo(
             SpawnPosition.OVERHANG -> top.clone().down(1)
         }
 
-    override fun toString(): String = "SpawnArea: $bottom, $top"
+    override fun toString(): String = "SpawnInfo: $bottom, $top"
 }
 
 fun Collection<Entity>.categorizeMobs(): Map<NMSEntityType<*>, AtomicInteger> {
     val map = mutableMapOf<NMSEntityType<*>, AtomicInteger>()
     forEach { entity ->
-        map.getOrPut(entity.toNMS().entityType, { AtomicInteger() }).incrementAndGet()
+        map.getOrPut(entity.toNMS().entityType) { AtomicInteger() }.incrementAndGet()
     }
     return map
 }

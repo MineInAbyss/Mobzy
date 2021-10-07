@@ -1,8 +1,9 @@
 package com.mineinabyss.mobzy.listener
 
-import com.mineinabyss.geary.minecraft.access.geary
-import com.mineinabyss.geary.minecraft.access.gearyOrNull
+import com.mineinabyss.geary.ecs.api.entities.with
 import com.mineinabyss.geary.minecraft.access.toBukkit
+import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.minecraft.access.toGearyOrNull
 import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
@@ -10,8 +11,7 @@ import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
-import com.mineinabyss.mobzy.api.isCustomMob
-import com.mineinabyss.mobzy.api.toMobzy
+import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
@@ -27,7 +27,6 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Ageable
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
-import org.bukkit.entity.NPC
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -37,7 +36,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
-import org.bukkit.event.world.ChunkLoadEvent
+import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -60,7 +59,7 @@ object MobListener : Listener {
     /** Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect. */
     @EventHandler(ignoreCancelled = true)
     fun EntityDamageEvent.onHit() {
-        val gearyEntity = gearyOrNull(entity) ?: return
+        val gearyEntity = entity.toGearyOrNull() ?: return
         val mob = entity as? LivingEntity ?: return
         val model = gearyEntity.get<Model>() ?: return
         model.hitId ?: return
@@ -89,8 +88,8 @@ object MobListener : Listener {
         val mob = entity.toBukkit<Mob>() ?: return
 
         //add depth strider item on feet to simulate faster water speed TODO do this better
-        entity.with<IncreasedWaterSpeed> { (level) ->
-            mob.equipment?.apply {
+        entity.with { (level): IncreasedWaterSpeed ->
+            mob.equipment.apply {
                 boots = ItemStack(Material.STONE).editItemMeta {
                     isUnbreakable = true
                     addEnchant(Enchantment.DEPTH_STRIDER, level, true)
@@ -99,8 +98,8 @@ object MobListener : Listener {
         }
 
         //add equipment
-        entity.with<Equipment> { equipment ->
-            mob.equipment?.apply {
+        entity.with { equipment: Equipment ->
+            mob.equipment.apply {
                 equipment.helmet?.toItemStack()?.let { helmet = it }
                 equipment.chestplate?.toItemStack()?.let { chestplate = it }
                 equipment.leggings?.toItemStack()?.let { leggings = it }
@@ -109,10 +108,10 @@ object MobListener : Listener {
         }
 
         //create an item based on model ID in head slot if entity will be using itself for the model
-        entity.with<Model> { model ->
+        entity.with { model: Model ->
             if (model.small && mob is Ageable) mob.setBaby()
             //TODO model.giant property which would send packets for giant instead of zombie
-            mob.equipment?.helmet = model.modelItemStack
+            mob.equipment.helmet = model.modelItemStack
             mob.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
         }
     }
@@ -120,29 +119,17 @@ object MobListener : Listener {
     /** Ride entities with [Rideable] component on right click. */
     @EventHandler
     fun PlayerInteractEntityEvent.rideOnRightClick() {
-        val gearyEntity = gearyOrNull(rightClicked) ?: return
+        val gearyEntity = rightClicked.toGearyOrNull() ?: return
         if (gearyEntity.has<Rideable>())
             rightClicked.addPassenger(player)
     }
 
-    /**
-     * Remove all old entities, which still contain the original `customMob` tag.
-     *
-     * Update `customMob2` entities with old damage values for models to the new custom-model-data tag.
-     */
     @EventHandler
-    fun ChunkLoadEvent.onChunkLoad() {
+    fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
         for (entity in chunk.entities) {
-            if (entity.scoreboardTags.contains("customMob")) {
+            val removeOnUnload = entity.toGeary().get<RemoveOnChunkUnload>() ?: continue
+            if (!(removeOnUnload.keepIfRenamed && entity.isCustomAndRenamed))
                 entity.remove()
-            } else if (entity.scoreboardTags.contains("customMob2") && entity is Mob) {
-                geary(entity).get<Model>()?.apply { entity.equipment?.helmet = modelItemStack }
-                entity.removeScoreboardTag("customMob2")
-                entity.addScoreboardTag("customMob3")
-            } else if (entity.isCustomMob && entity.toNMS() !is NPC && !entity.isCustomAndRenamed) {
-                (entity as LivingEntity).removeWhenFarAway = true
-            }
-            //TODO: Do we need to despawn non-monster entities?
         }
     }
 
@@ -165,12 +152,12 @@ object MobListener : Listener {
 
             //if we hit a custom mob, attack or fire an event
             //TODO component for this
-            trace?.hitEntity?.toMobzy()?.let { hit ->
+            trace?.hitEntity?.let { hit ->
                 if (leftClicked) {
                     isCancelled = true
-                    player.toNMS().attack(hit.nmsEntity)
+                    player.toNMS().attack(hit.toNMS())
                 } else {
-                    PlayerInteractEntityEvent(player, hit.entity).call()
+                    PlayerInteractEntityEvent(player, hit).call()
                 }
             }
         }
@@ -179,14 +166,14 @@ object MobListener : Listener {
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
     @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {
-        val gearyEntity = gearyOrNull(entered) ?: return
+        val gearyEntity = entered.toGearyOrNull() ?: return
         if (gearyEntity.has<PreventRiding>())
             isCancelled = true
     }
 
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
-        val gearyEntity = gearyOrNull(entity) ?: return
+        val gearyEntity = entity.toGearyOrNull() ?: return
         gearyEntity.with<DeathLoot> { deathLoot ->
             drops.clear()
             droppedExp = 0
@@ -195,8 +182,7 @@ object MobListener : Listener {
                 deathLoot.expToDrop()?.let { droppedExp = it }
                 val heldItem = entity.killer?.inventory?.itemInMainHand
                 val looting = heldItem?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
-                val fire = (heldItem?.enchantments?.get(Enchantment.FIRE_ASPECT) ?: 0) > 0
-                drops.addAll(deathLoot.drops.mapNotNull { it.chooseDrop(looting, fire) })
+                drops.addAll(deathLoot.drops.mapNotNull { it.chooseDrop(looting, entity.fireTicks > 0) })
 
                 //TODO only enable running commands when we prevent creative players from spawning entities w/ custom data
 //            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)

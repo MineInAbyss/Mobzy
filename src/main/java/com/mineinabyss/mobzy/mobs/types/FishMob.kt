@@ -1,11 +1,19 @@
 package com.mineinabyss.mobzy.mobs.types
 
-import com.mieninabyss.mobzy.processor.GenerateFromBase
 import com.mineinabyss.idofront.nms.aliases.*
+import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
+import com.mineinabyss.mobzy.mobs.CustomEntity
+import com.mineinabyss.mobzy.mobs.geary
+import com.mineinabyss.mobzy.mobs.makeSound
+import net.minecraft.network.chat.IChatBaseComponent
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.animal.EntityFishSchool
 
-@GenerateFromBase(base = MobBase::class, createFor = [EntityFishSchool::class])
-open class FishMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFishSchool(world, type) {
+//@GenerateFromBase(base = MobBase::class, createFor = [EntityFishSchool::class])
+open class FishMob(
+    type: NMSEntityType<*>, world: NMSWorld
+) : EntityFishSchool(type as EntityTypes<out EntityFishSchool>, world), CustomEntity {
     //bucket you get from picking up fish (we disable this interaction anyways)
     override fun getBucketItem(): NMSItemStack =
         NMSItemStack(NMSItems.nX) //Water Bucket TODO let protocolburrito wrap this kinda stuff
@@ -16,10 +24,15 @@ open class FishMob(type: NMSEntityType<*>, world: NMSWorld) : MobzyEntityFishSch
     //on player interact
     override fun b(entityhuman: NMSEntityHuman, enumhand: NMSHand) = NMSInteractionResult.d //PASS
 
-    init {
-        //TODO dont add these scoreboard tags, I think they're only used to filter by type when spawning, just use a
-        // better system than this...
-        addScoreboardTag("fishMob")
-//        entity.removeWhenFarAway = true
-    }
+
+    override fun getScoreboardDisplayName(): IChatBaseComponent = NMSChatMessage(entityType.typeName
+        .split('_').joinToString(" ") { it.replaceFirstChar(Char::uppercase) })
+
+    override fun getSoundVolume(): Float = geary.get<Sounds>()?.volume ?: super.getSoundVolume()
+    override fun getSoundAmbient(): NMSSound? = makeSound(super.getSoundAmbient()) { ambient }
+    override fun getSoundDeath(): NMSSound? = makeSound(super.getSoundDeath()) { death }
+    override fun getSoundSplash(): NMSSound? = makeSound(super.getSoundSplash()) { splash }
+    override fun getSoundSwim(): NMSSound? = makeSound(super.getSoundSwim()) { swim }
+    override fun getSoundHurt(damagesource: NMSDamageSource): NMSSound? =
+        makeSound(super.getSoundHurt(damagesource)) { hurt }
 }

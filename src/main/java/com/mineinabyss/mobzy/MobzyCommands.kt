@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.minecraft.components.of
+import com.mineinabyss.geary.minecraft.access.toGeary
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
@@ -9,6 +9,7 @@ import com.mineinabyss.idofront.commands.arguments.optionArg
 import com.mineinabyss.idofront.commands.arguments.stringArg
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
+import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.color
@@ -16,29 +17,30 @@ import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.mobzy.api.extendsCustomClass
 import com.mineinabyss.mobzy.api.isCustomAndRenamed
-import com.mineinabyss.mobzy.api.isCustomEntity
-import com.mineinabyss.mobzy.api.isOfType
 import com.mineinabyss.mobzy.mobs.types.FlyingMob
 import com.mineinabyss.mobzy.mobs.types.HostileMob
+import com.mineinabyss.mobzy.mobs.types.NPC
 import com.mineinabyss.mobzy.mobs.types.PassiveMob
 import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.registration.MobzyTypesQuery
+import com.mineinabyss.mobzy.registration.MobzyTypesQuery.key
+import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Entity
-import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
 @ExperimentalCommandDSL
 class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
                 "spawns" {
-                    MobzyConfig.reloadSpawns()
+                    SpawnRegistry.reloadSpawns()
                     sender.success("Reloaded spawn config")
                 }
 
@@ -53,20 +55,24 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 fun PlayerAction.removeOrInfo(isInfo: Boolean) {
                     val worlds = mobzy.server.worlds
-                    var mobCount = 0
                     var entityCount = 0
                     val entities = mutableSetOf<Entity>()
+
                     for (world in worlds) for (entity in world.entities) {
-                        val tags = entity.scoreboardTags
                         val nmsEntity = entity.toNMS()
-                        if (entity.isCustomEntity && when (entityType) {
-                                "all" -> !entity.isCustomAndRenamed && !entity.scoreboardTags.contains("npc")
+                        val geary = entity.toGeary()
+                        if (when (entityType) {
+                                "custom" -> entity.extendsCustomClass
                                 "named" -> entity.isCustomAndRenamed
-                                "npc" -> entity.scoreboardTags.contains("npc")
-                                "passive" -> !entity.scoreboardTags.contains("npc") && nmsEntity is PassiveMob
+                                "npc" -> nmsEntity is NPC
+                                "passive" -> nmsEntity !is NPC && nmsEntity is PassiveMob
                                 "hostile" -> nmsEntity is HostileMob
                                 "flying" -> nmsEntity is FlyingMob
-                                else -> entity.isOfType(entityType)
+                                else -> {
+                                    val prefab = runCatching { PrefabKey.of(entityType).toEntity() }.getOrNull()
+                                        ?: this@commandGroup.stopCommand("No such prefab or selector $entityType")
+                                    geary.instanceOf(prefab)
+                                }
                             }
                         ) {
                             val playerLoc = player.location
@@ -74,7 +80,6 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                                 entityCount++
                                 if (isInfo) entities += entity
                                 else entity.remove()
-                                if (!tags.contains("additionalPart")) mobCount++
                             }
                         }
                     }
@@ -82,7 +87,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     sender.success(
                         """
                         ${if (isInfo) "There are" else "Removed"}
-                        &l$mobCount&r&a ${if (entityType == "all") "custom mobs" else entityType}
+                        &l$entityCount&r&a ${if (entityType == "custom") "custom mobs" else entityType}
                         ${if (radius <= 0) "in all loaded chunks." else "in a radius of $radius blocks."}
                         """.trimIndent().replace("\n", " "), '&'
                     )
@@ -107,7 +112,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("spawn" / "s")(desc = "Spawns a custom mob") {
-                val mobName by optionArg(options = MobzyNMSTypeInjector.typeNames) {
+                val mobKey by optionArg(options = MobzyTypesQuery.map { it.key.toString() }) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val numOfSpawns by intArg {
@@ -116,11 +121,11 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
 
                 playerAction {
-                    val cappedSpawns = numOfSpawns.coerceAtMost(MobzyConfig.data.maxCommandSpawns)
-                    val key = PrefabKey.of(mobzy, mobName)
+                    val cappedSpawns = numOfSpawns.coerceAtMost(mobzyConfig.maxCommandSpawns)
+                    val key = PrefabKey.of(mobKey)
 
                     repeat(cappedSpawns) {
-                        player.location.spawnGeary(key) ?: error("Prefab $mobName not found")
+                        player.location.spawnGeary(key) ?: error("Prefab $mobKey not found")
                     }
                 }
             }
@@ -140,8 +145,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
                     // be made private once that's done
                     action {
-                        if (MobzyConfig.data.doMobSpawns != enabled) {
-                            MobzyConfig.data.doMobSpawns = enabled
+                        if (mobzyConfig.doMobSpawns != enabled) {
+                            mobzyConfig.doMobSpawns = enabled
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")
@@ -179,24 +184,31 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 if (subCommand == "spawn" || subCommand == "s")
                     if (args.size == 2) {
-                        return MobzyNMSTypeInjector.typeNames
-                            .filter { it.startsWith(args[1].toLowerCase()) }
+                        return MobzyTypesQuery
+                            .filter {
+                                val arg = args[1].toLowerCase()
+                                it.key.name.startsWith(arg) || it.key.key.startsWith(arg)
+                            }
+                            .map { it.key.toString() }
                     } else if (args.size == 3) {
                         var min = 1
                         try {
                             min = args[2].toInt()
                         } catch (e: NumberFormatException) {
                         }
-                        return (min until MobzyConfig.data.maxCommandSpawns).asIterable()
+                        return (min until mobzyConfig.maxCommandSpawns).asIterable()
                             .map { it.toString() }.filter { it.startsWith(min.toString()) }
                     }
 
                 if (subCommand in listOf("remove", "rm", "info", "i"))
                     if (args.size == 2) {
                         val mobs: MutableList<String> = ArrayList()
-                        mobs.addAll(MobzyNMSTypeInjector.typeNames)
-                        mobs.addAll(listOf("all", "npc", "mob", "named", "passive", "hostile", "flying"))
-                        return mobs.filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
+                        mobs.addAll(MobzyTypesQuery.map { it.key.toString() })
+                        mobs.addAll(listOf("custom", "npc", "mob", "named", "passive", "hostile", "flying"))
+                        return mobs.filter {
+                            val arg = args[1].toLowerCase()
+                            it.startsWith(arg) || it.substringAfter(":").startsWith(arg)
+                        }
                     }
                 return if (subCommand == "config") listOf("mobs", "spawns", "domobspawns")
                     .filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }

@@ -22,7 +22,7 @@ class DeathLoot(
     val maxExp: Int? = null,
     val deathCommands: List<String> = listOf(),
     val drops: List<MobDrop> = listOf(),
-    val ignoredCauses: List<DamageCause> = listOf(DamageCause.SUFFOCATION),
+    val ignoredCauses: List<DamageCause> = listOf(DamageCause.SUFFOCATION, DamageCause.DROWNING, DamageCause.DRYOUT, DamageCause.CRAMMING),
 ) {
     /** Helper function for randomly picking some amount of exp to drop. */
     fun expToDrop(): Int? {

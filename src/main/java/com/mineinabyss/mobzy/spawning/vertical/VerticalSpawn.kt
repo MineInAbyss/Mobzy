@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
 import org.bukkit.Chunk
+import org.bukkit.ChunkSnapshot
 import org.bukkit.Location
 
 /**
@@ -11,18 +12,17 @@ import org.bukkit.Location
 object VerticalSpawn {
     fun findGap(
         chunk: Chunk,
+        //TODO getting the full chunk snapshot is by far the most inefficient step
+        snapshot: ChunkSnapshot = chunk.chunkSnapshot,
         minY: Int,
         maxY: Int,
         x: Int = (0..15).random(),
         z: Int = (0..15).random(),
-        //TODO normal distribution random around player's y position
         startY: Int = (minY..maxY).random(),
     ): SpawnInfo {
-        //TODO getting the full chunk snapshot is by far the most inefficient step
-        val snapshot = chunk.chunkSnapshot
         fun Int.getBlock() = snapshot.getBlockType(x, this, z)
 
-        val startIsEmpty = startY.getBlock().isEmpty
+        val startIsEmpty = startY.getBlock().isAir
 
         class BlocLoc(val add: Int) {
             lateinit var opposite: BlocLoc
@@ -33,10 +33,16 @@ object VerticalSpawn {
             fun next(): Boolean {
                 if (foundBlock) return false
 
-                val nextIsEmpty = y.getBlock().isEmpty
+                if(y !in minY..maxY) {
+                    y -= add
+                    foundBlock=true
+                    return false
+                }
+
+                val nextIsEmpty = y.getBlock().isAir
 
                 when {
-                    y !in (minY + 1) until maxY || isEmpty && !nextIsEmpty -> {
+                    isEmpty && !nextIsEmpty -> {
                         foundBlock = true
                         return false
                     }
@@ -56,8 +62,10 @@ object VerticalSpawn {
         up.opposite = down
         down.opposite = up
 
-        while (up.next() || down.next()) {
-        }
+        do {
+            val searchUp = up.next()
+            val searchDown = down.next()
+        } while(searchUp || searchDown)
 
         return SpawnInfo(chunk.getBlock(x, down.y, z).location, chunk.getBlock(x, up.y, z).location)
     }

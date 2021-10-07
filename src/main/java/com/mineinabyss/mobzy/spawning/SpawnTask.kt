@@ -50,8 +50,7 @@ object SpawnTask {
     fun startTask() {
         if (runningTask != null) return
         runningTask = mobzy.schedule(ASYNC) {
-            repeating(MobzyConfig.data.spawnTaskDelay.inTicks)
-            while (MobzyConfig.data.doMobSpawns) {
+            while (mobzyConfig.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
                     runSpawnTask()
@@ -62,7 +61,7 @@ object SpawnTask {
                 } catch (e: RuntimeException) {
                     e.printStackTrace()
                 }
-                yield()
+                waitFor(mobzyConfig.spawnTaskDelay.inTicks)
             }
             stopTask()
         }
@@ -76,11 +75,19 @@ object SpawnTask {
         GlobalSpawnInfo.playerGroupCount = playerGroups.size
 
         //TODO sorted by least mobs around
+        //TODO i think it cant find slimjar classes cause not loaded into system classloader
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
+            val heights = playerGroup.map { it.location.y.toInt() }
+            val world = playerGroup.first().world
+            val heightRange = mobzyConfig.spawnHeightRange
+            val min = (heights.minOrNull()!! - heightRange).coerceAtLeast(world.minHeight)
+            val max = (heights.maxOrNull()!! + heightRange).coerceAtMost(world.maxHeight - 1)
+
             // Every player group picks a random chunk around them
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
             Engine.temporaryEntity { spawn ->
-                val spawnInfo = VerticalSpawn.findGap(chunk, 0, 255)
+                val chunkSnapshot = chunk.chunkSnapshot
+                val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
                 val priorities = regionContainer.createQuery()
                     .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
                     .sorted()
@@ -88,6 +95,7 @@ object SpawnTask {
                     .getMobSpawnsForRegions()
                     .associateWithTo(mutableMapOf()) { it.basePriority * Random.nextDouble() }
 
+//                spawn.set(SubChunkBlockComposition(chunkSnapshot, spawnInfo.bottom.blockY))
                 spawn.set(spawnInfo.bottom)
                 spawn.set(spawnInfo)
 

@@ -1,8 +1,7 @@
 # Send debug messages
 debug: false
 doMobSpawns: false
-minChunkSpawnRad: 3
-maxChunkSpawnRad: 6
+chunkSpawnRad: 3..6
 maxCommandSpawns: 50
 spawnTaskDelay: 100
 creatureTypeCaps:
@@ -12,3 +11,4 @@ creatureTypeCaps:
   MISC: 5
   AMBIENT: 0
 playerGroupRadius: 128.0
+spawnHeightRange: 150

@@ -1,5 +1,10 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.api.engine.Engine
+import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
+import com.mineinabyss.geary.ecs.components.DebugComponent
+import com.mineinabyss.geary.minecraft.store.decode
+import com.mineinabyss.geary.minecraft.store.encode
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.stringArg
@@ -7,14 +12,35 @@ import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.PlayerGroups
+import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Bukkit
 import kotlin.system.measureTimeMillis
 
+fun Int.toChunkLoc() = (this % 16).let { if (it < 0) it + 16 else it }
+
 internal fun Command.createDebugCommands() {
+    "chunk" {
+        "write"{
+            playerAction {
+                player.location.chunk.persistentDataContainer.encode(DebugComponent("Test"))
+            }
+        }
+        "read" {
+            playerAction {
+                player.info(player.location.chunk.persistentDataContainer.decode<DebugComponent>())
+            }
+        }
+    }
+
     "spawn" {
+        "categoryCounts" {
+            action {
+                sender.info(MobCountManager.categoryCounts)
+            }
+        }
         "groups" {
             action {
                 sender.info(PlayerGroups.group(Bukkit.getOnlinePlayers()))
@@ -24,6 +50,26 @@ internal fun Command.createDebugCommands() {
             val spawnName by stringArg()
 
             playerAction {
+                val loc = player.location
+                val x = loc.blockX.toChunkLoc()
+                val z = loc.blockZ.toChunkLoc()
+                val spawnInfo = VerticalSpawn.findGap(
+                    player.location.chunk,
+                    minY = -256,
+                    maxY = 255,
+                    x = x,
+                    z = z,
+                    startY = loc.blockY
+                )
+                val spawnDef = SpawnRegistry.findMobSpawn(spawnName.replace("_", " "))
+                Engine.temporaryEntity { spawnEntity ->
+                    spawnEntity.set(spawnInfo)
+                    spawnEntity.set(spawnInfo.bottom)
+                    spawnEntity.set(spawnDef)
+                    player.info(spawnDef.conditions
+                        .filter { !it.metFor(spawnEntity) }
+                        .map { it::class.simpleName })
+                }
                 //TODO list all failed conditions
 //                SpawnRegistry.findMobSpawn(spawnName).conditionsMet()
             }
@@ -56,11 +102,11 @@ internal fun Command.createDebugCommands() {
 
     "benchmark" {
         "nearby" {
-            val rad by intArg()
+            val radius by intArg()
             val i by intArg { default = 10000 }
             playerAction {
                 measureTimeMillis {
-                    val rad = rad.toDouble()
+                    val rad = radius.toDouble()
                     repeat(i) {
                         player.getNearbyEntities(rad, rad, rad).count()
                     }
@@ -76,15 +122,6 @@ internal fun Command.createDebugCommands() {
             val rad = rad.toDouble()
             sender.info(player.getNearbyEntities(rad, rad, rad).count())
         }
-    }
-    ("configinfo" / "cfginfo")(desc = "Information about the current state of the plugin")?.action {
-        sender.info(
-            """
-            LOG OF CURRENTLY REGISTERED STUFF:
-            Spawn configs: ${MobzyConfig.spawnCfgs}
-            Registered addons: ${MobzyConfig.registeredAddons}
-            Registered EntityTypes: ${MobzyNMSTypeInjector.typeNames}""".trimIndent()
-        )
     }
     "snapshot"()?.playerAction {
         val snapshot = player.location.chunk.chunkSnapshot

@@ -8,6 +8,7 @@ import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
+import com.mineinabyss.mobzy.debug
 import com.mineinabyss.mobzy.spawning.conditions.SpawnCapCondition
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
@@ -45,44 +46,44 @@ data class SpawnDefinition(
     val _conditions: List<GearyCondition> = listOf(),
     val ignore: List<String> = listOf()
 ) {
-    companion object {
-        val defaultConditions = listOf(
-            SpawnCapCondition,
-//            EnoughSpaceCondition,
-        )
-    }
-
     @Transient
     val copyFrom: SpawnDefinition? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
 
     // associateBy ensures we only have one instance of each condition and we take the overridden one
-    @Transient
-    val conditions: Collection<GearyCondition> = ((copyFrom?.conditions ?: defaultConditions) + _conditions)
-        .associateBy { it::class }
-        .minus(ignore.map { Formats.yamlFormat.serializersModule.getPolymorphic(GearyCondition::class, it)?.descriptor?.capturedKClass })
-        .values
+    val conditions: Collection<GearyCondition> by lazy {
+        ((copyFrom?.conditions ?: defaultConditions) + _conditions)
+            .associateBy { it::class }
+            .minus(ignore.map {
+                Formats.yamlFormat.serializersModule.getPolymorphic(
+                    GearyCondition::class,
+                    it
+                )?.descriptor?.capturedKClass
+            })
+            .values
+    }
 
     @Transient
-    val prefabKey: PrefabKey = getOrCopy { _prefabKey } ?: error("Mob prefab must not be null")
+    val prefabKey: PrefabKey = _prefabKey ?: copyFrom?.prefabKey ?: error("Mob prefab must not be null")
 
     @Transient
     val prefab: GearyEntity = prefabKey.toEntity() ?: error("Prefab $prefabKey not found")
 
     @Transient
-    val amount: IntRange = getOrCopy { _amount } ?: 1..1
+    val entityType: NMSEntityType<*> by lazy {
+        prefab.get() ?: error("No entity type found for prefab $prefabKey in mob spawn")
+    }
 
     @Transient
-    val radius: Double = getOrCopy { _radius } ?: 0.0
+    val amount: IntRange = _amount ?: copyFrom?.amount ?: 1..1
 
     @Transient
-    val basePriority: Double = getOrCopy { _basePriority } ?: 1.0
+    val radius: Double = _radius ?: copyFrom?.radius ?: 0.0
 
     @Transient
-    val spawnPos: SpawnPosition = getOrCopy { _spawnPos } ?: SpawnPosition.GROUND
+    val basePriority: Double = _basePriority ?: copyFrom?.basePriority ?: 1.0
 
     @Transient
-    val entityType: NMSEntityType<*> = prefab.get<NMSEntityType<*>>()
-        ?: error("No entity type found for prefab $prefabKey in mob spawn")
+    val spawnPos: SpawnPosition = _spawnPos ?: copyFrom?.spawnPos ?: SpawnPosition.GROUND
 
     /** Given a [SpawnInfo] Spawns a number of entities defined in this [SpawnDefinition] at its location */
     fun spawn(spawnInfo: SpawnInfo, spawns: Int = chooseSpawnAmount()): Int {
@@ -98,20 +99,14 @@ data class SpawnDefinition(
     }
 
     fun conditionsMet(area: GearyEntity): Boolean {
-        return conditions.all { it.metFor(area) }
+        return conditions.all { it.metFor(area) }.apply {
+            if (!this) debug(conditions
+                .filter { !it.metFor(area) }
+                .map { it::class.simpleName })
+        }
     }
 
     fun chooseSpawnAmount(): Int = amount.randomOrMin()
-
-    /**
-     * Where we should look for a location to actually spawn mobs in when calling [spawn]
-     *
-     * @see SpawnInfo.getSpawnFor
-     */
-    @Serializable
-    enum class SpawnPosition {
-        AIR, GROUND, OVERHANG
-    }
 
     /**
      * Gets a location to spawn in a mob given an original location and min/max radii around it
@@ -135,7 +130,10 @@ data class SpawnDefinition(
         return null
     }
 
-    // Hacky stuff for the `reuse` keyword
-    /** Uses a value from [copyFrom] unless overridden in this spawn. */
-    private inline fun <T> getOrCopy(prop: SpawnDefinition.() -> T) = this.prop() ?: copyFrom?.prop()
+    companion object {
+        val defaultConditions = listOf(
+            SpawnCapCondition,
+//            EnoughSpaceCondition,
+        )
+    }
 }

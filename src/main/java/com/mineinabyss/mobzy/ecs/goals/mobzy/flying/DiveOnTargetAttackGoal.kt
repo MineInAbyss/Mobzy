@@ -7,6 +7,7 @@ import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.idofront.nms.entity.lookAt
 import com.mineinabyss.idofront.nms.entity.lookAtPitchLock
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem.toModelEntity
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -104,10 +105,22 @@ class DiveOnTargetAttackGoal(
     private fun bash() {
         val (x, _, z) = mob.location
         mob.lookAt(x + bashVelX, z + bashVelZ)
+
+        if (bashLeft == bashDuration) {
+            val model = mob.toModelEntity()
+            if (model !== null) {
+                model.allActiveModel.values.forEach { it.addState("bash", 0, 5, 1.0) }
+            }
+        }
+
         mob.velocity = mob.velocity.setX(bashVelX).setZ(bashVelZ)
         if (bashLeft-- <= 0 || mob.target == null || mob.distanceSqrTo(mob.target!!) < 2 || mob.velocity.x == 0.0 || mob.velocity.z == 0.0) {
             currentAction = Action.FLY
             bashLeft = bashDuration
+            val model = mob.toModelEntity()
+            if (model !== null) {
+                model.allActiveModel.values.forEach { it.removeState("bash", true) }
+            }
         }
     }
 
