@@ -13,7 +13,7 @@ import org.bukkit.event.Listener
 object ModelEngineSystem : Listener {
     private val modelManager: ModelManager? by lazy { ModelEngineAPI.api.modelManager }
 
-    fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager.getModeledEntity(uniqueId)
+    fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager?.getModeledEntity(uniqueId)
 
     @EventHandler
     fun GearyMinecraftSpawnEvent.registerModelEngine() {
