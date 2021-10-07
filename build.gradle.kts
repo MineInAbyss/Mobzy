@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val serverVersion: String by project
 val idofrontVersion: String by project
+val gearyVersion: String by project
+
 
 plugins {
     id("com.mineinabyss.conventions.kotlin")
@@ -47,7 +49,7 @@ repositories {
 dependencies {
     slim(kotlin("stdlib-jdk8"))
     // Other plugins
-    compileOnly("com.mineinabyss:geary-platform-papermc:0.7.54")
+    compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")
     compileOnly("com.mineinabyss:geary-commons-papermc:0.1.2")
     compileOnly("com.mineinabyss:protocolburrito:0.2.25")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2") { exclude(group = "org.bukkit") }
