@@ -73,7 +73,11 @@ class DiveOnTargetAttackGoal(
 
     private fun prepareDive() {
         val target = mob.target ?: return
-        mob.lookAtPitchLock(target)
+        if (mob.toModelEntity() !== null) {
+            mob.lookAt(target)
+        } else {
+            mob.lookAtPitchLock(target)
+        }
 
         //if arrived to dive
         //TODO dont make so many location instances
@@ -90,9 +94,13 @@ class DiveOnTargetAttackGoal(
 
     private fun beginDive() {
         val target = mob.target ?: return
-        mob.lookAtPitchLock(target)
+        if (mob.toModelEntity() !== null) {
+            mob.lookAt(target)
+        } else {
+            mob.lookAtPitchLock(target)
+        }
         val targetLoc = target.location
-        if (mob.distanceSqrTo(target) < 2 || mob.velocity.y == 0.0 || mob.location.y <= target.location.y + 1.0) {
+        if ((mob.distanceSqrTo(target) < 2 || mob.velocity.y == 0.0) && mob.location.y <= target.location.y + 1.0) {
             currentAction = Action.BASH
             bashVelX = mob.location.direction.x * bashVelMultiplier
             bashVelZ = mob.location.direction.z * bashVelMultiplier

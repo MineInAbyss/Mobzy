@@ -3,9 +3,10 @@ package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
-import com.mineinabyss.idofront.nms.entity.lookAt
+import com.mineinabyss.idofront.nms.entity.lookAtPitchLock
 import com.mineinabyss.idofront.nms.pathfindergoals.moveTo
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem.toModelEntity
 import com.mineinabyss.mobzy.pathfinders.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -25,7 +26,11 @@ class FlyTowardsTargetGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown
     override fun executeWhenCooledDown() {
         restartCooldown()
         val target = mob.target ?: return
-        mob.lookAt(target)
+        if (mob.toModelEntity() !== null) {
+            mob.lookAt(target)
+        } else {
+            mob.lookAtPitchLock(target)
+        }
 
         val (x, y, z) = target.eyeLocation
 
