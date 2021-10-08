@@ -63,7 +63,9 @@ dependencies {
 
     // Shaded
     implementation("com.github.DRE2N:HeadLib:7e2d443678")
-    implementation(Deps.`kotlin-statistics`) { isTransitive = false }
+    implementation(Deps.`kotlin-statistics`) {
+        exclude(group = "org.jetbrains.kotlin")
+    }
 
     // Testing
     testImplementation(Deps.`kotlin-statistics`)

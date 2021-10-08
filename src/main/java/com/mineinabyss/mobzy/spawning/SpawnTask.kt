@@ -80,8 +80,9 @@ object SpawnTask {
             val heights = playerGroup.map { it.location.y.toInt() }
             val world = playerGroup.first().world
             val heightRange = mobzyConfig.spawnHeightRange
-            val min = (heights.minOrNull()!! - heightRange).coerceAtLeast(world.minHeight)
-            val max = (heights.maxOrNull()!! + heightRange).coerceAtMost(world.maxHeight - 1)
+            val worldHeight = world.minHeight until world.maxHeight
+            val min = (heights.minOrNull()!! - heightRange).coerceIn(worldHeight)
+            val max = (heights.maxOrNull()!! + heightRange).coerceIn(worldHeight)
 
             // Every player group picks a random chunk around them
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop

@@ -11,7 +11,9 @@ import org.bukkit.event.Listener
 
 
 object ModelEngineSystem : Listener {
-    private val modelManager: ModelManager? by lazy { ModelEngineAPI.api.modelManager }
+    private val modelManager: ModelManager? by lazy {
+        runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
+    }
 
     fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager?.getModeledEntity(uniqueId)
 

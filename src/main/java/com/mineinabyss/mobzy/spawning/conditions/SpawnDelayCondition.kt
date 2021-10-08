@@ -13,7 +13,8 @@ import kotlinx.serialization.Serializable
 class SpawnDelayCondition(
     private val attemptEvery: TimeSpan
 ) : GearyCondition() {
-    private val iterationMod: Int = (attemptEvery.inMillis / mobzyConfig.spawnTaskDelay.inMillis).toInt()
+    private val iterationMod: Int = (attemptEvery.inMillis / mobzyConfig.spawnTaskDelay.inMillis)
+        .toInt().coerceAtLeast(1)
 
     override fun GearyEntity.check(): Boolean =
         GlobalSpawnInfo.iterationNumber % iterationMod == 0
