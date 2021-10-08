@@ -100,10 +100,14 @@ class DiveOnTargetAttackGoal(
             mob.lookAtPitchLock(target)
         }
         val targetLoc = target.location
-        if ((mob.distanceSqrTo(target) < 2 || mob.velocity.y == 0.0) && mob.location.y <= target.location.y + 1.0) {
-            currentAction = Action.BASH
-            bashVelX = mob.location.direction.x * bashVelMultiplier
-            bashVelZ = mob.location.direction.z * bashVelMultiplier
+        if (mob.velocity.y == 0.0 || abs(mob.location.y - target.location.y) <= 1) {
+            if (mob.distanceSqrTo(target) > 20) {
+                currentAction = Action.BASH
+                bashVelX = mob.location.direction.x * bashVelMultiplier
+                bashVelZ = mob.location.direction.z * bashVelMultiplier
+            } else {
+                currentAction = Action.FLY
+            }
             return
         }
         moveController.a(targetLoc.x, targetLoc.y, targetLoc.z, 1.0)
