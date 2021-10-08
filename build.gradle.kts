@@ -33,9 +33,7 @@ allprojects {
     }
 
     dependencies {
-        implementation("com.mineinabyss:idofront-nms:$idofrontVersion") {
-            exclude(group = "io.github.slimjar")
-        }
+        implementation("com.mineinabyss:idofront-nms:$idofrontVersion")
     }
 }
 
@@ -65,18 +63,19 @@ dependencies {
 
     // Shaded
     implementation("com.github.DRE2N:HeadLib:7e2d443678")
-    implementation(Deps.`kotlin-statistics`)
+    implementation(Deps.`kotlin-statistics`) { isTransitive = false }
 
     // Testing
-//    testImplementation("io.papermc.paper:paper-api:$serverVersion") //TODO add to papermc conventions
+    testImplementation(Deps.`kotlin-statistics`)
     testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.10.1")// { isTransitive = false }
-    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    testImplementation(Deps.kotlinx.serialization.json)
     testImplementation(Deps.kotlinx.serialization.kaml)
 }
 
 tasks {
     shadowJar {
         archiveBaseName.set("Mobzy")
-        relocate("com.mineinabyss.idofront", "com.mineinabyss.idofront.${project.group}.${project.name}")
+//        relocate("com.mineinabyss.idofront", "com.mineinabyss.idofront.${project.group}.${project.name}")
+//        relocate("io.github.slimjar", "io.github.slimjar.${project.group}.${project.name}")
     }
 }

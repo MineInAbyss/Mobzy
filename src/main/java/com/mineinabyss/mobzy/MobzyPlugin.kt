@@ -21,6 +21,7 @@ import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.MobCountManager
+import io.github.slimjar.app.builder.ApplicationBuilder
 import org.bukkit.plugin.java.JavaPlugin
 
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
@@ -35,7 +36,7 @@ class MobzyPlugin : JavaPlugin() {
 
     @ExperimentalCommandDSL
     override fun onEnable() {
-        IdofrontSlimjar.loadGlobally(this)
+        IdofrontSlimjar.loadToLibraryLoader(this)
 
         //Plugin startup logic
         logger.info("On enable has been called")
