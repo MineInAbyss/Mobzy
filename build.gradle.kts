@@ -42,6 +42,7 @@ repositories {
     maven("https://maven.sk89q.com/repo/") //WorldGuard/Edit
     maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
     maven("https://jitpack.io")
+    maven("https://mvn.lumine.io/repository/maven-public/") // Model Engine
 }
 
 dependencies {
@@ -52,7 +53,7 @@ dependencies {
     compileOnly("com.mineinabyss:protocolburrito:0.2.25")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2") { exclude(group = "org.bukkit") }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.5.0")
-    compileOnly("com.ticxo.modelengine:api:R2.1.6")
+    compileOnly("com.ticxo.modelengine:api:R2.2.0")
     compileOnly("com.mineinabyss:looty:0.3.19")
 
     // From Geary
