@@ -35,7 +35,6 @@ object ModelEngineSystem : Listener {
             }
 
             setNametagVisible(model.nametag)
-            isRideable = model.rideable
             isInvisible = model.invisible
         }
     }
