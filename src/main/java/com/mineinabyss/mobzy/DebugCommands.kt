@@ -2,9 +2,6 @@ package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.api.engine.Engine
 import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
-import com.mineinabyss.geary.ecs.components.DebugComponent
-import com.mineinabyss.geary.minecraft.store.decode
-import com.mineinabyss.geary.minecraft.store.encode
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.stringArg
@@ -21,20 +18,8 @@ import kotlin.system.measureTimeMillis
 
 fun Int.toChunkLoc() = (this % 16).let { if (it < 0) it + 16 else it }
 
+//TODO move debugging into its own module (perhaps in Geary-addons)
 internal fun Command.createDebugCommands() {
-    "chunk" {
-        "write"{
-            playerAction {
-                player.location.chunk.persistentDataContainer.encode(DebugComponent("Test"))
-            }
-        }
-        "read" {
-            playerAction {
-                player.info(player.location.chunk.persistentDataContainer.decode<DebugComponent>())
-            }
-        }
-    }
-
     "spawn" {
         "categoryCounts" {
             action {

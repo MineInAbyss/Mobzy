@@ -9,7 +9,6 @@ import com.mineinabyss.idofront.plugin.registerService
 import com.mineinabyss.idofront.serialization.SerializablePrefabItemService
 import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
-import com.mineinabyss.mobzy.ecs.events.MobzyEventListener
 import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.ecs.systems.AddPrefabsListener
 import com.mineinabyss.mobzy.ecs.systems.CopyNBTSystem
@@ -21,7 +20,6 @@ import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.registration.MobzyPacketInterception
 import com.mineinabyss.mobzy.registration.MobzyWorldguard
 import com.mineinabyss.mobzy.spawning.MobCountManager
-import io.github.slimjar.app.builder.ApplicationBuilder
 import org.bukkit.plugin.java.JavaPlugin
 
 /** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
@@ -47,7 +45,6 @@ class MobzyPlugin : JavaPlugin() {
         registerEvents(
             MobListener,
             MobzyECSListener,
-            MobzyEventListener,
             MobCountManager,
             GearySpawningListener,
             AddPrefabsListener(),
