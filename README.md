@@ -1,13 +1,14 @@
+<div align="center">
+
+# Mobzy    
 [![Java CI with Gradle](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml)
 [![Maven](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/mobzy/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/mobzy)
 [![Wiki](https://badgen.net/badge/color/Project%20Wiki/purple?icon=wiki&label)](https://github.com/MineInAbyss/Mobzy/wiki)
-
-
-# Mobzy
+</div>
 
 ### Overview
 
-Mobzy is a WIP Spigot/Paper plugin for creating custom NMS entities built on top of our own [Geary](https://github.com/MineInAbyss/Geary) Entity Component System (ECS). It makes coding complex entities simpler by breaking them down into many modular components. Mobzy then provides a configuration system for making custom entity types out of these components.
+Mobzy is a WIP PaperMC plugin for creating custom entities built on top of our own [Geary](https://github.com/MineInAbyss/Geary) Entity Component System (ECS). It makes coding complex entities simpler by breaking them down into many modular components. Mobzy then provides a configuration system for making custom entity types out of these components.
 
 Mobzy also provides an API for injecting custom NMS entity types into the server, and packet interception to allow clients to see them. Some of these more general-use features may be moved into their own library eventually.
 
@@ -31,7 +32,6 @@ Mobzy provides many serializable wrappers for pathfinders which can be used by o
 
 - Custom hitboxes (Minecraft normally lets the client handle that, so it wouldn't work on entity types it doesn't know).
 - Custom spawning system.
-- Annotation processor that makes extending any NMS entity as a custom mob simpler (will likely be rewritten as a compiler plugin once [ksp](https://github.com/google/ksp) is stable).
 - Many premade components, with more to come in the future.
 
 ## Future plans
