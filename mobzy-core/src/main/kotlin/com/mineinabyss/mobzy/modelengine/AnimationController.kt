@@ -3,6 +3,9 @@ package com.mineinabyss.mobzy.modelengine
 import com.mineinabyss.idofront.plugin.getService
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 
+/**
+ * A service that lets you interact with ModelEngine without depending on it.
+ */
 interface AnimationController {
     companion object: AnimationController by getService()
 
