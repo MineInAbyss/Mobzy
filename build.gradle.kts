@@ -16,6 +16,8 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+apply(from = "$rootDir/gradle/ci-support.gradle")
+
 allprojects {
     apply(plugin = "java")
 

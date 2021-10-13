@@ -1,34 +1,62 @@
 name: Java CI with Gradle
 
+# For the CI matrix task, Copyright (c) 2015-2019 Richard North
+# Under the MIT License
+# Taken from: https://github.com/testcontainers/testcontainers-java/blob/master/.github/workflows/ci.yml
+
 on:
   push:
     branches:
       - master
+      - development
     paths-ignore:
       - '**.md'
   pull_request:
 
 jobs:
-  build:
+  find_gradle_jobs:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2.3.1
+        with:
+          java-version: 16
+          distribution: temurin
+      - name: Cache Gradle Home files
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-home-testmatrix-${{ hashFiles('**/*.gradle') }}
+      - id: set-matrix
+        env:
+          # Since we override the tests executor,
+          # we should not push empty results to the cache
+          READ_ONLY_REMOTE_GRADLE_CACHE: true
+        run: |
+          TASKS=$(./gradlew --no-daemon --parallel -q testMatrix)
+          echo $TASKS
+          echo "::set-output name=matrix::{\"gradle_args\":$TASKS}"
+
+  check:
+    needs: [ find_gradle_jobs ]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.find_gradle_jobs.outputs.matrix) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set up JDK 16
-        uses: actions/setup-java@v2
+      - uses: actions/setup-java@v2.3.1
         with:
-          distribution: adopt
           java-version: 16
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build
-        run: gradle build
-
-      - name: Upload build
-        uses: actions/upload-artifact@v1
+          distribution: temurin
+      - name: Cache Gradle Home files
+        uses: actions/cache@v2.1.6
+        continue-on-error: true
         with:
-          name: build
-          path: build/libs
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-home-${{matrix.gradle_args}}_check-${{ hashFiles('**/*.gradle') }}
+      - name: Build and test with Gradle (${{matrix.gradle_args}})
+        run: |
+          ./gradlew --no-daemon --continue --scan ${{matrix.gradle_args}}
