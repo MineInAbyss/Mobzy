@@ -21,3 +21,12 @@ pluginManagement {
 }
 
 rootProject.name = "mobzy"
+
+include(
+    "mobzy-pathfinding",
+    "mobzy-systems",
+    "mobzy-spawning",
+    "mobzy-nms-injection",
+    "mobzy-core",
+    "mobzy-components"
+)

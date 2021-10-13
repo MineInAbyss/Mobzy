@@ -104,8 +104,8 @@ internal fun Command.createDebugCommands() {
     "nearby" {
         val rad by intArg()
         playerAction {
-            val rad = rad.toDouble()
-            sender.info(player.getNearbyEntities(rad, rad, rad).count())
+            val radD = rad.toDouble()
+            sender.info(player.getNearbyEntities(radD, radD, radD).count())
         }
     }
     "snapshot"()?.playerAction {

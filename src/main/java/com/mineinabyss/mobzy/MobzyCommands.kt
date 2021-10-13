@@ -17,15 +17,14 @@ import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.typeName
-import com.mineinabyss.mobzy.api.extendsCustomClass
-import com.mineinabyss.mobzy.api.isCustomAndRenamed
-import com.mineinabyss.mobzy.mobs.types.FlyingMob
-import com.mineinabyss.mobzy.mobs.types.HostileMob
-import com.mineinabyss.mobzy.mobs.types.NPC
-import com.mineinabyss.mobzy.mobs.types.PassiveMob
-import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
-import com.mineinabyss.mobzy.registration.MobzyTypesQuery
-import com.mineinabyss.mobzy.registration.MobzyTypesQuery.key
+import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.injection.MobzyTypesQuery
+import com.mineinabyss.mobzy.injection.extendsCustomClass
+import com.mineinabyss.mobzy.injection.isCustomAndRenamed
+import com.mineinabyss.mobzy.injection.types.FlyingMob
+import com.mineinabyss.mobzy.injection.types.HostileMob
+import com.mineinabyss.mobzy.injection.types.NPC
+import com.mineinabyss.mobzy.injection.types.PassiveMob
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
@@ -112,7 +111,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("spawn" / "s")(desc = "Spawns a custom mob") {
-                val mobKey by optionArg(options = MobzyTypesQuery.map { it.key.toString() }) {
+                val mobKey by optionArg(options = MobzyTypesQuery.run { map { it.key.toString() } }) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val numOfSpawns by intArg {
@@ -184,12 +183,12 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 if (subCommand == "spawn" || subCommand == "s")
                     if (args.size == 2) {
-                        return MobzyTypesQuery
-                            .filter {
-                                val arg = args[1].toLowerCase()
+                        return MobzyTypesQuery.run {
+                            filter {
+                                val arg = args[1].lowercase()
                                 it.key.name.startsWith(arg) || it.key.key.startsWith(arg)
-                            }
-                            .map { it.key.toString() }
+                            }.map { it.key.toString() }
+                        }
                     } else if (args.size == 3) {
                         var min = 1
                         try {
@@ -203,15 +202,15 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 if (subCommand in listOf("remove", "rm", "info", "i"))
                     if (args.size == 2) {
                         val mobs: MutableList<String> = ArrayList()
-                        mobs.addAll(MobzyTypesQuery.map { it.key.toString() })
+                        mobs.addAll(MobzyTypesQuery.run { map { it.key.toString() } })
                         mobs.addAll(listOf("custom", "npc", "mob", "named", "passive", "hostile", "flying"))
                         return mobs.filter {
-                            val arg = args[1].toLowerCase()
+                            val arg = args[1].lowercase()
                             it.startsWith(arg) || it.substringAfter(":").startsWith(arg)
                         }
                     }
                 return if (subCommand == "config") listOf("mobs", "spawns", "domobspawns")
-                    .filter { it.toLowerCase().startsWith(args[1].toLowerCase()) }
+                    .filter { it.lowercase().startsWith(args[1].lowercase()) }
                 else emptyList()
             }
         }

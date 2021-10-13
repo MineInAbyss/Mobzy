@@ -9,30 +9,26 @@ import com.mineinabyss.idofront.plugin.registerService
 import com.mineinabyss.idofront.serialization.SerializablePrefabItemService
 import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
-import com.mineinabyss.mobzy.ecs.listeners.MobzyECSListener
-import com.mineinabyss.mobzy.ecs.systems.AddPrefabsListener
-import com.mineinabyss.mobzy.ecs.systems.CopyNBTSystem
-import com.mineinabyss.mobzy.ecs.systems.ModelEngineSystem
-import com.mineinabyss.mobzy.ecs.systems.WalkingAnimationSystem
-import com.mineinabyss.mobzy.listener.GearySpawningListener
-import com.mineinabyss.mobzy.listener.MobListener
-import com.mineinabyss.mobzy.registration.MobzyNMSTypeInjector
-import com.mineinabyss.mobzy.registration.MobzyPacketInterception
-import com.mineinabyss.mobzy.registration.MobzyWorldguard
+import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.spawning.MobCountManager
+import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
+import com.mineinabyss.mobzy.systems.listeners.GearySpawningListener
+import com.mineinabyss.mobzy.systems.listeners.MobListener
+import com.mineinabyss.mobzy.systems.listeners.MobzyECSListener
+import com.mineinabyss.mobzy.systems.packets.MobzyPacketInterception
+import com.mineinabyss.mobzy.systems.systems.AddPrefabsListener
+import com.mineinabyss.mobzy.systems.systems.CopyNBTSystem
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem
+import com.mineinabyss.mobzy.systems.systems.WalkingAnimationSystem
 import org.bukkit.plugin.java.JavaPlugin
 
-/** Gets [MobzyPlugin] via Bukkit once, then sends that reference back afterwards */
-val mobzy: JavaPlugin by lazy { JavaPlugin.getPlugin(MobzyPlugin::class.java) }
-
+@ExperimentalCommandDSL
 class MobzyPlugin : JavaPlugin() {
-
     override fun onLoad() {
         logger.info("On load has been called")
-        MobzyWorldguard.registerFlags()
+        WorldGuardSpawnFlags.registerFlags()
     }
 
-    @ExperimentalCommandDSL
     override fun onEnable() {
         IdofrontSlimjar.loadToLibraryLoader(this)
 
@@ -59,9 +55,13 @@ class MobzyPlugin : JavaPlugin() {
         if (isPluginEnabled("Looty"))
             registerService<SerializablePrefabItemService>(MobzySerializablePrefabItemService)
 
+        val config = MobzyConfigImpl()
+        registerService<MobzyConfig>(config)
+
         gearyAddon {
             systems(
                 WalkingAnimationSystem(),
+                PathfinderAttachSystem(),
             )
 
             //Component event listeners
@@ -76,7 +76,7 @@ class MobzyPlugin : JavaPlugin() {
 
             startup {
                 GearyLoadPhase.ENABLE {
-                    MobzyConfig.load()
+                    config.load()
                 }
             }
         }
