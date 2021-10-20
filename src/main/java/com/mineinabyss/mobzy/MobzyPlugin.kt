@@ -10,6 +10,7 @@ import com.mineinabyss.idofront.serialization.SerializablePrefabItemService
 import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
 import com.mineinabyss.mobzy.systems.listeners.GearySpawningListener
@@ -46,8 +47,10 @@ class MobzyPlugin : JavaPlugin() {
             AddPrefabsListener(),
         )
 
-        if (isPluginEnabled("ModelEngine"))
+        if (isPluginEnabled("ModelEngine")) {
             registerEvents(ModelEngineSystem)
+            registerService<AnimationController>(ModelEngineSystem)
+        }
 
         //Register commands
         MobzyCommands()
