@@ -15,6 +15,7 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.Nametaggable
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
@@ -24,9 +25,7 @@ import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
 import org.bukkit.Statistic
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.Ageable
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Mob
+import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -54,6 +53,33 @@ object MobListener : Listener {
         //if the statistic is entity related and the entity is null, it must be custom, therefore we cancel the event
         if (statistic.type == Statistic.Type.ENTITY && entityType == null)
             isCancelled = true
+    }
+
+    /** Nametag entities with [Nametaggable] component on right click with a nametag. */
+    @EventHandler
+    fun PlayerInteractEntityEvent.applyNametag() {
+        val entity = rightClicked.toGearyOrNull() ?: return
+        val passengers = rightClicked.passengers
+        val hand = player.inventory.itemInMainHand
+        val tag = Material.NAME_TAG
+        val tagName = hand.itemMeta.displayName
+        val location = rightClicked.location.add(0.0, entity.get<Nametaggable>()!!.tagOffset, 0.0)//
+
+        if (entity.get<Nametaggable>()?.nametaggable == false
+            || hand.type != tag
+            || passengers.contains(player)
+        ) return
+
+        val armorstand = location.world.spawnEntity(location, EntityType.ARMOR_STAND) as ArmorStand
+        armorstand.isCustomNameVisible = true
+        armorstand.customName = tagName
+        armorstand.isInvulnerable = false
+        armorstand.isSmall = true
+        armorstand.isMarker = true
+        armorstand.isInvisible = true
+
+        rightClicked.passenger?.remove()
+        rightClicked.addPassenger(armorstand)
     }
 
     /** Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect. */
@@ -128,7 +154,8 @@ object MobListener : Listener {
     fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
         for (entity in chunk.entities) {
             val removeOnUnload = entity.toGeary().get<RemoveOnChunkUnload>() ?: continue
-            if (!(removeOnUnload.keepIfRenamed && entity.isCustomAndRenamed))
+            val nametaggedEntity = entity.toGearyOrNull()?.get<Nametaggable>()?.nametaggable
+            if (!(removeOnUnload.keepIfRenamed && (entity.isCustomAndRenamed) || nametaggedEntity == true))
                 entity.remove()
         }
     }
