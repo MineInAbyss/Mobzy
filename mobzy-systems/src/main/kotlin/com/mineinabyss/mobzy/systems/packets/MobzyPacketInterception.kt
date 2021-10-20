@@ -21,7 +21,7 @@ object MobzyPacketInterception {
             ) {
                 val entity = Bukkit.getEntity(uuid) ?: return@onSend
                 if (entity.toGeary().has<Model>())
-                    type = PacketEntityType.ARMOR_STAND.id
+                    type = PacketEntityType.ZOMBIE.id
             }
 
             //pitch lock custom mobs
