@@ -75,8 +75,8 @@ fun Location.checkDown(maxI: Int): Location? {
     var l = clone()
     for (i in 0 until maxI) {
         l = l.add(0.0, -1.0, 0.0)
-        if (l.y < 10) return null
-        if (l.y >= 256) l.y = 255.0
+        if (l.y < l.world.minHeight) return null
+        if (l.y >= l.world.maxHeight) l.y = l.world.maxHeight.toDouble()
         if (l.block.type.isSolid) return l.add(0.0, 1.0, 0.0)
     }
     return null
@@ -89,8 +89,8 @@ fun Location.checkUp(maxI: Int): Location? {
         if (!l.block.type.isSolid) {
             return l
         }
-        if (l.y >= 256) return null
-        if (l.y < 10) l.y = 10.0
+        if (l.y >= l.world.maxHeight) return null
+        if (l.y < l.world.minHeight) l.y = 10.0
     }
     return null
 }
