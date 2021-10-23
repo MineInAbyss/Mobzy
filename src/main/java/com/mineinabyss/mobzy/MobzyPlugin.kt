@@ -13,6 +13,7 @@ import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
+import com.mineinabyss.mobzy.systems.listeners.AddPrefabFromNMSTypeSystem
 import com.mineinabyss.mobzy.systems.listeners.GearySpawningListener
 import com.mineinabyss.mobzy.systems.listeners.MobListener
 import com.mineinabyss.mobzy.systems.listeners.MobzyECSListener
@@ -63,8 +64,10 @@ class MobzyPlugin : JavaPlugin() {
 
         gearyAddon {
             systems(
+                AddPrefabFromNMSTypeSystem(),
                 WalkingAnimationSystem(),
                 PathfinderAttachSystem(),
+                MobCountManager.CountMobsSystem()
             )
 
             //Component event listeners
