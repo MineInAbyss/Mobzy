@@ -7,7 +7,6 @@ import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
 import com.mineinabyss.idofront.commands.arguments.stringArg
-import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
@@ -33,7 +32,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Entity
 
-@ExperimentalCommandDSL
 class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
