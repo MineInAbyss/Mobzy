@@ -17,6 +17,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
+import com.mineinabyss.mobzy.ecs.components.interaction.Sexable
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
@@ -188,5 +189,13 @@ object MobListener : Listener {
 //            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun PlayerInteractEntityEvent.onMobSex() {
+        val gearyEntity = rightClicked.toGearyOrNull() ?: return
+        val fuckable = gearyEntity.get<Sexable>() ?: return
+
+        TODO("Implement Sex system Kira")
     }
 }
