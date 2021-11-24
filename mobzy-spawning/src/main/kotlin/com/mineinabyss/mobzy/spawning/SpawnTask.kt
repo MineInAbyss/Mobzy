@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
@@ -61,7 +62,7 @@ object SpawnTask {
                 } catch (e: RuntimeException) {
                     e.printStackTrace()
                 }
-                waitFor(mobzyConfig.spawnTaskDelay.inTicks)
+                waitFor(mobzyConfig.spawnTaskDelay.inWholeTicks)
             }
             stopTask()
         }
