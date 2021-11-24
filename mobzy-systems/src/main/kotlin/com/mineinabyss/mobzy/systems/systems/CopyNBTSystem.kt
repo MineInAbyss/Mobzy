@@ -1,7 +1,10 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.api.systems.ComponentAddSystem
+import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.engine.Archetype
+import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.api.systems.GearyHandlerScope
+import com.mineinabyss.geary.ecs.events.onComponentAdd
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -14,13 +17,15 @@ import com.mineinabyss.mobzy.ecs.components.CopyNBT
  *
  * TODO MAKE SURE IT ACTUALLY DOES COPY THE PDC!
  */
-class CopyNBTSystem : ComponentAddSystem() {
-    private val GearyEntity.nbt by get<CopyNBT>()
-    private val GearyEntity.bukkitEntity by get<BukkitEntity>()
+class CopyNBTSystem : GearyListener() {
+    private val ResultScope.nbt by get<CopyNBT>()
+    private val ResultScope.bukkitEntity by get<BukkitEntity>()
 
-    override fun GearyEntity.run() {
-        bukkitEntity.toNMS().load(nbt.compound)
-        decodeComponentsFrom(bukkitEntity.persistentDataContainer)
-        remove<CopyNBT>()
+    override fun GearyHandlerScope.register() {
+        onComponentAdd {
+            bukkitEntity.toNMS().load(nbt.compound)
+            entity.decodeComponentsFrom(bukkitEntity.persistentDataContainer)
+            entity.remove<CopyNBT>()
+        }
     }
 }

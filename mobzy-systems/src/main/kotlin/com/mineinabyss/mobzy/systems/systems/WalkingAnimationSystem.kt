@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.systems.systems
 
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
-import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
+import com.mineinabyss.geary.ecs.accessors.ResultScope
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
@@ -11,10 +11,10 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 
 class WalkingAnimationSystem : TickingSystem(interval = 10) {
-    private val QueryResult.model by get<Model>()
-    private val QueryResult.mob by get<BukkitEntity>()
+    private val ResultScope.model by get<Model>()
+    private val ResultScope.mob by get<BukkitEntity>()
 
-    override fun QueryResult.tick() {
+    override fun ResultScope.tick() {
         val mob = mob as? Mob ?: return
 
         val headItem = mob.toNMS().getEquipment(EnumItemSlot.f /* HEAD */)

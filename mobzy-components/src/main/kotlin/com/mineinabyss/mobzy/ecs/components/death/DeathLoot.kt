@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.components.death
 
-import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
@@ -16,13 +15,18 @@ import kotlin.random.Random
  */
 @Serializable
 @SerialName("mobzy:death_loot")
-@AutoscanComponent
 class DeathLoot(
     val minExp: Int? = null,
     val maxExp: Int? = null,
     val deathCommands: List<String> = listOf(),
     val drops: List<MobDrop> = listOf(),
-    val ignoredCauses: List<DamageCause> = listOf(DamageCause.SUFFOCATION, DamageCause.DROWNING, DamageCause.DRYOUT, DamageCause.CRAMMING, DamageCause.FALL),
+    val ignoredCauses: List<DamageCause> = listOf(
+        DamageCause.SUFFOCATION,
+        DamageCause.DROWNING,
+        DamageCause.DRYOUT,
+        DamageCause.CRAMMING,
+        DamageCause.FALL
+    ),
 ) {
     /** Helper function for randomly picking some amount of exp to drop. */
     fun expToDrop(): Int? {

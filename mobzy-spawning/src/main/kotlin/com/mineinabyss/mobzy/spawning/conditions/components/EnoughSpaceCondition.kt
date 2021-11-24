@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.spawning.conditions
+package com.mineinabyss.mobzy.spawning.conditions.components
 
 //TODO
 /*object EnoughSpaceCondition : GearyCondition() {

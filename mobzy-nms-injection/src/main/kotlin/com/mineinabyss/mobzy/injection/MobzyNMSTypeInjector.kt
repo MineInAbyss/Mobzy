@@ -1,10 +1,12 @@
 package com.mineinabyss.mobzy.injection
 
+import com.mineinabyss.geary.ecs.accessors.ResultScope
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.relations.Processed
-import com.mineinabyss.geary.ecs.api.systems.ComponentAddSystem
+import com.mineinabyss.geary.ecs.api.systems.GearyHandlerScope
+import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.components.*
-import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
+import com.mineinabyss.geary.ecs.events.onComponentAdd
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.geary.ecs.query.Query
@@ -23,11 +25,13 @@ import sun.misc.Unsafe
 import java.lang.reflect.Field
 import kotlin.collections.set
 
-object MobzyTypesQuery : Query({
-    has<MobzyType>()
-    has<Prefab>()
-}) {
-    val QueryResult.key by get<PrefabKey>()
+object MobzyTypesQuery : Query() {
+    init {
+        has<MobzyType>()
+        has<Prefab>()
+    }
+
+    val ResultScope.key by get<PrefabKey>()
 }
 
 /**
@@ -35,21 +39,23 @@ object MobzyTypesQuery : Query({
  * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
  */
 @Suppress("ObjectPropertyName")
-object MobzyNMSTypeInjector : ComponentAddSystem() {
-    private val GearyEntity.info by get<MobzyType>()
-    private val GearyEntity.key by get<PrefabKey>()
+object MobzyNMSTypeInjector : GearyListener() {
+    private val ResultScope.info by get<MobzyType>()
+    private val ResultScope.key by get<PrefabKey>()
 
     init {
         has<Prefab>()
     }
 
-    override fun GearyEntity.run() {
-        val nmsEntityType = inject(key, info, get() ?: MobAttributes())
-        set(nmsEntityType)
-        set(info.mobCategory ?: info.creatureType.toMobCategory())
-        setRelation<Processed, MobzyType>(Processed, data = true)
+    override fun GearyHandlerScope.register() {
+        onComponentAdd {
+            val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
+            entity.set(nmsEntityType)
+            entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
+            entity.setRelation<Processed, MobzyType>(Processed)
 
-        typeToPrefabMap[nmsEntityType.keyName] = key
+            typeToPrefabMap[nmsEntityType.keyName] = key
+        }
     }
 
     val typeNames get() = _types.keys.toList()

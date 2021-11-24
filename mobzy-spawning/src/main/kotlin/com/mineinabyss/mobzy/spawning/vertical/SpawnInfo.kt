@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
-import com.mineinabyss.geary.ecs.engine.iteration.QueryResult
+import com.mineinabyss.geary.ecs.accessors.ResultScope
 import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
@@ -8,8 +8,8 @@ import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.spawning.SpawnPosition
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import com.mineinabyss.mobzy.spawning.components.SubChunkBlockComposition
+import org.bukkit.ChunkSnapshot
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import java.util.concurrent.atomic.AtomicInteger
@@ -23,24 +23,31 @@ import kotlin.random.Random
  * @property bottom The bottommost location of the spawn.
  * @property gap The gap in the y axis between the two of them.
  */
-data class SpawnInfo(
+class SpawnInfo(
     val bottom: Location,
     val top: Location,
-    val searchRadius: Double = 200.0
+    searchRadius: Double = 200.0,
+    chunkSnapshot: ChunkSnapshot? = null,
 ) {
+    val chunkSnapshot: ChunkSnapshot by lazy { chunkSnapshot ?: bottom.chunk.chunkSnapshot }
+
+    val blockComposition by lazy { SubChunkBlockComposition(this.chunkSnapshot, bottom.blockY) }
+
     object NearbyQuery : Query() {
-        val QueryResult.bukkit by get<BukkitEntity>()
+        val ResultScope.bukkit by get<BukkitEntity>()
     }
 
     private val searchRadiusSquared = searchRadius * searchRadius
 
     //TODO more efficiently finding all ECS entities nearby
     val localMobs: Map<NMSEntityType<*>, AtomicInteger> by lazy {
-        runBlocking {
-            delay(500L)
-        }
-        NearbyQuery.run { map { it.bukkit }.filter { it.location.world == bottom.world && it.location.distanceSquared(bottom) < searchRadiusSquared } }
-            .categorizeMobs()
+        NearbyQuery.run {
+            map { it.bukkit }.filter {
+                it.location.world == bottom.world && it.location.distanceSquared(
+                    bottom
+                ) < searchRadiusSquared
+            }
+        }.categorizeMobs()
     }
 
     //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
@@ -63,6 +70,24 @@ data class SpawnInfo(
         }
 
     override fun toString(): String = "SpawnInfo: $bottom, $top"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SpawnInfo
+
+        if (bottom != other.bottom) return false
+        if (top != other.top) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = bottom.hashCode()
+        result = 31 * result + top.hashCode()
+        return result
+    }
 }
 
 fun Collection<Entity>.categorizeMobs(): Map<NMSEntityType<*>, AtomicInteger> {

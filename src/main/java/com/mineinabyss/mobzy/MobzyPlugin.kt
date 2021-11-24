@@ -57,15 +57,12 @@ class MobzyPlugin : JavaPlugin() {
                 AddPrefabFromNMSTypeSystem(),
                 WalkingAnimationSystem(),
                 PathfinderAttachSystem(),
-                MobCountManager.CountMobsSystem()
+                MobCountManager.CountMobsSystem(),
+                MobzyNMSTypeInjector,
+                CopyNBTSystem()
             )
 
-            //Component event listeners
-            MobzyNMSTypeInjector.track()
-            CopyNBTSystem().track()
-
-            autoscanComponents()
-            autoscanConditions()
+            autoscanAll()
 
             // Autoscan the subclasses of PathfinderComponent
             autoscan<PathfinderComponent>()

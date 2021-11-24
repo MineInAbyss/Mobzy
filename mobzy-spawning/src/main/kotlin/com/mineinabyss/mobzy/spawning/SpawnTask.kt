@@ -1,11 +1,10 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.ecs.api.engine.Engine
-import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
-import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
+import com.mineinabyss.mobzy.spawning.conditions.CheckSpawn
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import com.okkero.skedule.CoroutineTask
 import com.okkero.skedule.SynchronizationContext.*
@@ -13,6 +12,7 @@ import com.okkero.skedule.schedule
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
+import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.nield.kotlinstatistics.WeightedDice
 import kotlin.random.Random
@@ -86,31 +86,29 @@ object SpawnTask {
 
             // Every player group picks a random chunk around them
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
-            Engine.temporaryEntity { spawn ->
-                val chunkSnapshot = chunk.chunkSnapshot
-                val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
-                val priorities = regionContainer.createQuery()
-                    .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
-                    .sorted()
-                    .filterWhenOverlapFlag()
-                    .getMobSpawnsForRegions()
-                    .associateWithTo(mutableMapOf()) { it.basePriority * Random.nextDouble() }
-
-//                spawn.set(SubChunkBlockComposition(chunkSnapshot, spawnInfo.bottom.blockY))
-                spawn.set(spawnInfo.bottom)
-                spawn.set(spawnInfo)
-
-                while (priorities.isNotEmpty()) {
-                    val choice: SpawnDefinition = WeightedDice(priorities).roll()
-                    spawn.set(choice)
-                    if (choice.conditionsMet(spawn)) {
-                        // Must spawn mobs in sync
-                        mobzy.schedule(SYNC) {
-                            if (mobzy.isEnabled) choice.spawn(spawnInfo)
-                        }
-                        break
-                    } else priorities.remove(choice)
+            val chunkSnapshot = chunk.chunkSnapshot
+            val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
+            val spawnEvent = SpawnEvent(spawnInfo)
+            val priorities = regionContainer.createQuery()
+                .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
+                .sorted()
+                .filterWhenOverlapFlag()
+                .getMobSpawnsForRegions()
+                .associateWithTo(mutableMapOf()) {
+                    (it.get<SpawnPriority>()?.priority ?: 1.0) * Random.nextDouble()
                 }
+
+            while (priorities.isNotEmpty()) {
+                val choice: GearyEntity = WeightedDice(priorities).roll()
+                val verify = CheckSpawn(spawnInfo)
+                choice.callEvent(verify)
+                if (verify.success) {
+                    // Must spawn mobs in sync
+                    mobzy.schedule(SYNC) {
+                        if (mobzy.isEnabled) choice.callEvent(spawnEvent)
+                    }
+                    break
+                } else priorities.remove(choice)
             }
         }
     }

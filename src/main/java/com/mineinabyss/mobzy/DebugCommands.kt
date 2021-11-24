@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.api.engine.Engine
 import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
+import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.stringArg
@@ -11,6 +12,7 @@ import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.PlayerGroups
+import com.mineinabyss.mobzy.spawning.SpawnEvent
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Bukkit
@@ -40,23 +42,15 @@ internal fun Command.createDebugCommands() {
                 val z = loc.blockZ.toChunkLoc()
                 val spawnInfo = VerticalSpawn.findGap(
                     player.location.chunk,
-                    minY = -256,
-                    maxY = 255,
+                    minY = loc.world.minHeight,
+                    maxY = loc.world.maxHeight,
                     x = x,
                     z = z,
                     startY = loc.blockY
                 )
-                val spawnDef = SpawnRegistry.findMobSpawn(spawnName.replace("_", " "))
-                Engine.temporaryEntity { spawnEntity ->
-                    spawnEntity.set(spawnInfo)
-                    spawnEntity.set(spawnInfo.bottom)
-                    spawnEntity.set(spawnDef)
-                    player.info(spawnDef.conditions
-                        .filter { !it.metFor(spawnEntity) }
-                        .map { it::class.simpleName })
-                }
+                val spawnEvent = SpawnEvent(spawnInfo)
+                PrefabKey.of(spawnName).toEntity()?.callEvent(spawnEvent)
                 //TODO list all failed conditions
-//                SpawnRegistry.findMobSpawn(spawnName).conditionsMet()
             }
         }
         "find" {
@@ -64,7 +58,7 @@ internal fun Command.createDebugCommands() {
             val maxy by intArg()
             playerAction {
                 val loc = player.location
-                val (min, max) = VerticalSpawn.findGap(
+                val info = VerticalSpawn.findGap(
                     chunk = loc.chunk,
                     minY = miny,
                     maxY = maxy,
@@ -72,7 +66,7 @@ internal fun Command.createDebugCommands() {
                     z = loc.blockZ - (loc.chunk.z shl 4),
                     startY = loc.blockY
                 )
-                sender.info("${min.y} and ${max.y}")
+                sender.info("${info.bottom.y} and ${info.top.y}")
             }
         }
     }
