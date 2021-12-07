@@ -21,13 +21,13 @@ class LocalGroupConditions(
     val radius: Double
 )
 
-class CapFull() : GearyListener() {
+object CapFull : GearyListener() {
     val ResultScope.conf by get<LocalGroupConditions>()
     val ResultScope.spawnType by get<SpawnType>()
 
     override fun GearyHandlerScope.register() {
-        onCheckSpawn { event ->
-            (event.spawnInfo.localMobs[spawnType.prefab.toEntity()?.get()]?.get() ?: 0) < conf.max
+        onCheckSpawn { spawnInfo ->
+            (spawnInfo.localMobs[spawnType.prefab.toEntity()?.get()]?.get() ?: 0) < conf.max
         }
     }
 }

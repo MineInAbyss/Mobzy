@@ -17,6 +17,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
+import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.mobzy
 import com.okkero.skedule.schedule
@@ -37,6 +38,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -136,10 +138,11 @@ object MobListener : Listener {
     /** The magic method that lets you hit entities in their server side hitboxes. */
     //TODO right click doesn't work in adventure mode, but the alternative is a lot worse to deal with. Decide what to do
     //TODO ignore hits on the spoofed entity
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun PlayerInteractEvent.rayTracedHitBoxInteractions() {
         val player = player
-        if (leftClicked || rightClicked) {
+
+        if ((leftClicked && hand == EquipmentSlot.HAND || rightClicked)) {
             //shoot ray to simulate a left/right click, accounting for server-side custom mob hitboxes
             val trace = player.world.rayTrace(
                 player.eyeLocation,
@@ -153,6 +156,7 @@ object MobListener : Listener {
             //if we hit a custom mob, attack or fire an event
             //TODO component for this
             trace?.hitEntity?.let { hit ->
+                if (!hit.extendsCustomClass) return
                 if (leftClicked) {
                     isCancelled = true
                     player.toNMS().attack(hit.toNMS())
@@ -174,7 +178,7 @@ object MobListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        gearyEntity.with<DeathLoot> { deathLoot ->
+        gearyEntity.with { deathLoot: DeathLoot ->
             drops.clear()
             droppedExp = 0
 

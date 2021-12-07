@@ -16,7 +16,6 @@ import com.mineinabyss.mobzy.systems.listeners.GearySpawningListener
 import com.mineinabyss.mobzy.systems.listeners.MobListener
 import com.mineinabyss.mobzy.systems.listeners.MobzyECSListener
 import com.mineinabyss.mobzy.systems.packets.MobzyPacketInterception
-import com.mineinabyss.mobzy.systems.systems.AddPrefabsListener
 import com.mineinabyss.mobzy.systems.systems.CopyNBTSystem
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem
 import com.mineinabyss.mobzy.systems.systems.WalkingAnimationSystem
@@ -38,7 +37,6 @@ class MobzyPlugin : JavaPlugin() {
             MobzyECSListener,
             MobCountManager,
             GearySpawningListener,
-            AddPrefabsListener(),
         )
 
         if (isPluginEnabled("ModelEngine")) {

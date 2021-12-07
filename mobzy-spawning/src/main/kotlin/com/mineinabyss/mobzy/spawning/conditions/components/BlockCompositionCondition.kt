@@ -21,13 +21,13 @@ class BlockComposition(
     val materials: Map<Material, @Serializable(with = DoubleRangeSerializer::class) DoubleRange>
 )
 
-class BlockCompositionCondition : GearyListener() {
+object BlockCompositionCondition : GearyListener() {
     private val ResultScope.blockComposition by get<BlockComposition>()
 
     override fun GearyHandlerScope.register() {
-        onCheckSpawn { event ->
+        onCheckSpawn { spawnInfo ->
             blockComposition.materials.all { (material, range) ->
-                event.spawnInfo.blockComposition.percent(material) in range
+                spawnInfo.blockComposition.percent(material) in range
             }
         }
     }

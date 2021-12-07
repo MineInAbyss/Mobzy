@@ -24,8 +24,8 @@ object SpawnGapCondition : GearyListener() {
     private val ResultScope.spawnGap by get<SpawnGap>()
 
     override fun GearyHandlerScope.register() {
-        onCheckSpawn { event ->
-            event.spawnInfo.gap in spawnGap.range
+        onCheckSpawn { spawnInfo ->
+            spawnInfo.gap in spawnGap.range
         }
     }
 }

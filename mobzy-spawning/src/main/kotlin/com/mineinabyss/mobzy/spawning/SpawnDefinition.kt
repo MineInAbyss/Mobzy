@@ -4,6 +4,7 @@ package com.mineinabyss.mobzy.spawning
 
 
 import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.api.entities.with
 import com.mineinabyss.geary.ecs.api.systems.GearyHandlerScope
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
@@ -22,7 +23,7 @@ import kotlin.math.sign
 import kotlin.random.Random
 
 @Serializable
-@SerialName("mobzy:wg_regions")
+@SerialName("mobzy:spawn_regions")
 class WGRegions(
     val keys: Set<String>
 )
@@ -75,8 +76,11 @@ enum class SpawnPosition {
  * @property spawnPos Whether the mob should be spawned directly on the ground, in air, or under cliffs.
  */
 
-class SpawnEvent(
-    val info: SpawnInfo,
+/**
+ *
+ */
+data class DoSpawn(
+    val location: Location
 ) {
     var spawnedAmount: Int = 0
 }
@@ -85,20 +89,22 @@ object SpawnRequestListener : GearyListener() {
     val ResultScope.type by get<SpawnType>()
 
     override fun GearyHandlerScope.register() {
-        on<SpawnEvent> { event ->
-            val radius = entity.get<SpawnSpread>()?.radius
-            val amount = entity.get<SpawnAmount>()
-            val spawnPos = entity.get<SpawnPosition>() ?: SpawnPosition.GROUND
-            val location = event.info.getSpawnFor(spawnPos)
-            val spawns = amount?.amount?.randomOrMin() ?: 1
-            for (i in 0 until spawns) {
-                val chosenLoc = if (radius != null && spawnPos != SpawnPosition.AIR)
-                    getSpawnInRadius(location, radius) ?: location
-                else location
+        handler {
+            event.with { spawnEvent: DoSpawn ->
+                val radius = entity.get<SpawnSpread>()?.radius
+                val amount = entity.get<SpawnAmount>()
+                val spawnPos = entity.get<SpawnPosition>() ?: SpawnPosition.GROUND
+                val location = spawnEvent.location
+                val spawns = amount?.amount?.randomOrMin() ?: 1
+                for (i in 0 until spawns) {
+                    val chosenLoc = if (radius != null && spawnPos != SpawnPosition.AIR)
+                        getSpawnInRadius(location, radius) ?: location
+                    else location
 
-                chosenLoc.spawnGeary(type.prefab)
+                    chosenLoc.spawnGeary(type.prefab)
+                }
+                spawnEvent.spawnedAmount = spawns
             }
-            event.spawnedAmount = spawns
         }
     }
 

@@ -1,11 +1,11 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.ecs.events.CheckEvent
 import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
-import com.mineinabyss.mobzy.spawning.conditions.CheckSpawn
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import com.okkero.skedule.CoroutineTask
 import com.okkero.skedule.SynchronizationContext.*
@@ -89,7 +89,6 @@ object SpawnTask {
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
             val chunkSnapshot = chunk.chunkSnapshot
             val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
-            val spawnEvent = SpawnEvent(spawnInfo)
             val priorities = regionContainer.createQuery()
                 .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
                 .sorted()
@@ -101,12 +100,16 @@ object SpawnTask {
 
             while (priorities.isNotEmpty()) {
                 val choice: GearyEntity = WeightedDice(priorities).roll()
-                val verify = CheckSpawn(spawnInfo)
-                choice.callEvent(verify)
-                if (verify.success) {
+
+                val check = CheckEvent()
+                //TODO this should be immutable but bukkit doesn't have an immutable location!
+                val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
+                val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
+                choice.callEvent(spawnInfo, check, spawnCheckLoc)
+                if (check.success) {
                     // Must spawn mobs in sync
                     mobzy.schedule(SYNC) {
-                        if (mobzy.isEnabled) choice.callEvent(spawnEvent)
+                        if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
                     }
                     break
                 } else priorities.remove(choice)

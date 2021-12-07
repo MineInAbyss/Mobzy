@@ -10,8 +10,6 @@ import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * A singleton for keeping track of registered [SpawnRegion]s. Used for the mob spawning system
@@ -43,7 +41,7 @@ object SpawnRegistry : GearyListener() {
 
     fun reloadSpawns() {
         unregisterSpawns()
-        SpawnConfigs.forEach {
+        SpawnConfigs.toList().forEach {
             PrefabManager.reread(it.entity)
         }
     }

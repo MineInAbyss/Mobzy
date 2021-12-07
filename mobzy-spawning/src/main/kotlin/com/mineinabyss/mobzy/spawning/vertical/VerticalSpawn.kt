@@ -68,8 +68,8 @@ object VerticalSpawn {
         } while(searchUp || searchDown)
 
         return SpawnInfo(
-            chunk.getBlock(x, down.y, z).location,
-            chunk.getBlock(x, up.y, z).location,
+            bottom = chunk.getBlock(x, down.y, z).location,
+            top = chunk.getBlock(x, up.y, z).location,
             chunkSnapshot = snapshot
         )
     }

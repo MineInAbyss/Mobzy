@@ -64,7 +64,7 @@ class SpawnInfo(
     fun getSpawnFor(position: SpawnPosition): Location =
         when (position) {
             //pick some position between the bottom and top when spawn position is in air
-            SpawnPosition.AIR -> bottom.clone().apply { if (gap > 1) y = Random.nextInt(gap - 1).toDouble() }
+            SpawnPosition.AIR -> bottom.clone().apply { if (gap > 1) y += Random.nextInt(gap - 1).toDouble() }
             SpawnPosition.GROUND -> bottom.clone().up(1)
             SpawnPosition.OVERHANG -> top.clone().down(1)
         }
