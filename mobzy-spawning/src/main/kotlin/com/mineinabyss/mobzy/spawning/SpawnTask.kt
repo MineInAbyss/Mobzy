@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.events.CheckEvent
+import com.mineinabyss.geary.ecs.events.FailedCheck
+import com.mineinabyss.geary.ecs.events.RequestCheck
 import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
@@ -76,7 +77,6 @@ object SpawnTask {
         GlobalSpawnInfo.playerGroupCount = playerGroups.size
 
         //TODO sorted by least mobs around
-        //TODO i think it cant find slimjar classes cause not loaded into system classloader
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             val heights = playerGroup.map { it.location.y.toInt() }
             val world = playerGroup.first().world
@@ -101,12 +101,11 @@ object SpawnTask {
             while (priorities.isNotEmpty()) {
                 val choice: GearyEntity = WeightedDice(priorities).roll()
 
-                val check = CheckEvent()
                 //TODO this should be immutable but bukkit doesn't have an immutable location!
                 val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
                 val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
-                choice.callEvent(spawnInfo, check, spawnCheckLoc)
-                if (check.success) {
+                val success = choice.callEvent(RequestCheck, spawnInfo, spawnCheckLoc) { !it.has<FailedCheck>() }
+                if (success) {
                     // Must spawn mobs in sync
                     mobzy.schedule(SYNC) {
                         if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))

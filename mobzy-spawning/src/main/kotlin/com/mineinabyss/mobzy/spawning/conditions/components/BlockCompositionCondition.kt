@@ -1,11 +1,13 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
+import com.mineinabyss.geary.ecs.accessors.EventResultScope
 import com.mineinabyss.geary.ecs.accessors.ResultScope
-import com.mineinabyss.geary.ecs.api.systems.GearyHandlerScope
+import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.events.handlers.CheckHandler
 import com.mineinabyss.idofront.serialization.DoubleRangeSerializer
 import com.mineinabyss.idofront.util.DoubleRange
-import com.mineinabyss.mobzy.spawning.conditions.onCheckSpawn
+import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Material
@@ -21,14 +23,16 @@ class BlockComposition(
     val materials: Map<Material, @Serializable(with = DoubleRangeSerializer::class) DoubleRange>
 )
 
-object BlockCompositionCondition : GearyListener() {
+@AutoScan
+class BlockCompositionCondition : GearyListener() {
     private val ResultScope.blockComposition by get<BlockComposition>()
 
-    override fun GearyHandlerScope.register() {
-        onCheckSpawn { spawnInfo ->
+    private inner class Check : CheckHandler() {
+        val EventResultScope.spawnInfo by get<SpawnInfo>()
+
+        override fun ResultScope.check(event: EventResultScope): Boolean =
             blockComposition.materials.all { (material, range) ->
-                spawnInfo.blockComposition.percent(material) in range
+                event.spawnInfo.blockComposition.percent(material) in range
             }
-        }
     }
 }

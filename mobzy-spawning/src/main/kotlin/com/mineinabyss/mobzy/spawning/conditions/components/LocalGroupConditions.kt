@@ -1,10 +1,12 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
+import com.mineinabyss.geary.ecs.accessors.EventResultScope
 import com.mineinabyss.geary.ecs.accessors.ResultScope
-import com.mineinabyss.geary.ecs.api.systems.GearyHandlerScope
+import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.events.handlers.CheckHandler
 import com.mineinabyss.mobzy.spawning.SpawnType
-import com.mineinabyss.mobzy.spawning.conditions.onCheckSpawn
+import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -21,13 +23,15 @@ class LocalGroupConditions(
     val radius: Double
 )
 
-object CapFull : GearyListener() {
+@AutoScan
+class CapFull : GearyListener() {
     val ResultScope.conf by get<LocalGroupConditions>()
     val ResultScope.spawnType by get<SpawnType>()
 
-    override fun GearyHandlerScope.register() {
-        onCheckSpawn { spawnInfo ->
-            (spawnInfo.localMobs[spawnType.prefab.toEntity()?.get()]?.get() ?: 0) < conf.max
-        }
+    private inner class Check : CheckHandler() {
+        val EventResultScope.spawnInfo by get<SpawnInfo>()
+
+        override fun ResultScope.check(event: EventResultScope): Boolean =
+            (event.spawnInfo.localMobs[spawnType.prefab.toEntity()?.get()]?.get() ?: 0) < conf.max
     }
 }

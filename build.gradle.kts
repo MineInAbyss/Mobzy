@@ -9,7 +9,6 @@ val gearyVersion: String by project
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.slimjar")
     id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
@@ -43,12 +42,12 @@ repositories {
 }
 
 dependencies {
-    // Download at runtime
-    slim(kotlin("stdlib-jdk8"))
-    slim(Deps.kotlinx.serialization.json)
-    slim(Deps.kotlinx.serialization.kaml)
-    slim(Deps.kotlinx.coroutines)
-    slim(Deps.minecraft.skedule)
+    // MineInAbyss platform
+    compileOnly(Deps.kotlin.stdlib)
+    compileOnly(Deps.kotlinx.serialization.json)
+    compileOnly(Deps.kotlinx.serialization.kaml)
+    compileOnly(Deps.kotlinx.coroutines)
+    compileOnly(Deps.minecraft.skedule)
 
     // Other plugins
     compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")

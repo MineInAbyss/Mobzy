@@ -1,12 +1,13 @@
 package com.mineinabyss.mobzy.injection
 
+import com.mineinabyss.geary.ecs.accessors.EventResultScope
 import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.relations.Processed
-import com.mineinabyss.geary.ecs.api.systems.GearyHandlerScope
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.components.*
-import com.mineinabyss.geary.ecs.events.onComponentAdd
+import com.mineinabyss.geary.ecs.events.handlers.ComponentAddHandler
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.geary.ecs.query.Query
@@ -39,6 +40,7 @@ object MobzyTypesQuery : Query() {
  * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
  */
 @Suppress("ObjectPropertyName")
+@AutoScan
 object MobzyNMSTypeInjector : GearyListener() {
     private val ResultScope.info by get<MobzyType>()
     private val ResultScope.key by get<PrefabKey>()
@@ -47,8 +49,8 @@ object MobzyNMSTypeInjector : GearyListener() {
         has<Prefab>()
     }
 
-    override fun GearyHandlerScope.register() {
-        onComponentAdd {
+    private object AddNMSType : ComponentAddHandler() {
+        override fun ResultScope.handle(event: EventResultScope) {
             val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
             entity.set(nmsEntityType)
             entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
