@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.components
 
-import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,7 +10,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("mobzy:remove_on_chunk_unload")
-@AutoscanComponent
 data class RemoveOnChunkUnload(
     val keepIfRenamed: Boolean = true
 )

@@ -67,7 +67,11 @@ object VerticalSpawn {
             val searchDown = down.next()
         } while(searchUp || searchDown)
 
-        return SpawnInfo(chunk.getBlock(x, down.y, z).location, chunk.getBlock(x, up.y, z).location)
+        return SpawnInfo(
+            bottom = chunk.getBlock(x, down.y, z).location,
+            top = chunk.getBlock(x, up.y, z).location,
+            chunkSnapshot = snapshot
+        )
     }
 }
 

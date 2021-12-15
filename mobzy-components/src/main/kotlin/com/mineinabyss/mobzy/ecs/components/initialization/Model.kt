@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import com.mineinabyss.idofront.items.editItemMeta
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,7 +17,6 @@ import org.bukkit.inventory.ItemStack
  */
 @Serializable
 @SerialName("mobzy:model")
-@AutoscanComponent
 data class Model(
     val id: Int,
     val material: Material = Material.DIAMOND_SWORD,

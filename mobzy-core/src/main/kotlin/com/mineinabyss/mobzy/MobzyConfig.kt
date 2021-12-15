@@ -1,11 +1,12 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.idofront.plugin.getService
+import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
-import com.mineinabyss.idofront.time.TimeSpan
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import kotlinx.serialization.Serializable
 import org.bukkit.command.CommandSender
+import kotlin.time.Duration
 
 interface MobzyConfig {
     companion object : MobzyConfig by getService()
@@ -29,7 +30,8 @@ interface MobzyConfig {
         var chunkSpawnRad: IntRange,
         var maxCommandSpawns: Int,
         var playerGroupRadius: Double,
-        var spawnTaskDelay: TimeSpan,
+        @Serializable(with = DurationSerializer::class)
+        var spawnTaskDelay: Duration,
         var creatureTypeCaps: MutableMap<MobCategory, Int> = mutableMapOf(),
         var spawnHeightRange: Int,
     )

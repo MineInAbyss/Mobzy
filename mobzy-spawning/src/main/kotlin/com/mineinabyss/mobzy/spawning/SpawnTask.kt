@@ -1,11 +1,12 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.ecs.api.engine.Engine
-import com.mineinabyss.geary.ecs.api.engine.temporaryEntity
+import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.ecs.events.FailedCheck
+import com.mineinabyss.geary.ecs.events.RequestCheck
+import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
-import com.mineinabyss.mobzy.spawning.regions.SpawnRegion
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import com.okkero.skedule.CoroutineTask
 import com.okkero.skedule.SynchronizationContext.*
@@ -13,6 +14,7 @@ import com.okkero.skedule.schedule
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
+import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.nield.kotlinstatistics.WeightedDice
 import kotlin.random.Random
@@ -61,7 +63,7 @@ object SpawnTask {
                 } catch (e: RuntimeException) {
                     e.printStackTrace()
                 }
-                waitFor(mobzyConfig.spawnTaskDelay.inTicks)
+                waitFor(mobzyConfig.spawnTaskDelay.inWholeTicks)
             }
             stopTask()
         }
@@ -75,7 +77,6 @@ object SpawnTask {
         GlobalSpawnInfo.playerGroupCount = playerGroups.size
 
         //TODO sorted by least mobs around
-        //TODO i think it cant find slimjar classes cause not loaded into system classloader
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             val heights = playerGroup.map { it.location.y.toInt() }
             val world = playerGroup.first().world
@@ -86,31 +87,31 @@ object SpawnTask {
 
             // Every player group picks a random chunk around them
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
-            Engine.temporaryEntity { spawn ->
-                val chunkSnapshot = chunk.chunkSnapshot
-                val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
-                val priorities = regionContainer.createQuery()
-                    .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
-                    .sorted()
-                    .filterWhenOverlapFlag()
-                    .getMobSpawnsForRegions()
-                    .associateWithTo(mutableMapOf()) { it.basePriority * Random.nextDouble() }
-
-//                spawn.set(SubChunkBlockComposition(chunkSnapshot, spawnInfo.bottom.blockY))
-                spawn.set(spawnInfo.bottom)
-                spawn.set(spawnInfo)
-
-                while (priorities.isNotEmpty()) {
-                    val choice: SpawnDefinition = WeightedDice(priorities).roll()
-                    spawn.set(choice)
-                    if (choice.conditionsMet(spawn)) {
-                        // Must spawn mobs in sync
-                        mobzy.schedule(SYNC) {
-                            if (mobzy.isEnabled) choice.spawn(spawnInfo)
-                        }
-                        break
-                    } else priorities.remove(choice)
+            val chunkSnapshot = chunk.chunkSnapshot
+            val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
+            val priorities = regionContainer.createQuery()
+                .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
+                .sorted()
+                .filterWhenOverlapFlag()
+                .getMobSpawnsForRegions()
+                .associateWithTo(mutableMapOf()) {
+                    (it.get<SpawnPriority>()?.priority ?: 1.0) * Random.nextDouble()
                 }
+
+            while (priorities.isNotEmpty()) {
+                val choice: GearyEntity = WeightedDice(priorities).roll()
+
+                //TODO this should be immutable but bukkit doesn't have an immutable location!
+                val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
+                val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
+                val success = choice.callEvent(RequestCheck, spawnInfo, spawnCheckLoc) { !it.has<FailedCheck>() }
+                if (success) {
+                    // Must spawn mobs in sync
+                    mobzy.schedule(SYNC) {
+                        if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
+                    }
+                    break
+                } else priorities.remove(choice)
             }
         }
     }

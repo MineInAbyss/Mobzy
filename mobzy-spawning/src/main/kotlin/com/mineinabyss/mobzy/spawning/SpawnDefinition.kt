@@ -1,26 +1,69 @@
+@file:UseSerializers(IntRangeSerializer::class)
+
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.ecs.api.conditions.GearyCondition
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+
+import com.mineinabyss.geary.ecs.accessors.EventResultScope
+import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.events.handlers.GearyHandler
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.ecs.serialization.Formats
 import com.mineinabyss.geary.minecraft.spawnGeary
-import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
-import com.mineinabyss.mobzy.debug
-import com.mineinabyss.mobzy.spawning.conditions.SpawnCapCondition
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.descriptors.capturedKClass
+import kotlinx.serialization.UseSerializers
 import org.bukkit.Location
 import org.bukkit.util.Vector
 import kotlin.math.sign
 import kotlin.random.Random
+
+@Serializable
+@SerialName("mobzy:spawn_regions")
+class WGRegions(
+    val keys: Set<String>
+)
+
+@Serializable
+@SerialName("mobzy:spawn.spread")
+class SpawnSpread(
+    val radius: Double,
+)
+
+@Serializable
+@SerialName("mobzy:spawn.amount")
+class SpawnAmount(
+    val amount: IntRange,
+)
+
+@Serializable
+@SerialName("mobzy:spawn.type")
+class SpawnType(
+    val prefab: PrefabKey,
+)
+
+@Serializable
+@SerialName("mobzy:spawn.priority")
+class SpawnPriority(
+    val priority: Double,
+)
+
+/**
+ * Where we should look for a location to actually spawn mobs in when calling [spawn]
+ *
+ * @see SpawnInfo.getSpawnFor
+ */
+@Serializable
+@SerialName("mobzy:spawn.position")
+enum class SpawnPosition {
+    AIR, GROUND, OVERHANG
+}
+
 
 /**
  * A class describing information about
@@ -33,79 +76,40 @@ import kotlin.random.Random
  * be chosen when compared to other spawns.
  * @property spawnPos Whether the mob should be spawned directly on the ground, in air, or under cliffs.
  */
-@Serializable
-data class SpawnDefinition(
-    @SerialName("reuse") private val _reuse: String? = null,
-    @SerialName("mob") private val _prefabKey: PrefabKey? = null,
-    @Serializable(with = IntRangeSerializer::class)
-    @SerialName("amount") private val _amount: IntRange? = null,
-    @SerialName("radius") private val _radius: Double? = null,
-    @SerialName("priority") private val _basePriority: Double? = null,
-    @SerialName("spawnPos") private val _spawnPos: SpawnPosition? = null,
-    @SerialName("conditions")
-    val _conditions: List<GearyCondition> = listOf(),
-    val ignore: List<String> = listOf()
+
+/**
+ *
+ */
+data class DoSpawn(
+    val location: Location
 ) {
-    @Transient
-    val copyFrom: SpawnDefinition? = _reuse?.let { SpawnRegistry.findMobSpawn(it) }
+    var spawnedAmount: Int = 0
+}
 
-    // associateBy ensures we only have one instance of each condition and we take the overridden one
-    val conditions: Collection<GearyCondition> by lazy {
-        ((copyFrom?.conditions ?: defaultConditions) + _conditions)
-            .associateBy { it::class }
-            .minus(ignore.map {
-                Formats.yamlFormat.serializersModule.getPolymorphic(
-                    GearyCondition::class,
-                    it
-                )?.descriptor?.capturedKClass
-            })
-            .values
-    }
+@AutoScan
+class SpawnRequestListener : GearyListener() {
+    private val ResultScope.type by get<SpawnType>()
+    private val ResultScope.amount by getOrNull<SpawnAmount>().map { it?.amount }
+    private val ResultScope.spawnPos by getOrDefault<SpawnPosition>(SpawnPosition.GROUND)
+    private val ResultScope.radius by getOrNull<SpawnSpread>().map { it?.radius ?: 0.0 }
 
-    val entityType: NMSEntityType<*> by lazy {
-        prefab.get() ?: error("No entity type found for prefab $prefabKey in mob spawn")
-    }
+    private inner class Event : GearyHandler() {
+        private val EventResultScope.spawnEvent by get<DoSpawn>()
 
-    @Transient
-    val prefabKey: PrefabKey = _prefabKey ?: copyFrom?.prefabKey ?: error("Mob prefab must not be null")
+        override fun ResultScope.handle(event: EventResultScope) {
+            val location = event.spawnEvent.location
+            val spawns = amount?.randomOrMin() ?: 1
+            for (i in 0 until spawns) {
+                val chosenLoc =
+                    if (spawnPos != SpawnPosition.AIR)
+                        getSpawnInRadius(location, radius) ?: location
+                    else location
 
-    @Transient
-    val prefab: GearyEntity = prefabKey.toEntity() ?: error("Prefab $prefabKey not found")
-
-    @Transient
-    val amount: IntRange = _amount ?: copyFrom?.amount ?: 1..1
-
-    @Transient
-    val radius: Double = _radius ?: copyFrom?.radius ?: 0.0
-
-    @Transient
-    val basePriority: Double = _basePriority ?: copyFrom?.basePriority ?: 1.0
-
-    @Transient
-    val spawnPos: SpawnPosition = _spawnPos ?: copyFrom?.spawnPos ?: SpawnPosition.GROUND
-
-    /** Given a [SpawnInfo] Spawns a number of entities defined in this [SpawnDefinition] at its location */
-    fun spawn(spawnInfo: SpawnInfo, spawns: Int = chooseSpawnAmount()): Int {
-        val location = spawnInfo.getSpawnFor(spawnPos)
-        for (i in 0 until spawns) {
-            val chosenLoc = if (radius != 0.0 && spawnPos != SpawnPosition.AIR)
-                getSpawnInRadius(location, radius) ?: location
-            else location
-
-            chosenLoc.spawnGeary(prefab)
-        }
-        return spawns
-    }
-
-    fun conditionsMet(area: GearyEntity): Boolean {
-        return conditions.all { it.metFor(area) }.apply {
-            if (!this) debug(conditions
-                .filter { !it.metFor(area) }
-                .map { it::class.simpleName })
+                chosenLoc.spawnGeary(type.prefab)
+            }
+            event.spawnEvent.spawnedAmount = spawns
         }
     }
-
-    fun chooseSpawnAmount(): Int = amount.randomOrMin()
 
     /**
      * Gets a location to spawn in a mob given an original location and min/max radii around it
@@ -115,6 +119,7 @@ data class SpawnDefinition(
      * @return a new position to spawn in
      */
     private fun getSpawnInRadius(loc: Location, maxRad: Double): Location? {
+        if (maxRad == 0.0) return loc
         if (!loc.chunk.isLoaded) return null
         for (i in 0..29) { //TODO, arbitrary number, should instead search all locations around the spawn
             val x = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
@@ -127,12 +132,5 @@ data class SpawnDefinition(
                 searchLoc.checkUp(2) ?: continue
         }
         return null
-    }
-
-    companion object {
-        val defaultConditions = listOf(
-            SpawnCapCondition,
-//            EnoughSpaceCondition,
-        )
     }
 }

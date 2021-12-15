@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test
 
 internal class VerticalSpawnTest : BukkitTest() {
     val chunk get() = world.getChunkAt(0, 0)
-    fun gap(min: Int, max: Int) = SpawnInfo(chunk.getBlock(0, min, 0).location, chunk.getBlock(0, max, 0).location)
+    fun gap(min: Int, max: Int) =
+        SpawnInfo(chunk.getBlock(0, min, 0).location, chunk.getBlock(0, max, 0).location)
 
     fun findGapAt(min: Int, max: Int, start: Int) =
         VerticalSpawn.findGap(

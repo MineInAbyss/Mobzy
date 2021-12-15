@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import com.mineinabyss.idofront.nms.typeinjection.NMSAttributeBuilder
 import com.mineinabyss.idofront.nms.typeinjection.NMSAttributes
 import com.mineinabyss.idofront.nms.typeinjection.NMSGenericAttributes
@@ -10,7 +9,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("mobzy:attributes")
-@AutoscanComponent
 data class MobAttributes(
     val width: Float = 0.7f,
     val height: Float = 0.7f,

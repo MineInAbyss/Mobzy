@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.geary.ecs.api.autoscan.AutoscanComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -13,7 +12,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("mobzy:increased_water_speed")
-@AutoscanComponent
 data class IncreasedWaterSpeed(
     val level: Int = 10
 )
