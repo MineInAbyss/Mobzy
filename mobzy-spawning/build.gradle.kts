@@ -9,7 +9,7 @@ plugins {
 }
 
 repositories {
-    maven("https://maven.sk89q.com/repo/") //WorldGuard/Edit
+    maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
     maven("https://jitpack.io")
 }
 
@@ -23,7 +23,7 @@ dependencies {
     }
 
     compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2") { exclude(group = "org.bukkit") }
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6") { exclude(group = "org.bukkit") }
 
     compileOnly(project(":mobzy-components"))
     compileOnly(project(":mobzy-core"))

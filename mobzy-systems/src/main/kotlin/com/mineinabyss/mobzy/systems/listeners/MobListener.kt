@@ -16,10 +16,11 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
-import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
@@ -37,6 +38,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
+import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -118,14 +120,6 @@ object MobListener : Listener {
         }
     }
 
-    /** Ride entities with [Rideable] component on right click. */
-    @EventHandler
-    fun PlayerInteractEntityEvent.rideOnRightClick() {
-        val gearyEntity = rightClicked.toGearyOrNull() ?: return
-        if (gearyEntity.has<Rideable>())
-            rightClicked.addPassenger(player)
-    }
-
     @EventHandler
     fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
         for (entity in chunk.entities) {
@@ -167,6 +161,18 @@ object MobListener : Listener {
         }
     }
 
+    /** Ride ModelEngine entites with a [mount]-bone on right click. */
+    @EventHandler
+    fun PlayerInteractEntityEvent.rideOnRightClick() {
+        if (hand != EquipmentSlot.HAND) return
+        val modelengineEntity = rightClicked.toModelEntity()
+        val mounthandler = modelengineEntity?.mountHandler
+        mounthandler?.setSteerable(true)
+        if (mounthandler?.hasDriver() == false)
+            mounthandler.setDriver(player, mounthandler.getController(player))
+        else return
+    }
+
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
     @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {
@@ -175,9 +181,21 @@ object MobListener : Listener {
             isCancelled = true
     }
 
+    @EventHandler
+    fun VehicleExitEvent.onLeavingRidable() {
+        val modelEngineEntity = vehicle.toModelEntity()
+        val mountHandler = modelEngineEntity?.mountHandler
+
+        if (!vehicle.isModelEngineEntity) return
+        if (mountHandler?.hasDriver() == true && exited == mountHandler.driver) mountHandler.dismountAll()
+    }
+
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
+        val mounthandler = entity.toModelEntity()?.mountHandler
+        if (mounthandler?.hasDriver() == true || mounthandler?.hasPassengers() == true) mounthandler.dismountAll()
+
         gearyEntity.with { deathLoot: DeathLoot ->
             drops.clear()
             droppedExp = 0
