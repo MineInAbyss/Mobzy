@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
-import com.mineinabyss.geary.ecs.accessors.EventResultScope
-import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.accessors.EventScope
+import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.accessors.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.events.handlers.CheckHandler
+import com.mineinabyss.geary.ecs.api.systems.Handler
 import com.mineinabyss.idofront.serialization.DoubleRangeSerializer
 import com.mineinabyss.idofront.util.DoubleRange
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
@@ -25,14 +26,13 @@ class BlockComposition(
 
 @AutoScan
 class BlockCompositionCondition : GearyListener() {
-    private val ResultScope.blockComposition by get<BlockComposition>()
+    private val TargetScope.blockComposition by get<BlockComposition>()
 
-    private inner class Check : CheckHandler() {
-        val EventResultScope.spawnInfo by get<SpawnInfo>()
+    val EventScope.spawnInfo by get<SpawnInfo>()
 
-        override fun ResultScope.check(event: EventResultScope): Boolean =
-            blockComposition.materials.all { (material, range) ->
-                event.spawnInfo.blockComposition.percent(material) in range
-            }
-    }
+    @Handler
+    fun TargetScope.check(event: EventScope): Boolean =
+        blockComposition.materials.all { (material, range) ->
+            event.spawnInfo.blockComposition.percent(material) in range
+        }
 }

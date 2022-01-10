@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
-import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.accessors.get
 import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
@@ -21,7 +22,7 @@ import kotlin.random.Random
  *
  * @property top The topmost location of the spawn.
  * @property bottom The bottommost location of the spawn.
- * @property gap The gap in the y axis between the two of them.
+ * @property gap The gap in the y-axis between the two of them.
  */
 class SpawnInfo(
     val bottom: Location,
@@ -34,7 +35,7 @@ class SpawnInfo(
     val blockComposition by lazy { SubChunkBlockComposition(this.chunkSnapshot, bottom.blockY) }
 
     object NearbyQuery : Query() {
-        val ResultScope.bukkit by get<BukkitEntity>()
+        val TargetScope.bukkit by get<BukkitEntity>()
     }
 
     private val searchRadiusSquared = searchRadius * searchRadius

@@ -9,7 +9,7 @@ plugins {
 }
 
 repositories {
-    maven("https://maven.sk89q.com/repo/") //WorldGuard/Edit
+    maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
     maven("https://jitpack.io")
 }
 

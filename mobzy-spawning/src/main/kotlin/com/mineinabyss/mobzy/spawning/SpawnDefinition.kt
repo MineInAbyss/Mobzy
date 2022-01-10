@@ -3,11 +3,10 @@
 package com.mineinabyss.mobzy.spawning
 
 
-import com.mineinabyss.geary.ecs.accessors.EventResultScope
-import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.accessors.*
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.events.handlers.GearyHandler
+import com.mineinabyss.geary.ecs.api.systems.Handler
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.minecraft.spawnGeary
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
@@ -88,27 +87,26 @@ data class DoSpawn(
 
 @AutoScan
 class SpawnRequestListener : GearyListener() {
-    private val ResultScope.type by get<SpawnType>()
-    private val ResultScope.amount by getOrNull<SpawnAmount>().map { it?.amount }
-    private val ResultScope.spawnPos by getOrDefault<SpawnPosition>(SpawnPosition.GROUND)
-    private val ResultScope.radius by getOrNull<SpawnSpread>().map { it?.radius ?: 0.0 }
+    private val TargetScope.type by get<SpawnType>()
+    private val TargetScope.amount by getOrNull<SpawnAmount>().map { it?.amount }
+    private val TargetScope.spawnPos by getOrDefault<SpawnPosition>(SpawnPosition.GROUND)
+    private val TargetScope.radius by getOrNull<SpawnSpread>().map { it?.radius ?: 0.0 }
 
-    private inner class Event : GearyHandler() {
-        private val EventResultScope.spawnEvent by get<DoSpawn>()
+    private val EventScope.spawnEvent by get<DoSpawn>()
 
-        override fun ResultScope.handle(event: EventResultScope) {
-            val location = event.spawnEvent.location
-            val spawns = amount?.randomOrMin() ?: 1
-            for (i in 0 until spawns) {
-                val chosenLoc =
-                    if (spawnPos != SpawnPosition.AIR)
-                        getSpawnInRadius(location, radius) ?: location
-                    else location
+    @Handler
+    fun TargetScope.handleSpawn(event: EventScope) {
+        val location = event.spawnEvent.location
+        val spawns = amount?.randomOrMin() ?: 1
+        for (i in 0 until spawns) {
+            val chosenLoc =
+                if (spawnPos != SpawnPosition.AIR)
+                    getSpawnInRadius(location, radius) ?: location
+                else location
 
-                chosenLoc.spawnGeary(type.prefab)
-            }
-            event.spawnEvent.spawnedAmount = spawns
+            chosenLoc.spawnGeary(type.prefab)
         }
+        event.spawnEvent.spawnedAmount = spawns
     }
 
     /**

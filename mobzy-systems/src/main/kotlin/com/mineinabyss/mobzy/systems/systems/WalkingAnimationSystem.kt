@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.accessors.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -13,10 +14,10 @@ import org.bukkit.entity.Mob
 
 @AutoScan
 class WalkingAnimationSystem : TickingSystem(interval = 10) {
-    private val ResultScope.model by get<Model>()
-    private val ResultScope.mob by get<BukkitEntity>()
+    private val TargetScope.model by get<Model>()
+    private val TargetScope.mob by get<BukkitEntity>()
 
-    override fun ResultScope.tick() {
+    override fun TargetScope.tick() {
         val mob = mob as? Mob ?: return
 
         val headItem = mob.toNMS().getEquipment(EnumItemSlot.f /* HEAD */)
