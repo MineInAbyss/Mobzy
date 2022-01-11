@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy
 import com.mineinabyss.geary.ecs.api.entities.with
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
 import com.mineinabyss.geary.minecraft.access.toGeary
-import com.mineinabyss.geary.minecraft.spawnGeary
+import com.mineinabyss.geary.minecraft.spawnFromPrefab
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
 import com.mineinabyss.geary.minecraft.store.decodePrefabs
 import com.mineinabyss.idofront.config.IdofrontConfig
@@ -79,7 +79,7 @@ class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data
             }.onEach { oldEntity ->
                 //spawn a replacement entity and copy this entity's NBT over to it
                 oldEntity.toGeary().with { prefab: PrefabKey ->
-                    (oldEntity.location.spawnGeary(prefab) ?: return@onEach).toGeary {
+                    (oldEntity.location.spawnFromPrefab(prefab) ?: return@onEach).toGeary {
                         decodeComponentsFrom(oldEntity.persistentDataContainer)
                         set(CopyNBT(NMSDataContainer().apply { oldEntity.toNMS().save(this) }))
                     }

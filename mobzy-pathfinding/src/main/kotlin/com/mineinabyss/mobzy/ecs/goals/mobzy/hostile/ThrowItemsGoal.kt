@@ -1,51 +1,45 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
-import com.mineinabyss.geary.ecs.api.GearyComponent
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.api.entities.createEntity
-import com.mineinabyss.geary.minecraft.spawnGeary
+import com.mineinabyss.geary.ecs.serialization.parseEntity
+import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.minecraft.spawnFromPrefab
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
-import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.idofront.nms.pathfindergoals.doneNavigating
 import com.mineinabyss.idofront.nms.pathfindergoals.moveToEntity
 import com.mineinabyss.idofront.nms.pathfindergoals.stopNavigation
+import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.world.entity.projectile.IProjectile
-import net.minecraft.world.phys.Vec3D
-import org.bukkit.entity.Creature
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Mob
-import org.bukkit.entity.Snowball
+import org.bukkit.entity.*
 import org.bukkit.util.Vector
-import kotlin.math.atan2
 import kotlin.math.min
 import kotlin.math.pow
-import kotlin.math.sqrt
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
     //TODO replace with serializable geary entity when that works
-    val spawn: List<@Polymorphic GearyComponent>,
+    val spawn: String,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
     val yOffset: Double = 0.0,
     val projectileSpeed: Float = 1.6f,
     val projectileAngularDiameter: Double = 12.0,
     val projectileCountPerThrow: Int = 1,
-    val cooldown: Long = 3000L,
+    val cooldown: @Serializable(with = DurationSerializer::class) Duration = 3.seconds,
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = ThrowItemsGoal(
         (mob as Creature),
-        spawn.createEntity(),
+        mob.toGeary().parseEntity(spawn),
         minChaseRad,
         minThrowRad,
         yOffset,
@@ -71,8 +65,8 @@ class ThrowItemsGoal(
     private val speed: Float,
     private val randomAngle: Double,
     private val count: Int,
-    cooldown: Long = 3000L,
-) : MobzyPathfinderGoal(cooldown = cooldown) {
+    cooldown: Duration,
+) : MobzyPathfinderGoal(cooldown = cooldown.inWholeMilliseconds) {
     private var distance = 0.0
 
     override fun shouldExecute(): Boolean {
@@ -106,8 +100,10 @@ class ThrowItemsGoal(
     /** Throws the mob's defined item at the [target]*/
     private fun throwItem(target: LivingEntity) {
         repeat(count) {
-            val entity = mob.eyeLocation.spawnGeary(prefab) ?: return@repeat
+            val entity = mob.eyeLocation.spawnFromPrefab(prefab = prefab) ?: return@repeat
             val snowball = entity as? Snowball ?: return
+            snowball.shooter = mob
+//            snowball.velocity = Vector(0.0, 0.0, 0.1)
             val loc = entity.location
             val (x, y, z) = loc
 
@@ -115,7 +111,7 @@ class ThrowItemsGoal(
             val dX = targetLoc.x - x
             val dY = targetLoc.y - y - 0.4
             val dZ = targetLoc.z - z
-            snowball.toNMS().shootDirection(dX, dY, dZ, speed, randomAngle)
+            snowball.shootDirection(dX, dY, dZ, speed, randomAngle)
         }
     }
 }
@@ -129,7 +125,7 @@ class ThrowItemsGoal(
  * @param randomAngle The maximum random angle that can be applied to the projectile shooting direction. Set to 0 to aim directly at the target.
  */
 //TODO: Implement the entity deltaPosition ticking ourselves at some point, to circumvent NMS.
-fun IProjectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float, randomAngle: Double) {
+fun Projectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float, randomAngle: Double) {
     val directionVector = Vector(dX, dY, dZ).normalize()
     if (randomAngle != 0.0) {
         directionVector.rotateAroundX(Random.nextDouble(-randomAngle, randomAngle).toRadians())
@@ -139,14 +135,15 @@ fun IProjectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float,
     }
     directionVector.multiply(speed)
 
-    mot = Vec3D(directionVector.x, directionVector.y, directionVector.z)
+    velocity = Vector(directionVector.x, directionVector.y, directionVector.z)
 
     // NMS stuff for orienting the projectile model towards the target
-    val horizontalDistanceSqrt = sqrt(directionVector.x * directionVector.x + directionVector.z * directionVector.z)
-    setYawPitch(
-        Math.toDegrees(atan2(directionVector.x, directionVector.z)).toFloat(),
-        Math.toDegrees(atan2(directionVector.y, horizontalDistanceSqrt)).toFloat()
-    )
+//    val horizontalDistanceSqrt = sqrt(directionVector.x * directionVector.x + directionVector.z * directionVector.z)
+
+//    setYawPitch(
+//        Math.toDegrees(atan2(directionVector.x, directionVector.z)).toFloat(),
+//        Math.toDegrees(atan2(directionVector.y, horizontalDistanceSqrt)).toFloat()
+//    )
     //TODO verify this is no longer needed
 //    lastYaw = yRot
 //    lastPitch = xRot

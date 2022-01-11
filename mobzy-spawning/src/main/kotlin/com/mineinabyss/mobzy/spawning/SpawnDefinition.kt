@@ -8,7 +8,7 @@ import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.api.systems.Handler
 import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.minecraft.spawnGeary
+import com.mineinabyss.geary.minecraft.spawnFromPrefab
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
@@ -104,7 +104,7 @@ class SpawnRequestListener : GearyListener() {
                     getSpawnInRadius(location, radius) ?: location
                 else location
 
-            chosenLoc.spawnGeary(type.prefab)
+            chosenLoc.spawnFromPrefab(type.prefab)
         }
         event.spawnEvent.spawnedAmount = spawns
     }
