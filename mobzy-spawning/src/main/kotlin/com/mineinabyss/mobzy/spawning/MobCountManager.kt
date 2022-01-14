@@ -1,11 +1,11 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
-import com.mineinabyss.geary.ecs.accessors.EventResultScope
-import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.autoscan.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.events.handlers.ComponentAddHandler
 import com.mineinabyss.geary.minecraft.access.toGearyOrNull
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.ecs.components.MobCategory
@@ -29,13 +29,16 @@ object MobCountManager : Listener {
 
     @AutoScan
     class CountMobsSystem : GearyListener() {
-        val ResultScope.bukkitEntity by get<MobCategory>()
-        val ResultScope.category by get<MobCategory>()
+        val TargetScope.bukkitEntity by get<MobCategory>()
+        val TargetScope.category by get<MobCategory>()
 
-        private inner class Count : ComponentAddHandler() {
-            override fun ResultScope.handle(event: EventResultScope) {
-                categoryCounts.getOrPut(category) { AtomicInteger() }.getAndIncrement()
-            }
+        init {
+            allAdded()
+        }
+
+        @Handler
+        fun TargetScope.count() {
+            categoryCounts.getOrPut(category) { AtomicInteger() }.getAndIncrement()
         }
     }
 }

@@ -51,7 +51,6 @@ dependencies {
 
     // Other plugins
     compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")
-    compileOnly("com.mineinabyss:looty:0.3.19")
 
     // Shaded
     implementation(project(":mobzy-pathfinding"))
@@ -63,7 +62,7 @@ dependencies {
 
     // Testing
     testImplementation(Deps.`kotlin-statistics`)
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.10.1")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.13.0")
     testImplementation(Deps.kotlinx.serialization.json)
     testImplementation(Deps.kotlinx.serialization.kaml)
 }

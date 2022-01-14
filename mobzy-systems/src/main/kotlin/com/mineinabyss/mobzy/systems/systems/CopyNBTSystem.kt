@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.ecs.accessors.EventResultScope
-import com.mineinabyss.geary.ecs.accessors.ResultScope
+import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.autoscan.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.events.handlers.ComponentAddHandler
 import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -19,14 +19,17 @@ import com.mineinabyss.mobzy.ecs.components.CopyNBT
  */
 @AutoScan
 class CopyNBTSystem : GearyListener() {
-    private val ResultScope.nbt by get<CopyNBT>()
-    private val ResultScope.bukkitEntity by get<BukkitEntity>()
+    private val TargetScope.nbt by get<CopyNBT>()
+    private val TargetScope.bukkitEntity by get<BukkitEntity>()
 
-    private inner class AddPrefab : ComponentAddHandler() {
-        override fun ResultScope.handle(event: EventResultScope) {
-            bukkitEntity.toNMS().load(nbt.compound)
-            entity.decodeComponentsFrom(bukkitEntity.persistentDataContainer)
-            entity.remove<CopyNBT>()
-        }
+    init {
+        allAdded()
+    }
+
+    @Handler
+    fun TargetScope.copyNBT() {
+        bukkitEntity.toNMS().load(nbt.compound)
+        entity.decodeComponentsFrom(bukkitEntity.persistentDataContainer)
+        entity.remove<CopyNBT>()
     }
 }
