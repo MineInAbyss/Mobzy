@@ -28,7 +28,6 @@ jobs:
         run: gradle build publish -PmineinabyssMavenUsername=${{ secrets.MAVEN_PUBLISH_USERNAME }} -PmineinabyssMavenPassword=${{ secrets.MAVEN_PUBLISH_PASSWORD }}
 
       - name: Get version from gradle
-        if: steps.changes.outputs.platform == 'true'
         shell: bash
         id: extract_version
         run: |
