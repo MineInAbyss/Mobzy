@@ -2,15 +2,16 @@
 
 # Mobzy    
 [![Java CI with Gradle](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml)
-[![Maven](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/mobzy/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/mobzy)
-[![Wiki](https://badgen.net/badge/color/Project%20Wiki/purple?icon=wiki&label)](https://github.com/MineInAbyss/Mobzy/wiki)
+[![Maven](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.mineinabyss.com/releases/com/mineinabyss/mobzy/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/mobzy)
+[![Wiki](https://img.shields.io/badge/-Project%20Wiki-blueviolet?logo=Wikipedia&labelColor=gray)](https://github.com/MineInAbyss/Mobzy/wiki)
+[![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://github.com/MineInAbyss/MineInAbyss/wiki/Setup-and-Contribution-Guide)
 </div>
 
 ### Overview
 
-Mobzy is a WIP PaperMC plugin for creating custom entities built on top of our own [Geary](https://github.com/MineInAbyss/Geary) Entity Component System (ECS). It makes coding complex entities simpler by breaking them down into many modular components. Mobzy then provides a configuration system for making custom entity types out of these components.
+Mobzy is a PaperMC plugin for injecting custom NMS entities into the server, built on top of our own [Geary](https://github.com/MineInAbyss/Geary) Entity Component System (ECS). We use it to break down complex entities into many modular components in config files.
 
-Mobzy also provides an API for injecting custom NMS entity types into the server, and packet interception to allow clients to see them. Some of these more general-use features may be moved into their own library eventually.
+Our plan is to eventually phase out use of vanilla entities in favor of fully custom, platform-agnostic ones that get sent through packets.
 
 ![Custom Mobs](https://media.discordapp.net/attachments/464678554681081856/625036159772524582/2019-09-21_19.39.27.png?width=1210&height=681)
 
