@@ -17,13 +17,13 @@ plugins {
 
 allprojects {
     apply(plugin = "java")
+    apply(plugin = "org.jetbrains.dokka")
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf(
                 "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
             )
-            jvmTarget = "16"
         }
     }
 
