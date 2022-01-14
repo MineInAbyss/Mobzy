@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.systems.systems
 
 import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.get
+import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.systems.TickingSystem
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -11,9 +11,10 @@ import net.minecraft.world.entity.EnumItemSlot
 import net.minecraft.world.phys.Vec3D
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.entity.Mob
+import kotlin.time.Duration.Companion.seconds
 
 @AutoScan
-class WalkingAnimationSystem : TickingSystem(interval = 10) {
+class WalkingAnimationSystem : TickingSystem(interval = 0.5.seconds) {
     private val TargetScope.model by get<Model>()
     private val TargetScope.mob by get<BukkitEntity>()
 

@@ -1,11 +1,10 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
-import com.mineinabyss.geary.ecs.accessors.EventScope
 import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.get
+import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.autoscan.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.Handler
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.SpawnType
@@ -25,7 +24,7 @@ class SpawnCategoryCapCondition : GearyListener() {
     }
 
     @Handler
-    fun TargetScope.check(event: EventScope): Boolean {
+    fun TargetScope.check(): Boolean {
         return MobCountManager.isCategoryAllowed(
             spawnType.prefab.toEntity()?.get<MobCategory>() ?: return false
         )

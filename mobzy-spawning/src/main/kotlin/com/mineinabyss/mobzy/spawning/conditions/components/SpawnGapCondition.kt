@@ -2,8 +2,9 @@ package com.mineinabyss.mobzy.spawning.conditions.components
 
 import com.mineinabyss.geary.ecs.accessors.EventScope
 import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.get
+import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.autoscan.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
@@ -28,6 +29,7 @@ class SpawnGapCondition : GearyListener() {
 
     val EventScope.spawnInfo by get<SpawnInfo>()
 
+    @Handler
     fun TargetScope.check(event: EventScope): Boolean =
         event.spawnInfo.gap in spawnGap.range
 }

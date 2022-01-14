@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
 import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.get
+import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up

@@ -1,17 +1,17 @@
 package com.mineinabyss.mobzy.injection
 
-import com.mineinabyss.geary.ecs.accessors.EventScope
 import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.get
+import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.autoscan.Handler
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.relations.Processed
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.Handler
 import com.mineinabyss.geary.ecs.components.*
-import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.geary.prefabs.PrefabKey
+import com.mineinabyss.geary.prefabs.PrefabManager
+import com.mineinabyss.geary.prefabs.configuration.components.Prefab
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
@@ -52,7 +52,7 @@ object MobzyNMSTypeInjector : GearyListener() {
     }
 
     @Handler
-    fun TargetScope.addNMSType(event: EventScope) {
+    fun TargetScope.addNMSType() {
         val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
         entity.set(nmsEntityType)
         entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
