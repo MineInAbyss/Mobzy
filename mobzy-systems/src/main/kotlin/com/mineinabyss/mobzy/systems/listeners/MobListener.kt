@@ -148,7 +148,7 @@ object MobListener : Listener {
                 player.eyeLocation,
                 player.location.direction,
                 3.0,
-                FluidCollisionMode.ALWAYS,
+                FluidCollisionMode.NEVER,
                 true,
                 0.0
             ) { entity -> entity != player }
