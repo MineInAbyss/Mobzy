@@ -93,7 +93,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         if (categories.size > 1)
                             sender.info(
                                 categories.entries
-                                    .sortedByDescending { it.value.get() }
+                                    .sortedByDescending { it.value }
                                     .joinToString("\n") { (type, amount) -> "&7${type.typeName}&r: $amount".color() }
                             )
                     }

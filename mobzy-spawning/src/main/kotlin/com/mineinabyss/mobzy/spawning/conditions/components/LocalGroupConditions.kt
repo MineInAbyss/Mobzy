@@ -6,6 +6,7 @@ import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.autoscan.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.spawning.SpawnType
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import kotlinx.serialization.SerialName
@@ -33,5 +34,5 @@ class CapFull : GearyListener() {
 
     @Handler
     fun TargetScope.check(event: EventScope): Boolean =
-        (event.spawnInfo.localMobs[spawnType.prefab.toEntity()?.get()]?.get() ?: 0) < conf.max
+        (event.spawnInfo.localTypes[spawnType.prefab.toEntity()?.get<NMSEntityType<*>>()] ?: 0) < conf.max
 }
