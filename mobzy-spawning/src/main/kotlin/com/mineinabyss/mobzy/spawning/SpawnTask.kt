@@ -70,7 +70,7 @@ object SpawnTask {
     }
 
     private fun runSpawnTask() {
-        val onlinePlayers = Bukkit.getOnlinePlayers()
+        val onlinePlayers = Bukkit.getOnlinePlayers().filter { !it.isDead }
         if (onlinePlayers.isEmpty()) return
 
         val playerGroups = PlayerGroups.group(onlinePlayers)

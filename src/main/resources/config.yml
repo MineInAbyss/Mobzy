@@ -3,7 +3,7 @@ debug: false
 doMobSpawns: false
 chunkSpawnRad: 3..6
 maxCommandSpawns: 50
-spawnTaskDelay: 100
+spawnTaskDelay: 100t
 creatureTypeCaps:
   CREATURE: 20
   MONSTER: 20
