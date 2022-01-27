@@ -45,7 +45,6 @@ class TargetNearbyPlayerCustomGoal(
     }
 
     override fun shouldKeepExecuting(): Boolean {
-        logInfo("called shouldKeepExecuting")
         return isPlayerValidTarget(playerDamager, range, ticksWaitAfterPlayerDeath)
     }
 
@@ -53,7 +52,6 @@ class TargetNearbyPlayerCustomGoal(
     override fun init() = assignTargetPlayer()
 
     override fun reset() {
-        logInfo("target is reset")
         mob.target = null
     }
 
@@ -88,8 +86,6 @@ class TargetNearbyPlayerCustomGoal(
         }
 
         val chosenTarget = possibleTargets[chosenTargetIndex]
-
-        logInfo("The target is ${chosenTarget.name}")
 
         nmsEntity.setGoalTarget(
                 (chosenTarget as CraftPlayer).handle as EntityLiving,
