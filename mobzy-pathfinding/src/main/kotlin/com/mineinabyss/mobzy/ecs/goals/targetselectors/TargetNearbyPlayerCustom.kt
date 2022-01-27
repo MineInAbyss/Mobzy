@@ -16,7 +16,13 @@ import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
-
+/**
+ * This PathFinderComponent class allows mobs to Target Nearby Players that meet the necessary criteria.
+ * Specifically, it builds the following Goal class, which encloses the actual logic of the targetting
+ *
+ * @param range the range of the mob to detect players to target
+ * @param ticksWaitAfterPlayerDeath the number of ticks to wait after a player has died until they are a viable target
+ */
 @Serializable
 @SerialName("mobzy:target.nearby_player")
 class TargetNearbyPlayerCustom(
@@ -55,6 +61,12 @@ class TargetNearbyPlayerCustomGoal(
         mob.target = null
     }
 
+    /**
+     * Finds and Assigns a player to be the target, if any are present.
+     * Uses nmsEntity.setGoalTarget() to set target at end of function
+     *
+     * @return none, but uses return to exit early if no target is found
+     */
     private fun assignTargetPlayer() {
         val possibleTargets = nmsEntity.toBukkit().getNearbyEntities(range, range, range)
 
@@ -95,11 +107,4 @@ class TargetNearbyPlayerCustomGoal(
     }
 
 }
-
-
-//make TargetNearbyPlayer a mobzytargetselector class like TargetAttacker
-
-//extend PathfinderGoalNearestAttackableTarget
-
-//implement TargetAttacker class that uses isPlayerValidTarget
 

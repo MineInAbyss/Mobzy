@@ -52,6 +52,15 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, type: Type?
 
     open fun executeWhenCooledDown() = Unit
 
+
+    /**
+     * This function checks a given player is a viable target for a mob
+     *
+     * @param player the player to be checked
+     * @param range mob's target range / follow range
+     * @param ticksWaitAfterPlayerDeath the number of ticks to wait after a player has died until they are a viable target
+     * @return True if the player is valid target, False if not
+     * */
     fun isPlayerValidTarget(player: Player, range: Double = mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0, ticksWaitAfterPlayerDeath: Int): Boolean {
         if (player.getStatistic(Statistic.TIME_SINCE_DEATH) < ticksWaitAfterPlayerDeath) {    //time in ticks
             return false

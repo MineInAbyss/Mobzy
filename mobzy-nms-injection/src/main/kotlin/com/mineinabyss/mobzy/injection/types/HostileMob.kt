@@ -26,12 +26,9 @@ open class HostileMob(
         addPathfinderGoal(7, RandomStrollLandBehavior())
         addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8.0f))
         addPathfinderGoal(8, RandomLookAroundBehavior())
-        logInfo(world.time)
 
-        addTargetSelector(6, TargetNearbyPlayerCustom())
-        logInfo("TargetNearbyPlayer registered")
         addTargetSelector(2, TargetAttacker())
-        logInfo("TargetAttacker registered")
+        addTargetSelector(6, TargetNearbyPlayerCustom())
     }
 
     override fun getScoreboardDisplayName(): IChatBaseComponent = NMSChatMessage(entityType.typeName
