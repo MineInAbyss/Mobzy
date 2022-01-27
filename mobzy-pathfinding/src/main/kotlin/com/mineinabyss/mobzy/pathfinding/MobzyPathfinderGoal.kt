@@ -9,6 +9,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import net.minecraft.world.entity.EntityInsentient
 import net.minecraft.world.entity.ai.control.ControllerMove
 import org.bukkit.GameMode
+import org.bukkit.Statistic
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import java.util.*
@@ -51,12 +52,17 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, type: Type?
 
     open fun executeWhenCooledDown() = Unit
 
-    fun isPlayerValidTarget(player: Player, range: Double = mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0) =
-        !player.isInvulnerable &&
+    fun isPlayerValidTarget(player: Player, range: Double = mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0, ticksWaitAfterPlayerDeath: Int): Boolean {
+        if (player.getStatistic(Statistic.TIME_SINCE_DEATH) < ticksWaitAfterPlayerDeath) {    //time in ticks
+            return false
+        }
+
+        return !player.isInvulnerable &&
                 !player.isDead &&
                 player.gameMode != GameMode.SPECTATOR &&
                 player.gameMode != GameMode.CREATIVE &&
                 mob.distanceSqrTo(player) < range * range
+    }
 }
 
 fun NMSPathfinderGoal.setType(type: net.minecraft.world.entity.ai.goal.PathfinderGoal.Type) = a(EnumSet.of(type))

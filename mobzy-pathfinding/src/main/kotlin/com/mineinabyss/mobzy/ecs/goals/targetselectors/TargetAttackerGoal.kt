@@ -33,7 +33,7 @@ class TargetAttackerGoal(
         return shouldKeepExecuting()
     }
 
-    override fun shouldKeepExecuting(): Boolean = isPlayerValidTarget(playerDamager, range)
+    override fun shouldKeepExecuting(): Boolean = isPlayerValidTarget(playerDamager, range, ticksWaitAfterPlayerDeath = 1)
 
     override fun init() {
         nmsEntity.setGoalTarget(
