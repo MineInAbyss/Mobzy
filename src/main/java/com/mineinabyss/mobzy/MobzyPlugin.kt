@@ -1,7 +1,8 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.minecraft.dsl.GearyLoadPhase
-import com.mineinabyss.geary.minecraft.dsl.gearyAddon
+import com.mineinabyss.geary.api.addon.GearyLoadPhase
+import com.mineinabyss.geary.api.addon.GearyLoadPhase.ENABLE
+import com.mineinabyss.geary.papermc.dsl.gearyAddon
 import com.mineinabyss.idofront.platforms.IdofrontPlatforms
 import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
@@ -53,7 +54,7 @@ class MobzyPlugin : JavaPlugin() {
             autoScan<PathfinderComponent>()
 
             startup {
-                GearyLoadPhase.ENABLE {
+                ENABLE {
                     config.load()
                 }
             }

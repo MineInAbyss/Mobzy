@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.minecraft.access.toGeary
-import com.mineinabyss.geary.minecraft.spawnFromPrefab
+import com.mineinabyss.geary.papermc.access.toGeary
+import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg

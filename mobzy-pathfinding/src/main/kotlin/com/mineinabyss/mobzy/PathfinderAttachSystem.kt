@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.accessors.EventScope
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.api.autoscan.Handler
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -15,15 +14,11 @@ import org.bukkit.entity.Mob
 
 @AutoScan
 class PathfinderAttachSystem : GearyListener() {
-    val TargetScope.bukkit by get<BukkitEntity>()
-    val TargetScope.pathfinders by get<Pathfinders>()
-
-    init {
-        allAdded()
-    }
+    val TargetScope.bukkit by added<BukkitEntity>()
+    val TargetScope.pathfinders by added<Pathfinders>()
 
     @Handler
-    fun TargetScope.attachPathfinders(event: EventScope) {
+    fun TargetScope.attachPathfinders() {
         val mob = bukkit as? Mob ?: return
         val (targets, goals) = pathfinders
 

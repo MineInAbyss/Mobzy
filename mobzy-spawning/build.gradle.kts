@@ -18,11 +18,11 @@ dependencies {
     compileOnly(Deps.kotlinx.serialization.kaml)
     compileOnly(Deps.minecraft.skedule)
     compileOnly(Deps.kotlinx.coroutines)
-    implementation(Deps.`kotlin-statistics`) {
+    compileOnly(Deps.`kotlin-statistics`) {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")
+    compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2") { exclude(group = "org.bukkit") }
 
     compileOnly(project(":mobzy-components"))
