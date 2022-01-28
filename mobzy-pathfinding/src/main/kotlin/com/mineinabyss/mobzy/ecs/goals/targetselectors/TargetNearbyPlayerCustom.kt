@@ -83,8 +83,7 @@ class TargetNearbyPlayerCustomGoal(
 
             if (targetEntity is Player) {
 
-                val ticksSinceDeath = targetEntity.getStatistic(Statistic.TIME_SINCE_DEATH)
-                if (ticksSinceDeath < ticksWaitAfterPlayerDeath) { continue }
+                if (!isPlayerValidTarget(targetEntity, range, 200)) { continue }
 
                 if (chosenTargetIndex == -1 ||  mob.distanceSqrTo(targetEntity) < mob.distanceSqrTo(possibleTargets[chosenTargetIndex])) {
                     chosenTargetIndex = i
