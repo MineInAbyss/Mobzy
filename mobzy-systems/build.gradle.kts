@@ -21,7 +21,7 @@ dependencies {
     compileOnly(Deps.minecraft.skedule)
 
     compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
-    compileOnly("com.ticxo.modelengine:api:R2.2.0")
+    compileOnly("com.ticxo.modelengine:api:R2.4.0")
     compileOnly("com.mineinabyss:protocolburrito:0.2.25")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 
