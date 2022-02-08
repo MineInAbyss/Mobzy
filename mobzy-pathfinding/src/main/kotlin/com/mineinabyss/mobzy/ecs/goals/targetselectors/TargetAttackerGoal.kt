@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
-import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent

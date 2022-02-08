@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
+import com.mineinabyss.geary.papermc.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.modelengine.AnimationController

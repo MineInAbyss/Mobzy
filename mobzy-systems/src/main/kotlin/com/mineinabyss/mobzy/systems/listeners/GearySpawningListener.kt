@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.systems.listeners
 
-import com.mineinabyss.geary.minecraft.events.GearyAttemptMinecraftSpawnEvent
+import com.mineinabyss.geary.papermc.events.GearyAttemptMinecraftSpawnEvent
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.spawnEntity
 import com.mineinabyss.mobzy.injection.CustomEntity

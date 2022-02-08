@@ -2,15 +2,17 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.api.autoscan.Handler
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.geary.prefabs.PrefabManager
+import com.mineinabyss.geary.prefabs.PrefabManagerScope
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
+import org.koin.core.component.inject
 
 /**
  * A singleton for keeping track of registered [SpawnRegion]s. Used for the mob spawning system
@@ -18,16 +20,14 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion
  * @property regionSpawns A map of region names to their [SpawnRegion].
  */
 @AutoScan
-object SpawnRegistry : GearyListener() {
-    private val TargetScope.parentRegions by get<WGRegions>()
-    private val TargetScope.spawn by get<SpawnType>()
+object SpawnRegistry : GearyListener(), PrefabManagerScope {
+    override val prefabManager: PrefabManager by inject()
+
+    private val TargetScope.parentRegions by added<WGRegions>()
+    private val TargetScope.spawn by added<SpawnType>()
 
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
     private val regionSpawns: MutableMap<String, MutableSet<GearyEntity>> = HashMap()
-
-    init {
-        allAdded()
-    }
 
     @Handler
     fun TargetScope.trackSpawns() {
@@ -47,7 +47,7 @@ object SpawnRegistry : GearyListener() {
     fun reloadSpawns() {
         unregisterSpawns()
         SpawnConfigs.toList().forEach {
-            PrefabManager.reread(it.entity)
+            prefabManager.reread(it.entity)
         }
     }
 

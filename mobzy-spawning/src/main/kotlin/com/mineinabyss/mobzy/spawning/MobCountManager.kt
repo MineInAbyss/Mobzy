@@ -3,10 +3,10 @@ package com.mineinabyss.mobzy.spawning
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.api.autoscan.Handler
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.minecraft.access.toGearyOrNull
+import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import org.bukkit.event.EventHandler
@@ -29,12 +29,8 @@ object MobCountManager : Listener {
 
     @AutoScan
     class CountMobsSystem : GearyListener() {
-        val TargetScope.bukkitEntity by get<MobCategory>()
-        val TargetScope.category by get<MobCategory>()
-
-        init {
-            allAdded()
-        }
+        val TargetScope.bukkitEntity by added<MobCategory>()
+        val TargetScope.category by added<MobCategory>()
 
         @Handler
         fun TargetScope.count() {

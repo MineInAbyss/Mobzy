@@ -11,7 +11,7 @@ plugins {
 dependencies {
     compileOnly(Deps.kotlinx.serialization.json)
 
-    compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")
+    compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
 
     compileOnly(project(":mobzy-core"))
     compileOnly(project(":mobzy-components"))

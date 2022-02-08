@@ -1,16 +1,16 @@
 package com.mineinabyss.mobzy.injection
 
+import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.api.autoscan.Handler
+import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.relations.Processed
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.components.*
 import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.geary.papermc.GearyMCKoinComponent
 import com.mineinabyss.geary.prefabs.PrefabKey
-import com.mineinabyss.geary.prefabs.PrefabManager
 import com.mineinabyss.geary.prefabs.configuration.components.Prefab
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
@@ -43,12 +43,11 @@ object MobzyTypesQuery : Query() {
 @Suppress("ObjectPropertyName")
 @AutoScan
 object MobzyNMSTypeInjector : GearyListener() {
-    private val TargetScope.info by get<MobzyType>()
-    private val TargetScope.key by get<PrefabKey>()
+    private val TargetScope.info by added<MobzyType>()
+    private val TargetScope.key by added<PrefabKey>()
 
     init {
         target.has<Prefab>()
-        allAdded()
     }
 
     @Handler
@@ -141,6 +140,6 @@ object MobzyNMSTypeInjector : GearyListener() {
 //TODO try to reduce usage around code, should really only be done in one central place
 internal fun String.toEntityTypeName() = lowercase().replace(" ", "_")
 
-fun NMSEntityType<*>.toPrefab(): GearyEntity? {
-    return PrefabManager[MobzyNMSTypeInjector.getPrefabForType(this) ?: return null]
+fun NMSEntityType<*>.toPrefab(): GearyEntity? = GearyMCKoinComponent {
+    return prefabManager[MobzyNMSTypeInjector.getPrefabForType(this@toPrefab) ?: return null]
 }

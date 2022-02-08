@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components
 
-import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.creatureType
@@ -18,6 +18,7 @@ enum class MobCategory {
     WATER_AMBIENT,
     FLYING,
     MISC,
+    UNDERGROUND_WATER_CREATURE
 }
 
 fun NMSCreatureType.toMobCategory(): MobCategory =

@@ -20,7 +20,7 @@ dependencies {
     compileOnly(Deps.kotlinx.coroutines)
     compileOnly(Deps.minecraft.skedule)
 
-    compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")
+    compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
     compileOnly("com.ticxo.modelengine:api:R2.3.1")
     compileOnly("com.mineinabyss:protocolburrito:0.2.25")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")

@@ -2,10 +2,10 @@ package com.mineinabyss.mobzy.systems.systems
 
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.api.autoscan.Handler
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.minecraft.store.decodeComponentsFrom
+import com.mineinabyss.geary.papermc.store.decodeComponentsFrom
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
@@ -19,12 +19,8 @@ import com.mineinabyss.mobzy.ecs.components.CopyNBT
  */
 @AutoScan
 class CopyNBTSystem : GearyListener() {
-    private val TargetScope.nbt by get<CopyNBT>()
-    private val TargetScope.bukkitEntity by get<BukkitEntity>()
-
-    init {
-        allAdded()
-    }
+    private val TargetScope.nbt by added<CopyNBT>()
+    private val TargetScope.bukkitEntity by added<BukkitEntity>()
 
     @Handler
     fun TargetScope.copyNBT() {

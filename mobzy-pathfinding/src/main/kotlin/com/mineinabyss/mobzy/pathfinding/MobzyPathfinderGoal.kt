@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.pathfinding
 
-import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSPathfinderGoal
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.distanceSqrTo
