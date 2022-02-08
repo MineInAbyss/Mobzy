@@ -8,10 +8,12 @@ import com.mineinabyss.mobzy.injection.geary
 import com.mineinabyss.mobzy.injection.makeSound
 import net.minecraft.network.chat.IChatBaseComponent
 import net.minecraft.world.entity.EntityTypes
+import net.minecraft.world.entity.EnumMoveType
 import net.minecraft.world.entity.ai.control.SmoothSwimmingLookControl
 import net.minecraft.world.entity.ai.control.SmoothSwimmingMoveControl
 import net.minecraft.world.entity.animal.EntityFishSchool
 import net.minecraft.world.level.pathfinder.PathType
+import net.minecraft.world.phys.Vec3D
 
 //@GenerateFromBase(base = MobBase::class, createFor = [EntityFishSchool::class])
 class FishMob(
@@ -31,6 +33,19 @@ class FishMob(
         a(PathType.i, 0.0F)
         bM = SmoothSwimmingMoveControl(this, 85, 10, 1.0f, 0.5f, false)
         bL = SmoothSwimmingLookControl(this, 20)
+    }
+
+    override fun g(movementInput: Vec3D) {
+        if (doAITick() && this.isInWater) {
+            this.a(0.1f, movementInput)
+            move(EnumMoveType.a, this.mot)
+            this.mot = this.mot.a(0.9)
+            if (this.goalTarget == null) {
+                this.mot = this.mot.add(0.0, -0.005, 0.0)
+            }
+        } else {
+            super.g(movementInput)
+        }
     }
 
     override fun getScoreboardDisplayName(): IChatBaseComponent = NMSChatMessage(entityType.typeName

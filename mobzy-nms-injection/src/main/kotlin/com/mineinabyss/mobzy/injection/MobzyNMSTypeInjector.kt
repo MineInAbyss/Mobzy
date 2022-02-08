@@ -129,6 +129,7 @@ object MobzyNMSTypeInjector : GearyListener() {
         "mobzy:hostile" to ::HostileMob,
         "mobzy:passive" to ::PassiveMob,
         "mobzy:fish" to ::FishMob,
+        "mobzy:hostileWater" to ::HostileWaterMob,
         "mobzy:npc" to ::NPC,
     )
 
