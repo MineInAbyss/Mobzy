@@ -16,5 +16,5 @@ dependencies {
     compileOnly(Deps.kotlinx.serialization.json)
 
     compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
-    compileOnly("com.ticxo.modelengine:api:R2.3.1")
+    compileOnly("com.ticxo.modelengine:api:R2.4.0")
 }
