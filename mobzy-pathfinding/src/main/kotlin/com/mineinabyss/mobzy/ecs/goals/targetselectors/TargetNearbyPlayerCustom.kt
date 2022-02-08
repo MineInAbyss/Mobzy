@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
-import com.mineinabyss.geary.minecraft.access.toGeary
-import com.mineinabyss.idofront.messaging.logInfo
+import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
@@ -10,7 +9,6 @@ import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.minecraft.world.entity.EntityLiving
-import org.bukkit.Statistic
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
