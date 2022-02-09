@@ -4,8 +4,8 @@ import com.comphenix.protocol.PacketType.Play.Server
 import com.comphenix.protocol.wrappers.Vector3F
 import com.comphenix.protocol.wrappers.WrappedDataWatcher
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject
-import com.mineinabyss.geary.minecraft.access.toGeary
-import com.mineinabyss.geary.minecraft.access.toGearyOrNull
+import com.mineinabyss.geary.papermc.access.toGeary
+import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
@@ -14,6 +14,7 @@ import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacket
 import com.mineinabyss.protocolburrito.packets.ClientboundMoveEntityPacket
 import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacket
 import org.bukkit.Bukkit
+import org.bukkit.entity.Entity
 import kotlin.experimental.or
 
 
@@ -35,7 +36,7 @@ object MobzyPacketInterception {
             }
 
             onSend(::ClientboundSetEntityDataPacket, Server.ENTITY_METADATA) {
-                val entity = getEntityFromID(it.player.world, id)
+                val entity: Entity = getEntityFromID(it.player.world, id) ?: return@onSend
                 if (!entity.toGeary().has<Model>()) return@onSend
 
                 val existingMeta = WrappedDataWatcher(handle.watchableCollectionModifier.values[0])

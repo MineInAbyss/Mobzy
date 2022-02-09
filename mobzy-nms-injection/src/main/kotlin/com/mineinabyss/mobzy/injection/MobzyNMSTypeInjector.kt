@@ -1,16 +1,17 @@
 package com.mineinabyss.mobzy.injection
 
-import com.mineinabyss.geary.ecs.accessors.EventResultScope
-import com.mineinabyss.geary.ecs.accessors.ResultScope
-import com.mineinabyss.geary.ecs.api.autoscan.AutoScan
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.accessors.building.get
+import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.relations.Processed
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.components.*
-import com.mineinabyss.geary.ecs.events.handlers.ComponentAddHandler
-import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.ecs.prefab.PrefabManager
 import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.geary.papermc.GearyMCKoinComponent
+import com.mineinabyss.geary.prefabs.PrefabKey
+import com.mineinabyss.geary.prefabs.configuration.components.Prefab
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
@@ -32,7 +33,7 @@ object MobzyTypesQuery : Query() {
         has<Prefab>()
     }
 
-    val ResultScope.key by get<PrefabKey>()
+    val TargetScope.key by get<PrefabKey>()
 }
 
 /**
@@ -42,22 +43,21 @@ object MobzyTypesQuery : Query() {
 @Suppress("ObjectPropertyName")
 @AutoScan
 object MobzyNMSTypeInjector : GearyListener() {
-    private val ResultScope.info by get<MobzyType>()
-    private val ResultScope.key by get<PrefabKey>()
+    private val TargetScope.info by added<MobzyType>()
+    private val TargetScope.key by added<PrefabKey>()
 
     init {
-        has<Prefab>()
+        target.has<Prefab>()
     }
 
-    private object AddNMSType : ComponentAddHandler() {
-        override fun ResultScope.handle(event: EventResultScope) {
-            val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
-            entity.set(nmsEntityType)
-            entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
-            entity.setRelation<Processed, MobzyType>(Processed)
+    @Handler
+    fun TargetScope.addNMSType() {
+        val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
+        entity.set(nmsEntityType)
+        entity.set(info.mobCategory ?: info.creatureType.toMobCategory())
+        entity.setRelation(MobzyType::class, Processed)
 
-            typeToPrefabMap[nmsEntityType.keyName] = key
-        }
+        typeToPrefabMap[nmsEntityType.keyName] = key
     }
 
     val typeNames get() = _types.keys.toList()
@@ -140,6 +140,6 @@ object MobzyNMSTypeInjector : GearyListener() {
 //TODO try to reduce usage around code, should really only be done in one central place
 internal fun String.toEntityTypeName() = lowercase().replace(" ", "_")
 
-fun NMSEntityType<*>.toPrefab(): GearyEntity? {
-    return PrefabManager[MobzyNMSTypeInjector.getPrefabForType(this) ?: return null]
+fun NMSEntityType<*>.toPrefab(): GearyEntity? = GearyMCKoinComponent {
+    return prefabManager[MobzyNMSTypeInjector.getPrefabForType(this@toPrefab) ?: return null]
 }

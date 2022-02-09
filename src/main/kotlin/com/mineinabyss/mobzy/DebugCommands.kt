@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.prefab.PrefabKey
+import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.stringArg

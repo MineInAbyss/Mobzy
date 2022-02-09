@@ -5,7 +5,6 @@ val serverVersion: String by project
 val idofrontVersion: String by project
 val gearyVersion: String by project
 
-
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
@@ -17,13 +16,13 @@ plugins {
 
 allprojects {
     apply(plugin = "java")
+    apply(plugin = "org.jetbrains.dokka")
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf(
                 "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
             )
-            jvmTarget = "16"
         }
     }
 
@@ -50,8 +49,7 @@ dependencies {
     compileOnly(Deps.minecraft.skedule)
 
     // Other plugins
-    compileOnly("com.mineinabyss:geary-platform-papermc:$gearyVersion")
-    compileOnly("com.mineinabyss:looty:0.3.19")
+    compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
 
     // Shaded
     implementation(project(":mobzy-pathfinding"))
@@ -63,7 +61,7 @@ dependencies {
 
     // Testing
     testImplementation(Deps.`kotlin-statistics`)
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.10.1")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.13.0")
     testImplementation(Deps.kotlinx.serialization.json)
     testImplementation(Deps.kotlinx.serialization.kaml)
 }

@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.injection
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.minecraft.access.toBukkit
-import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.papermc.access.toBukkit
+import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSSound
 import com.mineinabyss.idofront.nms.aliases.toBukkit

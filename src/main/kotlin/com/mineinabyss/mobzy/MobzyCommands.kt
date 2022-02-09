@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.prefab.PrefabKey
-import com.mineinabyss.geary.minecraft.access.toGeary
-import com.mineinabyss.geary.minecraft.spawnGeary
+import com.mineinabyss.geary.papermc.access.toGeary
+import com.mineinabyss.geary.papermc.spawnFromPrefab
+import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -93,7 +93,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         if (categories.size > 1)
                             sender.info(
                                 categories.entries
-                                    .sortedByDescending { it.value.get() }
+                                    .sortedByDescending { it.value }
                                     .joinToString("\n") { (type, amount) -> "&7${type.typeName}&r: $amount".color() }
                             )
                     }
@@ -122,7 +122,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     val key = PrefabKey.of(mobKey)
 
                     repeat(cappedSpawns) {
-                        player.location.spawnGeary(key) ?: error("Prefab $mobKey not found")
+                        player.location.spawnFromPrefab(key) ?: error("Prefab $mobKey not found")
                     }
                 }
             }

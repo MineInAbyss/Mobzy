@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.systems.listeners
 
 import com.mineinabyss.geary.ecs.api.entities.with
-import com.mineinabyss.geary.minecraft.access.toBukkit
-import com.mineinabyss.geary.minecraft.access.toGeary
-import com.mineinabyss.geary.minecraft.access.toGearyOrNull
-import com.mineinabyss.geary.minecraft.events.GearyMinecraftSpawnEvent
+import com.mineinabyss.geary.papermc.access.toBukkit
+import com.mineinabyss.geary.papermc.access.toGeary
+import com.mineinabyss.geary.papermc.access.toGearyOrNull
+import com.mineinabyss.geary.papermc.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
@@ -142,7 +142,7 @@ object MobListener : Listener {
                 player.eyeLocation,
                 player.location.direction,
                 3.0,
-                FluidCollisionMode.ALWAYS,
+                FluidCollisionMode.NEVER,
                 true,
                 0.0
             ) { entity -> entity != player }

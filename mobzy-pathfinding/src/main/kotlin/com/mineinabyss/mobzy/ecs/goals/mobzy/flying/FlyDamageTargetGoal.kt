@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 
-import com.mineinabyss.geary.minecraft.access.toGeary
+import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.entity.canReach
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
