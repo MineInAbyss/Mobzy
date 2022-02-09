@@ -42,10 +42,10 @@ object ModelEngineSystem : Listener, AnimationController {
         modelEntity.apply {
             detectPlayers()
             bukkit.customName?.let {
-                setNametag(it)
+                modelEntity.nametagHandler.setCustomName("head", it)
             }
 
-            setNametagVisible(model.nametag)
+            modelEntity.nametagHandler.setCustomNameVisibility("head", model.nametag)
             isInvisible = model.invisible
         }
     }

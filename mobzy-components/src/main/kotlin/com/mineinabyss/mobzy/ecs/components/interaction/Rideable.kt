@@ -8,4 +8,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("mobzy:rideable")
-class Rideable
+class Rideable(
+    val steerable: Boolean = true,
+    val canTakePassenger: Boolean = false,
+    val canBeLead: Boolean = false
+)
