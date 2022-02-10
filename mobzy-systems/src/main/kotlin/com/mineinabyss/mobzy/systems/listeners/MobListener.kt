@@ -9,7 +9,6 @@ import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.idofront.messaging.broadcast
 import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
@@ -17,12 +16,14 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
@@ -38,6 +39,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.entity.PlayerLeashEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
@@ -192,13 +194,25 @@ object MobListener : Listener {
         }
     }
 
+    //TODO Find a way to render the lead that isnt scuffed
+    /** Handling leashing of entities with [ModelEngineComponent] */
+    @EventHandler
+    fun PlayerLeashEntityEvent.onLeashingMob() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val leashable = gearyEntity.get<ModelEngineComponent>()?.leashable ?: return
+
+        if (!entity.isModelEngineEntity) return
+        if (!leashable) isCancelled = true
+    }
+
     /** Tame entities with [Tamable] component on right click */
     @EventHandler
     fun PlayerInteractEntityEvent.tameMob() {
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
-        val tamable = gearyEntity.get<Tamable>() ?: return
         val itemInHand = player.inventory.itemInMainHand
+
+        val tamable = gearyEntity.get<Tamable>() ?: return
 
         if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
             tamable.isTamed = true
@@ -212,11 +226,6 @@ object MobListener : Listener {
             modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
             modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
             modelEntity.nametagHandler.getCustomName("nametag").broadcastVal("nametag: ")
-        }
-
-        if (tamable.canBeLead && itemInHand.type == Material.LEAD) {
-            // TODO Somehow attach a lead to the entity
-            broadcast("lead")
         }
     }
 

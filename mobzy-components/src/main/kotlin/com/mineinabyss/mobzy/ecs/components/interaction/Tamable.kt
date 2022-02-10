@@ -13,5 +13,4 @@ class Tamable(
     val tameItem: SerializableItemStack? = null,
     var isTamed: Boolean = false,
     var owner: @Serializable(with = UUIDSerializer::class) UUID? = null,
-    val canBeLead: Boolean = true,
 )
