@@ -16,6 +16,7 @@ import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.injection.extendsCustomClass
@@ -76,7 +77,9 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             if (radius <= 0 || entity.world == playerLoc.world && entity.location.distance(playerLoc) < radius) {
                                 entityCount++
                                 if (isInfo) entities += entity
+                                else if (geary.get<Tamable>()?.owner != null) return
                                 else entity.remove()
+
                             }
                         }
                     }

@@ -9,6 +9,8 @@ import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.idofront.messaging.broadcast
+import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
@@ -17,14 +19,15 @@ import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
+import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.okkero.skedule.schedule
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
+import org.bukkit.Particle
 import org.bukkit.Statistic
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Ageable
@@ -39,7 +42,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
-import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -177,22 +179,45 @@ object MobListener : Listener {
         val modelEntity = rightClicked.toModelEntity() ?: return
         val rideable = gearyEntity.get<Rideable>() ?: return
         val mount = modelEntity.mountHandler
-        mount.setSteerable(rideable.steerable)
+        val itemInHand = player.inventory.itemInMainHand
+
+        if (itemInHand.type != Material.AIR) return
+
+        mount.setSteerable(rideable.isSteerable)
         mount.setCanCarryPassenger(rideable.canTakePassenger)
 
         if (!mount.hasDriver()) mount.driver = player
-        if (rideable.canTakePassenger && mount.hasDriver() && !mount.hasPassengers()) {
+        if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
             mount.addPassenger("passenger${mount.passengers.size + 1}", player) // Adds passenger to the next seat
         }
     }
 
+    /** Tame entities with [Tamable] component on right click */
     @EventHandler
-    fun VehicleExitEvent.onLeavingRidable() {
-        val modelEngineEntity = vehicle.toModelEntity()
-        val mountHandler = modelEngineEntity?.mountHandler ?: return
+    fun PlayerInteractEntityEvent.tameMob() {
+        val gearyEntity = rightClicked.toGearyOrNull() ?: return
+        val modelEntity = rightClicked.toModelEntity() ?: return
+        val tamable = gearyEntity.get<Tamable>() ?: return
+        val itemInHand = player.inventory.itemInMainHand
 
-        if (!vehicle.isModelEngineEntity) return
-        if (mountHandler.hasDriver() && exited == mountHandler.driver) mountHandler.dismountAll()
+        if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
+            tamable.isTamed = true
+            tamable.owner = player.uniqueId
+            itemInHand.subtract(1)
+            player.spawnParticle(Particle.HEART, rightClicked.location.toCenterLocation(), 10)
+        }
+
+        // Doesnt work
+        if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.NAME_TAG) {
+            modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
+            modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
+            modelEntity.nametagHandler.getCustomName("nametag").broadcastVal("nametag: ")
+        }
+
+        if (tamable.canBeLead && itemInHand.type == Material.LEAD) {
+            // TODO Somehow attach a lead to the entity
+            broadcast("lead")
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
