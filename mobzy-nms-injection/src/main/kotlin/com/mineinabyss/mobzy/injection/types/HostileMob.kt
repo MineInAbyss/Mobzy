@@ -1,10 +1,12 @@
 package com.mineinabyss.mobzy.injection.types
 
+import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.goals.minecraft.*
-import com.mineinabyss.mobzy.ecs.goals.targetselectors.minecraft.TargetNearbyPlayer
+import com.mineinabyss.mobzy.ecs.goals.targetselectors.TargetAttacker
+import com.mineinabyss.mobzy.ecs.goals.targetselectors.TargetNearbyPlayerCustom
 import com.mineinabyss.mobzy.injection.CustomEntity
 import com.mineinabyss.mobzy.injection.geary
 import com.mineinabyss.mobzy.injection.makeSound
@@ -25,7 +27,8 @@ open class HostileMob(
         addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8.0f))
         addPathfinderGoal(8, RandomLookAroundBehavior())
 
-        addTargetSelector(2, TargetNearbyPlayer())
+        addTargetSelector(2, TargetAttacker())
+        addTargetSelector(6, TargetNearbyPlayerCustom())
     }
 
     override fun getScoreboardDisplayName(): IChatBaseComponent = NMSChatMessage(entityType.typeName
