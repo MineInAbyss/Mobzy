@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
-import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
@@ -66,38 +65,17 @@ class TargetNearbyPlayerCustomGoal(
      * @return none, but uses return to exit early if no target is found
      */
     private fun assignTargetPlayer() {
-        val possibleTargets = nmsEntity.toBukkit().getNearbyEntities(range, range, range)
 
-        if (possibleTargets.isEmpty()) {
+        val targetPlayer = nmsEntity.toBukkit().getNearbyEntities(range, range, range).firstOrNull { it is Player }
+                ?: return
+
+        if (!isPlayerValidTarget(targetPlayer as Player, range, 200)) {
             reset()
             return
         }
-
-        var chosenTargetIndex = -1
-
-        for (i in possibleTargets.indices) {
-
-            val targetEntity = possibleTargets[i]
-
-            if (targetEntity is Player) {
-
-                if (!isPlayerValidTarget(targetEntity, range, 200)) { continue }
-
-                if (chosenTargetIndex == -1 ||  mob.distanceSqrTo(targetEntity) < mob.distanceSqrTo(possibleTargets[chosenTargetIndex])) {
-                    chosenTargetIndex = i
-                }
-            }
-        }
-
-        if (chosenTargetIndex == -1) {
-            reset()
-            return
-        }
-
-        val chosenTarget = possibleTargets[chosenTargetIndex]
 
         nmsEntity.setGoalTarget(
-                (chosenTarget as CraftPlayer).handle as EntityLiving,
+                (targetPlayer as CraftPlayer).handle as EntityLiving,
                 EntityTargetEvent.TargetReason.CLOSEST_PLAYER,
                 true
         )
