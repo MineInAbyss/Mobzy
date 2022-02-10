@@ -20,10 +20,7 @@ import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
-import com.mineinabyss.mobzy.injection.types.FlyingMob
-import com.mineinabyss.mobzy.injection.types.HostileMob
-import com.mineinabyss.mobzy.injection.types.NPC
-import com.mineinabyss.mobzy.injection.types.PassiveMob
+import com.mineinabyss.mobzy.injection.types.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
@@ -65,6 +62,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                                 "passive" -> nmsEntity !is NPC && nmsEntity is PassiveMob
                                 "hostile" -> nmsEntity is HostileMob
                                 "flying" -> nmsEntity is FlyingMob
+                                "fish" -> nmsEntity is FishMob
+                                "hostileWater" -> nmsEntity is HostileWaterMob
                                 else -> {
                                     val prefab = runCatching { PrefabKey.of(entityType).toEntity() }.getOrNull()
                                         ?: this@commandGroup.stopCommand("No such prefab or selector $entityType")
