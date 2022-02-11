@@ -7,8 +7,10 @@ import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.geary.papermc.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
+import com.mineinabyss.idofront.entities.toPlayer
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.idofront.messaging.broadcast
 import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
@@ -26,10 +28,7 @@ import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.okkero.skedule.schedule
-import org.bukkit.FluidCollisionMode
-import org.bukkit.Material
-import org.bukkit.Particle
-import org.bukkit.Statistic
+import org.bukkit.*
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Ageable
 import org.bukkit.entity.LivingEntity
@@ -129,7 +128,8 @@ object MobListener : Listener {
     fun ChunkUnloadEvent.removeCustomOnChunkUnload() {
         for (entity in chunk.entities) {
             val removeOnUnload = entity.toGeary().get<RemoveOnChunkUnload>() ?: continue
-            if (!(removeOnUnload.keepIfRenamed && entity.isCustomAndRenamed))
+            val tamed = entity.toGeary().get<Tamable>()?.isTamed ?: continue
+            if (!(removeOnUnload.keepIfRenamed && entity.isCustomAndRenamed) || !tamed)
                 entity.remove()
         }
     }
@@ -139,8 +139,6 @@ object MobListener : Listener {
     //TODO ignore hits on the spoofed entity
     @EventHandler(priority = EventPriority.LOWEST)
     fun PlayerInteractEvent.rayTracedHitBoxInteractions() {
-        val player = player
-
         if ((leftClicked && hand == EquipmentSlot.HAND || rightClicked)) {
             //shoot ray to simulate a left/right click, accounting for server-side custom mob hitboxes
             val trace = player.world.rayTrace(
@@ -179,18 +177,20 @@ object MobListener : Listener {
     fun PlayerInteractEntityEvent.rideOnRightClick() {
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
-        val rideable = gearyEntity.get<Rideable>() ?: return
-        val mount = modelEntity.mountHandler
-        val itemInHand = player.inventory.itemInMainHand
 
-        if (itemInHand.type != Material.AIR) return
+        gearyEntity.with { rideable: Rideable ->
+            val mount = modelEntity.mountHandler
+            val itemInHand = player.inventory.itemInMainHand
 
-        mount.setSteerable(rideable.isSteerable)
-        mount.setCanCarryPassenger(rideable.canTakePassenger)
+            if (itemInHand.type != Material.AIR) return
 
-        if (!mount.hasDriver()) mount.driver = player
-        if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
-            mount.addPassenger("passenger${mount.passengers.size + 1}", player) // Adds passenger to the next seat
+            mount.setSteerable(rideable.isSteerable)
+            mount.setCanCarryPassenger(rideable.canTakePassenger)
+
+            if (!mount.hasDriver()) mount.driver = player
+            if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
+                mount.addPassenger("passenger${mount.passengers.size + 1}", player) // Adds passenger to the next seat
+            }
         }
     }
 
@@ -201,39 +201,78 @@ object MobListener : Listener {
         val gearyEntity = entity.toGearyOrNull() ?: return
         val leashable = gearyEntity.get<ModelEngineComponent>()?.leashable ?: return
 
-        if (!entity.isModelEngineEntity) return
         if (!leashable) isCancelled = true
     }
 
     /** Tame entities with [Tamable] component on right click */
     @EventHandler
     fun PlayerInteractEntityEvent.tameMob() {
+        val mob = (rightClicked as LivingEntity)
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
         val itemInHand = player.inventory.itemInMainHand
 
-        val tamable = gearyEntity.get<Tamable>() ?: return
+        gearyEntity.with { tamable: Tamable ->
+            broadcast(tamable.owner?.toPlayer()?.name)
+            tamable.isTamed.broadcastVal("isTamed: ")
+            if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
+                tamable.isTamed = true
+                tamable.owner = player.uniqueId
+                itemInHand.subtract(1)
+                player.spawnParticle(Particle.HEART, rightClicked.location.apply { y += 2 }, 10)
 
-        if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
-            tamable.isTamed = true
-            tamable.owner = player.uniqueId
-            itemInHand.subtract(1)
-            player.spawnParticle(Particle.HEART, rightClicked.location.toCenterLocation(), 10)
+                return
+            }
+
+            //TODO Heal mob if fed tameItem
+            if (tamable.isTamed && (mob.health != mob.maxHealth) && itemInHand == tamable.tameItem?.toItemStack()) {
+                mob.health += 2
+                player.playSound(mob.location, Sound.ENTITY_HORSE_EAT, 1f, 1f)
+                player.spawnParticle(Particle.HEART, rightClicked.location.apply { y += 2 }, 4)
+
+                return
+            }
+
+            // TODO Make this work
+            if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.NAME_TAG) {
+                rightClicked.customName = itemInHand.itemMeta.displayName
+                modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
+                modelEntity.nametagHandler.setCustomName("nametag", rightClicked.customName)
+                modelEntity.nametagHandler.getCustomName("nametag").broadcastVal("nametag: ")
+
+                return
+            }
+
+            // TODO Make a saddle bone appear if someone "uses" a saddle on their mob
+            if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.SADDLE) {
+                broadcast("saddle")
+            }
+        }
+    }
+
+    // TODO Find a way to update the Mount Health Bar with the modelentity/vehicle's
+    @EventHandler
+    fun EntityDamageEvent.onMountDamaged() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val modelEntity = entity.toModelEntity()
+        val mountHandler = modelEntity?.mountHandler
+        val driver = mountHandler?.driver
+        val vehicle = driver?.vehicle as LivingEntity
+
+        if (entity.isModelEngineEntity) {
+            driver.isInsideVehicle.broadcastVal()
+            vehicle.health.broadcastVal()
+            (entity as LivingEntity).health.broadcastVal()
+            vehicle.health = (entity as LivingEntity).health
         }
 
-        // Doesnt work
-        if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.NAME_TAG) {
-            modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
-            modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
-            modelEntity.nametagHandler.getCustomName("nametag").broadcastVal("nametag: ")
-        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        val mounthandler = entity.toModelEntity()?.mountHandler ?: return
-        if (mounthandler.hasDriver() || mounthandler.hasPassengers()) mounthandler.dismountAll()
+        val mountHandler = entity.toModelEntity()?.mountHandler ?: return
+        if (mountHandler.hasDriver() || mountHandler.hasPassengers()) mountHandler.dismountAll()
 
         gearyEntity.with { deathLoot: DeathLoot ->
             drops.clear()
