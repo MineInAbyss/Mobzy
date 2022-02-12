@@ -198,10 +198,16 @@ object MobListener : Listener {
     /** Handling leashing of entities with [ModelEngineComponent] */
     @EventHandler
     fun PlayerLeashEntityEvent.onLeashingMob() {
+        isCancelled = true
         val gearyEntity = entity.toGearyOrNull() ?: return
         val leashable = gearyEntity.get<ModelEngineComponent>()?.leashable ?: return
+        val leashEntity = (entity as LivingEntity)
 
-        if (!leashable) isCancelled = true
+        if (leashable) {
+            // Bind leash to the entity itself and not whatever ModelEngine does
+            leashEntity.setLeashHolder(player)
+        }
+
     }
 
     /** Tame entities with [Tamable] component on right click */
