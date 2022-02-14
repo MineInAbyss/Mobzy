@@ -7,7 +7,6 @@ import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.geary.papermc.events.GearyMinecraftSpawnEvent
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
-import com.mineinabyss.idofront.entities.toPlayer
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.messaging.broadcast
@@ -18,7 +17,6 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
-import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
@@ -38,7 +36,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
-import org.bukkit.event.entity.PlayerLeashEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
@@ -194,22 +191,6 @@ object MobListener : Listener {
         }
     }
 
-    //TODO Find a way to render the lead that isnt scuffed
-    /** Handling leashing of entities with [ModelEngineComponent] */
-    @EventHandler
-    fun PlayerLeashEntityEvent.onLeashingMob() {
-        isCancelled = true
-        val gearyEntity = entity.toGearyOrNull() ?: return
-        val leashable = gearyEntity.get<ModelEngineComponent>()?.leashable ?: return
-        val leashEntity = (entity as LivingEntity)
-
-        if (leashable) {
-            // Bind leash to the entity itself and not whatever ModelEngine does
-            leashEntity.setLeashHolder(player)
-        }
-
-    }
-
     /** Tame entities with [Tamable] component on right click */
     @EventHandler
     fun PlayerInteractEntityEvent.tameMob() {
@@ -219,8 +200,6 @@ object MobListener : Listener {
         val itemInHand = player.inventory.itemInMainHand
 
         gearyEntity.with { tamable: Tamable ->
-            broadcast(tamable.owner?.toPlayer()?.name)
-            tamable.isTamed.broadcastVal("isTamed: ")
             if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
                 tamable.isTamed = true
                 tamable.owner = player.uniqueId

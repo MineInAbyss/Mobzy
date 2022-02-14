@@ -9,6 +9,8 @@ import com.ticxo.modelengine.api.manager.ModelManager
 import com.ticxo.modelengine.api.model.ModeledEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 
 object ModelEngineSystem : Listener, AnimationController {
@@ -46,7 +48,12 @@ object ModelEngineSystem : Listener, AnimationController {
             }
 
             modelEntity.nametagHandler.setCustomNameVisibility("nametag", model.nametag)
-            isInvisible = model.invisible
+            // To render the leash we need the base entity
+            // To not have a big walking around make it invisible via potion effect instead
+            if (model.leashable) {
+                isInvisible = false
+                entity.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
+            } else isInvisible = model.invisible
         }
     }
 }
