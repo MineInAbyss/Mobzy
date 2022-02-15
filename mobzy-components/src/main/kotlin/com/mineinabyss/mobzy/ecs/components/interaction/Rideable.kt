@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.ecs.components.interaction
 
+import com.mineinabyss.idofront.serialization.SerializableItemStack
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -10,6 +11,8 @@ import kotlinx.serialization.Serializable
 @SerialName("mobzy:rideable")
 class Rideable(
     val isSteerable: Boolean = false,
+    val requiresItemToSteer: Boolean = false,
+    val steerItem: SerializableItemStack? = null,
     val canTakePassenger: Boolean = false,
     val maxPassengerCount: Int = 0,
 )

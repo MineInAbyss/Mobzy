@@ -17,6 +17,7 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
@@ -31,15 +32,19 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Ageable
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.entity.PlayerLeashEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
+import org.bukkit.event.player.PlayerUnleashEntityEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
+import org.bukkit.event.vehicle.VehicleMoveEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -161,6 +166,43 @@ object MobListener : Listener {
         }
     }
 
+    /** Handle leashing of entities with [ModelEngineComponent.leashable] */
+    @EventHandler
+    fun PlayerLeashEntityEvent.onLeashMob() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val modelEntity = entity.toModelEntity() ?: return
+
+        gearyEntity.with { componentEntity: ModelEngineComponent ->
+            if (!componentEntity.leashable) return
+
+            modelEntity.isInvisible = false
+            modelEntity.entity.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.INVISIBILITY,
+                    Int.MAX_VALUE,
+                    1,
+                    false,
+                    false
+                )
+            )
+        }
+    }
+
+    /** Handle unleashing of entities with [ModelEngineComponent.leashable] */
+    @EventHandler
+    fun PlayerUnleashEntityEvent.onUnleashMob() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val modelEntity = entity.toModelEntity() ?: return
+
+        // Remove BaseEntity-packet again for hitbox reasons and remove invis effect
+        gearyEntity.with { componentEntity: ModelEngineComponent ->
+            if (!componentEntity.leashable) return
+
+            modelEntity.isInvisible = true
+            modelEntity.entity.removePotionEffect(PotionEffectType.INVISIBILITY)
+        }
+    }
+
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
     @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {
@@ -181,12 +223,33 @@ object MobListener : Listener {
 
             if (itemInHand.type != Material.AIR) return
 
-            mount.setSteerable(rideable.isSteerable)
+            mount.setSteerable(true)
             mount.setCanCarryPassenger(rideable.canTakePassenger)
 
-            if (!mount.hasDriver()) mount.driver = player
+            if (rideable.isSteerable && !mount.hasDriver()) mount.driver = player
+            else mount.addPassenger("mount", player)
+
             if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
                 mount.addPassenger("passenger${mount.passengers.size + 1}", player) // Adds passenger to the next seat
+            }
+        }
+    }
+
+    @EventHandler
+    fun VehicleMoveEvent.onMountControl() {
+        broadcast("test")
+        val gearyEntity = vehicle.toGearyOrNull() ?: return
+        val modelEntity = vehicle.toModelEntity() ?: return
+
+        gearyEntity.with { rideable: Rideable ->
+            val mount = modelEntity.mountHandler
+            val player = mount.driver as Player
+            val itemInHand = player.inventory.itemInMainHand
+
+            if (!mount.hasDriver()) return
+
+            if (rideable.requiresItemToSteer && itemInHand == rideable.steerItem?.toItemStack()) {
+                vehicle.setRotation(player.location.yaw, player.location.pitch)
             }
         }
     }
