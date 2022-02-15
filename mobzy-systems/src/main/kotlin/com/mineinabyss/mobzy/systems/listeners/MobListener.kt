@@ -24,9 +24,10 @@ import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.modelManager
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.okkero.skedule.schedule
+import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.*
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Ageable
@@ -44,7 +45,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
 import org.bukkit.event.player.PlayerUnleashEntityEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
-import org.bukkit.event.vehicle.VehicleMoveEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -166,6 +166,7 @@ object MobListener : Listener {
         }
     }
 
+    // TODO Make pig appearing and dissapearing less visible
     /** Handle leashing of entities with [ModelEngineComponent.leashable] */
     @EventHandler
     fun PlayerLeashEntityEvent.onLeashMob() {
@@ -176,6 +177,7 @@ object MobListener : Listener {
             if (!componentEntity.leashable) return
 
             modelEntity.isInvisible = false
+            //mobzy.schedule { waitFor(10) }
             modelEntity.entity.addPotionEffect(
                 PotionEffect(
                     PotionEffectType.INVISIBILITY,
@@ -226,30 +228,27 @@ object MobListener : Listener {
             mount.setSteerable(true)
             mount.setCanCarryPassenger(rideable.canTakePassenger)
 
-            if (rideable.isSteerable && !mount.hasDriver()) mount.driver = player
-            else mount.addPassenger("mount", player)
+            if (!mount.hasDriver()) mount.driver = player
+            else mount.addPassenger("p_${mount.passengers.size + 1}", player)
 
             if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
-                mount.addPassenger("passenger${mount.passengers.size + 1}", player) // Adds passenger to the next seat
+                mount.addPassenger("p_${mount.passengers.size + 1}", player) // Adds passenger to the next seat
             }
         }
     }
 
+    /** Controlling of entities with [Rideable.requiresItemToSteer] */
     @EventHandler
-    fun VehicleMoveEvent.onMountControl() {
-        broadcast("test")
-        val gearyEntity = vehicle.toGearyOrNull() ?: return
-        val modelEntity = vehicle.toModelEntity() ?: return
+    fun EntityMoveEvent.onMountControl() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val mount = entity.toModelEntity()?.mountHandler ?: return
+        val player = (mount.driver ?: return) as Player
+        val itemInHand = player.inventory.itemInMainHand
 
+        //TODO Make mob move on its own if not holding correct item
         gearyEntity.with { rideable: Rideable ->
-            val mount = modelEntity.mountHandler
-            val player = mount.driver as Player
-            val itemInHand = player.inventory.itemInMainHand
-
-            if (!mount.hasDriver()) return
-
-            if (rideable.requiresItemToSteer && itemInHand == rideable.steerItem?.toItemStack()) {
-                vehicle.setRotation(player.location.yaw, player.location.pitch)
+            if (rideable.requiresItemToSteer && itemInHand != rideable.steerItem?.toItemStack()) {
+                isCancelled = true
             }
         }
     }
@@ -274,7 +273,7 @@ object MobListener : Listener {
 
             //TODO Heal mob if fed tameItem
             if (tamable.isTamed && (mob.health != mob.maxHealth) && itemInHand == tamable.tameItem?.toItemStack()) {
-                mob.health += 2
+                if (mob.health + 2 <= mob.maxHealth) mob.health += 2 else mob.health = mob.maxHealth
                 player.playSound(mob.location, Sound.ENTITY_HORSE_EAT, 1f, 1f)
                 player.spawnParticle(Particle.HEART, rightClicked.location.apply { y += 2 }, 4)
 
@@ -283,17 +282,25 @@ object MobListener : Listener {
 
             // TODO Make this work
             if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.NAME_TAG) {
-                rightClicked.customName = itemInHand.itemMeta.displayName
-                modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
-                modelEntity.nametagHandler.setCustomName("nametag", rightClicked.customName)
-                modelEntity.nametagHandler.getCustomName("nametag").broadcastVal("nametag: ")
+                broadcast("test")
+                modelEntity.nametagHandler.setCustomName("tag_nametag", "test")
+                modelEntity.nametagHandler.updateTags()
+                modelEntity.nametagHandler.getCustomName("tag_nametag").broadcastVal()
 
                 return
             }
 
-            // TODO Make a saddle bone appear if someone "uses" a saddle on their mob
+            // TODO Make this more seamless
+            // TODO Consider using Guiy to make a fake inventory for armor/saddle/storage
             if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.SADDLE) {
-                broadcast("saddle")
+                val model = gearyEntity.get<ModelEngineComponent>() ?: return
+                val saddleModel = modelManager?.createActiveModel(tamable.saddleModelId)?.apply {
+                    setDamageTint(model.damageTint)
+                }
+                modelEntity.addActiveModel(saddleModel)
+                modelEntity.removeModel(model.modelId)
+
+                modelEntity.apply { detectPlayers() }
             }
         }
     }
@@ -302,18 +309,16 @@ object MobListener : Listener {
     @EventHandler
     fun EntityDamageEvent.onMountDamaged() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        val modelEntity = entity.toModelEntity()
-        val mountHandler = modelEntity?.mountHandler
-        val driver = mountHandler?.driver
-        val vehicle = driver?.vehicle as LivingEntity
+        val modelEntity = entity.toModelEntity() ?: return
+        val mountHandler = modelEntity.mountHandler
+        val mounted = modelEntity.entity
+        val driver = mountHandler?.driver ?: return
+        val vehicle = (driver.vehicle as LivingEntity)
 
-        if (entity.isModelEngineEntity) {
-            driver.isInsideVehicle.broadcastVal()
-            vehicle.health.broadcastVal()
-            (entity as LivingEntity).health.broadcastVal()
-            vehicle.health = (entity as LivingEntity).health
+        gearyEntity.with { rideable: Rideable ->
+            vehicle.maxHealth = mounted.maxHealth
+            vehicle.health = mounted.health
         }
-
     }
 
     @EventHandler(priority = EventPriority.LOW)

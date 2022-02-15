@@ -10,9 +10,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("mobzy:rideable")
 class Rideable(
-    val isSteerable: Boolean = false,
     val requiresItemToSteer: Boolean = false,
     val steerItem: SerializableItemStack? = null,
     val canTakePassenger: Boolean = false,
-    val maxPassengerCount: Int = 0,
+    val maxPassengerCount: Int = 1,
 )

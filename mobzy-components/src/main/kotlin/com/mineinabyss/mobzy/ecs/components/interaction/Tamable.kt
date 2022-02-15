@@ -12,5 +12,6 @@ class Tamable(
     val isTamable: Boolean = true,
     val tameItem: SerializableItemStack? = null,
     var isTamed: Boolean = false,
+    val saddleModelId: String? = null,
     var owner: @Serializable(with = UUIDSerializer::class) UUID? = null,
 )

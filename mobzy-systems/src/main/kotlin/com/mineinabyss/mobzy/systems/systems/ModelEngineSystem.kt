@@ -12,7 +12,7 @@ import org.bukkit.event.Listener
 
 
 object ModelEngineSystem : Listener, AnimationController {
-    private val modelManager: ModelManager? by lazy {
+    val modelManager: ModelManager? by lazy {
         runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
     }
 
@@ -42,10 +42,10 @@ object ModelEngineSystem : Listener, AnimationController {
         modelEntity.apply {
             detectPlayers()
             bukkit.customName?.let {
-                modelEntity.nametagHandler.setCustomName("nametag", it)
+                modelEntity.nametagHandler.setCustomName("tag_nametag", it)
             }
 
-            modelEntity.nametagHandler.setCustomNameVisibility("nametag", model.nametag)
+            modelEntity.nametagHandler.setCustomNameVisibility("tag_nametag", model.nametag)
             isInvisible = model.invisible
         }
     }
