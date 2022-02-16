@@ -23,7 +23,7 @@ dependencies {
     }
 
     compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.2") { exclude(group = "org.bukkit") }
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6") { exclude(group = "org.bukkit") }
 
     compileOnly(project(":mobzy-components"))
     compileOnly(project(":mobzy-core"))

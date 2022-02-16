@@ -24,7 +24,6 @@ import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.modelManager
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.okkero.skedule.schedule
 import io.papermc.paper.event.entity.EntityMoveEvent
@@ -47,6 +46,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import kotlin.random.Random
 
 object MobListener : Listener {
     /**
@@ -244,7 +244,7 @@ object MobListener : Listener {
 
         //TODO Make mob move on its own if not holding correct item
         gearyEntity.with { rideable: Rideable ->
-            if (rideable.requiresItemToSteer && itemInHand != rideable.steerItem?.toItemStack()) {
+            if (!rideable.isSaddled || rideable.requiresItemToSteer && itemInHand != rideable.steerItem?.toItemStack()) {
                 isCancelled = true
             }
         }
@@ -258,12 +258,21 @@ object MobListener : Listener {
         val modelEntity = rightClicked.toModelEntity() ?: return
         val itemInHand = player.inventory.itemInMainHand
 
-        gearyEntity.with { tamable: Tamable ->
+        gearyEntity.with { tamable: Tamable, rideable: Rideable ->
             if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
+                val random = Random(1).nextDouble()
+
                 tamable.isTamed = true
                 tamable.owner = player.uniqueId
                 itemInHand.subtract(1)
-                player.spawnParticle(Particle.HEART, rightClicked.location.apply { y += 2 }, 10)
+                player.spawnParticle(
+                    Particle.HEART,
+                    rightClicked.location.apply { y += 1.5 },
+                    10,
+                    random,
+                    random,
+                    random
+                )
 
                 return
             }
@@ -284,44 +293,44 @@ object MobListener : Listener {
                 return
             }
 
-            // TODO Make this more seamless
             // TODO Consider using Guiy to make a fake inventory for armor/saddle/storage
-            if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.SADDLE) {
+            rideable.isSaddled = false
+            if (tamable.isTamed && !rideable.isSaddled && tamable.owner == player.uniqueId && itemInHand.type == Material.SADDLE) {
                 val model = gearyEntity.get<ModelEngineComponent>() ?: return
-                val saddleModel = modelManager?.createActiveModel(tamable.saddleModelId)?.apply {
-                    setDamageTint(model.damageTint)
-                }
-                modelEntity.addActiveModel(saddleModel)
-                modelEntity.removeModel(model.modelId)
-
-                modelEntity.apply { detectPlayers() }
+                val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
+                //itemInHand.subtract(1)
+                rideable.isSaddled = true
+                if (!saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
+                broadcast(saddle.isVisible)
             }
         }
     }
 
-    // TODO Find a way to update the Mount Health Bar with the modelentity/vehicle's
+    // TODO Wait for ModelEngine to implement support for this
     @EventHandler
     fun EntityDamageEvent.onMountDamaged() {
-        val gearyEntity = entity.toGearyOrNull() ?: return
-        val modelEntity = entity.toModelEntity() ?: return
-        val mountHandler = modelEntity.mountHandler
-        val mounted = modelEntity.entity
-        val driver = mountHandler?.driver ?: return
-        val vehicle = (driver.vehicle as LivingEntity)
-
-        gearyEntity.with { rideable: Rideable ->
-            vehicle.maxHealth = mounted.maxHealth
-            vehicle.health = mounted.health
-        }
+//        val gearyEntity = entity.toGearyOrNull() ?: return
+//        val modelEntity = entity.toModelEntity() ?: return
+//        val mountHandler = modelEntity.mountHandler
+//        val mounted = modelEntity.entity
+//        val driver = mountHandler?.driver ?: return
+//        val vehicle = (driver.vehicle as LivingEntity)
+//
+//        gearyEntity.with { rideable: Rideable ->
+//            vehicle.maxHealth = mounted.maxHealth
+//            vehicle.health = mounted.health
+//        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
 
-        gearyEntity.with { deathLoot: DeathLoot ->
+        gearyEntity.with { deathLoot: DeathLoot, rideable: Rideable ->
             drops.clear()
             droppedExp = 0
+
+            if (rideable.isSaddled) drops.add(ItemStack(Material.SADDLE))
 
             if (entity.lastDamageCause?.cause !in deathLoot.ignoredCauses) {
                 deathLoot.expToDrop()?.let { droppedExp = it }
