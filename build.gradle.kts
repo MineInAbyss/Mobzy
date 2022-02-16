@@ -38,6 +38,7 @@ allprojects {
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
+    maven("https://mvn.lumine.io/repository/maven-public/") // Model Engine
 }
 
 dependencies {
@@ -50,6 +51,7 @@ dependencies {
 
     // Other plugins
     compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
+    compileOnly("com.ticxo.modelengine:api:R2.3.1")
 
     // Shaded
     implementation(project(":mobzy-pathfinding"))

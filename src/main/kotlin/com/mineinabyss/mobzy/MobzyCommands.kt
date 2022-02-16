@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.api.entities.with
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
@@ -11,11 +12,14 @@ import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
+import com.mineinabyss.idofront.messaging.broadcast
 import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.typeName
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
+import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
@@ -28,6 +32,7 @@ import com.mineinabyss.mobzy.injection.types.PassiveMob
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -125,8 +130,20 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     val key = PrefabKey.of(mobKey)
 
                     repeat(cappedSpawns) {
-                        player.location.spawnFromPrefab(key) ?: error("Prefab $mobKey not found")
+                        val entity = player.location.spawnFromPrefab(key) ?: error("Prefab $mobKey not found")
+                        val gearyEntity = key.toEntity() ?: return@playerAction
+
+                        gearyEntity.with { rideable: Rideable ->
+                            val modelEntity = entity.toModelEntity() ?: return@playerAction
+                            val saddle =
+                                modelEntity.getActiveModel(gearyEntity.get<ModelEngineComponent>()?.modelId)
+                                    ?.partEntities?.get("saddle") ?: return@playerAction
+
+                            if (saddle.isVisible) saddle.setItemVisibility(false)
+                            broadcast(saddle.isVisible)
+                        }
                     }
+
                 }
             }
 

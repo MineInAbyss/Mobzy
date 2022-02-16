@@ -14,7 +14,7 @@ import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.messaging.broadcast
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.nms.entity.distanceSqrTo
+import com.mineinabyss.idofront.nms.entity.canReach
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -169,6 +169,17 @@ object MobListener : Listener {
         }
     }
 
+    @EventHandler
+    fun GearyMinecraftSpawnEvent.onSpawningMount() {
+//        val model = prefab.get<ModelEngineComponent>() ?: return
+//        val modelEntity = entity.toBukkit()?.toModelEntity() ?: return
+//        val saddle = modelEntity.getActiveModel(model.modelId).partEntities?.get("saddle") ?: return
+//
+//        entity.with { rideable: Rideable ->
+//            if (saddle.isVisible) saddle.setItemVisibility(false)
+//        }
+    }
+
     // TODO Make pig appearing and dissapearing less visible
     /** Handle leashing of entities with [ModelEngineComponent.leashable] */
     @EventHandler
@@ -246,7 +257,6 @@ object MobListener : Listener {
         val mount = entity.toModelEntity()?.mountHandler ?: return
         val player = (mount.driver ?: return) as Player
         val itemInHand = player.inventory.itemInMainHand
-        val mountInvViewer: GuiyInventoryHolder
 
         //TODO Make mob move on its own if not holding correct item
         gearyEntity.with { rideable: Rideable ->
@@ -263,7 +273,7 @@ object MobListener : Listener {
         val player = gearyEntity.get<Tamable>()?.owner?.toPlayer() ?: return
         val mountInvViewer = player.openInventory.topInventory.holder as? GuiyInventoryHolder ?: return
 
-        if (entity.distanceSqrTo(player) > 3 && player.openInventory.topInventory.holder === mountInvViewer) {
+        if (!player.canReach(entity) && player.openInventory.topInventory.holder === mountInvViewer) {
             player.closeInventory()
         }
     }
@@ -276,10 +286,10 @@ object MobListener : Listener {
         val modelEntity = rightClicked.toModelEntity() ?: return
         val itemInHand = player.inventory.itemInMainHand
         gearyEntity.with { tamable: Tamable, rideable: Rideable ->
-            broadcast(tamable.isTamed)
             if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
                 val random = Random(1).nextDouble()
                 tamable.isTamed = true
+                tamable.owner = player.uniqueId
                 rightClicked.toGeary().getOrSetPersisting { tamable.isTamed; tamable.owner == player.uniqueId }
                 //rightClicked.toGeary().encodeComponentsTo(rightClicked)
                 //rightClicked.toGeary().setPersisting(tamable.owner == player.uniqueId)
@@ -323,10 +333,13 @@ object MobListener : Listener {
                 val model = gearyEntity.get<ModelEngineComponent>() ?: return
                 val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
 
-                guiy { MountInventoryMenu(player, rightClicked) }
+                guiy { MountInventoryMenu(player, gearyEntity) }
                 //itemInHand.subtract(1)
                 //rideable.isSaddled = true
-                if (!saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
+                if (saddle.isVisible && !rideable.isSaddled) saddle.setItemVisibility(false)
+                else saddle.setItemVisibility(true)
+                broadcast(saddle.isVisible)
+                broadcast(rideable.isSaddled)
 
                 return
             }

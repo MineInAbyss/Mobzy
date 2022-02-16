@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.systems.systems
 
 import com.mineinabyss.geary.papermc.events.GearyMinecraftSpawnEvent
-import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
@@ -49,8 +48,8 @@ object ModelEngineSystem : Listener, AnimationController {
             modelEntity.nametagHandler.setCustomName("tag_nametag", bukkit.customName)
             modelEntity.nametagHandler.setCustomNameVisibility("tag_nametag", model.nametag)
             isInvisible = model.invisible
-            createdModel?.partEntities?.get("saddle")?.setItemVisibility(false)
-            createdModel?.partEntities?.get("saddle")?.isVisible.broadcastVal()
+            //createdModel?.partEntities?.get("saddle")?.setItemVisibility(false)
+            //createdModel?.partEntities?.get("saddle")?.isVisible.broadcastVal()
         }
     }
 }
