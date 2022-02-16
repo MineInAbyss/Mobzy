@@ -40,10 +40,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerLeashEntityEvent
-import org.bukkit.event.player.PlayerInteractEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerStatisticIncrementEvent
-import org.bukkit.event.player.PlayerUnleashEntityEvent
+import org.bukkit.event.player.*
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -280,12 +277,9 @@ object MobListener : Listener {
                 return
             }
 
-            // TODO Make this work
             if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.NAME_TAG) {
-                broadcast("test")
-                modelEntity.nametagHandler.setCustomName("tag_nametag", "test")
-                modelEntity.nametagHandler.updateTags()
-                modelEntity.nametagHandler.getCustomName("tag_nametag").broadcastVal()
+                modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
+                modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
 
                 return
             }
@@ -324,8 +318,6 @@ object MobListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        val mountHandler = entity.toModelEntity()?.mountHandler ?: return
-        if (mountHandler.hasDriver() || mountHandler.hasPassengers()) mountHandler.dismountAll()
 
         gearyEntity.with { deathLoot: DeathLoot ->
             drops.clear()
@@ -341,5 +333,13 @@ object MobListener : Listener {
 //            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun PlayerQuitEvent.onDisconnectOnMount() {
+        broadcast("test")
+        val mountHandler = player.vehicle.broadcastVal()
+        if (player.isInsideVehicle) player.leaveVehicle()
+        broadcast(player.isInsideVehicle)
     }
 }
