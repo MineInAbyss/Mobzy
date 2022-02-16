@@ -5,13 +5,15 @@ import com.mineinabyss.geary.papermc.access.toBukkit
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.geary.papermc.events.GearyMinecraftSpawnEvent
+import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.inventory.guiy
 import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
+import com.mineinabyss.idofront.entities.toPlayer
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
-import com.mineinabyss.idofront.messaging.broadcast
-import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -39,7 +41,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerLeashEntityEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractEntityEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerStatisticIncrementEvent
+import org.bukkit.event.player.PlayerUnleashEntityEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -215,12 +220,11 @@ object MobListener : Listener {
     fun PlayerInteractEntityEvent.rideOnRightClick() {
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
-
         gearyEntity.with { rideable: Rideable ->
             val mount = modelEntity.mountHandler
             val itemInHand = player.inventory.itemInMainHand
 
-            if (itemInHand.type != Material.AIR) return
+            if (itemInHand.type != Material.AIR || player.isSneaking) return
 
             mount.setSteerable(true)
             mount.setCanCarryPassenger(rideable.canTakePassenger)
@@ -241,12 +245,25 @@ object MobListener : Listener {
         val mount = entity.toModelEntity()?.mountHandler ?: return
         val player = (mount.driver ?: return) as Player
         val itemInHand = player.inventory.itemInMainHand
+        val mountInvViewer: GuiyInventoryHolder
 
         //TODO Make mob move on its own if not holding correct item
         gearyEntity.with { rideable: Rideable ->
             if (!rideable.isSaddled || rideable.requiresItemToSteer && itemInHand != rideable.steerItem?.toItemStack()) {
                 isCancelled = true
             }
+        }
+    }
+
+    //TODO Limit this to MountInventory
+    @EventHandler
+    fun EntityMoveEvent.onMobMoveWithInvOpen() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val player = gearyEntity.get<Tamable>()?.owner?.toPlayer() ?: return
+        val mountInvViewer = player.openInventory.topInventory.holder as? GuiyInventoryHolder ?: return
+
+        if (entity.distanceSqrTo(player) > 3 && player.openInventory.topInventory.holder === mountInvViewer) {
+            player.closeInventory()
         }
     }
 
@@ -264,7 +281,7 @@ object MobListener : Listener {
 
                 tamable.isTamed = true
                 tamable.owner = player.uniqueId
-                itemInHand.subtract(1)
+                //itemInHand.subtract(1)
                 player.spawnParticle(
                     Particle.HEART,
                     rightClicked.location.apply { y += 1.5 },
@@ -273,6 +290,8 @@ object MobListener : Listener {
                     random,
                     random
                 )
+                gearyEntity.getOrSetPersisting { Tamable }
+                gearyEntity.getOrSetPersisting { Rideable }
 
                 return
             }
@@ -294,14 +313,30 @@ object MobListener : Listener {
             }
 
             // TODO Consider using Guiy to make a fake inventory for armor/saddle/storage
-            rideable.isSaddled = false
-            if (tamable.isTamed && !rideable.isSaddled && tamable.owner == player.uniqueId && itemInHand.type == Material.SADDLE) {
+            // Guiy needs item-support first so it will be left basic for now
+            if (tamable.isTamed && !rideable.isSaddled && tamable.owner == player.uniqueId && player.isSneaking) {
                 val model = gearyEntity.get<ModelEngineComponent>() ?: return
                 val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
+
+                guiy { MountInventoryMenu(player, gearyEntity) }
                 //itemInHand.subtract(1)
-                rideable.isSaddled = true
+                //rideable.isSaddled = true
                 if (!saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
-                broadcast(saddle.isVisible)
+
+                return
+            }
+
+
+            if (tamable.isTamed && tamable.owner == player.uniqueId && rideable.isSaddled && player.isSneaking) {
+                val model = gearyEntity.get<ModelEngineComponent>() ?: return
+                val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
+
+                rideable.isSaddled = false
+                if (saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
+                gearyEntity.getOrSetPersisting { Tamable }
+                gearyEntity.getOrSetPersisting { Rideable }
+
+                return
             }
         }
     }
@@ -330,7 +365,13 @@ object MobListener : Listener {
             drops.clear()
             droppedExp = 0
 
+            // Drop equipped items from rideable entity
             if (rideable.isSaddled) drops.add(ItemStack(Material.SADDLE))
+            if (rideable.hasArmor && rideable.armor != null) drops.add(
+                rideable.armor?.toItemStack() ?: ItemStack(
+                    Material.AIR
+                )
+            )
 
             if (entity.lastDamageCause?.cause !in deathLoot.ignoredCauses) {
                 deathLoot.expToDrop()?.let { droppedExp = it }
@@ -342,13 +383,5 @@ object MobListener : Listener {
 //            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
             }
         }
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    fun PlayerQuitEvent.onDisconnectOnMount() {
-        broadcast("test")
-        val mountHandler = player.vehicle.broadcastVal()
-        if (player.isInsideVehicle) player.leaveVehicle()
-        broadcast(player.isInsideVehicle)
     }
 }

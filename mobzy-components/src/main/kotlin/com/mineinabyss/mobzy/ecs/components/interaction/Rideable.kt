@@ -13,6 +13,10 @@ class Rideable(
     val requiresItemToSteer: Boolean = false,
     val steerItem: SerializableItemStack? = null,
     var isSaddled: Boolean = false,
+    var hasArmor: Boolean = false,
+    val allowedArmor: List<SerializableItemStack>? = null,
+    var armor: SerializableItemStack? = null,
+    var hasStorage: Boolean = false,
     val canTakePassenger: Boolean = false,
     val maxPassengerCount: Int = 1,
 )
