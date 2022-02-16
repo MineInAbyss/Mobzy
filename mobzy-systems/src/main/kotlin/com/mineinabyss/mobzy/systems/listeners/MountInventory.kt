@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.systems.listeners
 
 import androidx.compose.runtime.Composable
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.inventory.GuiyOwner
@@ -17,6 +17,7 @@ import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -27,23 +28,27 @@ sealed class MountInventoryScreen(val title: String, val height: Int) {
 }
 
 @Composable
-fun GuiyOwner.MountInventoryMenu(player: Player, mount: GearyEntity) {
+fun GuiyOwner.MountInventoryMenu(player: Player, mount: Entity) {
     Chest(setOf(player), "Mount Inventory", Modifier.height(3),
         onClose = {
             player.closeInventory()
         })
     {
-        val rideable = mount.get<Rideable>()
-        val tamable = mount.get<Tamable>()
+        val rideable = mount.toGeary().get<Rideable>()
+        val tamable = mount.toGeary().get<Tamable>()
 
         Item(ItemStack(Material.LEATHER_HORSE_ARMOR), Modifier.at(0, 0).clickable {
             player.inventory.contents.forEach { item ->
                 if (rideable?.allowedArmor?.contains(item.toSerializable()) == true) {
                     item.subtract(1)
-                    rideable.hasArmor = true
                     player.playSound(player.location, Sound.ENTITY_HORSE_ARMOR, 1f, 1f)
-                    mount.getOrSetPersisting { Tamable }
-                    mount.getOrSetPersisting { Rideable }
+                    mount.toGeary().setPersisting(rideable.hasArmor)
+                    mount.toGeary().setPersisting(rideable.armor == item.toSerializable())
+//                    mount.toGeary().getOrSetPersisting {
+//                        rideable.hasArmor
+//                        rideable.armor = item.toSerializable()
+//                        broadcast(rideable.armor)
+//                    }
 
                     return@clickable
                 } else player.error("You need ${item.displayName()} for this!")
@@ -54,10 +59,12 @@ fun GuiyOwner.MountInventoryMenu(player: Player, mount: GearyEntity) {
             player.inventory.contents.forEach { item ->
                 if (item.type == Material.SADDLE) {
                     item.subtract(1)
-                    rideable?.isSaddled = true
+                    //rideable?.isSaddled = true
                     player.playSound(player.location, Sound.ENTITY_HORSE_SADDLE, 1f, 1f)
-                    mount.getOrSetPersisting { Tamable }
-                    mount.getOrSetPersisting { Rideable }
+                    mount.toGeary().setPersisting(rideable!!.isSaddled)
+                    /*mount.toGeary().getOrSetPersisting {
+                        rideable?.isSaddled ?: return@clickable
+                    }*/
 
                     return@clickable
                 } else player.error("You need a saddle for this!")
@@ -69,10 +76,12 @@ fun GuiyOwner.MountInventoryMenu(player: Player, mount: GearyEntity) {
             player.inventory.contents.forEach { item ->
                 if (item.type == Material.CHEST) {
                     item.subtract(1)
-                    rideable?.hasStorage = true
+                    //rideable?.hasStorage = true
                     player.playSound(player.location, Sound.ENTITY_DONKEY_CHEST, 1f, 1f)
-                    mount.getOrSetPersisting { Tamable }
-                    mount.getOrSetPersisting { Rideable }
+                    mount.toGeary().setPersisting(rideable!!.hasStorage)
+                    /*mount.toGeary().getOrSetPersisting {
+                        rideable?.hasStorage ?: return@clickable
+                    }*/
 
                     return@clickable
                 } else player.error("You need a chest for this!")

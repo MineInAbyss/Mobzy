@@ -12,6 +12,7 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.entities.toPlayer
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.idofront.messaging.broadcast
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.nms.entity.distanceSqrTo
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
@@ -274,13 +275,19 @@ object MobListener : Listener {
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
         val itemInHand = player.inventory.itemInMainHand
-
         gearyEntity.with { tamable: Tamable, rideable: Rideable ->
+            broadcast(tamable.isTamed)
             if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
                 val random = Random(1).nextDouble()
-
                 tamable.isTamed = true
-                tamable.owner = player.uniqueId
+                rightClicked.toGeary().getOrSetPersisting { tamable.isTamed; tamable.owner == player.uniqueId }
+                //rightClicked.toGeary().encodeComponentsTo(rightClicked)
+                //rightClicked.toGeary().setPersisting(tamable.owner == player.uniqueId)
+                broadcast(tamable.isTamed)
+                /*rightClicked.toGeary().getOrSetPersisting {
+                    tamable.isTamed = true
+                    tamable.owner = player.uniqueId
+                }*/
                 //itemInHand.subtract(1)
                 player.spawnParticle(
                     Particle.HEART,
@@ -290,8 +297,6 @@ object MobListener : Listener {
                     random,
                     random
                 )
-                gearyEntity.getOrSetPersisting { Tamable }
-                gearyEntity.getOrSetPersisting { Rideable }
 
                 return
             }
@@ -318,7 +323,7 @@ object MobListener : Listener {
                 val model = gearyEntity.get<ModelEngineComponent>() ?: return
                 val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
 
-                guiy { MountInventoryMenu(player, gearyEntity) }
+                guiy { MountInventoryMenu(player, rightClicked) }
                 //itemInHand.subtract(1)
                 //rideable.isSaddled = true
                 if (!saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
@@ -331,10 +336,9 @@ object MobListener : Listener {
                 val model = gearyEntity.get<ModelEngineComponent>() ?: return
                 val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
 
-                rideable.isSaddled = false
+                //rideable.isSaddled = false
+                rightClicked.toGeary().setPersisting(!rideable.isSaddled)
                 if (saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
-                gearyEntity.getOrSetPersisting { Tamable }
-                gearyEntity.getOrSetPersisting { Rideable }
 
                 return
             }
@@ -367,11 +371,8 @@ object MobListener : Listener {
 
             // Drop equipped items from rideable entity
             if (rideable.isSaddled) drops.add(ItemStack(Material.SADDLE))
-            if (rideable.hasArmor && rideable.armor != null) drops.add(
-                rideable.armor?.toItemStack() ?: ItemStack(
-                    Material.AIR
-                )
-            )
+            if (rideable.hasArmor && rideable.armor != null)
+                drops.add(rideable.armor?.toItemStack() ?: ItemStack(Material.AIR))
 
             if (entity.lastDamageCause?.cause !in deathLoot.ignoredCauses) {
                 deathLoot.expToDrop()?.let { droppedExp = it }
