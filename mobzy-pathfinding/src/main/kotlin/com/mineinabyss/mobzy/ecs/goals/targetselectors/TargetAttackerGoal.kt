@@ -33,7 +33,8 @@ class TargetAttackerGoal(
         return shouldKeepExecuting()
     }
 
-    override fun shouldKeepExecuting(): Boolean = isPlayerValidTarget(playerDamager, range)
+    //ticksWaitAfterPlayerDeath = 1 because a player can be targeted when they attack the mob, no matter when they last died
+    override fun shouldKeepExecuting(): Boolean = isPlayerValidTarget(playerDamager, range, ticksWaitAfterPlayerDeath = 1)
 
     override fun init() {
         nmsEntity.setGoalTarget(

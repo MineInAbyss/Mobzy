@@ -45,8 +45,8 @@ object ModelEngineSystem : Listener, AnimationController {
         modelEntity.apply {
             detectPlayers()
 
-            modelEntity.nametagHandler.setCustomName("tag_nametag", bukkit.customName)
-            modelEntity.nametagHandler.setCustomNameVisibility("tag_nametag", model.nametag)
+            modelEntity.nametagHandler.setCustomName("nametag", bukkit.customName)
+            modelEntity.nametagHandler.setCustomNameVisibility("nametag", model.nametag)
             isInvisible = model.invisible
             //createdModel?.partEntities?.get("saddle")?.setItemVisibility(false)
             //createdModel?.partEntities?.get("saddle")?.isVisible.broadcastVal()

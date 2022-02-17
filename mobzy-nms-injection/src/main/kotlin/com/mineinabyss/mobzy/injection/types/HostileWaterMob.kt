@@ -1,35 +1,21 @@
 package com.mineinabyss.mobzy.injection.types
 
-import com.mineinabyss.idofront.messaging.logInfo
 import com.mineinabyss.idofront.nms.aliases.*
 import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
-import com.mineinabyss.mobzy.ecs.goals.minecraft.*
-import com.mineinabyss.mobzy.ecs.goals.targetselectors.TargetAttacker
-import com.mineinabyss.mobzy.ecs.goals.targetselectors.TargetNearbyPlayerCustom
 import com.mineinabyss.mobzy.injection.CustomEntity
 import com.mineinabyss.mobzy.injection.geary
 import com.mineinabyss.mobzy.injection.makeSound
-import com.mineinabyss.mobzy.pathfinding.addPathfinderGoal
-import com.mineinabyss.mobzy.pathfinding.addTargetSelector
 import net.minecraft.network.chat.IChatBaseComponent
 import net.minecraft.world.entity.EntityTypes
-import net.minecraft.world.entity.monster.EntityMonster
+import net.minecraft.world.entity.animal.axolotl.Axolotl
 
-open class HostileMob(
+class HostileWaterMob(
     type: NMSEntityType<*>, world: NMSWorld
-) : EntityMonster(type as EntityTypes<out EntityMonster>, world), CustomEntity {
-    //TODO do not register any pathfinders automatically
-    override fun initPathfinder() {
-        addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false))
-        addPathfinderGoal(3, FloatBehavior())
-        addPathfinderGoal(7, RandomStrollLandBehavior())
-        addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8.0f))
-        addPathfinderGoal(8, RandomLookAroundBehavior())
+) : Axolotl(type as EntityTypes<out Axolotl>, world), CustomEntity {
 
-        addTargetSelector(2, TargetAttacker())
-        addTargetSelector(6, TargetNearbyPlayerCustom())
-    }
+    override fun getBucketItem(): NMSItemStack =
+        NMSItemStack(NMSItems.nX) //Water Bucket
 
     override fun getScoreboardDisplayName(): IChatBaseComponent = NMSChatMessage(entityType.typeName
         .split('_').joinToString(" ") { it.replaceFirstChar(Char::uppercase) })
