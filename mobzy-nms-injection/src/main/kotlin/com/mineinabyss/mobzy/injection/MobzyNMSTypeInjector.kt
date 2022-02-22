@@ -131,6 +131,7 @@ object MobzyNMSTypeInjector : GearyListener() {
         "mobzy:fish" to ::FishMob,
         "mobzy:hostile_water" to ::HostileWaterMob,
         "mobzy:npc" to ::NPC,
+        "mobzy:interactable" to ::InteractableEntity,
     )
 
     fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {

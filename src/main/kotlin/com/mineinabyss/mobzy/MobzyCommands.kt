@@ -59,6 +59,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                                 "custom" -> entity.extendsCustomClass
                                 "named" -> entity.isCustomAndRenamed
                                 "npc" -> nmsEntity is NPC
+                                "interactable" -> nmsEntity is InteractableEntity
                                 "passive" -> nmsEntity !is NPC && nmsEntity is PassiveMob
                                 "hostile" -> nmsEntity is HostileMob
                                 "flying" -> nmsEntity is FlyingMob
