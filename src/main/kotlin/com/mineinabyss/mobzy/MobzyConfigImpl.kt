@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.api.entities.with
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.geary.papermc.store.decodeComponentsFrom
@@ -10,7 +11,6 @@ import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.idofront.nms.aliases.NMSDataContainer
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.CopyNBT
 import com.mineinabyss.mobzy.ecs.components.MobCategory
@@ -19,9 +19,11 @@ import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.extendsCustomClass
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
+import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import java.util.*
 
+context(GearyMCContext)
 class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data.serializer()), MobzyConfig {
     /**
      * @param creatureType The name of the [EnumCreatureType].
@@ -81,7 +83,7 @@ class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data
                 oldEntity.toGeary().with { prefab: PrefabKey ->
                     (oldEntity.location.spawnFromPrefab(prefab) ?: return@onEach).toGeary {
                         decodeComponentsFrom(oldEntity.persistentDataContainer)
-                        set(CopyNBT(NMSDataContainer().apply { oldEntity.toNMS().save(this) }))
+                        set(CopyNBT(CompoundTag().apply { oldEntity.toNMS().save(this) }))
                     }
                     oldEntity.remove()
                 }

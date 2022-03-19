@@ -1,19 +1,28 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.papermc.events.GearyMinecraftSpawnEvent
+import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.api.annotations.Handler
+import com.mineinabyss.geary.ecs.api.engine.systems
+import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.api.systems.GearySystem
+import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.ecs.api.GearyContext
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.ticxo.modelengine.api.ModelEngineAPI
 import com.ticxo.modelengine.api.manager.ModelManager
 import com.ticxo.modelengine.api.model.ModeledEntity
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 
-object ModelEngineSystem : Listener, AnimationController {
+object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyContext by GearyMCContext() {
     private val modelManager: ModelManager? by lazy {
         runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
+    }
+
+    override fun onStart() {
+        systems(ModelEngineTracker())
     }
 
     override fun isModelEngineEntity(entity: BukkitEntity) = entity.toModelEntity() != null
@@ -28,16 +37,18 @@ object ModelEngineSystem : Listener, AnimationController {
         entity.toModelEntity()?.allActiveModel?.values
             ?.forEach { it.removeState(state, ignoreLerp) }
 
-    @EventHandler
-    fun GearyMinecraftSpawnEvent.registerModelEngine() {
-        val model = entity.get<ModelEngineComponent>() ?: return
-        val bukkit = entity.get<BukkitEntity>() ?: return
-        val modelEntity = bukkit.toModelEntity() ?: modelManager?.createModeledEntity(bukkit) ?: return
+    class ModelEngineTracker : GearyListener() {
+        val TargetScope.bukkit by added<BukkitEntity>()
+        val TargetScope.model by added<ModelEngineComponent>()
 
-        val createdModel = modelManager?.createActiveModel(model.modelId)?.apply {
-            setDamageTint(model.damageTint)
-        }
-        modelEntity.addActiveModel(createdModel)
+        @Handler
+        fun TargetScope.registerModelEngine() {
+            val modelEntity = bukkit.toModelEntity() ?: modelManager?.createModeledEntity(bukkit) ?: return
+
+            val createdModel = modelManager?.createActiveModel(model.modelId)?.apply {
+                setDamageTint(model.damageTint)
+            }
+            modelEntity.addActiveModel(createdModel)
 
         modelEntity.apply {
             detectPlayers()

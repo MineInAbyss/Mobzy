@@ -8,6 +8,7 @@ val gearyVersion: String by project
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
+    id("com.mineinabyss.conventions.nms")
     id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
@@ -21,7 +22,8 @@ allprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf(
-                "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+                "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                "-Xcontext-receivers",
             )
         }
     }

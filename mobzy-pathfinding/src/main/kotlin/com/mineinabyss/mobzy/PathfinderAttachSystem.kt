@@ -1,8 +1,7 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -10,7 +9,7 @@ import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.pathfinding.addPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.addTargetSelector
-import org.bukkit.entity.Mob
+import org.bukkit.entity.Creature
 
 @AutoScan
 class PathfinderAttachSystem : GearyListener() {
@@ -19,7 +18,7 @@ class PathfinderAttachSystem : GearyListener() {
 
     @Handler
     fun TargetScope.attachPathfinders() {
-        val mob = bukkit as? Mob ?: return
+        val mob = bukkit as? Creature ?: return
         val (targets, goals) = pathfinders
 
         targets?.forEach { (priority, component) ->

@@ -3,14 +3,15 @@
 package com.mineinabyss.mobzy.spawning
 
 
+import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.accessors.*
 import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.accessors.building.getOrDefault
 import com.mineinabyss.geary.ecs.accessors.building.getOrNull
 import com.mineinabyss.geary.ecs.accessors.building.map
-import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
@@ -89,6 +90,7 @@ data class DoSpawn(
     var spawnedAmount: Int = 0
 }
 
+context(GearyMCContext)
 @AutoScan
 class SpawnRequestListener : GearyListener() {
     private val TargetScope.type by get<SpawnType>()

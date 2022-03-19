@@ -4,25 +4,24 @@ import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.nms.entity.distanceSqrTo
-import com.mineinabyss.idofront.nms.pathfindergoals.moveTo
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.modelengine.playAnimation
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.world.phys.Vec3D
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
+import org.bukkit.entity.Creature
 import org.bukkit.entity.Mob
 import kotlin.random.Random
 
 @Serializable
 @SerialName("mobzy:behavior.idle_fly")
 class IdleFlyBehavior : PathfinderComponent() {
-    override fun build(mob: Mob) = IdleFlyGoal(mob)
+    override fun build(mob: Creature) = IdleFlyGoal(mob)
 }
 
-open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 100, type = Type.a /* MOVE */) {
+open class IdleFlyGoal(override val mob: Creature) : MobzyPathfinderGoal(cooldown = 100, flags = listOf(Flag.MOVE)) {
     protected var targetLoc: Location? = null
 
     //if there isn't an operation to move somewhere, we can start looking for somewhere to fly
@@ -30,7 +29,7 @@ open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 1
 
     override fun shouldKeepExecuting(): Boolean {
         val targetLoc = targetLoc ?: return false
-        val dist = mob.distanceSqrTo(targetLoc)
+        val dist = mob.location.distanceSquared(targetLoc)
         return mob.target == null && dist in 1.0..2000.0 && !mob.isStuck
     }
 
@@ -49,12 +48,11 @@ open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 1
 
     override fun executeWhenCooledDown() {
         restartCooldown()
-        val (x, y, z) = targetLoc ?: return
 //        mob.lookAt(x, y, z)
-        moveController.moveTo(x, y, z, 1.0)
+        pathfinder.moveTo(targetLoc ?: return, 1.0)
     }
 }
 
-val Mob.isStuck get() = toNMS().mot.lengthSqr < 0.0001
+val Mob.isStuck get() = toNMS().deltaMovement.lengthSqr < 0.0001
 
-val Vec3D.lengthSqr get() = x * x + y * y + z * z
+val Vec3.lengthSqr get() = x * x + y * y + z * z

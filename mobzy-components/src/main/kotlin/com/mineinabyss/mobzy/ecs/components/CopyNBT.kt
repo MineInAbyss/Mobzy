@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.ecs.components
 
-import com.mineinabyss.idofront.nms.aliases.NMSDataContainer
+import net.minecraft.nbt.CompoundTag
 
 data class CopyNBT(
-    val compound: NMSDataContainer
+    val compound: CompoundTag
 )

@@ -1,12 +1,13 @@
 package com.mineinabyss.mobzy.injection
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toBukkit
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
-import com.mineinabyss.idofront.nms.aliases.NMSSound
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
+import net.minecraft.sounds.SoundEvent
 import org.bukkit.SoundCategory
 import kotlin.random.Random
 
@@ -21,13 +22,15 @@ interface CustomEntity {
 }
 
 /** Plays a sound effect at the mob's location and returns null */
-fun NMSEntity.makeSound(default: NMSSound? = null, sound: Sounds.() -> String?): NMSSound? {
-    val entity = geary
+context(GearyMCContext)
+fun NMSEntity.makeSound(default: SoundEvent? = null, sound: Sounds.() -> String?): SoundEvent? {
+    val entity = toGeary()
     entity.makeSound(entity.get<Sounds>()?.sound() ?: return default)
     return null
 }
 
 //TODO think of a better place to put this, something less inheritance-ey
+context(GearyMCContext)
 fun GearyEntity.makeSound(sound: String) {
     val bukkit = toBukkit() ?: return
     val sounds = get() ?: Sounds()
@@ -41,4 +44,5 @@ fun GearyEntity.makeSound(sound: String) {
     )
 }
 
-val NMSEntity.geary: GearyEntity get() = toBukkit().toGeary()
+context(GearyMCContext)
+fun NMSEntity.toGeary(): GearyEntity = toBukkit().toGeary()

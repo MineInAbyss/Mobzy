@@ -3,9 +3,6 @@ package com.mineinabyss.mobzy.ecs.goals.mobzy.flying
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
-import com.mineinabyss.idofront.nms.entity.distanceSqrTo
-import com.mineinabyss.idofront.nms.entity.lookAt
-import com.mineinabyss.idofront.nms.entity.lookAtPitchLock
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
 import com.mineinabyss.mobzy.modelengine.playAnimation
@@ -13,7 +10,7 @@ import com.mineinabyss.mobzy.modelengine.stopAnimation
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.entity.Mob
+import org.bukkit.entity.Creature
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.random.Random
@@ -29,7 +26,7 @@ class DiveOnTargetBehavior(
     private val bashVelMultiplier: Double = 0.6,
     private val bashDuration: Double = 30.0
 ) : PathfinderComponent() {
-    override fun build(mob: Mob) = DiveOnTargetAttackGoal(
+    override fun build(mob: Creature) = DiveOnTargetAttackGoal(
         mob,
         diveVelocity,
         minHeight,
@@ -42,7 +39,7 @@ class DiveOnTargetBehavior(
 }
 
 class DiveOnTargetAttackGoal(
-    override val mob: Mob,
+    override val mob: Creature,
     private val diveVelocity: Double = -0.3,
     private val minHeight: Double = 6.0,
     private val maxHeight: Double = 10.0,
@@ -50,7 +47,7 @@ class DiveOnTargetAttackGoal(
     private val startDiveHeightRange: Double = 2.0,
     private val bashVelMultiplier: Double = 0.6,
     private val bashDuration: Double = 30.0
-) : MobzyPathfinderGoal(type = Type.a /* MOVE*/) {
+) : MobzyPathfinderGoal(flags = listOf(Flag.MOVE)) {
     private var currentAction = Action.FLY
     private var diveHeight: Double = pickDiveHeight()
     private var bashLeft = bashDuration
@@ -70,28 +67,33 @@ class DiveOnTargetAttackGoal(
     override fun reset() {
         bashLeft = bashDuration
         currentAction = Action.FLY
-        moveController.a() //this should reset the controller's destination FIXME this method doesn't actually do that
+        mob.pathfinder.stopPathfinding()
+//        moveController.tick() //this should reset the controller's destination FIXME this method doesn't actually do that
     }
 
     private fun prepareDive() {
         val target = mob.target ?: return
         if (mob.isModelEngineEntity) {
             mob.lookAt(target)
-        } else {
-            mob.lookAtPitchLock(target)
         }
 
         //if arrived to dive
         //TODO dont make so many location instances
         val diveTarget = target.location.add(0.0, diveHeight, 0.0)
-        if (mob.distanceSqrTo(diveTarget) < startDiveDistance.pow(2) && abs(mob.location.y - diveTarget.y) < startDiveHeightRange) {
+        if (mob.location.distanceSquared(diveTarget) < startDiveDistance.pow(2) && abs(mob.location.y - diveTarget.y) < startDiveHeightRange) {
             diveHeight = pickDiveHeight()
             currentAction = Action.DIVE
             return
         }
 
         val targetLoc = target.location
-        moveController.a(targetLoc.x, targetLoc.y + diveHeight, targetLoc.z, 1.0) //TODO use controllerMove wrapper
+        mob.pathfinder.moveTo(targetLoc.apply { y += diveHeight }, 1.0)
+//        moveController.setWantedPosition(
+//            targetLoc.x,
+//            targetLoc.y + diveHeight,
+//            targetLoc.z,
+//            1.0
+//        ) //TODO use controllerMove wrapper
     }
 
     private fun beginDive() {
@@ -99,11 +101,11 @@ class DiveOnTargetAttackGoal(
         if (mob.isModelEngineEntity) {
             mob.lookAt(target)
         } else {
-            mob.lookAtPitchLock(target)
+            mob.lookAt(target)
         }
         val targetLoc = target.location
         if (mob.velocity.y == 0.0 || abs(mob.location.y - target.location.y) <= 1) {
-            if (mob.distanceSqrTo(target) > 20) {
+            if (mob.location.distanceSquared(target.location) > 20) {
                 currentAction = Action.BASH
                 bashVelX = mob.location.direction.x * bashVelMultiplier
                 bashVelZ = mob.location.direction.z * bashVelMultiplier
@@ -112,20 +114,21 @@ class DiveOnTargetAttackGoal(
             }
             return
         }
-        moveController.a(targetLoc.x, targetLoc.y, targetLoc.z, 1.0)
+        mob.pathfinder.moveTo(target, 1.0)
+//        moveController.setWantedPosition(targetLoc.x, targetLoc.y, targetLoc.z, 1.0)
         mob.velocity = mob.velocity.setY(-abs(diveVelocity))
     }
 
     private fun bash() {
-        val (x, _, z) = mob.location
-        mob.lookAt(x + bashVelX, z + bashVelZ)
+        val (x, y, z) = mob.location
+        mob.lookAt(x + bashVelX, y, z + bashVelZ)
 
         if (bashLeft == bashDuration) {
             mob.playAnimation("bash", 0, 5, 1.0)
         }
 
         mob.velocity = mob.velocity.setX(bashVelX).setZ(bashVelZ)
-        if (bashLeft-- <= 0 || mob.target == null || mob.distanceSqrTo(mob.target!!) < 2 || mob.velocity.x == 0.0 || mob.velocity.z == 0.0) {
+        if (bashLeft-- <= 0 || mob.target == null || mob.location.distanceSquared(mob.target!!.location) < 2 || mob.velocity.x == 0.0 || mob.velocity.z == 0.0) {
             currentAction = Action.FLY
             bashLeft = bashDuration
             mob.stopAnimation("bash")

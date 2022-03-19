@@ -23,7 +23,7 @@ class SpawnCategoryCapCondition : GearyListener() {
 
     val EventScope.spawnInfo by get<SpawnInfo>()
 
-    init {
+    override fun onStart() {
         target.not { has<IgnoreSpawnCategoryCap>() }
     }
 

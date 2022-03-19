@@ -2,21 +2,21 @@ package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.serialization.parseEntity
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
-import com.mineinabyss.idofront.nms.entity.distanceSqrTo
-import com.mineinabyss.idofront.nms.pathfindergoals.doneNavigating
-import com.mineinabyss.idofront.nms.pathfindergoals.moveToEntity
-import com.mineinabyss.idofront.nms.pathfindergoals.stopNavigation
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.entity.*
+import org.bukkit.entity.Creature
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.Snowball
 import org.bukkit.util.Vector
 import kotlin.math.min
 import kotlin.math.pow
@@ -24,6 +24,7 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+context(GearyMCContext)
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
@@ -37,8 +38,8 @@ class ThrowItemsBehavior(
     val projectileCountPerThrow: Int = 1,
     val cooldown: @Serializable(with = DurationSerializer::class) Duration = 3.seconds,
 ) : PathfinderComponent() {
-    override fun build(mob: Mob) = ThrowItemsGoal(
-        (mob as Creature),
+    override fun build(mob: Creature) = ThrowItemsGoal(
+        mob,
         mob.toGeary().parseEntity(spawn),
         minChaseRad,
         minThrowRad,
@@ -56,6 +57,7 @@ class ThrowItemsBehavior(
  * @param minThrowRad The minimum radius at which to start throwing item at the target.
  * @param cooldown How long to wait between firing at the target.
  */
+context(GearyMCContext)
 class ThrowItemsGoal(
     override val mob: Creature,
     private val prefab: GearyEntity,
@@ -70,26 +72,26 @@ class ThrowItemsGoal(
     private var distance = 0.0
 
     override fun shouldExecute(): Boolean {
-        return mob.target != null && mob.distanceSqrTo(mob.target ?: return false).also { distance = it } >
+        return mob.target != null && mob.location.distanceSquared(mob.target?.location ?: return false).also { distance = it } >
                 //if there's no minChaseRad, stop pathfinder completely when we can't throw anymore
                 (if (minChaseRad <= 0) minThrowRad else min(minChaseRad, minThrowRad)).pow(2)
     }
 
-    override fun shouldKeepExecuting() = shouldExecute() && !navigation.doneNavigating
+    override fun shouldKeepExecuting() = shouldExecute() && pathfinder.hasPath()
 
     override fun init() {
-        mob.target?.let { navigation.moveToEntity(it, 1.0) }
+        mob.target?.let { pathfinder.moveTo(it, 1.0) }
     }
 
     override fun reset() {
-        navigation.stopNavigation()
+        pathfinder.stopPathfinding()
     }
 
     override fun execute() {
         val target = mob.target ?: return
 
         if (distance < minChaseRad)
-            navigation.stopNavigation()
+            pathfinder.stopPathfinding()
 
         if (cooledDown && distance > minThrowRad) {
             restartCooldown()

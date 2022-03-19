@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 object MobzyECSListener : Listener {
-
     @EventHandler
     fun GearyMinecraftSpawnEvent.setRemoveWhenFarAway() {
         val bukkit = entity.toBukkit<LivingEntity>() ?: return

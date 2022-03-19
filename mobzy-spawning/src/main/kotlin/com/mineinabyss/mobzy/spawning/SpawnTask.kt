@@ -3,20 +3,21 @@ package com.mineinabyss.mobzy.spawning
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.events.FailedCheck
 import com.mineinabyss.geary.ecs.events.RequestCheck
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
-import com.okkero.skedule.CoroutineTask
+import com.okkero.skedule.BukkitDispatcher
 import com.okkero.skedule.SynchronizationContext.*
-import com.okkero.skedule.schedule
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.nield.kotlinstatistics.WeightedDice
+import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 /**
@@ -39,8 +40,11 @@ import kotlin.random.Random
  * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
  * the chosen region
  */
-object SpawnTask {
-    private var runningTask: CoroutineTask? = null
+context(GearyMCContext)
+object SpawnTask : CoroutineScope {
+    private var runningTask: Job? = null
+    override val coroutineContext: CoroutineContext =
+        (CoroutineScope(Dispatchers.Default) + CoroutineName("Mobzy spawn task")).coroutineContext
 
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
 
@@ -51,7 +55,7 @@ object SpawnTask {
 
     fun startTask() {
         if (runningTask != null) return
-        runningTask = mobzy.schedule(ASYNC) {
+        runningTask = launch(BukkitDispatcher(mobzy, async = true)) {
             while (mobzyConfig.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
@@ -59,17 +63,17 @@ object SpawnTask {
                 } catch (e: NoClassDefFoundError) {
                     e.printStackTrace()
                     stopTask()
-                    return@schedule
+                    return@launch
                 } catch (e: RuntimeException) {
                     e.printStackTrace()
                 }
-                waitFor(mobzyConfig.spawnTaskDelay.inWholeTicks)
+                delay(mobzyConfig.spawnTaskDelay.inWholeTicks)
             }
             stopTask()
         }
     }
 
-    private fun runSpawnTask() {
+    private suspend fun runSpawnTask() {
         val onlinePlayers = Bukkit.getOnlinePlayers().filter { !it.isDead }
         if (onlinePlayers.isEmpty()) return
 
@@ -107,8 +111,10 @@ object SpawnTask {
                 val success = choice.callEvent(RequestCheck, spawnInfo, spawnCheckLoc) { !it.has<FailedCheck>() }
                 if (success) {
                     // Must spawn mobs in sync
-                    mobzy.schedule(SYNC) {
-                        if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
+                    coroutineScope {
+                        launch(BukkitDispatcher(mobzy)) {
+                            if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
+                        }
                     }
                     break
                 } else priorities.remove(choice)

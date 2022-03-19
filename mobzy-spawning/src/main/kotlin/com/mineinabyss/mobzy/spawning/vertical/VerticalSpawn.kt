@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
+import com.mineinabyss.geary.papermc.GearyMCContext
 import org.bukkit.Chunk
 import org.bukkit.ChunkSnapshot
 import org.bukkit.Location
@@ -9,6 +10,7 @@ import org.bukkit.Location
  *
  * Will generate a list of [SpawnInfo]s, from all air gaps within this vertical strip.
  */
+context(GearyMCContext)
 object VerticalSpawn {
     fun findGap(
         chunk: Chunk,

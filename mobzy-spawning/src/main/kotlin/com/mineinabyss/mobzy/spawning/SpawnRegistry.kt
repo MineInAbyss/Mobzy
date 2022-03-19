@@ -1,14 +1,14 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.geary.prefabs.PrefabManager
-import com.mineinabyss.geary.prefabs.PrefabManagerScope
+import com.mineinabyss.geary.prefabs.PrefabManagerContext
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
@@ -20,7 +20,7 @@ import org.koin.core.component.inject
  * @property regionSpawns A map of region names to their [SpawnRegion].
  */
 @AutoScan
-object SpawnRegistry : GearyListener(), PrefabManagerScope {
+object SpawnRegistry : GearyListener(), PrefabManagerContext {
     override val prefabManager: PrefabManager by inject()
 
     private val TargetScope.parentRegions by added<WGRegions>()

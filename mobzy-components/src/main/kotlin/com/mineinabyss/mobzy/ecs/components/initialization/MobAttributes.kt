@@ -1,11 +1,10 @@
 package com.mineinabyss.mobzy.ecs.components.initialization
 
-import com.mineinabyss.idofront.nms.typeinjection.NMSAttributeBuilder
-import com.mineinabyss.idofront.nms.typeinjection.NMSAttributes
-import com.mineinabyss.idofront.nms.typeinjection.NMSGenericAttributes
-import com.mineinabyss.idofront.nms.typeinjection.set
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.minecraft.world.entity.ai.attributes.Attribute
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
 
 @Serializable
 @SerialName("mobzy:attributes")
@@ -27,19 +26,23 @@ data class MobAttributes(
     val movementSpeed: Double? = 0.25,
     val spawnReinforcements: Double? = null
 ) {
+    fun AttributeSupplier.Builder.addNullable(attribute: Attribute, value: Double?): AttributeSupplier.Builder {
+        if (value != null) add(attribute, value)
+        return this
+    }
 
-    fun toNMSBuilder(): NMSAttributeBuilder = NMSAttributes.forEntityInsentient()
-        .set(NMSGenericAttributes.a, maxHealth)
-        .set(NMSGenericAttributes.b, followRange)
-        .set(NMSGenericAttributes.c, knockbackResistance)
-        .set(NMSGenericAttributes.d, movementSpeed)
-        .set(NMSGenericAttributes.e, flyingSpeed)
-        .set(NMSGenericAttributes.f, attackDamage)
-        .set(NMSGenericAttributes.g, attackKnockback)
-        .set(NMSGenericAttributes.h, attackSpeed)
-        .set(NMSGenericAttributes.i, armor)
-        .set(NMSGenericAttributes.j, armorToughness)
-        .set(NMSGenericAttributes.k, luck)
-        .set(NMSGenericAttributes.l, spawnReinforcements)
-        .set(NMSGenericAttributes.m, jumpStrength)
+    fun toNMSBuilder(): AttributeSupplier.Builder = AttributeSupplier.builder()
+        .addNullable(Attributes.MAX_HEALTH, maxHealth)
+        .addNullable(Attributes.FOLLOW_RANGE, followRange)
+        .addNullable(Attributes.KNOCKBACK_RESISTANCE, knockbackResistance)
+        .addNullable(Attributes.MOVEMENT_SPEED, movementSpeed)
+        .addNullable(Attributes.FLYING_SPEED, flyingSpeed)
+        .addNullable(Attributes.ATTACK_DAMAGE, attackDamage)
+        .addNullable(Attributes.ATTACK_KNOCKBACK, attackKnockback)
+        .addNullable(Attributes.ATTACK_SPEED, attackSpeed)
+        .addNullable(Attributes.ARMOR, armor)
+        .addNullable(Attributes.ARMOR_TOUGHNESS, armorToughness)
+        .addNullable(Attributes.LUCK, luck)
+        .addNullable(Attributes.SPAWN_REINFORCEMENTS_CHANCE, spawnReinforcements)
+        .addNullable(Attributes.JUMP_STRENGTH, jumpStrength)
 }

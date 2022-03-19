@@ -1,12 +1,12 @@
 package com.mineinabyss.mobzy.ecs.components
 
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
-import com.mineinabyss.idofront.nms.aliases.NMSCreatureType
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.nms.entity.creatureType
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.minecraft.world.entity.MobCategory as NMSMobCategory
 
 @Serializable
 @SerialName("mobzy:mob_category")
@@ -21,8 +21,9 @@ enum class MobCategory {
     UNDERGROUND_WATER_CREATURE
 }
 
-fun NMSCreatureType.toMobCategory(): MobCategory =
+fun NMSMobCategory.toMobzyCategory(): MobCategory =
     MobCategory.valueOf(this.name)
 
+context(GearyMCContext)
 val BukkitEntity.mobCategory
-    get() = toGeary().get(MobCategory::class) ?: toNMS().entityType.creatureType.toMobCategory()
+    get() = toGeary().get(MobCategory::class) ?: toNMS().type.category.toMobzyCategory()

@@ -1,5 +1,7 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.ecs.api.GearyContext
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
@@ -29,7 +31,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Entity
 
-class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
+class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by GearyMCContext() {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
@@ -59,7 +61,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                                 "custom" -> entity.extendsCustomClass
                                 "named" -> entity.isCustomAndRenamed
                                 "npc" -> nmsEntity is NPC
-                                "interactable" -> nmsEntity is InteractableEntity
+                                "interactable" -> nmsEntity is NPC
                                 "passive" -> nmsEntity !is NPC && nmsEntity is PassiveMob
                                 "hostile" -> nmsEntity is HostileMob
                                 "flying" -> nmsEntity is FlyingMob

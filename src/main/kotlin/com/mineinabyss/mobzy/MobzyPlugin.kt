@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.api.addon.GearyLoadPhase
 import com.mineinabyss.geary.api.addon.GearyLoadPhase.ENABLE
 import com.mineinabyss.geary.papermc.dsl.gearyAddon
 import com.mineinabyss.idofront.platforms.IdofrontPlatforms
@@ -36,11 +35,6 @@ class MobzyPlugin : JavaPlugin() {
             GearySpawningListener,
         )
 
-        if (isPluginEnabled("ModelEngine")) {
-            registerEvents(ModelEngineSystem)
-            registerService<AnimationController>(ModelEngineSystem)
-        }
-
         //Register commands
         MobzyCommands()
 
@@ -50,6 +44,12 @@ class MobzyPlugin : JavaPlugin() {
         gearyAddon {
             autoScanAll()
 
+            systems(ModelEngineSystem)
+
+            if (isPluginEnabled("ModelEngine")) {
+                registerService<AnimationController>(ModelEngineSystem)
+            }
+
             // Autoscan the subclasses of PathfinderComponent
             autoScan<PathfinderComponent>()
 
@@ -58,9 +58,9 @@ class MobzyPlugin : JavaPlugin() {
                     config.load()
                 }
             }
-        }
 
-        MobzyPacketInterception.registerPacketInterceptors()
+            MobzyPacketInterception.registerPacketInterceptors()
+        }
     }
 
     override fun onDisable() {

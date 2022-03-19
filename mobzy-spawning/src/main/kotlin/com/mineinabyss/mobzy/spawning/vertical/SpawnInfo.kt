@@ -4,6 +4,7 @@ import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.geary.ecs.query.invoke
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
@@ -26,6 +27,7 @@ import kotlin.random.Random
  * @property bottom The bottommost location of the spawn.
  * @property gap The gap in the y-axis between the two of them.
  */
+context(GearyMCContext)
 class SpawnInfo(
     val bottom: Location,
     val top: Location,
@@ -94,4 +96,4 @@ class SpawnInfo(
 }
 
 fun Collection<Entity>.categorizeMobs(): Map<NMSEntityType<*>, Int> =
-    groupingBy { it.toNMS().entityType }.eachCount()
+    groupingBy { it.toNMS().type }.eachCount()

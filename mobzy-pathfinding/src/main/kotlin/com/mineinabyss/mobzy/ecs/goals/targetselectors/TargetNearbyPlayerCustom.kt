@@ -1,15 +1,15 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
+import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.minecraft.world.entity.EntityLiving
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
-import org.bukkit.entity.Mob
+import org.bukkit.entity.Creature
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
@@ -20,27 +20,32 @@ import org.bukkit.event.entity.EntityTargetEvent
  * @param range the range of the mob to detect players to target
  * @param ticksWaitAfterPlayerDeath the number of ticks to wait after a player has died until they are a viable target
  */
+context(GearyMCContext)
 @Serializable
 @SerialName("mobzy:target.nearby_player")
 class TargetNearbyPlayerCustom(
-        private val range: Double? = null,
-        private val ticksWaitAfterPlayerDeath: Int = 200
+    private val range: Double? = null,
+    private val ticksWaitAfterPlayerDeath: Int = 200
 ) : PathfinderComponent() {
-    override fun build(mob: Mob) =
-            TargetNearbyPlayerCustomGoal(mob, range ?: mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0, ticksWaitAfterPlayerDeath)
+    override fun build(mob: Creature) =
+        TargetNearbyPlayerCustomGoal(
+            mob,
+            range ?: mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0,
+            ticksWaitAfterPlayerDeath
+        )
 }
 
+context(GearyMCContext)
 class TargetNearbyPlayerCustomGoal(
-        override val mob: Mob,
-        private val range: Double,
-        private val ticksWaitAfterPlayerDeath: Int = 200
-) : MobzyPathfinderGoal(type = Type.d /* TARGET */) {
+    override val mob: Creature,
+    private val range: Double,
+    private val ticksWaitAfterPlayerDeath: Int = 200
+) : MobzyPathfinderGoal(flags = listOf(Flag.TARGET) /* TARGET */) {
     private lateinit var playerDamager: Player
 
     override fun shouldExecute(): Boolean {
         assignTargetPlayer()
-
-        val damager = (nmsEntity.lastDamager ?: return false).toBukkit()
+        val damager = (nmsEntity.lastDamageSource?.entity ?: return false).toBukkit()
         if (damager !is Player) return false
         playerDamager = damager
 
@@ -65,20 +70,16 @@ class TargetNearbyPlayerCustomGoal(
      * @return none, but uses return to exit early if no target is found
      */
     private fun assignTargetPlayer() {
-
-        val targetPlayer = nmsEntity.toBukkit().getNearbyEntities(range, range, range).firstOrNull { it is Player }
-                ?: return
+        val targetPlayer = nmsEntity.toBukkit()
+            .getNearbyEntities(range, range, range)
+            .firstOrNull { it is Player } ?: return
 
         if (!isPlayerValidTarget(targetPlayer as Player, range, 200)) {
             reset()
             return
         }
 
-        nmsEntity.setGoalTarget(
-                (targetPlayer as CraftPlayer).handle as EntityLiving,
-                EntityTargetEvent.TargetReason.CLOSEST_PLAYER,
-                true
-        )
+        nmsEntity.setTarget(targetPlayer.toNMS(), EntityTargetEvent.TargetReason.CLOSEST_PLAYER, true)
     }
 
 }
