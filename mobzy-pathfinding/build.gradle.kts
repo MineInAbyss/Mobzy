@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(Deps.kotlinx.serialization.json)
+    compileOnly(libs.kotlinx.serialization.json)
 
     compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
 

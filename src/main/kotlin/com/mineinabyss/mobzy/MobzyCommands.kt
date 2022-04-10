@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.api.GearyContext
-import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
@@ -17,7 +17,6 @@ import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.nms.entity.typeName
 import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.injection.extendsCustomClass
@@ -31,7 +30,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Entity
 
-class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by GearyMCContext() {
+class MobzyCommands(
+    val nmsTypeInjector: MobzyNMSTypeInjector
+) : IdofrontCommandExecutor(), TabCompleter, GearyContext by GearyMCContextKoin() {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
@@ -96,7 +97,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                             sender.info(
                                 categories.entries
                                     .sortedByDescending { it.value }
-                                    .joinToString("\n") { (type, amount) -> "&7${type.typeName}&r: $amount".color() }
+                                    .joinToString("\n") { (type, amount) -> "&7${type.id}&r: $amount".color() }
                             )
                     }
                 }
@@ -134,7 +135,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
             }
 
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
-                sender.success("All registered types:\n${MobzyNMSTypeInjector.typeNames}")
+                sender.success("All registered types:\n${nmsTypeInjector.typeNames}")
             }
 
             "config"(desc = "Configuration options") {
@@ -193,7 +194,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                         var min = 1
                         try {
                             min = args[2].toInt()
-                        } catch (e: NumberFormatException) {
+                        } catch (_: NumberFormatException) {
                         }
                         return (min until mobzyConfig.maxCommandSpawns).asIterable()
                             .map { it.toString() }.filter { it.startsWith(min.toString()) }

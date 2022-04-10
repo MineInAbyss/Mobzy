@@ -6,6 +6,7 @@ import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.api.systems.provideDelegate
 import com.mineinabyss.geary.ecs.query.Query
 import com.mineinabyss.geary.prefabs.PrefabManager
 import com.mineinabyss.geary.prefabs.PrefabManagerContext

@@ -15,7 +15,6 @@ import net.minecraft.world.entity.animal.axolotl.Axolotl
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
-context(GearyMCContext)
 class HostileWaterMob(
     type: NMSEntityType<out Axolotl>, world: NMSWorld
 ) : Axolotl(type, world), CustomEntity {

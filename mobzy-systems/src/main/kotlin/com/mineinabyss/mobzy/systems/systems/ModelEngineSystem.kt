@@ -1,12 +1,13 @@
 package com.mineinabyss.mobzy.systems.systems
 
 import com.mineinabyss.geary.ecs.accessors.TargetScope
+import com.mineinabyss.geary.ecs.api.GearyContext
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.engine.systems
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
 import com.mineinabyss.geary.ecs.api.systems.GearySystem
-import com.mineinabyss.geary.papermc.GearyMCContext
-import com.mineinabyss.geary.ecs.api.GearyContext
+import com.mineinabyss.geary.ecs.api.systems.provideDelegate
+import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.modelengine.AnimationController
@@ -16,7 +17,7 @@ import com.ticxo.modelengine.api.model.ModeledEntity
 import org.bukkit.event.Listener
 
 
-object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyContext by GearyMCContext() {
+object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyContext by GearyMCContextKoin() {
     private val modelManager: ModelManager? by lazy {
         runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
     }
@@ -50,14 +51,15 @@ object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyCont
             }
             modelEntity.addActiveModel(createdModel)
 
-        modelEntity.apply {
-            detectPlayers()
-            bukkit.customName?.let {
-                modelEntity.nametagHandler.setCustomName("head", it)
-            }
+            modelEntity.apply {
+                detectPlayers()
+                bukkit.customName?.let {
+                    modelEntity.nametagHandler.setCustomName("head", it)
+                }
 
-            modelEntity.nametagHandler.setCustomNameVisibility("head", model.nametag)
-            isInvisible = model.invisible
+                modelEntity.nametagHandler.setCustomNameVisibility("head", model.nametag)
+                isInvisible = model.invisible
+            }
         }
     }
 }

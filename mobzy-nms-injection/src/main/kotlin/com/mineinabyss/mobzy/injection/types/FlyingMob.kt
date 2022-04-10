@@ -14,7 +14,6 @@ import net.minecraft.world.entity.FlyingMob
 import net.minecraft.world.entity.ai.control.FlyingMoveControl
 import net.minecraft.world.level.Level
 
-context(GearyMCContext)
 class FlyingMob(
     type: EntityType<out FlyingMob>, world: Level
 ) : FlyingMob(type, world), CustomEntity {

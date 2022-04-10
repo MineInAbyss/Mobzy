@@ -1,5 +1,3 @@
-import Com_mineinabyss_conventions_platform_gradle.Deps
-
 val gearyVersion: String by project
 
 plugins {
@@ -15,11 +13,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly(Deps.kotlinx.serialization.json)
-    compileOnly(Deps.kotlinx.serialization.kaml)
-    compileOnly(Deps.minecraft.skedule)
-    compileOnly(Deps.kotlinx.coroutines)
-    compileOnly(Deps.`kotlin-statistics`) {
+    compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(libs.kotlinx.serialization.kaml)
+    compileOnly(libs.minecraft.skedule)
+    compileOnly(libs.kotlinx.coroutines)
+    compileOnly(libs.kotlin.statistics) {
         exclude(group = "org.jetbrains.kotlin")
     }
 

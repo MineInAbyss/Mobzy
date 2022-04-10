@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.ecs.api.entities.with
-import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
 import com.mineinabyss.geary.papermc.store.decodeComponentsFrom
@@ -23,8 +22,9 @@ import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import java.util.*
 
-context(GearyMCContext)
-class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data.serializer()), MobzyConfig {
+class MobzyConfigImpl(
+    val nmsTypeInjector: MobzyNMSTypeInjector
+) : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data.serializer()), MobzyConfig {
     /**
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
@@ -35,7 +35,7 @@ class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data
         //TODO PrefabManager.clearFromPlugin(mobzy)
 
         "Clear registered types" {
-            MobzyNMSTypeInjector.clear()
+            nmsTypeInjector.clear()
         }
 
         "Stop spawn task" {
@@ -47,7 +47,7 @@ class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data
         logSuccess("Loading Mobzy config")
 
         "Inject mob attributes" {
-            MobzyNMSTypeInjector.injectDefaultAttributes()
+            nmsTypeInjector.injectDefaultAttributes()
         }
 
         "Spawns" {
@@ -63,7 +63,7 @@ class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data
             fixEntitiesAfterReload()
         }
 
-        sender.success("Loaded types: ${MobzyNMSTypeInjector.typeNames}")
+        sender.success("Loaded types: ${nmsTypeInjector.typeNames}")
         sender.success("Successfully loaded config")
     }
 

@@ -20,7 +20,6 @@ import org.bukkit.event.entity.EntityTargetEvent
  * @param range the range of the mob to detect players to target
  * @param ticksWaitAfterPlayerDeath the number of ticks to wait after a player has died until they are a viable target
  */
-context(GearyMCContext)
 @Serializable
 @SerialName("mobzy:target.nearby_player")
 class TargetNearbyPlayerCustom(
@@ -35,7 +34,6 @@ class TargetNearbyPlayerCustom(
         )
 }
 
-context(GearyMCContext)
 class TargetNearbyPlayerCustomGoal(
     override val mob: Creature,
     private val range: Double,

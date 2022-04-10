@@ -7,9 +7,10 @@ import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.api.relations.Processed
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.api.systems.provideDelegate
 import com.mineinabyss.geary.ecs.components.*
 import com.mineinabyss.geary.ecs.query.Query
-import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.papermc.globalContextMC
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.geary.prefabs.configuration.components.Prefab
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
@@ -42,10 +43,9 @@ object MobzyTypesQuery : Query() {
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobType]
  * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
  */
-context(GearyMCContext)
 @Suppress("ObjectPropertyName")
 @AutoScan
-object MobzyNMSTypeInjector : GearyListener() {
+class MobzyNMSTypeInjector : GearyListener() {
     private val TargetScope.info by added<MobzyType>()
     private val TargetScope.key by added<PrefabKey>()
 
@@ -132,7 +132,7 @@ object MobzyNMSTypeInjector : GearyListener() {
     }
 
     private val mobBaseClasses =
-        mutableMapOf<String, /*context(GearyMCContext) */(EntityType<out Nothing>, Level) -> Entity>(
+        mutableMapOf<String, (EntityType<out Nothing>, Level) -> Entity>(
             "mobzy:flying" to { type, world -> FlyingMob(type, world) }, //TODO use namespaced keys
             "mobzy:hostile" to { type, world -> HostileMob(type, world) },
             "mobzy:passive" to { type, world -> PassiveMob(type, world) },
@@ -149,7 +149,6 @@ object MobzyNMSTypeInjector : GearyListener() {
 //TODO try to reduce usage around code, should really only be done in one central place
 internal fun String.toEntityTypeName() = lowercase().replace(" ", "_")
 
-context(GearyMCContext)
 fun NMSEntityType<*>.toPrefab(): GearyEntity? {
-    return prefabManager[MobzyNMSTypeInjector.getPrefabForType(this@toPrefab) ?: return null]
+    return globalContextMC.prefabManager[globalNMSTypeInjector.getPrefabForType(this@toPrefab) ?: return null]
 }

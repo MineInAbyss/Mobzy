@@ -13,7 +13,6 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.monster.Monster
 
-context(GearyMCContext)
 open class HostileMob(
     type: NMSEntityType<out Monster>, world: NMSWorld
 ) : Monster(type, world), CustomEntity {

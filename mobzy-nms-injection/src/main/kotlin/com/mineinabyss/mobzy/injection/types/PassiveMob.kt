@@ -15,7 +15,6 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.AgeableMob
 import net.minecraft.world.entity.animal.Animal
 
-context(GearyMCContext)
 open class PassiveMob(
     type: NMSEntityType<out Animal>, world: NMSWorld
 ) : Animal(type, world), CustomEntity {

@@ -5,7 +5,9 @@ import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.api.systems.provideDelegate
 import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.ecs.components.MobCategory
@@ -13,8 +15,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.concurrent.atomic.AtomicInteger
 
-context(GearyMCContext)
-object MobCountManager : Listener {
+object MobCountManager : Listener, GearyMCContext by GearyMCContextKoin() {
     val categoryCounts: MutableMap<MobCategory, AtomicInteger> = mutableMapOf()
 
     fun isCategoryAllowed(category: MobCategory) =

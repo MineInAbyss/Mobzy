@@ -16,7 +16,6 @@ import net.minecraft.world.entity.animal.AbstractSchoolingFish
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
-context(GearyMCContext)
 class FishMob(
     type: NMSEntityType<out AbstractSchoolingFish>, world: NMSWorld
 ) : AbstractSchoolingFish(type, world), CustomEntity {

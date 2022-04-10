@@ -9,7 +9,6 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.phys.Vec3
 
-context(GearyMCContext)
 class NPC(type: NMSEntityType<out Animal>, world: NMSWorld) : PassiveMob(type, world), CustomEntity {
     //Stop from being pushed around
     override fun setDeltaMovement(velocity: Vec3) = Unit

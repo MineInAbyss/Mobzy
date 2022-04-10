@@ -1,4 +1,3 @@
-import Com_mineinabyss_conventions_platform_gradle.Deps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val serverVersion: String by project
@@ -6,13 +5,14 @@ val idofrontVersion: String by project
 val gearyVersion: String by project
 
 plugins {
+    kotlin("jvm")
+    kotlin("plugin.serialization")
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.nms")
     id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
-    kotlin("plugin.serialization")
 }
 
 allprojects {
@@ -44,11 +44,12 @@ repositories {
 
 dependencies {
     // MineInAbyss platform
-    compileOnly(Deps.kotlin.stdlib)
-    compileOnly(Deps.kotlinx.serialization.json)
-    compileOnly(Deps.kotlinx.serialization.kaml)
-    compileOnly(Deps.kotlinx.coroutines)
-    compileOnly(Deps.minecraft.skedule)
+    compileOnly(libs.kotlin.stdlib)
+    compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(libs.kotlinx.serialization.kaml)
+    compileOnly(libs.kotlinx.coroutines)
+    compileOnly(libs.minecraft.skedule)
+    compileOnly(libs.koin.core)
 
     // Other plugins
     compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
@@ -62,10 +63,10 @@ dependencies {
     implementation(project(":mobzy-core"))
 
     // Testing
-    testImplementation(Deps.`kotlin-statistics`)
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.17:1.13.0")
-    testImplementation(Deps.kotlinx.serialization.json)
-    testImplementation(Deps.kotlinx.serialization.kaml)
+    testImplementation(libs.kotlin.statistics)
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.18:1.24.1")
+    testImplementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.kotlinx.serialization.kaml)
 }
 
 tasks {

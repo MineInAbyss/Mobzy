@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
+import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.api.systems.provideDelegate
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.mobzyConfig
 import com.mineinabyss.mobzy.spawning.GlobalSpawnInfo

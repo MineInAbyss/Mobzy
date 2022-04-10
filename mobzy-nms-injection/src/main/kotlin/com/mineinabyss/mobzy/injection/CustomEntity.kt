@@ -22,7 +22,6 @@ interface CustomEntity {
 }
 
 /** Plays a sound effect at the mob's location and returns null */
-context(GearyMCContext)
 fun NMSEntity.makeSound(default: SoundEvent? = null, sound: Sounds.() -> String?): SoundEvent? {
     val entity = toGeary()
     entity.makeSound(entity.get<Sounds>()?.sound() ?: return default)
@@ -30,7 +29,6 @@ fun NMSEntity.makeSound(default: SoundEvent? = null, sound: Sounds.() -> String?
 }
 
 //TODO think of a better place to put this, something less inheritance-ey
-context(GearyMCContext)
 fun GearyEntity.makeSound(sound: String) {
     val bukkit = toBukkit() ?: return
     val sounds = get() ?: Sounds()
@@ -44,5 +42,4 @@ fun GearyEntity.makeSound(sound: String) {
     )
 }
 
-context(GearyMCContext)
 fun NMSEntity.toGeary(): GearyEntity = toBukkit().toGeary()

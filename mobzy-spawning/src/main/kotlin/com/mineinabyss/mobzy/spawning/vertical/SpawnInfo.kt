@@ -27,7 +27,6 @@ import kotlin.random.Random
  * @property bottom The bottommost location of the spawn.
  * @property gap The gap in the y-axis between the two of them.
  */
-context(GearyMCContext)
 class SpawnInfo(
     val bottom: Location,
     val top: Location,

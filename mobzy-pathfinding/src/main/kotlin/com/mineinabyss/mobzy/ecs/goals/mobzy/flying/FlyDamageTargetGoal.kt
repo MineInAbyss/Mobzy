@@ -11,14 +11,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Creature
 
-context(GearyMCContext)
 @Serializable
 @SerialName("mobzy:behavior.flying_damage_target")
 class FlyDamageTargetBehavior : PathfinderComponent() {
     override fun build(mob: Creature) = FlyDamageTargetGoal(mob)
 }
 
-context(GearyMCContext)
 class FlyDamageTargetGoal(override val mob: Creature) : MobzyPathfinderGoal() {
     override fun shouldExecute(): Boolean = mob.target != null && cooledDown
 

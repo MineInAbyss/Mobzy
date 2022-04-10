@@ -40,7 +40,6 @@ import kotlin.random.Random
  * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
  * the chosen region
  */
-context(GearyMCContext)
 object SpawnTask : CoroutineScope {
     private var runningTask: Job? = null
     override val coroutineContext: CoroutineContext =

@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.components
 
-import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -24,6 +23,5 @@ enum class MobCategory {
 fun NMSMobCategory.toMobzyCategory(): MobCategory =
     MobCategory.valueOf(this.name)
 
-context(GearyMCContext)
 val BukkitEntity.mobCategory
     get() = toGeary().get(MobCategory::class) ?: toNMS().type.category.toMobzyCategory()

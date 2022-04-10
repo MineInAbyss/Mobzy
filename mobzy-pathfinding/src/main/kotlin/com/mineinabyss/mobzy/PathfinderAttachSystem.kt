@@ -4,6 +4,7 @@ import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
+import com.mineinabyss.geary.ecs.api.systems.provideDelegate
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders

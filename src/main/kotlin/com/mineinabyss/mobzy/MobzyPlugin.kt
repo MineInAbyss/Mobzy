@@ -7,6 +7,7 @@ import com.mineinabyss.idofront.plugin.isPluginEnabled
 import com.mineinabyss.idofront.plugin.registerEvents
 import com.mineinabyss.idofront.plugin.registerService
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
@@ -35,10 +36,11 @@ class MobzyPlugin : JavaPlugin() {
             GearySpawningListener,
         )
 
+        val nmsTypeInjector = MobzyNMSTypeInjector()
         //Register commands
-        MobzyCommands()
+        MobzyCommands(nmsTypeInjector)
 
-        val config = MobzyConfigImpl()
+        val config = MobzyConfigImpl(nmsTypeInjector)
         registerService<MobzyConfig>(config)
 
         gearyAddon {

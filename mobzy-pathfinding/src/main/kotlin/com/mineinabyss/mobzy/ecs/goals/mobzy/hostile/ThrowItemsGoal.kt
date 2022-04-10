@@ -24,7 +24,6 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-context(GearyMCContext)
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
@@ -57,7 +56,6 @@ class ThrowItemsBehavior(
  * @param minThrowRad The minimum radius at which to start throwing item at the target.
  * @param cooldown How long to wait between firing at the target.
  */
-context(GearyMCContext)
 class ThrowItemsGoal(
     override val mob: Creature,
     private val prefab: GearyEntity,

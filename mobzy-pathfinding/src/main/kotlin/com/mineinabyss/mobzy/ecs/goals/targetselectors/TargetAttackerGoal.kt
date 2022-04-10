@@ -12,7 +12,6 @@ import org.bukkit.entity.Creature
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
-context(GearyMCContext)
 @Serializable
 @SerialName("mobzy:target.attacker")
 class TargetAttacker(
@@ -22,7 +21,6 @@ class TargetAttacker(
         TargetAttackerGoal(mob, range ?: mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0)
 }
 
-context(GearyMCContext)
 class TargetAttackerGoal(
     override val mob: Creature,
     private val range: Double

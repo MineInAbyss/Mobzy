@@ -65,7 +65,6 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, flags: List
      * @param ticksWaitAfterPlayerDeath the number of ticks to wait after a player has died until they are a viable target
      * @return True if the player is valid target, False if not
      * */
-    context(GearyMCContext)
     fun isPlayerValidTarget(
         player: Player,
         range: Double = mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0,

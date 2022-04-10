@@ -1,5 +1,3 @@
-import Com_mineinabyss_conventions_platform_gradle.Deps
-
 val gearyVersion: String by project
 
 plugins {
@@ -14,8 +12,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly(Deps.kotlinx.serialization.json)
+    compileOnly(libs.kotlinx.serialization.json)
 
     compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
-    compileOnly("com.ticxo.modelengine:api:R2.4.1")
+    compileOnly("com.ticxo.modelengine:api:R2.5.0")
 }

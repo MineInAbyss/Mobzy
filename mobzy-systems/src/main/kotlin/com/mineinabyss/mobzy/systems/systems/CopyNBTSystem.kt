@@ -1,11 +1,10 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.building.get
 import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.ecs.accessors.TargetScope
 import com.mineinabyss.geary.ecs.api.annotations.Handler
 import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.ecs.api.systems.provideDelegate
 import com.mineinabyss.geary.papermc.store.decodeComponentsFrom
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -18,7 +17,6 @@ import com.mineinabyss.mobzy.ecs.components.CopyNBT
  *
  * TODO MAKE SURE IT ACTUALLY DOES COPY THE PDC!
  */
-context(GearyMCContext)
 @AutoScan
 class CopyNBTSystem : GearyListener() {
     private val TargetScope.nbt by added<CopyNBT>()

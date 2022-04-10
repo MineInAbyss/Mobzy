@@ -8,6 +8,9 @@ import kotlinx.serialization.Serializable
 @SerialName("mobzy:type")
 class MobzyType(
     val baseClass: String,
-    val creatureType: net.minecraft.world.entity.MobCategory,
+    @SerialName("creatureType")
+    private val _creatureType: String,
     val mobCategory: MobCategory? = null
-)
+) {
+    val creatureType get() = net.minecraft.world.entity.MobCategory.byName(_creatureType)
+}
