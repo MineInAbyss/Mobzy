@@ -23,7 +23,6 @@ allprojects {
         kotlinOptions {
             freeCompilerArgs = listOf(
                 "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
-                "-Xcontext-receivers",
             )
         }
     }

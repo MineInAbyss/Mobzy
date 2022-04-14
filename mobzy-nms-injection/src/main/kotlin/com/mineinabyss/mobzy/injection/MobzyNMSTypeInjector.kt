@@ -17,10 +17,11 @@ import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
 import com.mineinabyss.idofront.nms.typeinjection.*
-import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.ecs.components.toMobzyCategory
 import com.mineinabyss.mobzy.injection.types.*
+import net.minecraft.core.Registry
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
@@ -39,6 +40,8 @@ object MobzyTypesQuery : Query() {
     val TargetScope.key by get<PrefabKey>()
 }
 
+fun PrefabKey.toResourceKey(): ResourceLocation = ResourceLocation(namespace, name)
+
 /**
  * @property types Used for getting a MobType from a String, which makes it easier to access from [MobType]
  * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
@@ -55,7 +58,10 @@ class MobzyNMSTypeInjector : GearyListener() {
 
     @Handler
     fun TargetScope.addNMSType() {
-        val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
+        val nmsEntityType = Registry.ENTITY_TYPE.getOptional(info.baseClass.toResourceKey()).orElseGet {
+            error("Couldn't find a key ${info.baseClass} registered with minecraft.")
+        }
+//        val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
         entity.set(nmsEntityType)
         entity.set(info.mobCategory ?: info.creatureType.toMobzyCategory())
         entity.setRelation(MobzyType::class, Processed)
@@ -103,33 +109,33 @@ class MobzyNMSTypeInjector : GearyListener() {
         }
     }
 
-    /**
-     * Registers a new entity with the server with extra parameters for width, height, and the function for creating the
-     * entity.
-     *
-     * @see injectType
-     */
-    fun inject(
-        key: PrefabKey,
-        prefabInfo: MobzyType,
-        attributes: MobAttributes = MobAttributes()
-    ): NMSEntityType<*> {
-        val init: (EntityType<NMSEntity>, Level) -> Entity =
-            (mobBaseClasses[prefabInfo.baseClass] as? (EntityType<NMSEntity>, Level) -> Entity
-                ?: error("Not a valid parent class: ${prefabInfo.baseClass}"))
-        val mobID = key.name.toEntityTypeName()
-        val injected: NMSEntityType<out NMSEntity> =
-            EntityType.Builder.of<NMSEntity>(EntityType.EntityFactory(init), prefabInfo.creatureType)
-                .sized(attributes.width, attributes.height)
-                .apply {
-                    if (attributes.fireImmune) fireImmune()
-                }
-                .injectType(namespace = key.namespace, key = mobID, extendFrom = "minecraft:zombie")
-
-        customAttributes[injected] = attributes.toNMSBuilder().build()
-        _types[mobID] = injected
-        return injected
-    }
+//    /**
+//     * Registers a new entity with the server with extra parameters for width, height, and the function for creating the
+//     * entity.
+//     *
+//     * @see injectType
+//     */
+//    fun inject(
+//        key: PrefabKey,
+//        prefabInfo: MobzyType,
+//        attributes: MobAttributes = MobAttributes()
+//    ): NMSEntityType<*> {
+//        val init: (EntityType<NMSEntity>, Level) -> Entity =
+//            (mobBaseClasses[prefabInfo.baseClass] as? (EntityType<NMSEntity>, Level) -> Entity
+//                ?: error("Not a valid parent class: ${prefabInfo.baseClass}"))
+//        val mobID = key.name.toEntityTypeName()
+//        val injected: NMSEntityType<out NMSEntity> =
+//            EntityType.Builder.of<NMSEntity>(EntityType.EntityFactory(init), prefabInfo.creatureType)
+//                .sized(attributes.width, attributes.height)
+//                .apply {
+//                    if (attributes.fireImmune) fireImmune()
+//                }
+//                .injectType(namespace = key.namespace, key = mobID, extendFrom = "minecraft:zombie")
+//
+//        customAttributes[injected] = attributes.toNMSBuilder().build()
+//        _types[mobID] = injected
+//        return injected
+//    }
 
     private val mobBaseClasses =
         mutableMapOf<String, (EntityType<out Nothing>, Level) -> Entity>(

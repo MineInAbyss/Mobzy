@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.injection.types
 
-import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds

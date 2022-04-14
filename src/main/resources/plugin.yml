@@ -3,7 +3,7 @@ version: ${plugin_version}
 author: Offz
 main: com.mineinabyss.mobzy.MobzyPlugin
 api-version: 1.16
-depend: [Geary, WorldGuard, ProtocolLib, ProtocolBurrito]
+depend: [ Geary, WorldGuard, ProtocolLib, ProtocolBurrito ]
 softdepend: [ Looty, ModelEngine ]
 
 prefix: Mobzy
@@ -11,6 +11,6 @@ description: A custom entities API
 
 commands:
   mobzy:
-    aliases: [mz, mobzy]
+    aliases: [ mz, mobzy ]
     description: The main mobzy command
     usage: /mobzy [sub command]

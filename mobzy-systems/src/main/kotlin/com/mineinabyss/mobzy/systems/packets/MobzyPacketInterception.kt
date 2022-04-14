@@ -5,15 +5,14 @@ import com.comphenix.protocol.wrappers.Vector3F
 import com.comphenix.protocol.wrappers.WrappedDataWatcher
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject
 import com.mineinabyss.geary.papermc.access.toGeary
-import com.mineinabyss.geary.papermc.access.toGearyOrNull
+import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
-import com.mineinabyss.protocolburrito.enums.PacketEntityType
-import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacket
-import com.mineinabyss.protocolburrito.packets.ClientboundMoveEntityPacket
-import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacket
-import org.bukkit.Bukkit
+import com.mineinabyss.protocolburrito.packets.wrap
+import net.minecraft.core.Registry
+import net.minecraft.network.protocol.game.ClientboundAddMobPacket
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import org.bukkit.entity.Entity
 import kotlin.experimental.or
 
@@ -26,20 +25,20 @@ object MobzyPacketInterception {
     fun registerPacketInterceptors() {
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
-            onSend(
-                ::ClientboundAddMobPacket,
-                Server.SPAWN_ENTITY_LIVING
-            ) {
-                val entity = Bukkit.getEntity(uuid) ?: return@onSend
+            onSend(Server.SPAWN_ENTITY_LIVING) {
+                val nms = (packet.handle as ClientboundAddMobPacket).wrap()
+                val entity = entity(nms.id)
                 if (entity.toGeary().has<Model>())
-                    type = PacketEntityType.ARMOR_STAND.id
+                    nms.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
+
             }
 
-            onSend(::ClientboundSetEntityDataPacket, Server.ENTITY_METADATA) {
-                val entity: Entity = getEntityFromID(it.player.world, id) ?: return@onSend
+            onSend(Server.ENTITY_METADATA) {
+                val nms = (packet.handle as ClientboundSetEntityDataPacket).wrap()
+                val entity: Entity = getEntityFromID(player.world, nms.id) ?: return@onSend
                 if (!entity.toGeary().has<Model>()) return@onSend
 
-                val existingMeta = WrappedDataWatcher(handle.watchableCollectionModifier.values[0])
+                val existingMeta = WrappedDataWatcher(packet.watchableCollectionModifier.values[0])
                 val metadata = WrappedDataWatcher().apply {
                     val entityFlags = existingMeta.getObject(META_ENTITY_FLAGS) as? Byte ?: 0
 
@@ -65,23 +64,23 @@ object MobzyPacketInterception {
                     //Don't copy anything else to prevent crashes in bad packets.
                 }
 
-                handle.watchableCollectionModifier.write(0, metadata.watchableObjects)
+                packet.watchableCollectionModifier.write(0, metadata.watchableObjects)
             }
 
             //pitch lock custom mobs
-            onSend(
-                ::ClientboundMoveEntityPacket,
-                //all these packets seem to be enough to cover all head rotations
-                Server.ENTITY_LOOK,
-                Server.REL_ENTITY_MOVE_LOOK,
-                Server.LOOK_AT,
-                Server.ENTITY_TELEPORT
-            ) {
-                //TODO change entity(entityId) to return nullable in ProtocolBurrito
-                val entity = getEntityFromID(it.player.world, entityId) ?: return@onSend
-                if (entity.toGearyOrNull()?.has<Model>() == true) //check mob involved
-                    xRot = 0
-            }
+//            onSend(
+//                //all these packets seem to be enough to cover all head rotations
+//                Server.ENTITY_LOOK,
+//                Server.REL_ENTITY_MOVE_LOOK,
+//                Server.LOOK_AT,
+//                Server.ENTITY_TELEPORT
+//            ) {
+//                val nms = (packet.handle as ClientboundMoveEntityPacket).wrap()
+//                //TODO change entity(entityId) to return nullable in ProtocolBurrito
+//                val entity = getEntityFromID(player.world, nms.entityId) ?: return@onSend
+//                if (entity.toGearyOrNull()?.has<Model>() == true) //check mob involved
+//                    nms.xRot = 0
+//            }
 
 
             //TODO if entity has custom sound effects component, prevent entity sound packets
