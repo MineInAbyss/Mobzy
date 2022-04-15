@@ -7,6 +7,7 @@ import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.injection.CustomEntity
 import com.mineinabyss.mobzy.injection.toGeary
 import net.minecraft.core.BlockPos
@@ -32,6 +33,7 @@ object GearySpawningListener : Listener {
             ) {
                 it.toGeary().apply {
                     addPrefab(prefab)
+                    set<BukkitEntity>(it.toBukkit())
                     GearyMinecraftSpawnEvent(this).call()
                 }
             }?.toBukkit()?.apply {

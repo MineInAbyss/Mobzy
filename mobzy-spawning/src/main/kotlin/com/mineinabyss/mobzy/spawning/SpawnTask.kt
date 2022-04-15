@@ -1,9 +1,11 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.mineinabyss.geary.ecs.api.engine.runSafely
 import com.mineinabyss.geary.ecs.api.entities.GearyEntity
 import com.mineinabyss.geary.ecs.events.FailedCheck
 import com.mineinabyss.geary.ecs.events.RequestCheck
 import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
@@ -40,7 +42,7 @@ import kotlin.random.Random
  * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
  * the chosen region
  */
-object SpawnTask : CoroutineScope {
+object SpawnTask : CoroutineScope, GearyMCContext by GearyMCContextKoin() {
     private var runningTask: Job? = null
     override val coroutineContext: CoroutineContext =
         (CoroutineScope(Dispatchers.Default) + CoroutineName("Mobzy spawn task")).coroutineContext
@@ -58,7 +60,9 @@ object SpawnTask : CoroutineScope {
             while (mobzyConfig.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
-                    runSpawnTask()
+                    runSafely {
+                        runSpawnTask()
+                    }.join()
                 } catch (e: NoClassDefFoundError) {
                     e.printStackTrace()
                     stopTask()

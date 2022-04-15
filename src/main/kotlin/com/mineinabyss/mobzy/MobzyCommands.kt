@@ -17,10 +17,9 @@ import com.mineinabyss.idofront.messaging.color
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
-import com.mineinabyss.mobzy.injection.extendsCustomClass
-import com.mineinabyss.mobzy.injection.isCustomAndRenamed
 import com.mineinabyss.mobzy.injection.types.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
@@ -59,8 +58,8 @@ class MobzyCommands(
                         val nmsEntity = entity.toNMS()
                         val geary = entity.toGeary()
                         if (when (entityType) {
-                                "custom" -> entity.extendsCustomClass
-                                "named" -> entity.isCustomAndRenamed
+                                "custom" -> geary.has<MobzyType>()
+//                                "named" -> geary.has<MobzyType>()
                                 "npc" -> nmsEntity is NPC
                                 "interactable" -> nmsEntity is NPC
                                 "passive" -> nmsEntity !is NPC && nmsEntity is PassiveMob

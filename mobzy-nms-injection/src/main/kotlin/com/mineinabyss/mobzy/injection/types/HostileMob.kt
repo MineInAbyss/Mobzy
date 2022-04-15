@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.injection.types
 
-import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.NMSWorld
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
@@ -16,19 +15,6 @@ import net.minecraft.world.entity.monster.Monster
 open class HostileMob(
     type: NMSEntityType<out Monster>, world: NMSWorld
 ) : Monster(type, world), CustomEntity {
-    //TODO do not register any pathfinders automatically
-
-//    override fun registerGoals() {
-//        addPathfinderGoal(2, MeleeAttackBehavior(attackSpeed = 1.0, seeThroughWalls = false))
-//        addPathfinderGoal(3, FloatBehavior())
-//        addPathfinderGoal(7, RandomStrollLandBehavior())
-//        addPathfinderGoal(7, LookAtPlayerBehavior(radius = 8.0f))
-//        addPathfinderGoal(8, RandomLookAroundBehavior())
-//
-//        addTargetSelector(2, TargetAttacker())
-//        addTargetSelector(6, TargetNearbyPlayerCustom())
-//    }
-
     override fun getTypeName(): Component =
         TextComponent(type.descriptionId.split('_').joinToString(" ") { it.replaceFirstChar(Char::uppercase) })
 

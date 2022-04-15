@@ -21,6 +21,7 @@ class Sounds(
     val volume: Float = 1F,
     val pitch: Double = 1.0,
     val pitchRange: Double = 0.2,
+    val step: String? = null,
     val ambient: String? = null,
     val death: String? = null,
     val hurt: String? = null,
