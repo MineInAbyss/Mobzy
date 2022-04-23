@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.api.addon.GearyLoadPhase.ENABLE
+import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.geary.papermc.dsl.gearyAddon
 import com.mineinabyss.idofront.platforms.IdofrontPlatforms
 import com.mineinabyss.idofront.plugin.isPluginEnabled
@@ -43,7 +44,7 @@ class MobzyPlugin : JavaPlugin() {
         val config = MobzyConfigImpl(nmsTypeInjector)
         registerService<MobzyConfig>(config)
 
-        gearyAddon {
+        gearyAddon(autoscanPackage = "com.mineinabyss") {
             autoScanAll()
 
             systems(ModelEngineSystem)
@@ -67,5 +68,11 @@ class MobzyPlugin : JavaPlugin() {
 
     override fun onDisable() {
         server.scheduler.cancelTasks(this)
+        server.worlds.forEach { world ->
+            world.entities.forEach { entity ->
+                // Encode geary entity data
+                entity.toGearyOrNull()?.removeEntity()
+            }
+        }
     }
 }

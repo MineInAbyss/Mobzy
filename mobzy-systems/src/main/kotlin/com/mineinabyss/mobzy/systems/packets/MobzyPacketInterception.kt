@@ -2,28 +2,31 @@ package com.mineinabyss.mobzy.systems.packets
 
 import com.comphenix.protocol.PacketType.Play.Server
 import com.comphenix.protocol.events.PacketContainer
+import com.comphenix.protocol.events.ScheduledPacket
 import com.comphenix.protocol.wrappers.Vector3F
 import com.comphenix.protocol.wrappers.WrappedDataWatcher
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject
 import com.mineinabyss.geary.ecs.api.entities.with
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
-import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.dsl.sendTo
-import com.mineinabyss.protocolburrito.packets.wrap
+import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacketWrap
+import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacketWrap
+import com.mineinabyss.protocolburrito.packets.ClientboundSetEquipmentPacketWrap
+import com.mineinabyss.protocolburrito.packets.ClientboundSoundPacketWrap
 import com.okkero.skedule.schedule
 import kotlinx.coroutines.delay
 import net.minecraft.core.Registry
-import net.minecraft.network.protocol.game.ClientboundAddMobPacket
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
-import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
+import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
 import org.bukkit.SoundCategory
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
 import org.bukkit.entity.Entity
 import kotlin.experimental.or
 import kotlin.random.Random
@@ -35,20 +38,34 @@ object MobzyPacketInterception {
     private val vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer()
     private const val META_ENTITY_FLAGS = 0
     private const val META_ARMORSTAND = 15
+
     fun registerPacketInterceptors() {
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
-            onSend(Server.SPAWN_ENTITY_LIVING) {
-                val nms = (packet.handle as ClientboundAddMobPacket).wrap()
-                val entity = entity(nms.id)
+            onSend<ClientboundAddMobPacketWrap>() { wrap ->
+                val entity = entity(wrap.id)
                 if (entity.toGeary().has<Model>())
-                    nms.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
-
+                    wrap.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
             }
 
-            onSend(Server.ENTITY_METADATA) {
-                val nms = (packet.handle as ClientboundSetEntityDataPacket).wrap()
-                val entity: Entity = getEntityFromID(player.world, nms.id) ?: return@onSend
+            onSend<ClientboundSetEquipmentPacketWrap> { wrap ->
+                val entity: Entity = getEntityFromID(player.world, wrap.entity) ?: return@onSend
+                val geary = entity.toGeary()
+                geary.with { model: Model ->
+                    wrap.slots = wrap.slots.toMutableList().apply {
+                        removeIf { it.first == EquipmentSlot.HEAD }
+                        add(
+                            com.mojang.datafixers.util.Pair(
+                                EquipmentSlot.HEAD,
+                                CraftItemStack.asNMSCopy(model.modelItemStack)
+                            )
+                        )
+                    }
+                }
+            }
+
+            onSend<ClientboundSetEntityDataPacketWrap> { wrap ->
+                val entity: Entity = getEntityFromID(player.world, wrap.id) ?: return@onSend
                 val geary = entity.toGeary()
                 if (!geary.has<Model>() || geary.has<PlayingDeathAnimation>()) return@onSend
 
@@ -90,37 +107,38 @@ object MobzyPacketInterception {
                                 WrappedDataWatcherObject(16, vectorSerializer),
                                 Vector3F(0f, 0f, rot)
                             )
-                            val nmsEntity = entity.toNMS()
                             packet.watchableCollectionModifier.write(0, metadata.watchableObjects)
                             PacketContainer(
                                 Server.REL_ENTITY_MOVE,
-                                ClientboundMoveEntityPacket.Pos(nms.id, 0, -50, 0, true)
+                                ClientboundMoveEntityPacket.Pos(wrap.id, 0, -50, 0, true)
                             ).sendTo(player)
                             packet.sendTo(player)
                             delay(5)
                         }
                     }
                 }
-
                 packet.watchableCollectionModifier.write(0, metadata.watchableObjects)
+                schedule(
+                    ScheduledPacket.fromFiltered(
+                        PacketContainer(Server.ENTITY_EQUIPMENT, ClientboundSetEquipmentPacket(wrap.id, listOf())),
+                        player
+                    )
+                )
             }
 
-            onSend(
-                Server.NAMED_SOUND_EFFECT
-            ) {
-                val nms = (packet.handle as ClientboundSoundPacket).wrap()
+            onSend<ClientboundSoundPacketWrap>() { wrap ->
                 val loc = Location(
                     player.world,
-                    nms.x / 8.0,
-                    nms.y / 8.0,
-                    nms.z / 8.0
+                    wrap.x / 8.0,
+                    wrap.y / 8.0,
+                    wrap.z / 8.0
                 )
                 val entity = player.world.getNearbyEntities(
                     loc, 1.0, 1.0, 1.0
-                ).first().toGeary()
+                ).firstOrNull()?.toGeary() ?: return@onSend
                 entity.with { sounds: Sounds ->
                     isCancelled = true
-                    val path = nms.sound.location.path
+                    val path = wrap.sound.location.path
                     val sound = when {
                         ".step" in path -> sounds.step
                         ".ambient" in path -> sounds.ambient
@@ -134,8 +152,8 @@ object MobzyPacketInterception {
                         player.world.playSound(
                             loc,
                             sound,
-                            SoundCategory.valueOf(nms.source.getName().uppercase()),
-                            nms.volume,
+                            SoundCategory.valueOf(wrap.source.getName().uppercase()),
+                            wrap.volume,
                             (sounds.pitch + (Random.nextDouble(-sounds.pitchRange, sounds.pitchRange))).toFloat()
                         )
                         return@onSend
