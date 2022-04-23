@@ -11,7 +11,7 @@ class MobzyType(
     val baseClass: PrefabKey,
     @SerialName("creatureType")
     private val _creatureType: String,
-    val mobCategory: MobCategory? = null
+    val mobCategory: MobCategory? = null,
 ) {
     val creatureType get() = net.minecraft.world.entity.MobCategory.byName(_creatureType.lowercase())
 }

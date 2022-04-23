@@ -20,15 +20,21 @@ class PathfinderAttachSystem : GearyListener() {
     @Handler
     fun TargetScope.attachPathfinders() {
         val mob = bukkit as? Creature ?: return
+        val nmsMob = mob.toNMS()
         val (targets, goals) = pathfinders
 
-        targets?.forEach { (priority, component) ->
-            mob.toNMS().addTargetSelector(priority.toInt(), component)
+        if(pathfinders.override) {
+            nmsMob.targetSelector.removeAllGoals()
+            nmsMob.goalSelector.removeAllGoals()
+        }
 
+        targets?.forEach { (priority, component) ->
+            nmsMob.addTargetSelector(priority.toInt(), component)
             entity.set(component)
         }
+
         goals?.forEach { (priority, component) ->
-            mob.toNMS().addPathfinderGoal(priority.toInt(), component)
+            nmsMob.addPathfinderGoal(priority.toInt(), component)
             entity.set(component)
         }
     }

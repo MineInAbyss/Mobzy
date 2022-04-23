@@ -14,10 +14,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.dsl.sendTo
-import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacketWrap
-import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacketWrap
-import com.mineinabyss.protocolburrito.packets.ClientboundSetEquipmentPacketWrap
-import com.mineinabyss.protocolburrito.packets.ClientboundSoundPacketWrap
+import com.mineinabyss.protocolburrito.packets.*
 import com.okkero.skedule.schedule
 import kotlinx.coroutines.delay
 import net.minecraft.core.Registry
@@ -42,7 +39,7 @@ object MobzyPacketInterception {
     fun registerPacketInterceptors() {
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
-            onSend<ClientboundAddMobPacketWrap>() { wrap ->
+            onSend<ClientboundAddMobPacketWrap> { wrap ->
                 val entity = entity(wrap.id)
                 if (entity.toGeary().has<Model>())
                     wrap.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
@@ -126,7 +123,16 @@ object MobzyPacketInterception {
                 )
             }
 
-            onSend<ClientboundSoundPacketWrap>() { wrap ->
+            onSend<ClientboundCustomSoundPacketWrap> {
+                it.name
+
+            }
+            onSend<ClientboundSoundEntityPacketWrap> { wrap ->
+                val entity = entity(wrap.id)
+                wrap.sound
+            }
+
+            onSend<ClientboundSoundPacketWrap> { wrap ->
                 val loc = Location(
                     player.world,
                     wrap.x / 8.0,
