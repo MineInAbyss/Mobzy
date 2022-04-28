@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.query.Query
-import com.mineinabyss.geary.ecs.query.invoke
-import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.get
+import com.mineinabyss.geary.systems.query.GearyQuery
+import com.mineinabyss.geary.systems.query.invoke
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
@@ -37,7 +36,7 @@ class SpawnInfo(
 
     val blockComposition by lazy { SubChunkBlockComposition(this.chunkSnapshot, bottom.blockY) }
 
-    object NearbyQuery : Query() {
+    object NearbyQuery : GearyQuery() {
         val TargetScope.bukkit by get<BukkitEntity>()
     }
 

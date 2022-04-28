@@ -1,65 +1,50 @@
 package com.mineinabyss.mobzy.injection
 
-import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.annotations.Handler
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.api.relations.Processed
-import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.provideDelegate
-import com.mineinabyss.geary.ecs.components.*
-import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.geary.annotations.AutoScan
+import com.mineinabyss.geary.annotations.Handler
+import com.mineinabyss.geary.datatypes.family.family
+import com.mineinabyss.geary.components.Processed
+import com.mineinabyss.geary.datatypes.GearyEntity
+import com.mineinabyss.geary.datatypes.family.MutableFamilyOperations.Companion.has
 import com.mineinabyss.geary.papermc.globalContextMC
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.geary.prefabs.configuration.components.Prefab
-import com.mineinabyss.idofront.nms.aliases.NMSEntity
+import com.mineinabyss.geary.systems.GearyListener
+import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.get
+import com.mineinabyss.geary.systems.query.GearyQuery
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
-import com.mineinabyss.idofront.nms.aliases.NMSWorld
-import com.mineinabyss.idofront.nms.typeinjection.*
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.ecs.components.toMobzyCategory
-import com.mineinabyss.mobzy.injection.types.*
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes
-import net.minecraft.world.level.Level
 import sun.misc.Unsafe
 import java.lang.reflect.Field
 import kotlin.collections.set
 
-object MobzyTypesQuery : Query() {
-    override fun onStart() {
+object MobzyTypesQuery : GearyQuery() {
+    val TargetScope.key by get<PrefabKey>()
+    val TargetScope.isMobzy by family {
         has<MobzyType>()
         has<Prefab>()
     }
-
-    val TargetScope.key by get<PrefabKey>()
 }
 
 fun PrefabKey.toResourceKey(): ResourceLocation = ResourceLocation(namespace, name)
 
-/**
- * @property types Used for getting a MobType from a String, which makes it easier to access from [MobType]
- * @property templates A map of mob [EntityTypes.mobName]s to [MobType]s.
- */
 @Suppress("ObjectPropertyName")
 @AutoScan
 class MobzyNMSTypeInjector : GearyListener() {
     private val TargetScope.info by added<MobzyType>()
     private val TargetScope.key by added<PrefabKey>()
-
-    override fun onStart() {
-        target.has<Prefab>()
-    }
+    private val TargetScope.prefab by family { has<Prefab>() }
 
     @Handler
     fun TargetScope.addNMSType() {
         val nmsEntityType = Registry.ENTITY_TYPE.getOptional(info.baseClass.toResourceKey()).orElseGet {
-            error("Couldn't find a key ${info.baseClass} registered with minecraft.")
+            error("Couldn't find a key ${info.baseClass} registered with Minecraft.")
         }
 //        val nmsEntityType = inject(key, info, entity.get() ?: MobAttributes())
         entity.set(nmsEntityType)
@@ -107,48 +92,6 @@ class MobzyNMSTypeInjector : GearyListener() {
             reason.printStackTrace()
             error("Failed to inject custom attribute defaults")
         }
-    }
-
-//    /**
-//     * Registers a new entity with the server with extra parameters for width, height, and the function for creating the
-//     * entity.
-//     *
-//     * @see injectType
-//     */
-//    fun inject(
-//        key: PrefabKey,
-//        prefabInfo: MobzyType,
-//        attributes: MobAttributes = MobAttributes()
-//    ): NMSEntityType<*> {
-//        val init: (EntityType<NMSEntity>, Level) -> Entity =
-//            (mobBaseClasses[prefabInfo.baseClass] as? (EntityType<NMSEntity>, Level) -> Entity
-//                ?: error("Not a valid parent class: ${prefabInfo.baseClass}"))
-//        val mobID = key.name.toEntityTypeName()
-//        val injected: NMSEntityType<out NMSEntity> =
-//            EntityType.Builder.of<NMSEntity>(EntityType.EntityFactory(init), prefabInfo.creatureType)
-//                .sized(attributes.width, attributes.height)
-//                .apply {
-//                    if (attributes.fireImmune) fireImmune()
-//                }
-//                .injectType(namespace = key.namespace, key = mobID, extendFrom = "minecraft:zombie")
-//
-//        customAttributes[injected] = attributes.toNMSBuilder().build()
-//        _types[mobID] = injected
-//        return injected
-//    }
-
-    private val mobBaseClasses =
-        mutableMapOf<String, (EntityType<out Nothing>, Level) -> Entity>(
-            "mobzy:flying" to { type, world -> FlyingMob(type, world) }, //TODO use namespaced keys
-            "mobzy:hostile" to { type, world -> HostileMob(type, world) },
-            "mobzy:passive" to { type, world -> PassiveMob(type, world) },
-            "mobzy:fish" to { type, world -> FishMob(type, world) },
-            "mobzy:hostile_water" to { type, world -> HostileWaterMob(type, world) },
-            "mobzy:npc" to { type, world -> NPC(type, world) },
-        )
-
-    fun addMobBaseClasses(vararg classes: Pair<String, (NMSEntityType<*>, NMSWorld) -> NMSEntity>) {
-        mobBaseClasses += classes
     }
 }
 

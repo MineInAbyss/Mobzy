@@ -1,14 +1,13 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
-import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.api.annotations.Handler
-import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.provideDelegate
+import com.mineinabyss.geary.annotations.AutoScan
+import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
+import com.mineinabyss.geary.systems.GearyListener
+import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import org.bukkit.event.EventHandler

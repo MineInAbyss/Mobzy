@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.ecs.api.GearyContext
+import com.mineinabyss.geary.context.GearyContext
 import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
@@ -20,14 +20,18 @@ import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
-import com.mineinabyss.mobzy.injection.types.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
+import net.minecraft.world.entity.FlyingMob
+import net.minecraft.world.entity.animal.AbstractFish
+import net.minecraft.world.entity.animal.Animal
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Monster
+import org.bukkit.entity.NPC
 
 class MobzyCommands(
     val nmsTypeInjector: MobzyNMSTypeInjector
@@ -59,14 +63,11 @@ class MobzyCommands(
                         val geary = entity.toGeary()
                         if (when (entityType) {
                                 "custom" -> geary.has<MobzyType>()
-//                                "named" -> geary.has<MobzyType>()
                                 "npc" -> nmsEntity is NPC
-                                "interactable" -> nmsEntity is NPC
-                                "passive" -> nmsEntity !is NPC && nmsEntity is PassiveMob
-                                "hostile" -> nmsEntity is HostileMob
+                                "passive" -> nmsEntity !is NPC && nmsEntity is Animal
+                                "hostile" -> nmsEntity is Monster
                                 "flying" -> nmsEntity is FlyingMob
-                                "fish" -> nmsEntity is FishMob
-                                "hostileWater" -> nmsEntity is HostileWaterMob
+                                "fish" -> nmsEntity is AbstractFish
                                 else -> {
                                     val prefab = runCatching { PrefabKey.of(entityType).toEntity() }.getOrNull()
                                         ?: this@commandGroup.stopCommand("No such prefab or selector $entityType")

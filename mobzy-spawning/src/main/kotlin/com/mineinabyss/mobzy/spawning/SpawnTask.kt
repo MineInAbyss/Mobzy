@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.events.FailedCheck
-import com.mineinabyss.geary.ecs.events.RequestCheck
+import com.mineinabyss.geary.components.RequestCheck
+import com.mineinabyss.geary.components.events.FailedCheck
+import com.mineinabyss.geary.datatypes.GearyEntity
 import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.GearyMCContextKoin
+import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
@@ -53,25 +54,24 @@ object SpawnTask : CoroutineScope, GearyMCContext by GearyMCContextKoin() {
     }
 
     fun startTask() {
-//        if (runningTask != null) return
-//        runningTask = launch(BukkitDispatcher(mobzy, async = true)) {
-//            while (mobzyConfig.doMobSpawns) {
-//                try {
-//                    GlobalSpawnInfo.iterationNumber++
-//                    runSafely {
-//                        runSpawnTask()
-//                    }.join()
-//                } catch (e: NoClassDefFoundError) {
-//                    e.printStackTrace()
-//                    stopTask()
-//                    return@launch
-//                } catch (e: RuntimeException) {
-//                    e.printStackTrace()
-//                }
-//                delay(mobzyConfig.spawnTaskDelay.inWholeTicks)
-//            }
-//            stopTask()
-//        }
+        if (runningTask != null) return
+        // TODO Switch back to async when we fix geary async access
+        runningTask = launch(BukkitDispatcher(mobzy, async = false)) {
+            while (mobzyConfig.doMobSpawns) {
+                try {
+                    GlobalSpawnInfo.iterationNumber++
+                    runSpawnTask()
+                } catch (e: NoClassDefFoundError) {
+                    e.printStackTrace()
+                    stopTask()
+                    return@launch
+                } catch (e: RuntimeException) {
+                    e.printStackTrace()
+                }
+                delay(mobzyConfig.spawnTaskDelay.inWholeTicks)
+            }
+            stopTask()
+        }
     }
 
     private suspend fun runSpawnTask() {

@@ -1,15 +1,14 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.annotations.Handler
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.provideDelegate
-import com.mineinabyss.geary.ecs.query.Query
+import com.mineinabyss.geary.annotations.AutoScan
+import com.mineinabyss.geary.annotations.Handler
+import com.mineinabyss.geary.datatypes.GearyEntity
 import com.mineinabyss.geary.prefabs.PrefabManager
 import com.mineinabyss.geary.prefabs.PrefabManagerContext
+import com.mineinabyss.geary.systems.GearyListener
+import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.get
+import com.mineinabyss.geary.systems.query.GearyQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
@@ -41,7 +40,7 @@ object SpawnRegistry : GearyListener(), PrefabManagerContext {
     /** Clears [regionSpawns] */
     fun unregisterSpawns() = regionSpawns.clear()
 
-    object SpawnConfigs : Query() {
+    object SpawnConfigs : GearyQuery() {
         val TargetScope.config by get<SpawnType>()
     }
 

@@ -1,12 +1,14 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
-import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.accessors.EventScope
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.accessors.building.get
-import com.mineinabyss.geary.ecs.api.annotations.Handler
-import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.provideDelegate
+import com.mineinabyss.geary.annotations.AutoScan
+import com.mineinabyss.geary.annotations.Handler
+import com.mineinabyss.geary.datatypes.family.family
+import com.mineinabyss.geary.datatypes.family.MutableFamilyOperations.Companion.has
+import com.mineinabyss.geary.datatypes.family.MutableFamilyOperations.Companion.not
+import com.mineinabyss.geary.systems.GearyListener
+import com.mineinabyss.geary.systems.accessors.EventScope
+import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.SpawnType
@@ -20,13 +22,10 @@ class IgnoreSpawnCategoryCap()
 
 @AutoScan
 class SpawnCategoryCapCondition : GearyListener() {
-    val TargetScope.spawnType by get<SpawnType>()
+    private val TargetScope.spawnType by get<SpawnType>()
+    private val TargetScope.notIgnored by family { not { has<IgnoreSpawnCategoryCap>() } }
 
-    val EventScope.spawnInfo by get<SpawnInfo>()
-
-    override fun onStart() {
-        target.not { has<IgnoreSpawnCategoryCap>() }
-    }
+    private val EventScope.spawnInfo by get<SpawnInfo>()
 
     @Handler
     fun TargetScope.check(event: EventScope): Boolean {

@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.api.addon.GearyLoadPhase.ENABLE
+import com.mineinabyss.geary.api.addon.autoscan
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.geary.papermc.dsl.gearyAddon
 import com.mineinabyss.idofront.platforms.IdofrontPlatforms
@@ -44,17 +45,17 @@ class MobzyPlugin : JavaPlugin() {
         val config = MobzyConfigImpl(nmsTypeInjector)
         registerService<MobzyConfig>(config)
 
-        gearyAddon(autoscanPackage = "com.mineinabyss") {
-            autoScanAll()
+        gearyAddon {
+            autoscan("com.mineinabyss") {
+                all()
+                custom<PathfinderComponent>()
+            }
 
             systems(ModelEngineSystem)
 
             if (isPluginEnabled("ModelEngine")) {
                 registerService<AnimationController>(ModelEngineSystem)
             }
-
-            // Autoscan the subclasses of PathfinderComponent
-            autoScan<PathfinderComponent>()
 
             startup {
                 ENABLE {

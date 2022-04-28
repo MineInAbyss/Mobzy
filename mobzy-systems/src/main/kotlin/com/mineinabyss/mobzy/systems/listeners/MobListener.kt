@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.systems.listeners
 
-import com.mineinabyss.geary.ecs.api.entities.with
+import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toBukkit
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
@@ -40,7 +40,6 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.util.BoundingBox
 
 object MobListener : Listener {
     /**

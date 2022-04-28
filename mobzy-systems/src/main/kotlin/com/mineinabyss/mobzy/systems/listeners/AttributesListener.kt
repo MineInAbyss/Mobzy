@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy.systems.listeners
 
-import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.api.annotations.Handler
-import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.provideDelegate
+import com.mineinabyss.geary.annotations.AutoScan
+import com.mineinabyss.geary.annotations.Handler
+import com.mineinabyss.geary.systems.GearyListener
+import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -14,8 +13,8 @@ import net.minecraft.world.entity.EntityDimensions
 //TODO Make sure this is the first thing to run when priority support comes
 @AutoScan
 class AddPrefabFromNMSTypeSystem : GearyListener() {
-    val TargetScope.bukkitEntity by added<BukkitEntity>()
-    val TargetScope.attributes by added<MobAttributes>()
+    private val TargetScope.bukkitEntity by added<BukkitEntity>()
+    private val TargetScope.attributes by added<MobAttributes>()
 
     @Handler
     fun TargetScope.addPrefab() {

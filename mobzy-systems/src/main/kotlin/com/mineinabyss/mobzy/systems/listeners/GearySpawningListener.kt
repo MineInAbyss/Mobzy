@@ -8,8 +8,7 @@ import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
-import com.mineinabyss.mobzy.injection.CustomEntity
-import com.mineinabyss.mobzy.injection.toGeary
+import com.mineinabyss.mobzy.injection.helpers.toGeary
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.MobSpawnType
 import org.bukkit.event.EventHandler
@@ -36,9 +35,7 @@ object GearySpawningListener : Listener {
                     set<BukkitEntity>(it.toBukkit())
                     GearyMinecraftSpawnEvent(this).call()
                 }
-            }?.toBukkit()?.apply {
-                addScoreboardTag(CustomEntity.ENTITY_VERSION)
-            }
+            }?.toBukkit()
         }
     }
 }

@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy.ecs.goals.mobzy.hostile
 
-import com.mineinabyss.geary.ecs.api.entities.GearyEntity
-import com.mineinabyss.geary.ecs.serialization.parseEntity
-import com.mineinabyss.geary.papermc.GearyMCContext
+import com.mineinabyss.geary.datatypes.GearyEntity
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.spawnFromPrefab
+import com.mineinabyss.geary.serialization.parseEntity
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3

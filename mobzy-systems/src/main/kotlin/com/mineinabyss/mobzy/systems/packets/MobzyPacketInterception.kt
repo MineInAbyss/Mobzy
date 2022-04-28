@@ -6,7 +6,7 @@ import com.comphenix.protocol.events.ScheduledPacket
 import com.comphenix.protocol.wrappers.Vector3F
 import com.comphenix.protocol.wrappers.WrappedDataWatcher
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject
-import com.mineinabyss.geary.ecs.api.entities.with
+import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.mobzy.ecs.components.ambient.Sounds
@@ -14,7 +14,10 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.dsl.sendTo
-import com.mineinabyss.protocolburrito.packets.*
+import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacketWrap
+import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacketWrap
+import com.mineinabyss.protocolburrito.packets.ClientboundSetEquipmentPacketWrap
+import com.mineinabyss.protocolburrito.packets.ClientboundSoundPacketWrap
 import com.okkero.skedule.schedule
 import kotlinx.coroutines.delay
 import net.minecraft.core.Registry
@@ -121,15 +124,6 @@ object MobzyPacketInterception {
                         player
                     )
                 )
-            }
-
-            onSend<ClientboundCustomSoundPacketWrap> {
-                it.name
-
-            }
-            onSend<ClientboundSoundEntityPacketWrap> { wrap ->
-                val entity = entity(wrap.id)
-                wrap.sound
             }
 
             onSend<ClientboundSoundPacketWrap> { wrap ->

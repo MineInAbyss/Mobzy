@@ -1,13 +1,12 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.ecs.accessors.TargetScope
-import com.mineinabyss.geary.ecs.api.GearyContext
-import com.mineinabyss.geary.ecs.api.annotations.Handler
-import com.mineinabyss.geary.ecs.api.engine.systems
-import com.mineinabyss.geary.ecs.api.systems.GearyListener
-import com.mineinabyss.geary.ecs.api.systems.GearySystem
-import com.mineinabyss.geary.ecs.api.systems.provideDelegate
+import com.mineinabyss.geary.annotations.Handler
+import com.mineinabyss.geary.context.GearyContext
+import com.mineinabyss.geary.helpers.systems
 import com.mineinabyss.geary.papermc.GearyMCContextKoin
+import com.mineinabyss.geary.systems.GearyListener
+import com.mineinabyss.geary.systems.GearySystem
+import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.modelengine.AnimationController
