@@ -13,9 +13,11 @@ repositories {
 }
 
 dependencies {
+    //TODO move to idofront platform
+    implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.0.1")
+    runtimeOnly("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.0.1")
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.kotlinx.serialization.kaml)
-    compileOnly(libs.minecraft.skedule)
     compileOnly(libs.kotlinx.coroutines)
     compileOnly(libs.kotlin.statistics) {
         exclude(group = "org.jetbrains.kotlin")

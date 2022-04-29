@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.geary.components.RequestCheck
 import com.mineinabyss.geary.components.events.FailedCheck
 import com.mineinabyss.geary.datatypes.GearyEntity
@@ -10,8 +11,6 @@ import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
-import com.okkero.skedule.BukkitDispatcher
-import com.okkero.skedule.SynchronizationContext.*
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
@@ -56,7 +55,7 @@ object SpawnTask : CoroutineScope, GearyMCContext by GearyMCContextKoin() {
     fun startTask() {
         if (runningTask != null) return
         // TODO Switch back to async when we fix geary async access
-        runningTask = launch(BukkitDispatcher(mobzy, async = false)) {
+        runningTask = mobzy.launch {
             while (mobzyConfig.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
@@ -113,7 +112,7 @@ object SpawnTask : CoroutineScope, GearyMCContext by GearyMCContextKoin() {
                 if (success) {
                     // Must spawn mobs in sync
                     coroutineScope {
-                        launch(BukkitDispatcher(mobzy)) {
+                        mobzy.launch {
                             if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
                         }
                     }
