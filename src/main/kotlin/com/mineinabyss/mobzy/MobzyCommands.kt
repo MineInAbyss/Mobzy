@@ -92,16 +92,14 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                     sender.success(
                         """
                         ${if (isInfo) "There are" else "Removed"}
-                        &l$entityCount&r&a ${if (query == "custom") "custom mobs" else query}
+                        &l$entityCount&r&a entities matching your query
                         ${if (radius <= 0) "in all loaded chunks." else "in a radius of $radius blocks."}
                         """.trimIndent().replace("\n", " "), '&'
                     )
                     if (isInfo) {
-                        val categories = entities.categorizeMobs()
-                        sender.info(
-                            categories.entries
-                                .sortedByDescending { it.value }
-                                .joinToString("\n") { (type, amount) -> "&7${type}&r: $amount".color() }
+                        val categories = entities.categorizeMobs().entries.sortedByDescending { it.value }
+                        if (categories.isNotEmpty()) sender.info(
+                            categories.joinToString("\n") { (type, amount) -> "&7${type}&r: $amount".color() }
                         )
                     }
                 }
