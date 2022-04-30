@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.pathfinding
 
 import com.destroystokyo.paper.entity.Pathfinder
-import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSPathfinderMob
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -20,14 +19,14 @@ import java.util.*
  * type will be executed until it finishes. Need to do more digging in NMS to confirm...
  */
 //TODO multiple types at a time
-abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, flags: List<Goal.Flag> = listOf()) : Goal() {
+abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, flags: List<Flag> = listOf()) : Goal() {
     abstract val mob: Creature
     protected val nmsEntity: NMSPathfinderMob by lazy { mob.toNMS() }
 //    protected val moveController: MoveControl get() = nmsEntity.moveControl
     protected val pathfinder: Pathfinder by lazy { mob.pathfinder }
 
     init {
-        setFlags(EnumSet.copyOf(flags.toList()))
+        if(flags.isNotEmpty()) setFlags(EnumSet.copyOf(flags.toList()))
     }
 
     private var cooldownStart: Long = 0

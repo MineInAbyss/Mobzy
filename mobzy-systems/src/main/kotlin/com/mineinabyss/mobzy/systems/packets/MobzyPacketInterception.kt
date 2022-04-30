@@ -38,7 +38,7 @@ object MobzyPacketInterception {
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
             onSend<ClientboundAddMobPacketWrap> { wrap ->
-                val entity = entity(wrap.id)
+                val entity = runCatching { entity(wrap.id) }.getOrNull() ?: return@onSend
                 if (entity.toGeary().has<Model>())
                     wrap.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
             }
