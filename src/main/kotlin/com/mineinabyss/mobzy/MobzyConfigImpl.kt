@@ -5,14 +5,12 @@ import com.mineinabyss.idofront.config.ReloadScope
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.ecs.components.MobCategory
-import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
+import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
 import java.util.*
 
-class MobzyConfigImpl(
-    val nmsTypeInjector: MobzyNMSTypeInjector
-) : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data.serializer()), MobzyConfig {
+class MobzyConfigImpl : IdofrontConfig<MobzyConfig.Data>(mobzy, MobzyConfig.Data.serializer()), MobzyConfig {
     /**
      * @param creatureType The name of the [EnumCreatureType].
      * @return The mob cap for that mob in config.
@@ -20,12 +18,6 @@ class MobzyConfigImpl(
     override fun getCreatureTypeCap(creatureType: MobCategory): Int = data.creatureTypeCaps[creatureType] ?: 0
 
     override fun ReloadScope.unload() {
-        //TODO PrefabManager.clearFromPlugin(mobzy)
-
-        "Clear registered types" {
-            nmsTypeInjector.clear()
-        }
-
         "Stop spawn task" {
             SpawnTask.stopTask()
         }
@@ -33,10 +25,6 @@ class MobzyConfigImpl(
 
     override fun ReloadScope.load() {
         logSuccess("Loading Mobzy config")
-
-        "Inject mob attributes" {
-            nmsTypeInjector.injectDefaultAttributes()
-        }
 
         "Spawns" {
             !"Load spawns" {
@@ -51,7 +39,7 @@ class MobzyConfigImpl(
             fixEntitiesAfterReload()
         }
 
-        sender.success("Loaded types: ${nmsTypeInjector.typeNames}")
+        sender.success("Loaded types: ${MobzyTypesQuery.getKeys()}")
         sender.success("Successfully loaded config")
     }
 

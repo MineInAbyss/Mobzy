@@ -1,13 +1,12 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
+import com.mineinabyss.geary.papermc.helpers.customMobType
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.geary.systems.query.GearyQuery
 import com.mineinabyss.geary.systems.query.invoke
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
-import com.mineinabyss.idofront.nms.aliases.NMSEntityType
-import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import com.mineinabyss.mobzy.ecs.components.mobCategory
@@ -50,8 +49,10 @@ class SpawnInfo(
             }
         }
     }
-    val localTypes: Map<NMSEntityType<*>, Int> by lazy { localMobs.categorizeMobs() }
-    val localCategories: Map<MobCategory, Int> by lazy { localMobs.groupingBy { it.mobCategory }.eachCount() }
+    val localTypes: Map<String, Int> by lazy { localMobs.categorizeMobs() }
+    val localCategories: Map<MobCategory, Int> by lazy {
+        localMobs.groupingBy { it.mobCategory }.eachCount()
+    }
 
     //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
     val gap: Int = top.blockY - bottom.blockY + 1
@@ -93,5 +94,6 @@ class SpawnInfo(
     }
 }
 
-fun Collection<Entity>.categorizeMobs(): Map<NMSEntityType<*>, Int> =
-    groupingBy { it.toNMS().type }.eachCount()
+//TODO perhaps give normal mobs prefab keys too to make this more type safe
+fun Collection<Entity>.categorizeMobs(): Map<String, Int> =
+    groupingBy { it.customMobType }.eachCount()

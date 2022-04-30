@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.api.addon.GearyLoadPhase.ENABLE
-import com.mineinabyss.geary.api.addon.autoscan
+import com.mineinabyss.geary.addon.GearyLoadPhase.ENABLE
+import com.mineinabyss.geary.addon.autoscan
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.geary.papermc.dsl.gearyAddon
 import com.mineinabyss.idofront.platforms.IdofrontPlatforms
@@ -40,9 +40,9 @@ class MobzyPlugin : JavaPlugin() {
 
         val nmsTypeInjector = MobzyNMSTypeInjector()
         //Register commands
-        MobzyCommands(nmsTypeInjector)
+        MobzyCommands()
 
-        val config = MobzyConfigImpl(nmsTypeInjector)
+        val config = MobzyConfigImpl()
         registerService<MobzyConfig>(config)
 
         gearyAddon {

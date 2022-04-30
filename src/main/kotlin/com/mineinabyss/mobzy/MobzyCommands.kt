@@ -3,8 +3,9 @@ package com.mineinabyss.mobzy
 import com.mineinabyss.geary.context.GearyContext
 import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGeary
-import com.mineinabyss.geary.papermc.spawnFromPrefab
+import com.mineinabyss.geary.papermc.helpers.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
+import com.mineinabyss.geary.systems.query.invoke
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -18,7 +19,6 @@ import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
-import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
@@ -33,9 +33,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Monster
 import org.bukkit.entity.NPC
 
-class MobzyCommands(
-    val nmsTypeInjector: MobzyNMSTypeInjector
-) : IdofrontCommandExecutor(), TabCompleter, GearyContext by GearyMCContextKoin() {
+class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by GearyMCContextKoin() {
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
@@ -50,31 +48,38 @@ class MobzyCommands(
             }
 
             commandGroup {
-                val entityType by stringArg()
+                val query by stringArg()
                 val radius by intArg { default = 0 }
 
                 fun PlayerAction.removeOrInfo(isInfo: Boolean) {
                     val worlds = mobzy.server.worlds
                     var entityCount = 0
                     val entities = mutableSetOf<Entity>()
+                    val types = query.split("+")
 
                     for (world in worlds) for (entity in world.entities) {
                         val nmsEntity = entity.toNMS()
                         val geary = entity.toGeary()
-                        if (when (entityType) {
-                                "custom" -> geary.has<MobzyType>()
-                                "npc" -> nmsEntity is NPC
-                                "passive" -> nmsEntity !is NPC && nmsEntity is Animal
-                                "hostile" -> nmsEntity is Monster
-                                "flying" -> nmsEntity is FlyingMob
-                                "fish" -> nmsEntity is AbstractFish
-                                else -> {
-                                    val prefab = runCatching { PrefabKey.of(entityType).toEntity() }.getOrNull()
-                                        ?: this@commandGroup.stopCommand("No such prefab or selector $entityType")
-                                    geary.instanceOf(prefab)
+                        if (!geary.has<MobzyType>()) continue
+
+
+                        if (types.any { type ->
+                                fun excludeDefault() = nmsEntity !is NPC && entity.customName() == null
+                                when (type) {
+                                    "custom" -> excludeDefault()
+                                    "passive" -> nmsEntity is Animal && excludeDefault()
+                                    "hostile" -> nmsEntity is Monster && excludeDefault()
+                                    "renamed" -> entity.customName() != null && nmsEntity !is NPC
+                                    "npc" -> nmsEntity is NPC && entity.customName() == null
+                                    "flying" -> nmsEntity is FlyingMob && excludeDefault()
+                                    "fish" -> nmsEntity is AbstractFish && excludeDefault()
+                                    else -> {
+                                        val prefab = runCatching { PrefabKey.of(type).toEntity() }.getOrNull()
+                                            ?: this@commandGroup.stopCommand("No such prefab or selector $type")
+                                        geary.instanceOf(prefab)
+                                    }
                                 }
-                            }
-                        ) {
+                            }) {
                             val playerLoc = player.location
                             if (radius <= 0 || entity.world == playerLoc.world && entity.location.distance(playerLoc) < radius) {
                                 entityCount++
@@ -87,18 +92,17 @@ class MobzyCommands(
                     sender.success(
                         """
                         ${if (isInfo) "There are" else "Removed"}
-                        &l$entityCount&r&a ${if (entityType == "custom") "custom mobs" else entityType}
+                        &l$entityCount&r&a ${if (query == "custom") "custom mobs" else query}
                         ${if (radius <= 0) "in all loaded chunks." else "in a radius of $radius blocks."}
                         """.trimIndent().replace("\n", " "), '&'
                     )
                     if (isInfo) {
                         val categories = entities.categorizeMobs()
-                        if (categories.size > 1)
-                            sender.info(
-                                categories.entries
-                                    .sortedByDescending { it.value }
-                                    .joinToString("\n") { (type, amount) -> "&7${type.id}&r: $amount".color() }
-                            )
+                        sender.info(
+                            categories.entries
+                                .sortedByDescending { it.value }
+                                .joinToString("\n") { (type, amount) -> "&7${type}&r: $amount".color() }
+                        )
                     }
                 }
 
@@ -135,7 +139,7 @@ class MobzyCommands(
             }
 
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
-                sender.success("All registered types:\n${nmsTypeInjector.typeNames}")
+                sender.success("All registered types:\n${MobzyTypesQuery.getKeys()}")
             }
 
             "config"(desc = "Configuration options") {
@@ -154,6 +158,13 @@ class MobzyCommands(
                     }
                 }
             }
+        }
+    }
+
+    private val mobs: List<String> by lazy {
+        buildList {
+            addAll(listOf("custom", "npc", "mob", "renamed", "passive", "hostile", "flying"))
+            addAll(MobzyTypesQuery.getKeys().map { it.toString() })
         }
     }
 
@@ -184,10 +195,10 @@ class MobzyCommands(
 
                 if (subCommand == "spawn" || subCommand == "s")
                     if (args.size == 2) {
-                        return MobzyTypesQuery.run {
+                        return MobzyTypesQuery {
                             filter {
                                 val arg = args[1].lowercase()
-                                it.key.name.startsWith(arg) || it.key.key.startsWith(arg)
+                                it.key.key.startsWith(arg) || it.key.full.startsWith(arg)
                             }.map { it.key.toString() }
                         }
                     } else if (args.size == 3) {
@@ -202,13 +213,15 @@ class MobzyCommands(
 
                 if (subCommand in listOf("remove", "rm", "info", "i"))
                     if (args.size == 2) {
-                        val mobs: MutableList<String> = ArrayList()
-                        mobs.addAll(MobzyTypesQuery.run { map { it.key.toString() } })
-                        mobs.addAll(listOf("custom", "npc", "mob", "named", "passive", "hostile", "flying"))
-                        return mobs.filter {
-                            val arg = args[1].lowercase()
-                            it.startsWith(arg) || it.substringAfter(":").startsWith(arg)
+                        val query = args[1].lowercase()
+                        val parts = query.split("+")
+                        val withoutLast = query.substringBeforeLast("+", missingDelimiterValue = "").let {
+                            if (parts.size > 1) "$it+" else it
                         }
+                        return mobs.asSequence().filter {
+                            it !in parts && (it.startsWith(parts.last()) ||
+                                    it.substringAfter(":").startsWith(parts.last()))
+                        }.take(20).map { "$withoutLast$it" }.toList()
                     }
                 return if (subCommand == "config") listOf("mobs", "spawns", "domobspawns")
                     .filter { it.lowercase().startsWith(args[1].lowercase()) }

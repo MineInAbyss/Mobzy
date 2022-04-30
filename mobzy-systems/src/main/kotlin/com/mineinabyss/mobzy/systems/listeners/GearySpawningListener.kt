@@ -37,6 +37,16 @@ object GearySpawningListener : Listener {
                 }
             }?.toBukkit()
         }
+
+//        type.create(
+//            world
+//        )?.apply {
+//            toGeary().apply {
+//                addPrefab(prefab)
+//                set<BukkitEntity>(toBukkit())
+//                GearyMinecraftSpawnEvent(this).call()
+//            }
+//        }?.toBukkit()
     }
 }
 
