@@ -6,9 +6,11 @@ import com.comphenix.protocol.events.ScheduledPacket
 import com.comphenix.protocol.wrappers.Vector3F
 import com.comphenix.protocol.wrappers.WrappedDataWatcher
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
+import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
@@ -16,7 +18,6 @@ import com.mineinabyss.protocolburrito.dsl.sendTo
 import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacketWrap
 import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacketWrap
 import com.mineinabyss.protocolburrito.packets.ClientboundSetEquipmentPacketWrap
-import com.okkero.skedule.schedule
 import kotlinx.coroutines.delay
 import net.minecraft.core.Registry
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
@@ -86,11 +87,10 @@ object MobzyPacketInterception {
                 //Tilt head on death
                 if (entity.isDead) {
                     geary.add<PlayingDeathAnimation>()
-                    mobzy.schedule {
-                        delay(1)
+                    mobzy.launch {
                         var rot = 0f
-                        repeat(90) {
-                            rot += 1f
+                        repeat(10) {
+                            rot += 10f
                             metadata.setObject(
                                 WrappedDataWatcherObject(16, vectorSerializer),
                                 Vector3F(0f, 0f, rot)
@@ -98,10 +98,10 @@ object MobzyPacketInterception {
                             packet.watchableCollectionModifier.write(0, metadata.watchableObjects)
                             PacketContainer(
                                 Server.REL_ENTITY_MOVE,
-                                ClientboundMoveEntityPacket.Pos(wrap.id, 0, -50, 0, true)
+                                ClientboundMoveEntityPacket.Pos(wrap.id, 0, -55, 0, true)
                             ).sendTo(player)
                             packet.sendTo(player)
-                            delay(5)
+                            delay(1.ticks)
                         }
                     }
                 }

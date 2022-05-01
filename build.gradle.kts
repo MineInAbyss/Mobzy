@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val serverVersion: String by project
 val idofrontVersion: String by project
-val gearyVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -29,10 +28,16 @@ allprojects {
 
     repositories {
         maven("https://repo.mineinabyss.com")
+        maven("https://mvn.lumine.io/repository/maven-public/") // Model Engine
     }
 
     dependencies {
-        implementation("com.mineinabyss:idofront-nms:$idofrontVersion")
+        val libs = rootProject.libs
+        val mobzylibs = rootProject.mobzylibs
+
+        compileOnly(mobzylibs.geary.papermc.core)
+
+        implementation(libs.idofront.nms)
     }
 }
 
@@ -47,11 +52,8 @@ dependencies {
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.kotlinx.serialization.kaml)
     compileOnly(libs.kotlinx.coroutines)
-    compileOnly(libs.minecraft.skedule)
+    compileOnly(libs.minecraft.mccoroutine)
     compileOnly(libs.koin.core)
-
-    // Other plugins
-    compileOnly("com.mineinabyss:geary-papermc-core:$gearyVersion")
 
     // Shaded
     implementation(project(":mobzy-pathfinding"))
@@ -63,7 +65,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.kotlin.statistics)
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.18:1.24.1")
+    testImplementation(libs.minecraft.mockbukkit)
     testImplementation(libs.kotlinx.serialization.json)
     testImplementation(libs.kotlinx.serialization.kaml)
 }

@@ -41,8 +41,7 @@ dependencyResolutionManagement {
     }
 
     versionCatalogs {
-        create("libs") {
-            from("com.mineinabyss:catalog:$idofrontVersion")
-        }
+        create("libs").from("com.mineinabyss:catalog:$idofrontVersion")
+        create("mobzylibs").from(files("gradle/mobzylibs.versions.toml"))
     }
 }

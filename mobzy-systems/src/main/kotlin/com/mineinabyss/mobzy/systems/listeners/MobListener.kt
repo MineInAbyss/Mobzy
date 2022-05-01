@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.systems.listeners
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toBukkit
 import com.mineinabyss.geary.papermc.access.toGeary
@@ -10,6 +11,7 @@ import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
 import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
@@ -18,7 +20,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.mobzy
-import com.okkero.skedule.schedule
+import kotlinx.coroutines.delay
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
 import org.bukkit.Statistic
@@ -71,8 +73,8 @@ object MobListener : Listener {
             }
 
             //in a few ticks change the model back to the non hit version
-            mobzy.schedule {
-                waitFor(7)
+            mobzy.launch {
+                delay(7.ticks)
                 if (!mob.isDead)
                     helmet = helmet?.editItemMeta {
                         setCustomModelData(model.id)
