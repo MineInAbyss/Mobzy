@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.ecs.components.initialization.pathfinding
 
 import kotlinx.serialization.Serializable
 import net.minecraft.world.entity.ai.goal.Goal
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 
 /**
  * The base class for serializable pathfinders. Subclasses define serializable properties to configure a pathfinder
@@ -11,5 +11,5 @@ import org.bukkit.entity.Creature
 @Serializable
 abstract class PathfinderComponent {
     /** @return A new [Goal] for this [mob]. */
-    abstract fun build(mob: Creature): Goal
+    abstract fun build(mob: Mob): Goal
 }

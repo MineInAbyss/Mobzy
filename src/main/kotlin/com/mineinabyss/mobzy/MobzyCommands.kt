@@ -17,6 +17,7 @@ import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
+import com.mineinabyss.mobzy.ecs.components.Important
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
@@ -63,13 +64,13 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
 
 
                         if (types.any { type ->
-                                fun excludeDefault() = nmsEntity !is NPC && entity.customName() == null
+                                fun excludeDefault() = !geary.has<Important>() && entity.customName() == null
                                 when (type) {
                                     "custom" -> excludeDefault()
                                     "passive" -> nmsEntity is Animal && excludeDefault()
                                     "hostile" -> nmsEntity is Monster && excludeDefault()
                                     "renamed" -> entity.customName() != null && nmsEntity !is NPC
-                                    "npc" -> nmsEntity is NPC && entity.customName() == null
+                                    "important" -> geary.has<Important>() && entity.customName() == null
                                     "flying" -> nmsEntity is FlyingMob && excludeDefault()
                                     "fish" -> nmsEntity is AbstractFish && excludeDefault()
                                     else -> {
@@ -126,7 +127,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                     val key = PrefabKey.of(mobKey)
 
                     repeat(cappedSpawns) {
-                        player.location.spawnFromPrefab(key) ?: error("Prefab $mobKey not found")
+                        player.location.spawnFromPrefab(key) ?: error("Error while spawning $mobKey")
                     }
                 }
             }
@@ -160,7 +161,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
 
     private val mobs: List<String> by lazy {
         buildList {
-            addAll(listOf("custom", "npc", "mob", "renamed", "passive", "hostile", "flying"))
+            addAll(listOf("custom", "important", "mob", "renamed", "passive", "hostile", "flying"))
             addAll(MobzyTypesQuery.getKeys().map { it.toString() })
         }
     }

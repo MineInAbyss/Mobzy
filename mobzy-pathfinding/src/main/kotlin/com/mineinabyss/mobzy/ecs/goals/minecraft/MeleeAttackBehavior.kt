@@ -5,7 +5,8 @@ import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinde
 import com.mineinabyss.mobzy.modelengine.playAnimation
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.entity.Creature
+import net.minecraft.world.entity.PathfinderMob
+import org.bukkit.entity.Mob
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal as NMSMeleeAttackGoal
 
 @Serializable
@@ -15,11 +16,11 @@ class MeleeAttackBehavior(
     private val seeThroughWalls: Boolean,
     private val range: Double? = null
 ) : PathfinderComponent() {
-    override fun build(mob: Creature) = MeleeAttackGoal(mob)
+    override fun build(mob: Mob) = MeleeAttackGoal(mob)
 
     inner class MeleeAttackGoal(
-        private val entity: Creature
-    ) : NMSMeleeAttackGoal(entity.toNMS(), attackSpeed, seeThroughWalls) {
+        private val entity: Mob
+    ) : NMSMeleeAttackGoal(entity.toNMS<PathfinderMob>(), attackSpeed, seeThroughWalls) {
         override fun start() {
             super.start()
             entity.playAnimation("attack", 0, 0, 1.0)

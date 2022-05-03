@@ -9,7 +9,7 @@ import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinders
 import com.mineinabyss.mobzy.pathfinding.addPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.addTargetSelector
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 
 @AutoScan
 class PathfinderAttachSystem : GearyListener() {
@@ -18,11 +18,11 @@ class PathfinderAttachSystem : GearyListener() {
 
     @Handler
     fun TargetScope.attachPathfinders() {
-        val mob = bukkit as? Creature ?: return
+        val mob = bukkit as? Mob ?: return
         val nmsMob = mob.toNMS()
         val (targets, goals) = pathfinders
 
-        if(pathfinders.override) {
+        if (pathfinders.override) {
             nmsMob.targetSelector.removeAllGoals()
             nmsMob.goalSelector.removeAllGoals()
         }

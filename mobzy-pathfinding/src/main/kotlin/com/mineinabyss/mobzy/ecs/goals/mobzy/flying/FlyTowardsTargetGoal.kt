@@ -5,18 +5,18 @@ import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("mobzy:behavior.fly_towards_target")
 class FlyTowardsTargetBehavior : PathfinderComponent() {
-    override fun build(mob: Creature) = FlyTowardsTargetGoal(mob)
+    override fun build(mob: Mob) = FlyTowardsTargetGoal(mob)
 }
 
-class FlyTowardsTargetGoal(override val mob: Creature) : MobzyPathfinderGoal(cooldown = 10, flags = listOf(Flag.MOVE)) {
+class FlyTowardsTargetGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 10, flags = listOf(Flag.MOVE)) {
     override fun shouldExecute(): Boolean = (mob.target != null)
 
-    override fun shouldKeepExecuting(): Boolean = shouldExecute()
+    override fun shouldKeepExecuting(): Boolean = false
 
     override fun executeWhenCooledDown() {
         restartCooldown()
@@ -27,10 +27,10 @@ class FlyTowardsTargetGoal(override val mob: Creature) : MobzyPathfinderGoal(coo
             mob.lookAt(target)
         }
 
-        //aim slightly higher when below target to fix getting stuck
-        if (target.eyeLocation.y > mob.location.y)
-            pathfinder.moveTo(target.eyeLocation.apply { y += 1 }, 1.0)
-        else
-            pathfinder.moveTo(target.eyeLocation, 1.0)
+        val l = target.eyeLocation.apply {
+            //aim slightly higher when below target to fix getting stuck
+            if (target.eyeLocation.y > mob.location.y) y += 1
+        }
+        nmsEntity.moveControl.setWantedPosition(l.x, l.y, l.z, 1.0)
     }
 }

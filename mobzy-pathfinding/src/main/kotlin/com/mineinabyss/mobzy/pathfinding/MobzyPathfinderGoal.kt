@@ -2,13 +2,13 @@ package com.mineinabyss.mobzy.pathfinding
 
 import com.destroystokyo.paper.entity.Pathfinder
 import com.mineinabyss.geary.papermc.access.toGeary
-import com.mineinabyss.idofront.nms.aliases.NMSPathfinderMob
+import com.mineinabyss.idofront.nms.aliases.NMSMob
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import net.minecraft.world.entity.ai.goal.Goal
 import org.bukkit.GameMode
 import org.bukkit.Statistic
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -20,13 +20,16 @@ import java.util.*
  */
 //TODO multiple types at a time
 abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, flags: List<Flag> = listOf()) : Goal() {
-    abstract val mob: Creature
-    protected val nmsEntity: NMSPathfinderMob by lazy { mob.toNMS() }
-//    protected val moveController: MoveControl get() = nmsEntity.moveControl
+    abstract val mob: Mob
+    protected val nmsEntity: NMSMob by lazy { mob.toNMS() }
+
+    //    protected val moveController: MoveControl get() = nmsEntity.moveControl
     protected val pathfinder: Pathfinder by lazy { mob.pathfinder }
 
+    final override fun setFlags(controls: EnumSet<Flag>) = super.setFlags(controls)
+
     init {
-        if(flags.isNotEmpty()) setFlags(EnumSet.copyOf(flags.toList()))
+        if (flags.isNotEmpty()) setFlags(EnumSet.copyOf(flags.toList()))
     }
 
     private var cooldownStart: Long = 0

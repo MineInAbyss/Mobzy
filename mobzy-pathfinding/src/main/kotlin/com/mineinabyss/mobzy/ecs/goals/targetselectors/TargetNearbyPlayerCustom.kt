@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
-import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -9,7 +8,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinde
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
@@ -26,7 +25,7 @@ class TargetNearbyPlayerCustom(
     private val range: Double? = null,
     private val ticksWaitAfterPlayerDeath: Int = 200
 ) : PathfinderComponent() {
-    override fun build(mob: Creature) =
+    override fun build(mob: Mob) =
         TargetNearbyPlayerCustomGoal(
             mob,
             range ?: mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0,
@@ -35,7 +34,7 @@ class TargetNearbyPlayerCustom(
 }
 
 class TargetNearbyPlayerCustomGoal(
-    override val mob: Creature,
+    override val mob: Mob,
     private val range: Double,
     private val ticksWaitAfterPlayerDeath: Int = 200
 ) : MobzyPathfinderGoal(flags = listOf(Flag.TARGET) /* TARGET */) {

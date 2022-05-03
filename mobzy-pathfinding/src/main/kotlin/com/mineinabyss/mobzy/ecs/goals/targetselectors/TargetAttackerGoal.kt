@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.ecs.goals.targetselectors
 
-import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
@@ -8,7 +7,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinde
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
 
@@ -17,12 +16,12 @@ import org.bukkit.event.entity.EntityTargetEvent
 class TargetAttacker(
     private val range: Double? = null
 ) : PathfinderComponent() {
-    override fun build(mob: Creature) =
+    override fun build(mob: Mob) =
         TargetAttackerGoal(mob, range ?: mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0)
 }
 
 class TargetAttackerGoal(
-    override val mob: Creature,
+    override val mob: Mob,
     private val range: Double
 ) : MobzyPathfinderGoal(flags = listOf(Flag.TARGET)) {
     private lateinit var playerDamager: Player

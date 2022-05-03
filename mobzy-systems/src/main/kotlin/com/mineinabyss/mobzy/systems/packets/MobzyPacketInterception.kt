@@ -12,6 +12,7 @@ import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.dsl.sendTo
@@ -34,13 +35,17 @@ object MobzyPacketInterception {
     private val vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer()
     private const val META_ENTITY_FLAGS = 0
     private const val META_ARMORSTAND = 15
-
     fun registerPacketInterceptors() {
+
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
             onSend<ClientboundAddMobPacketWrap> { wrap ->
-                val entity = runCatching { entity(wrap.id) }.getOrNull() ?: return@onSend
-                if (entity.toGeary().has<Model>())
+                val entity = runCatching { entity(wrap.id) }.getOrElse {
+                    return@onSend
+                }//() ?: return@onSend
+                val geary = entity.toGeary()
+                if (geary.has<ModelEngineComponent>()) isCancelled = true
+                if (geary.has<Model>())
                     wrap.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
             }
 

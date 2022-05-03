@@ -5,11 +5,11 @@ import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.Pathfinde
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("minecraft:behavior.random_look_around")
 class RandomLookAroundBehavior : PathfinderComponent() {
-    override fun build(mob: Creature) =
+    override fun build(mob: Mob) =
         RandomLookAroundGoal(mob.toNMS())
 }

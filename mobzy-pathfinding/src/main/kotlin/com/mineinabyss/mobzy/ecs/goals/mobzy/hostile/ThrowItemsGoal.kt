@@ -7,13 +7,16 @@ import com.mineinabyss.geary.serialization.parseEntity
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
+import com.mineinabyss.idofront.location.up
+import com.mineinabyss.idofront.operators.plus
+import com.mineinabyss.idofront.operators.times
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bukkit.entity.Creature
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Projectile
 import org.bukkit.entity.Snowball
 import org.bukkit.util.Vector
@@ -36,7 +39,7 @@ class ThrowItemsBehavior(
     val projectileCountPerThrow: Int = 1,
     val cooldown: @Serializable(with = DurationSerializer::class) Duration = 3.seconds,
 ) : PathfinderComponent() {
-    override fun build(mob: Creature) = ThrowItemsGoal(
+    override fun build(mob: Mob) = ThrowItemsGoal(
         mob,
         mob.toGeary().parseEntity(spawn),
         minChaseRad,
@@ -56,7 +59,7 @@ class ThrowItemsBehavior(
  * @param cooldown How long to wait between firing at the target.
  */
 class ThrowItemsGoal(
-    override val mob: Creature,
+    override val mob: Mob,
     private val prefab: GearyEntity,
     private val minChaseRad: Double,
     private val minThrowRad: Double,
@@ -99,7 +102,7 @@ class ThrowItemsGoal(
     /** Throws the mob's defined item at the [target]*/
     private fun throwItem(target: LivingEntity) {
         repeat(count) {
-            val entity = mob.eyeLocation.spawnFromPrefab(prefab = prefab) ?: return@repeat
+            val entity = (mob.location.up(mob.height / 1.2) + mob.location.direction.normalize() * (mob.width)).spawnFromPrefab(prefab = prefab) ?: return@repeat
             val snowball = entity as? Snowball ?: return
             snowball.shooter = mob
 //            snowball.velocity = Vector(0.0, 0.0, 0.1)

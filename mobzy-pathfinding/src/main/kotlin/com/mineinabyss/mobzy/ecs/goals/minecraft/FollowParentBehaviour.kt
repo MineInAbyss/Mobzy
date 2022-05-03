@@ -7,14 +7,14 @@ import kotlinx.serialization.Serializable
 import net.minecraft.world.entity.ai.goal.FollowParentGoal
 import net.minecraft.world.entity.ai.goal.Goal
 import net.minecraft.world.entity.animal.Animal
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 
 @Serializable
 @SerialName("minecraft:behavior.follow_parent")
 class FollowParentBehaviour(
     private val speedModifier: Double = 1.0,
 ) : PathfinderComponent() {
-    override fun build(mob: Creature): Goal = FollowParentGoal(
+    override fun build(mob: Mob): Goal = FollowParentGoal(
         mob.toNMS<Animal>(),
         speedModifier
     )

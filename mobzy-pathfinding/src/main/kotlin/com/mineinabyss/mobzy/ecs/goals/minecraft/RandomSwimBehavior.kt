@@ -7,8 +7,9 @@ import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.goal.RandomSwimmingGoal
-import org.bukkit.entity.Creature
+import org.bukkit.entity.Mob
 import kotlin.time.Duration
 
 @Serializable
@@ -18,8 +19,8 @@ class RandomSwimBehavior(
     @Serializable(with = DurationSerializer::class)
     private val interval: Duration = 120.ticks
 ) : PathfinderComponent() {
-    override fun build(mob: Creature) = RandomSwimmingGoal(
-        mob.toNMS(),
+    override fun build(mob: Mob) = RandomSwimmingGoal(
+        mob.toNMS<PathfinderMob>(),
         speedModifier,
         interval.inWholeTicks.toInt()
     )
