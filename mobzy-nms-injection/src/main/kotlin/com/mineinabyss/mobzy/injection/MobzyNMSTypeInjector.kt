@@ -32,7 +32,6 @@ fun PrefabKey.toResourceKey(): ResourceLocation = ResourceLocation(namespace, ke
 @AutoScan
 class MobzyNMSTypeInjector : GearyListener() {
     private val TargetScope.info by added<MobzyType>()
-    private val TargetScope.key by added<PrefabKey>()
     private val TargetScope.prefab by family { has<Prefab>() }
 
     @Handler
