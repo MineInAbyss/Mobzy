@@ -17,6 +17,7 @@ enum class MobCategory {
     WATER_AMBIENT,
     FLYING,
     MISC,
+    AXOLOTLS,
     UNDERGROUND_WATER_CREATURE
 }
 
