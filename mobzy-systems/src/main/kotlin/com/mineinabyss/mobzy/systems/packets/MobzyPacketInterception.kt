@@ -14,6 +14,7 @@ import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.dsl.sendTo
 import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacketWrap
@@ -44,7 +45,11 @@ object MobzyPacketInterception {
                     return@onSend
                 }//() ?: return@onSend
                 val geary = entity.toGeary()
-                if (geary.has<ModelEngineComponent>()) isCancelled = true
+
+                geary.with { model: ModelEngineComponent ->
+                    entity.toModelEntity()?.addPlayer(player)
+                    isCancelled = true
+                }
                 if (geary.has<Model>())
                     wrap.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
             }

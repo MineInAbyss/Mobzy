@@ -51,7 +51,6 @@ object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyCont
             modelEntity.addActiveModel(createdModel)
 
             modelEntity.apply {
-                detectPlayers()
                 bukkit.customName?.let {
                     modelEntity.nametagHandler.setCustomName("head", it)
                 }
