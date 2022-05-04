@@ -7,9 +7,8 @@ import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.injection.helpers.toGeary
-import net.minecraft.core.BlockPos
+import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.MobSpawnType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,35 +17,27 @@ import org.bukkit.event.entity.CreatureSpawnEvent
 object GearySpawningListener : Listener {
     @EventHandler
     fun GearyAttemptMinecraftSpawnEvent.attemptSpawnViaNMS() {
-        if (bukkitEntity == null) bukkitEntity = prefab.get<NMSEntityType<*>>()?.let { type ->
-            type.spawn(
-                location.world.toNMS(),
-                null,
-                null,
-                null,
-                BlockPos(location.x, location.y, location.z),
-                MobSpawnType.COMMAND,
-                true,
-                false,
-                CreatureSpawnEvent.SpawnReason.COMMAND
-            ) {
-                it.toGeary().apply {
-                    addPrefab(prefab)
-                    set<BukkitEntity>(it.toBukkit())
-                    GearyMinecraftSpawnEvent(this).call()
-                }
-            }?.toBukkit()
-        }
+        if (bukkitEntity != null) return
+        val world = location.world.toNMS()
+        val spawned = prefab.get<NMSEntityType<*>>()?.create(world) ?: return
+        spawned.moveTo(location.x, location.y, location.z)
 
-//        type.create(
-//            world
-//        )?.apply {
-//            toGeary().apply {
-//                addPrefab(prefab)
-//                set<BukkitEntity>(toBukkit())
-//                GearyMinecraftSpawnEvent(this).call()
-//            }
-//        }?.toBukkit()
+        spawned.toGeary().apply {
+            addPrefab(prefab)
+            set(spawned.toBukkit())
+            GearyMinecraftSpawnEvent(this).call()
+        }
+        if (spawned is Mob) {
+            spawned.finalizeSpawn(
+                world,
+                world.getCurrentDifficultyAt(spawned.blockPosition()),
+                MobSpawnType.COMMAND,
+                null,
+                null
+            )
+        }
+        world.addFreshEntityWithPassengers(spawned, CreatureSpawnEvent.SpawnReason.COMMAND)
+        bukkitEntity = spawned.toBukkit()
     }
 }
 
