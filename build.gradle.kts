@@ -21,7 +21,7 @@ allprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf(
-                "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             )
         }
     }

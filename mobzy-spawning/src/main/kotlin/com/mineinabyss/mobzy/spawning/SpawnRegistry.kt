@@ -7,7 +7,6 @@ import com.mineinabyss.geary.prefabs.PrefabManager
 import com.mineinabyss.geary.prefabs.PrefabManagerContext
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.geary.systems.query.GearyQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.sk89q.worldguard.WorldGuard

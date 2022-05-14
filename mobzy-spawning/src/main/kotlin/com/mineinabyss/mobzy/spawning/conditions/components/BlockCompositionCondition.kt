@@ -5,7 +5,6 @@ import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.EventScope
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.idofront.serialization.DoubleRangeSerializer
 import com.mineinabyss.idofront.util.DoubleRange
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
