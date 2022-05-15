@@ -11,7 +11,6 @@ import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.geary.systems.query.GearyQuery
-import com.mineinabyss.geary.systems.query.invoke
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.ecs.components.toMobzyCategory
 import net.minecraft.core.Registry
@@ -24,7 +23,7 @@ object MobzyTypesQuery : GearyQuery() {
         has<Prefab>()
     }
 
-    fun getKeys() = MobzyTypesQuery.invoke { map { it.key } }
+    fun getKeys() = map { it.key }
 }
 
 fun PrefabKey.toResourceKey(): ResourceLocation = ResourceLocation(namespace, key)
