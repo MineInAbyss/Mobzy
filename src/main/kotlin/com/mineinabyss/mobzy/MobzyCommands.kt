@@ -22,7 +22,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
+import com.mineinabyss.mobzy.spawning.helpers.categorizeMobs
 import net.minecraft.world.entity.FlyingMob
 import net.minecraft.world.entity.animal.AbstractFish
 import net.minecraft.world.entity.animal.Animal

@@ -26,6 +26,7 @@ interface MobzyConfig {
     class Data(
         var debug: Boolean = false,
         var doMobSpawns: Boolean = false,
+        var supportNonMEEntities: Boolean = false,
         @Serializable(with = IntRangeSerializer::class)
         var chunkSpawnRad: IntRange,
         var maxCommandSpawns: Int,

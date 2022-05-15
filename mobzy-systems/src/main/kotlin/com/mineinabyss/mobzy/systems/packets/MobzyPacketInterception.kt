@@ -11,6 +11,7 @@ import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.time.ticks
+import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.mobzy
@@ -70,7 +71,7 @@ object MobzyPacketInterception {
                 }
             }
 
-            onSend<ClientboundSetEntityDataPacketWrap> { wrap ->
+            if (MobzyConfig.data.supportNonMEEntities) onSend<ClientboundSetEntityDataPacketWrap> { wrap ->
                 val entity: Entity = getEntityFromID(player.world, wrap.id) ?: return@onSend
                 val geary = entity.toGeary()
                 if (!geary.has<Model>() || geary.has<PlayingDeathAnimation>()) return@onSend
