@@ -10,6 +10,7 @@ import com.mineinabyss.idofront.entities.leftClicked
 import com.mineinabyss.idofront.entities.rightClicked
 import com.mineinabyss.idofront.events.call
 import com.mineinabyss.idofront.items.editItemMeta
+import com.mineinabyss.idofront.messaging.broadcast
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.ecs.components.RemoveOnChunkUnload
@@ -17,31 +18,38 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
+import com.mineinabyss.mobzy.ecs.components.interaction.Tamable
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
+import io.papermc.paper.event.entity.EntityMoveEvent
 import kotlinx.coroutines.delay
-import org.bukkit.FluidCollisionMode
-import org.bukkit.Material
-import org.bukkit.Statistic
+import org.bukkit.*
+import org.bukkit.attribute.Attribute
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Ageable
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.entity.PlayerLeashEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
+import org.bukkit.event.player.PlayerUnleashEntityEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import kotlin.random.Random
 
 object MobListener : Listener {
     /**
@@ -81,7 +89,6 @@ object MobListener : Listener {
                     }
             }
         }
-
     }
 
     /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
@@ -116,14 +123,6 @@ object MobListener : Listener {
             mob.equipment.helmet = model.modelItemStack
             mob.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
         }
-    }
-
-    /** Ride entities with [Rideable] component on right click. */
-    @EventHandler
-    fun PlayerInteractEntityEvent.rideOnRightClick() {
-        val gearyEntity = rightClicked.toGearyOrNull() ?: return
-        if (gearyEntity.has<Rideable>())
-            rightClicked.addPassenger(player)
     }
 
     @EventHandler
@@ -175,13 +174,147 @@ object MobListener : Listener {
             isCancelled = true
     }
 
+    /** Ride entities with [Rideable] component on right click. */
+    @EventHandler
+    fun PlayerInteractEntityEvent.rideOnRightClick() {
+        val gearyEntity = rightClicked.toGearyOrNull() ?: return
+        val modelEntity = rightClicked.toModelEntity() ?: return
+
+        gearyEntity.with { rideable: Rideable ->
+            val mount = modelEntity.mountHandler
+            if (player.isSneaking) return
+
+            mount.setSteerable(true)
+            mount.setCanCarryPassenger(rideable.canTakePassenger)
+
+            if (!mount.hasDriver()) mount.driver = player
+            else mount.addPassenger("p_${mount.passengers.size + 1}", player)
+
+            if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
+                mount.addPassenger("p_${mount.passengers.size + 1}", player) // Adds passenger to the next seat
+            }
+        }
+    }
+
+    /** Controlling of entities with [Rideable.requiresItemToSteer] */
+    @EventHandler
+    fun EntityMoveEvent.onMountControl() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val mount = entity.toModelEntity()?.mountHandler ?: return
+        val player = (mount.driver ?: return) as? Player ?: return
+
+        //TODO Make mob move on its own if not holding correct item
+        gearyEntity.with { rideable: Rideable ->
+            if (rideable.requiresItemToSteer && player.inventory.itemInMainHand != rideable.steerItem?.toItemStack())
+                isCancelled = true
+        }
+    }
+
+    /** Tame entities with [Tamable] component on right click */
+    @EventHandler
+    fun PlayerInteractEntityEvent.tameMob() {
+        val mob = (rightClicked as LivingEntity)
+        val maxHealth = mob.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value
+        val gearyEntity = rightClicked.toGearyOrNull() ?: return
+        val modelEntity = rightClicked.toModelEntity() ?: return
+        val itemInHand = player.inventory.itemInMainHand
+
+        gearyEntity.with { tamable: Tamable, rideable: Rideable ->
+            if (tamable.isTamable && !tamable.isTamed && tamable.tameItem?.toItemStack() == itemInHand) {
+                val random = Random(1).nextDouble()
+                tamable.isTamed = true
+                tamable.owner = player.uniqueId
+                rightClicked.toGeary().getOrSetPersisting { tamable.isTamed; tamable.owner == player.uniqueId }
+                player.spawnParticle(
+                    Particle.HEART,
+                    rightClicked.location.apply { y += 1.5 },
+                    10,
+                    random,
+                    random,
+                    random
+                )
+                return
+            }
+
+            //TODO Heal mob if fed tameItem
+            if (tamable.isTamed && (mob.health != maxHealth) && itemInHand == tamable.tameItem?.toItemStack()) {
+                if (mob.health + 2 <= maxHealth!!) mob.health += 2 else mob.health = maxHealth
+                player.playSound(mob.location, Sound.ENTITY_HORSE_EAT, 1f, 1f)
+                player.spawnParticle(Particle.HEART, rightClicked.location.apply { y += 2 }, 4)
+            }
+            else if (tamable.isTamed && tamable.owner == player.uniqueId && itemInHand.type == Material.NAME_TAG) {
+                modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
+                modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
+            }
+
+            else if (tamable.isTamed && !rideable.isSaddled && tamable.owner == player.uniqueId && player.isSneaking) {
+                val model = gearyEntity.get<ModelEngineComponent>() ?: return
+                val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
+
+                if (saddle.isVisible && !rideable.isSaddled) saddle.setItemVisibility(false)
+                else saddle.setItemVisibility(true)
+            }
+
+            else if (tamable.isTamed && tamable.owner == player.uniqueId && rideable.isSaddled && player.isSneaking) {
+                val model = gearyEntity.get<ModelEngineComponent>() ?: return
+                val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
+
+                rightClicked.toGeary().setPersisting(!rideable.isSaddled)
+                if (saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
+            }
+        }
+    }
+
+    //TODO Find a way to render the lead that isnt scuffed
+    /** Handling leashing of entities with [ModelEngineComponent] */
+    @EventHandler
+    fun PlayerLeashEntityEvent.onLeashingMob() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val modelEntity = entity.toModelEntity() ?: return
+
+        gearyEntity.with { componentEntity: ModelEngineComponent ->
+            if (!componentEntity.leashable) return
+            broadcast(modelEntity.isInvisible)
+            modelEntity.isInvisible = false
+            modelEntity.entity.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.INVISIBILITY,
+                    Int.MAX_VALUE,
+                    1,
+                    false,
+                    false
+                )
+            )
+        }
+    }
+
+    /** Handle unleashing of entities with [ModelEngineComponent.leashable] */
+    @EventHandler
+    fun PlayerUnleashEntityEvent.onUnleashMob() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val modelEntity = entity.toModelEntity() ?: return
+
+        // Remove BaseEntity-packet again for hitbox reasons and remove invis effect
+        gearyEntity.with { componentEntity: ModelEngineComponent ->
+            if (!componentEntity.leashable) return
+            broadcast(modelEntity.isInvisible)
+            modelEntity.isInvisible = true
+            modelEntity.entity.removePotionEffect(PotionEffectType.INVISIBILITY)
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        gearyEntity.with { deathLoot: DeathLoot ->
+        val mountHandler = entity.toModelEntity()?.mountHandler
+        if (mountHandler?.hasDriver() == true || mountHandler?.hasPassengers() == true) mountHandler.dismountAll()
+
+        gearyEntity.with { deathLoot: DeathLoot, rideable: Rideable ->
             drops.clear()
             droppedExp = 0
 
+            // Drop equipped items from rideable entity
+            if (rideable.isSaddled) drops.add(ItemStack(Material.SADDLE))
             if (entity.lastDamageCause?.cause !in deathLoot.ignoredCauses) {
                 deathLoot.expToDrop()?.let { droppedExp = it }
                 val heldItem = entity.killer?.inventory?.itemInMainHand
