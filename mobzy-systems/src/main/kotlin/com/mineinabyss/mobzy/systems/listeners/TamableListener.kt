@@ -30,12 +30,30 @@ object TamableListener : Listener {
         val itemInHand = player.inventory.itemInMainHand
 
         gearyEntity.with { tamable: Tamable, rideable: Rideable ->
+            val tamed = gearyEntity.get<Tamed>() ?: run {
+                val random = Random(1).nextDouble()
+                if (tamable.tameItem?.toItemStack() == itemInHand) {
+                    gearyEntity.setPersisting(Tamed)
+                    gearyEntity.get<Tamed>()?.owner = player.uniqueId
+                    player.spawnParticle(
+                        Particle.HEART,
+                        rightClicked.location.apply { y += 1.5 },
+                        10,
+                        random,
+                        random,
+                        random
+                    )
+                }
+                return
+            }
             when {
-                !gearyEntity.has<Tamed>() -> {
-                    val random = Random(1).nextDouble()
-                    if (tamable.tameItem?.toItemStack() == itemInHand) {
-                        gearyEntity.setPersisting(Tamed)
-                        gearyEntity.get<Tamed>()?.owner = player.uniqueId
+                tamable.tameItem?.toItemStack() == itemInHand -> {
+                    if (mob.health <= maxHealth) {
+                        if (mob.health + 2 <= maxHealth) mob.health += 2 else mob.health = maxHealth
+                        player.playSound(mob.location, Sound.ENTITY_HORSE_EAT, 1f, 1f)
+                        player.spawnParticle(Particle.HEART, rightClicked.location.apply { y += 2 }, 4)
+                    } else {
+                        val random = Random(1).nextDouble()
                         player.spawnParticle(
                             Particle.HEART,
                             rightClicked.location.apply { y += 1.5 },
@@ -46,47 +64,20 @@ object TamableListener : Listener {
                         )
                     }
                 }
-                else -> {
-                    val tamed = gearyEntity.get<Tamed>() ?: return
-                    when {
-                        tamable.tameItem?.toItemStack() == itemInHand -> {
-                            if (mob.health <= maxHealth) {
-                                if (mob.health + 2 <= maxHealth) mob.health += 2 else mob.health = maxHealth
-                                player.playSound(mob.location, Sound.ENTITY_HORSE_EAT, 1f, 1f)
-                                player.spawnParticle(Particle.HEART, rightClicked.location.apply { y += 2 }, 4)
-                            }
-                            else {
-                                val random = Random(1).nextDouble()
-                                player.spawnParticle(
-                                    Particle.HEART,
-                                    rightClicked.location.apply { y += 1.5 },
-                                    10,
-                                    random,
-                                    random,
-                                    random
-                                )
-                            }
-                        }
-                        tamed.owner == player.uniqueId -> {
-                            when {
-                                itemInHand.type == Material.NAME_TAG -> {
-                                    modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
-                                    modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
-                                }
-                                player.isSneaking -> {
-                                    val model = gearyEntity.get<ModelEngineComponent>() ?: return
-                                    val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
-                                    if (rideable.isSaddled) {
-                                        rightClicked.toGeary().setPersisting(!rideable.isSaddled)
-                                        if (saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
-                                    }
-                                    else {
-                                        if (saddle.isVisible) saddle.setItemVisibility(false)
-                                        else saddle.setItemVisibility(true)
-                                    }
-                                }
-                            }
-                        }
+                tamed.owner != player.uniqueId -> return
+                itemInHand.type == Material.NAME_TAG -> {
+                    modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
+                    modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
+                }
+                player.isSneaking -> {
+                    val model = gearyEntity.get<ModelEngineComponent>() ?: return
+                    val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
+                    if (rideable.isSaddled) {
+                        rightClicked.toGeary().setPersisting(!rideable.isSaddled)
+                        if (saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
+                    } else {
+                        if (saddle.isVisible) saddle.setItemVisibility(false)
+                        else saddle.setItemVisibility(true)
                     }
                 }
             }
