@@ -216,12 +216,12 @@ object MobListener : Listener {
         val mountHandler = entity.toModelEntity()?.mountHandler
         if (mountHandler?.hasDriver() == true || mountHandler?.hasPassengers() == true) mountHandler.dismountAll()
 
-        gearyEntity.with { deathLoot: DeathLoot, rideable: Rideable ->
+        gearyEntity.with { deathLoot: DeathLoot ->
             drops.clear()
             droppedExp = 0
 
             // Drop equipped items from rideable entity
-            if (rideable.isSaddled) drops.add(ItemStack(Material.SADDLE))
+            if (gearyEntity.get<Rideable>()?.isSaddled == true) drops.add(ItemStack(Material.SADDLE))
             if (entity.lastDamageCause?.cause !in deathLoot.ignoredCauses) {
                 deathLoot.expToDrop()?.let { droppedExp = it }
                 val heldItem = entity.killer?.inventory?.itemInMainHand
