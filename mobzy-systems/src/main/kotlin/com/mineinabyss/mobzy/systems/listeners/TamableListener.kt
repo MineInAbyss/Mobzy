@@ -23,7 +23,7 @@ object TamableListener : Listener {
     /** Tame entities with [Tamable] component on right click */
     @EventHandler
     fun PlayerInteractEntityEvent.tameMob() {
-        val mob = (rightClicked as LivingEntity)
+        val mob = (rightClicked as? LivingEntity) ?: return
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val maxHealth = gearyEntity.get<MobAttributes>()?.maxHealth ?: 20.0
         val modelEntity = rightClicked.toModelEntity() ?: return
