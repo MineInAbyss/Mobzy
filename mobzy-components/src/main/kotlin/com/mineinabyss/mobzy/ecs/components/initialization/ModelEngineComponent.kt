@@ -11,4 +11,5 @@ class ModelEngineComponent(
     val invisible: Boolean = true,
     val damageTint: Boolean = true,
     val nametag: Boolean = true,
+    val leashable: Boolean = false,
 )

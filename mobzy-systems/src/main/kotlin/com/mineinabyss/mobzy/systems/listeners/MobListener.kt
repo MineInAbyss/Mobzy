@@ -17,9 +17,11 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import kotlinx.coroutines.delay
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
@@ -33,9 +35,11 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.entity.PlayerLeashEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
+import org.bukkit.event.player.PlayerUnleashEntityEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -81,7 +85,6 @@ object MobListener : Listener {
                     }
             }
         }
-
     }
 
     /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
@@ -116,14 +119,6 @@ object MobListener : Listener {
             mob.equipment.helmet = model.modelItemStack
             mob.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
         }
-    }
-
-    /** Ride entities with [Rideable] component on right click. */
-    @EventHandler
-    fun PlayerInteractEntityEvent.rideOnRightClick() {
-        val gearyEntity = rightClicked.toGearyOrNull() ?: return
-        if (gearyEntity.has<Rideable>())
-            rightClicked.addPassenger(player)
     }
 
     @EventHandler
@@ -175,13 +170,58 @@ object MobListener : Listener {
             isCancelled = true
     }
 
+    //TODO Find a way to render the lead that isnt scuffed
+    /** Handling leashing of entities with [ModelEngineComponent] */
+    @EventHandler
+    fun PlayerLeashEntityEvent.onLeashingMob() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val modelEntity = entity.toModelEntity() ?: return
+
+        // Leash is tied to the ModelEngine BaseEntity.
+        // This makes it exist for interaction but also invisible
+        // If BaseEntity doesn't exist, the lead won't render
+        gearyEntity.with { componentEntity: ModelEngineComponent ->
+            if (!componentEntity.leashable) return
+            modelEntity.isInvisible = false
+            modelEntity.entity.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.INVISIBILITY,
+                    Int.MAX_VALUE,
+                    1,
+                    false,
+                    false
+                )
+            )
+        }
+    }
+
+    /** Handle unleashing of entities with [ModelEngineComponent.leashable] */
+    @EventHandler
+    fun PlayerUnleashEntityEvent.onUnleashMob() {
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val modelEntity = entity.toModelEntity() ?: return
+
+        // Leash is tied to the ModelEngine BaseEntity.
+        // Since we unleash, we hide BaseEntity for some hitbox related reasons
+        gearyEntity.with { componentEntity: ModelEngineComponent ->
+            if (!componentEntity.leashable) return
+            modelEntity.isInvisible = true
+            modelEntity.entity.removePotionEffect(PotionEffectType.INVISIBILITY)
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        gearyEntity.with { deathLoot: DeathLoot ->
+        val mountHandler = entity.toModelEntity()?.mountHandler
+        if (mountHandler?.hasDriver() == true || mountHandler?.hasPassengers() == true) mountHandler.dismountAll()
+
+        gearyEntity.with { deathLoot: DeathLoot, rideable: Rideable ->
             drops.clear()
             droppedExp = 0
 
+            // Drop equipped items from rideable entity
+            if (rideable.isSaddled) drops.add(ItemStack(Material.SADDLE))
             if (entity.lastDamageCause?.cause !in deathLoot.ignoredCauses) {
                 deathLoot.expToDrop()?.let { droppedExp = it }
                 val heldItem = entity.killer?.inventory?.itemInMainHand
