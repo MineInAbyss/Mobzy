@@ -5,6 +5,7 @@ import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import io.papermc.paper.event.entity.EntityMoveEvent
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -20,7 +21,7 @@ object RidableListener : Listener {
 
         gearyEntity.with { rideable: Rideable ->
             val mount = modelEntity.mountHandler
-            if (player.isSneaking) return
+            if (player.isSneaking || player.inventory.itemInMainHand.type == Material.LEAD) return
 
             mount.setSteerable(true)
             mount.setCanCarryPassenger(rideable.canTakePassenger)
