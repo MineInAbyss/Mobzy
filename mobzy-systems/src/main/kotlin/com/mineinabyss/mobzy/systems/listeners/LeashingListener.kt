@@ -40,11 +40,13 @@ object LeashingListener : Listener {
 
             val mount = modelEntity.mountHandler
             val pufferFish = player.world.spawnEntity(entity.location, EntityType.PUFFERFISH) as PufferFish
-            pufferFish.puffState = 0
-            pufferFish.setAI(false)
-            pufferFish.isInvisible = true
-            pufferFish.isInvulnerable = true
-            pufferFish.toGeary().setPersisting(LeashEntity())
+            pufferFish.apply {
+                puffState = 0
+                setAI(false)
+                isInvisible = true
+                isInvulnerable = true
+                toGeary().setPersisting(LeashEntity())
+            }
 
             mount.setCanCarryPassenger(true)
             mount.addPassenger("leash", pufferFish)
