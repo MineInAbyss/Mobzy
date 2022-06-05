@@ -82,6 +82,7 @@ object MobListener : Listener {
                     }
             }
         }
+        entity.toModelEntity()?.mountHandler?.updateHealth() ?: return
     }
 
     /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
