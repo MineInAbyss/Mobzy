@@ -78,7 +78,7 @@ object LeashingListener : Listener {
     /** Handle unleashing of entities with [ModelEngineComponent.leashable] on death */
     @EventHandler
     fun EntityDamageEvent.unleashOnDeath() {
-        if ((entity as LivingEntity).health - damage > 0) return
+        if ((entity as? LivingEntity ?: return).health - damage > 0) return
         val modelEntity = entity.toModelEntity() ?: return
 
         modelEntity.mountHandler?.getPassengersOnBone("leash")?.filter { it.toGeary().has<LeashEntity>() }?.forEach {
