@@ -13,5 +13,5 @@ class MobzyType(
     private val _creatureType: String = "misc",
     val mobCategory: MobCategory? = null,
 ) {
-    val creatureType get() = net.minecraft.world.entity.MobCategory.byName(_creatureType.lowercase())
+    val creatureType get() = net.minecraft.world.entity.MobCategory.valueOf(_creatureType)
 }
