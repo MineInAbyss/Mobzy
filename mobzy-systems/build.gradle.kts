@@ -7,6 +7,7 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
     maven("https://jitpack.io")
 }
