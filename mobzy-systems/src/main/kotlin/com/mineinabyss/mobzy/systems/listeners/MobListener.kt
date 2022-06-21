@@ -17,7 +17,6 @@ import com.mineinabyss.mobzy.ecs.components.death.DeathLoot
 import com.mineinabyss.mobzy.ecs.components.initialization.Equipment
 import com.mineinabyss.mobzy.ecs.components.initialization.IncreasedWaterSpeed
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
-import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.mobzy
@@ -35,11 +34,9 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
-import org.bukkit.event.entity.PlayerLeashEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerStatisticIncrementEvent
-import org.bukkit.event.player.PlayerUnleashEntityEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -169,46 +166,6 @@ object MobListener : Listener {
         val gearyEntity = entered.toGearyOrNull() ?: return
         if (gearyEntity.has<PreventRiding>())
             isCancelled = true
-    }
-
-    //TODO Find a way to render the lead that isnt scuffed
-    /** Handling leashing of entities with [ModelEngineComponent] */
-    @EventHandler
-    fun PlayerLeashEntityEvent.onLeashingMob() {
-        val gearyEntity = entity.toGearyOrNull() ?: return
-        val modelEntity = entity.toModelEntity() ?: return
-
-        // Leash is tied to the ModelEngine BaseEntity.
-        // This makes it exist for interaction but also invisible
-        // If BaseEntity doesn't exist, the lead won't render
-        gearyEntity.with { componentEntity: ModelEngineComponent ->
-            if (!componentEntity.leashable) return
-            modelEntity.isInvisible = false
-            modelEntity.entity.addPotionEffect(
-                PotionEffect(
-                    PotionEffectType.INVISIBILITY,
-                    Int.MAX_VALUE,
-                    1,
-                    false,
-                    false
-                )
-            )
-        }
-    }
-
-    /** Handle unleashing of entities with [ModelEngineComponent.leashable] */
-    @EventHandler
-    fun PlayerUnleashEntityEvent.onUnleashMob() {
-        val gearyEntity = entity.toGearyOrNull() ?: return
-        val modelEntity = entity.toModelEntity() ?: return
-
-        // Leash is tied to the ModelEngine BaseEntity.
-        // Since we unleash, we hide BaseEntity for some hitbox related reasons
-        gearyEntity.with { componentEntity: ModelEngineComponent ->
-            if (!componentEntity.leashable) return
-            modelEntity.isInvisible = true
-            modelEntity.entity.removePotionEffect(PotionEffectType.INVISIBILITY)
-        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
