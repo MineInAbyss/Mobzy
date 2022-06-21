@@ -24,7 +24,6 @@ allprojects {
     }
 
     repositories {
-        mavenLocal()
         maven("https://repo.mineinabyss.com")
         maven("https://mvn.lumine.io/repository/maven-public/") // Model Engine
     }
@@ -41,7 +40,6 @@ allprojects {
 
 repositories {
     mavenCentral()
-    mavenLocal()
     maven("https://jitpack.io")
 }
 

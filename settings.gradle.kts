@@ -4,7 +4,6 @@ pluginManagement {
         maven("https://repo.mineinabyss.com/releases")
         maven("https://papermc.io/repo/repository/maven-public/")
         google()
-        mavenLocal()
     }
 
     plugins {
@@ -37,7 +36,6 @@ dependencyResolutionManagement {
     val idofrontVersion: String by settings
 
     repositories {
-        mavenLocal()
         maven("https://repo.mineinabyss.com/releases")
     }
 
