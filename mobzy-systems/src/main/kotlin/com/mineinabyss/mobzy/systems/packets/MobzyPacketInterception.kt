@@ -18,7 +18,7 @@ import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.dsl.sendTo
-import com.mineinabyss.protocolburrito.packets.ClientboundAddMobPacketWrap
+import com.mineinabyss.protocolburrito.packets.ClientboundAddEntityPacketWrap
 import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacketWrap
 import com.mineinabyss.protocolburrito.packets.ClientboundSetEquipmentPacketWrap
 import kotlinx.coroutines.delay
@@ -26,7 +26,7 @@ import net.minecraft.core.Registry
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.EquipmentSlot
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Entity
 import kotlin.experimental.or
 
@@ -41,7 +41,7 @@ object MobzyPacketInterception {
 
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
-            onSend<ClientboundAddMobPacketWrap> { wrap ->
+            onSend<ClientboundAddEntityPacketWrap> { wrap ->
                 val entity = runCatching { entity(wrap.id) }.getOrElse {
                     return@onSend
                 }//() ?: return@onSend
@@ -52,7 +52,7 @@ object MobzyPacketInterception {
                     isCancelled = true
                 }
                 if (geary.has<Model>())
-                    wrap.type = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
+                    wrap.id = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
             }
 
             onSend<ClientboundSetEquipmentPacketWrap> { wrap ->

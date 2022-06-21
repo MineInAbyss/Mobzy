@@ -9,7 +9,7 @@ import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.phys.Vec3
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 import kotlin.time.Duration.Companion.seconds
 
