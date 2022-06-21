@@ -1,6 +1,8 @@
 package com.mineinabyss.mobzy.spawning
 
+import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.geary.components.RequestCheck
 import com.mineinabyss.geary.components.events.FailedCheck
 import com.mineinabyss.geary.datatypes.GearyEntity
@@ -17,7 +19,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.nield.kotlinstatistics.WeightedDice
-import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 /**
@@ -40,11 +41,8 @@ import kotlin.random.Random
  * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
  * the chosen region
  */
-object SpawnTask : CoroutineScope, GearyMCContext by GearyMCContextKoin() {
+object SpawnTask : GearyMCContext by GearyMCContextKoin() {
     private var runningTask: Job? = null
-    override val coroutineContext: CoroutineContext =
-        (CoroutineScope(Dispatchers.Default) + CoroutineName("Mobzy spawn task")).coroutineContext
-
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
 
     fun stopTask() {
@@ -55,7 +53,7 @@ object SpawnTask : CoroutineScope, GearyMCContext by GearyMCContextKoin() {
     fun startTask() {
         if (runningTask != null) return
         // TODO Switch back to async when we fix geary async access
-        runningTask = mobzy.launch {
+        runningTask = mobzy.launch(mobzy.asyncDispatcher) {
             while (mobzyConfig.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
@@ -93,31 +91,30 @@ object SpawnTask : CoroutineScope, GearyMCContext by GearyMCContextKoin() {
             val chunk = PlayerGroups.randomChunkNear(playerGroup) ?: return@playerLoop
             val chunkSnapshot = chunk.chunkSnapshot
             val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
-            val priorities = regionContainer.createQuery()
-                .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
-                .sorted()
-                .filterWhenOverlapFlag()
-                .getMobSpawnsForRegions()
-                .associateWithTo(mutableMapOf()) {
-                    (it.get<SpawnPriority>()?.priority ?: 1.0) * Random.nextDouble()
-                }
 
-            while (priorities.isNotEmpty()) {
-                val choice: GearyEntity = WeightedDice(priorities).roll()
-
-                //TODO this should be immutable but bukkit doesn't have an immutable location!
-                val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
-                val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
-                val success = choice.callEvent(RequestCheck, spawnInfo, spawnCheckLoc) { !it.has<FailedCheck>() }
-                if (success) {
-                    // Must spawn mobs in sync
-                    coroutineScope {
-                        mobzy.launch {
-                            if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
-                        }
+            withContext(mobzy.minecraftDispatcher) {
+                val priorities = regionContainer.createQuery()
+                    .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
+                    .sorted()
+                    .filterWhenOverlapFlag()
+                    .getMobSpawnsForRegions()
+                    .associateWithTo(mutableMapOf()) {
+                        (it.get<SpawnPriority>()?.priority ?: 1.0) * Random.nextDouble()
                     }
-                    break
-                } else priorities.remove(choice)
+
+                while (priorities.isNotEmpty()) {
+                    val choice: GearyEntity = WeightedDice(priorities).roll()
+
+                    //TODO this should be immutable but bukkit doesn't have an immutable location!
+                    val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
+                    val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
+                    val success = choice.callEvent(RequestCheck, spawnInfo, spawnCheckLoc) { !it.has<FailedCheck>() }
+                    if (success) {
+                        // Must spawn mobs on main thread
+                        if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
+                        break
+                    } else priorities.remove(choice)
+                }
             }
         }
     }

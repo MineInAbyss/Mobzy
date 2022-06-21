@@ -20,6 +20,7 @@ import com.mineinabyss.mobzy.ecs.components.initialization.Model
 import com.mineinabyss.mobzy.ecs.components.interaction.PreventRiding
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.mobzy
+import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import kotlinx.coroutines.delay
 import org.bukkit.FluidCollisionMode
 import org.bukkit.Material
@@ -81,7 +82,7 @@ object MobListener : Listener {
                     }
             }
         }
-
+        entity.toModelEntity()?.mountHandler?.updateHealth() ?: return
     }
 
     /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
@@ -116,14 +117,6 @@ object MobListener : Listener {
             mob.equipment.helmet = model.modelItemStack
             mob.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
         }
-    }
-
-    /** Ride entities with [Rideable] component on right click. */
-    @EventHandler
-    fun PlayerInteractEntityEvent.rideOnRightClick() {
-        val gearyEntity = rightClicked.toGearyOrNull() ?: return
-        if (gearyEntity.has<Rideable>())
-            rightClicked.addPassenger(player)
     }
 
     @EventHandler
@@ -178,10 +171,15 @@ object MobListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
+        val mountHandler = entity.toModelEntity()?.mountHandler
+        if (mountHandler?.hasDriver() == true || mountHandler?.hasPassengers() == true) mountHandler.dismountAll()
+
         gearyEntity.with { deathLoot: DeathLoot ->
             drops.clear()
             droppedExp = 0
 
+            // Drop equipped items from rideable entity
+            if (gearyEntity.get<Rideable>()?.isSaddled == true) drops.add(ItemStack(Material.SADDLE))
             if (entity.lastDamageCause?.cause !in deathLoot.ignoredCauses) {
                 deathLoot.expToDrop()?.let { droppedExp = it }
                 val heldItem = entity.killer?.inventory?.itemInMainHand

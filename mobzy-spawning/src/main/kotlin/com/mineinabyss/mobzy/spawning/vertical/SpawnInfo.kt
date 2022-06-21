@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
-import com.mineinabyss.geary.papermc.helpers.customMobType
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.geary.systems.query.GearyQuery
 import com.mineinabyss.idofront.location.down
@@ -10,9 +9,9 @@ import com.mineinabyss.mobzy.ecs.components.MobCategory
 import com.mineinabyss.mobzy.ecs.components.mobCategory
 import com.mineinabyss.mobzy.spawning.SpawnPosition
 import com.mineinabyss.mobzy.spawning.components.SubChunkBlockComposition
+import com.mineinabyss.mobzy.spawning.helpers.categorizeMobs
 import org.bukkit.ChunkSnapshot
 import org.bukkit.Location
-import org.bukkit.entity.Entity
 import kotlin.random.Random
 
 //TODO name could be confused with SpawnRegion
@@ -92,6 +91,3 @@ class SpawnInfo(
     }
 }
 
-//TODO perhaps give normal mobs prefab keys too to make this more type safe
-fun Collection<Entity>.categorizeMobs(): Map<String, Int> =
-    groupingBy { it.customMobType }.eachCount()

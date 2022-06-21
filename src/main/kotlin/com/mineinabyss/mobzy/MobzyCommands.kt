@@ -18,10 +18,11 @@ import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.ecs.components.Important
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
+import com.mineinabyss.mobzy.ecs.components.interaction.Tamed
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry
 import com.mineinabyss.mobzy.spawning.SpawnTask
-import com.mineinabyss.mobzy.spawning.vertical.categorizeMobs
+import com.mineinabyss.mobzy.spawning.helpers.categorizeMobs
 import net.minecraft.world.entity.FlyingMob
 import net.minecraft.world.entity.animal.AbstractFish
 import net.minecraft.world.entity.animal.Animal
@@ -63,12 +64,13 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
 
 
                         if (types.any { type ->
-                                fun excludeDefault() = !geary.has<Important>() && entity.customName() == null
+                                fun excludeDefault() = !geary.has<Important>() && entity.customName() == null && !geary.has<Tamed>()
                                 when (type) {
                                     "custom" -> excludeDefault()
                                     "passive" -> nmsEntity is Animal && excludeDefault()
                                     "hostile" -> nmsEntity is Monster && excludeDefault()
                                     "renamed" -> entity.customName() != null && nmsEntity !is NPC
+                                    "tamed" -> geary.has<Tamed>()
                                     "important" -> geary.has<Important>() && entity.customName() == null
                                     "flying" -> nmsEntity is FlyingMob && excludeDefault()
                                     "fish" -> nmsEntity is AbstractFish && excludeDefault()

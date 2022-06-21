@@ -13,9 +13,7 @@ import com.mineinabyss.mobzy.injection.MobzyNMSTypeInjector
 import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
-import com.mineinabyss.mobzy.systems.listeners.GearySpawningListener
-import com.mineinabyss.mobzy.systems.listeners.MobListener
-import com.mineinabyss.mobzy.systems.listeners.MobzyECSListener
+import com.mineinabyss.mobzy.systems.listeners.*
 import com.mineinabyss.mobzy.systems.packets.MobzyPacketInterception
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem
 import org.bukkit.plugin.java.JavaPlugin
@@ -36,6 +34,9 @@ class MobzyPlugin : JavaPlugin() {
             MobzyECSListener,
             MobCountManager,
             GearySpawningListener,
+            RidableListener,
+            TamableListener,
+            LeashingListener
         )
 
         val nmsTypeInjector = MobzyNMSTypeInjector()

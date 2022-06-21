@@ -1,8 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val serverVersion: String by project
-val idofrontVersion: String by project
-
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
@@ -56,12 +53,12 @@ dependencies {
     compileOnly(libs.koin.core)
 
     // Shaded
-    implementation(project(":mobzy-pathfinding"))
-    implementation(project(":mobzy-systems"))
-    implementation(project(":mobzy-components"))
-    implementation(project(":mobzy-spawning"))
-    implementation(project(":mobzy-nms-injection"))
-    implementation(project(":mobzy-core"))
+    api(project(":mobzy-pathfinding"))
+    api(project(":mobzy-systems"))
+    api(project(":mobzy-components"))
+    api(project(":mobzy-spawning"))
+    api(project(":mobzy-nms-injection"))
+    api(project(":mobzy-core"))
 
     // Testing
     testImplementation(libs.kotlin.statistics)
