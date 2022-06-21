@@ -30,8 +30,8 @@ object MobCountManager : Listener, GearyMCContext by GearyMCContextKoin() {
 
     @AutoScan
     class CountMobsSystem : GearyListener() {
-        val TargetScope.bukkitEntity by added<MobCategory>()
-        val TargetScope.category by added<MobCategory>()
+        val TargetScope.bukkitEntity by onSet<MobCategory>()
+        val TargetScope.category by onSet<MobCategory>()
 
         @Handler
         fun TargetScope.count() {

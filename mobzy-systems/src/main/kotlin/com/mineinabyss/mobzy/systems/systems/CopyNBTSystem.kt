@@ -18,8 +18,8 @@ import com.mineinabyss.mobzy.ecs.components.CopyNBT
  */
 @AutoScan
 class CopyNBTSystem : GearyListener() {
-    private val TargetScope.nbt by added<CopyNBT>()
-    private val TargetScope.bukkitEntity by added<BukkitEntity>()
+    private val TargetScope.nbt by onSet<CopyNBT>()
+    private val TargetScope.bukkitEntity by onSet<BukkitEntity>()
 
     @Handler
     fun TargetScope.copyNBT() {

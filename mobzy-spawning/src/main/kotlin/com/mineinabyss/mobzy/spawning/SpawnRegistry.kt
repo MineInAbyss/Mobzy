@@ -22,8 +22,8 @@ import org.koin.core.component.inject
 object SpawnRegistry : GearyListener(), PrefabManagerContext {
     override val prefabManager: PrefabManager by inject()
 
-    private val TargetScope.parentRegions by added<WGRegions>()
-    private val TargetScope.spawn by added<SpawnType>()
+    private val TargetScope.parentRegions by onSet<WGRegions>()
+    private val TargetScope.spawn by onSet<SpawnType>()
 
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
     private val regionSpawns: MutableMap<String, MutableSet<GearyEntity>> = HashMap()
