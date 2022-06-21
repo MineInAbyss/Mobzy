@@ -22,6 +22,7 @@ import com.mineinabyss.protocolburrito.packets.ClientboundAddEntityPacketWrap
 import com.mineinabyss.protocolburrito.packets.ClientboundSetEntityDataPacketWrap
 import com.mineinabyss.protocolburrito.packets.ClientboundSetEquipmentPacketWrap
 import kotlinx.coroutines.delay
+import net.minecraft.core.Registry
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.EquipmentSlot
@@ -51,7 +52,7 @@ object MobzyPacketInterception {
                     isCancelled = true
                 }
                 if (geary.has<Model>())
-                    wrap.type = NMSEntityType.ARMOR_STAND
+                    wrap.id = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
             }
 
             onSend<ClientboundSetEquipmentPacketWrap> { wrap ->
