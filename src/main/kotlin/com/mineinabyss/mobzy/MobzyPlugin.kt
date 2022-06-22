@@ -36,7 +36,8 @@ class MobzyPlugin : JavaPlugin() {
             GearySpawningListener,
             RidableListener,
             TamableListener,
-            LeashingListener
+            LeashingListener,
+            BucketableListener
         )
 
         val nmsTypeInjector = MobzyNMSTypeInjector()

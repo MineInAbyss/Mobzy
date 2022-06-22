@@ -33,6 +33,7 @@ allprojects {
         val mobzylibs = rootProject.mobzylibs
 
         compileOnly(mobzylibs.geary.papermc.core)
+        compileOnly(mobzylibs.looty)
 
         implementation(libs.idofront.nms)
     }

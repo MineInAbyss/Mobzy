@@ -1,6 +1,8 @@
 [versions]
 geary = "0.16.100"
+looty = "0.7.56"
 
 [libraries]
 protocolburrito = "com.mineinabyss:protocolburrito:0.4.33"
 geary-papermc-core = { module = "com.mineinabyss:geary-papermc-core", version.ref = "geary" }
+looty = { module = "com.mineinabyss:looty", version.ref = "looty" }
