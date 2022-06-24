@@ -22,6 +22,8 @@ ECS lets us split up many mob behaviours into individual components, making code
 We can easily create serializable components, which lets us read from a config file or store data on a mob's persistent data container.
 
 Here's an example config from our own server:
+
+[**`plugins/Geary/mineinabyss/mobs/hostile/kuongatari.yml`**](https://github.com/MineInAbyss/server-config/blob/master/servers/minecraft/plugins/Geary/mineinabyss/mobs/hostile/kuongatari.yml)
 ```yaml
 - !<geary:inherit> # Inherits components from another prefab
   from: [mineinabyss:hostile]
