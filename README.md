@@ -1,19 +1,15 @@
 <div align="center">
 
-# Mobzy    
+# Mobzy
 [![Java CI with Gradle](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/MineInAbyss/Mobzy/actions/workflows/gradle-ci.yml)
 [![Maven](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.mineinabyss.com/releases/com/mineinabyss/mobzy/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/mobzy)
 [![Wiki](https://img.shields.io/badge/-Project%20Wiki-blueviolet?logo=Wikipedia&labelColor=gray)](https://github.com/MineInAbyss/Mobzy/wiki)
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://github.com/MineInAbyss/MineInAbyss/wiki/Setup-and-Contribution-Guide)
 </div>
 
-### Overview
+## Overview
 
-Mobzy is a PaperMC plugin for injecting custom NMS entities into the server, built on top of our own [Geary](https://github.com/MineInAbyss/Geary) Entity Component System (ECS). We use it to break down complex entities into many modular components in config files.
-
-Our plan is to eventually phase out use of vanilla entities in favor of fully custom, platform-agnostic ones that get sent through packets.
-
-![Custom Mobs](https://media.discordapp.net/attachments/464678554681081856/625036159772524582/2019-09-21_19.39.27.png?width=1210&height=681)
+Mobzy is a PaperMC plugin for creating custom Minecraft entities. It is built on top of [Geary](https://github.com/MineInAbyss/Geary), our own Entity Component System (ECS). We use it to break down complex entities into many modular components in config files.
 
 ## Features
 
@@ -23,17 +19,58 @@ ECS lets us split up many mob behaviours into individual components, making code
 
 ### Config based
 
-Thanks to kotlinx.serialization our component are automatically serializable without reflection. This means all components can be read from a config file or stored in a mob's persistent data container. We then provide some extra options for adding pathfinder goals, or inheriting from different entity types. You can read more on the [Configuring Custom Entities](https://github.com/MineInAbyss/Mobzy/wiki/Configuring-Custom-Entities) wiki page.
+We can easily create serializable components, which lets us read from a config file or store data on a mob's persistent data container.
 
-### NMS Wrappers
-
-Mobzy provides many serializable wrappers for pathfinders which can be used by other plugins to avoid going through NMS. We also provide some extension functions and typealiases to make dealing with NMS easier. We will likely put these into their own API later, with proper documentation. 
+Here's an example config from our own server:
+```yaml
+- !<geary:inherit> # Inherits components from another prefab
+  from: [mineinabyss:hostile]
+- !<mobzy:type> # Tells Minecraft which entity to use under the hood. You may register a custom type with NMS.
+  baseClass: minecraft:zombie
+  creatureType: MONSTER
+- !<geary:display_name> "<#1FB53D>Kuongatari" # Sets a colored display name
+- !<mobzy:modelengine> # Uses a ModelEngine model for this mob
+  modelId: kuongatari
+- !<mobzy:pathfinders> # Sets some pathfinder goals
+  targets:
+    1: !<mobzy:target.attacker>
+      range: 200
+    2: !<mobzy:target.nearby_player>
+      range: 10
+  goals:
+    1: !<minecraft:behavior.melee_attack>
+      seeThroughWalls: true
+    2: !<minecraft:behavior.leap_at_target>
+      jumpHeight: 0.6
+    4: !<minecraft:behavior.random_stroll_land>
+```
 
 ### Other
 
-- Custom hitboxes (Minecraft normally lets the client handle that, so it wouldn't work on entity types it doesn't know).
-- Custom spawning system.
-- Many premade components, with more to come in the future.
+- Support for single models or ModelEngine (all the packet manipulation is handled for you!)
+- Custom spawning system
+- Many premade components (see [Geary-addons](https://github.com/MineInAbyss/Geary-addons/))
+
+## Usage
+
+You may use Mobzy along with Geary through our maven repo, however the API isn't stable yet.
+
+### Gradle
+
+```kotlin
+repositories {
+    maven("https://repo.mineinabyss.com/releases")
+}
+
+dependencies {
+    compileOnly("com.mineinabyss:geary:<version>")
+    compileOnly("com.mineinabyss:mobzy:<version>")
+}
+```
+
+## Project Wiki
+
+We have started working on a [wiki](https://github.com/MineInAbyss/Mobzy/wiki) but it won't be complete for a while. You can ask us questions in `#plugin-dev` on our [Discord](https://discord.gg/QXPCk2y) server, or come help with development there!
 
 ## Future plans
 
@@ -43,22 +80,6 @@ We would like to write our own AI system that uses GOAPs to create configurable 
 
 Essentially, you would be able to code actions with conditions and outcomes, then given a list of possible actions, the system will pathfind its way from a goal to some chain of actions whose conditions are met. These goals can then directly be added as pathfinder goals, ordered by priority.
 
-## Usage
+### Fully custom entities
 
-We have a maven repo set up, however the API isn't properly maintained yet. Many things will change as the ECS is being built.
-
-### Gradle
-
-```groovy
-repositories {
-    maven { url 'https://repo.mineinabyss.com/releases' }
-}
-
-dependencies {
-    implementation 'com.mineinabyss:mobzy:<version>'
-}
-```
-
-## Project Wiki
-
-We have started working on a [wiki](https://github.com/MineInAbyss/Mobzy/wiki) but it won't be complete for a while. You can ask us questions in `#plugin-dev` on our [Discord](https://discord.gg/QXPCk2y) server, or come help with development there!
+Our plan is to eventually phase out use of vanilla entities in favor of fully custom, platform-agnostic ones that get sent through packets.
