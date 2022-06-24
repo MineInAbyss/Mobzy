@@ -38,8 +38,8 @@ object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyCont
             ?.forEach { it.removeState(state, ignoreLerp) }
 
     class ModelEngineTracker : GearyListener() {
-        val TargetScope.bukkit by added<BukkitEntity>()
-        val TargetScope.model by added<ModelEngineComponent>()
+        val TargetScope.bukkit by onSet<BukkitEntity>()
+        val TargetScope.model by onSet<ModelEngineComponent>()
 
         @Handler
         fun TargetScope.registerModelEngine() {

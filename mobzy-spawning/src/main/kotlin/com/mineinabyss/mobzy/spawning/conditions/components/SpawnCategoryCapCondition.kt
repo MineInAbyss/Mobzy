@@ -3,12 +3,9 @@ package com.mineinabyss.mobzy.spawning.conditions.components
 import com.mineinabyss.geary.annotations.AutoScan
 import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.datatypes.family.family
-import com.mineinabyss.geary.datatypes.family.MutableFamilyOperations.Companion.has
-import com.mineinabyss.geary.datatypes.family.MutableFamilyOperations.Companion.not
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.EventScope
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.SpawnType
@@ -18,7 +15,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("mobzy:ignore.spawn.category_cap")
-class IgnoreSpawnCategoryCap()
+class IgnoreSpawnCategoryCap
 
 @AutoScan
 class SpawnCategoryCapCondition : GearyListener() {

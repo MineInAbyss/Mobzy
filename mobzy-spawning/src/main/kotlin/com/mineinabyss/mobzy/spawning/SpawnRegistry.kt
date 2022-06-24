@@ -7,7 +7,6 @@ import com.mineinabyss.geary.prefabs.PrefabManager
 import com.mineinabyss.geary.prefabs.PrefabManagerContext
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.geary.systems.query.GearyQuery
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.regionSpawns
 import com.sk89q.worldguard.WorldGuard
@@ -23,8 +22,8 @@ import org.koin.core.component.inject
 object SpawnRegistry : GearyListener(), PrefabManagerContext {
     override val prefabManager: PrefabManager by inject()
 
-    private val TargetScope.parentRegions by added<WGRegions>()
-    private val TargetScope.spawn by added<SpawnType>()
+    private val TargetScope.parentRegions by onSet<WGRegions>()
+    private val TargetScope.spawn by onSet<SpawnType>()
 
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
     private val regionSpawns: MutableMap<String, MutableSet<GearyEntity>> = HashMap()

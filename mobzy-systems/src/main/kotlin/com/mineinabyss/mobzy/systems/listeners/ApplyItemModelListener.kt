@@ -9,8 +9,8 @@ import org.bukkit.entity.Snowball
 
 @AutoScan
 class ApplyItemModelListener : GearyListener() {
-    val TargetScope.model by added<ItemModel>()
-    val TargetScope.bukkit by added<Snowball>()
+    val TargetScope.model by onSet<ItemModel>()
+    val TargetScope.bukkit by onSet<Snowball>()
 
     @Handler
     fun TargetScope.applyModel() {

@@ -4,7 +4,6 @@ import com.mineinabyss.geary.annotations.AutoScan
 import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.mobzyConfig
 import com.mineinabyss.mobzy.spawning.GlobalSpawnInfo

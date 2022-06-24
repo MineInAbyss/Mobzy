@@ -2,14 +2,12 @@ package com.mineinabyss.mobzy.injection
 
 import com.mineinabyss.geary.annotations.AutoScan
 import com.mineinabyss.geary.annotations.Handler
-import com.mineinabyss.geary.components.Processed
-import com.mineinabyss.geary.datatypes.family.MutableFamilyOperations.Companion.has
+import com.mineinabyss.geary.components.relations.Processed
 import com.mineinabyss.geary.datatypes.family.family
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.geary.prefabs.configuration.components.Prefab
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.geary.systems.query.GearyQuery
 import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.ecs.components.toMobzyCategory
@@ -23,14 +21,14 @@ object MobzyTypesQuery : GearyQuery() {
         has<Prefab>()
     }
 
-    fun getKeys() = map { it.key }
+    fun getKeys() = MobzyTypesQuery.run { map { it.key } }
 }
 
 fun PrefabKey.toResourceKey(): ResourceLocation = ResourceLocation(namespace, key)
 
 @AutoScan
 class MobzyNMSTypeInjector : GearyListener() {
-    private val TargetScope.info by added<MobzyType>()
+    private val TargetScope.info by onSet<MobzyType>()
     private val TargetScope.prefab by family { has<Prefab>() }
 
     @Handler
@@ -40,6 +38,6 @@ class MobzyNMSTypeInjector : GearyListener() {
         }
         entity.set(nmsEntityType)
         entity.set(info.mobCategory ?: info.creatureType.toMobzyCategory())
-        entity.setRelation(MobzyType::class, Processed)
+        entity.addRelation<Processed, MobzyType>()
     }
 }

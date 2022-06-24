@@ -13,8 +13,8 @@ import org.bukkit.entity.Mob
 
 @AutoScan
 class PathfinderAttachSystem : GearyListener() {
-    val TargetScope.bukkit by added<BukkitEntity>()
-    val TargetScope.pathfinders by added<Pathfinders>()
+    val TargetScope.bukkit by onSet<BukkitEntity>()
+    val TargetScope.pathfinders by onSet<Pathfinders>()
 
     @Handler
     fun TargetScope.attachPathfinders() {

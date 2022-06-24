@@ -1,9 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.accessors.get
 import com.mineinabyss.geary.systems.query.GearyQuery
-import com.mineinabyss.geary.systems.query.invoke
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -42,7 +40,7 @@ class SpawnInfo(
 
     //TODO more efficiently finding all ECS entities nearby
     val localMobs: List<BukkitEntity> by lazy {
-        NearbyQuery {
+        NearbyQuery.run {
             map { it.bukkit }.filter {
                 it.location.world == bottom.world && it.location.distanceSquared(bottom) < searchRadiusSquared
             }

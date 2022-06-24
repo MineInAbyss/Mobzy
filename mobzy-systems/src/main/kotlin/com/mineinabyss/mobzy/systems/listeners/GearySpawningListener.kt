@@ -24,7 +24,6 @@ object GearySpawningListener : Listener {
 
         spawned.toGeary().apply {
             addPrefab(prefab)
-            set(spawned.toBukkit())
             GearyMinecraftSpawnEvent(this).call()
         }
         if (spawned is Mob) {

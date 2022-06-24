@@ -5,7 +5,6 @@ import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.helpers.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
-import com.mineinabyss.geary.systems.query.invoke
 import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -195,7 +194,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
 
                 if (subCommand == "spawn" || subCommand == "s")
                     if (args.size == 2) {
-                        return MobzyTypesQuery {
+                        return MobzyTypesQuery.run {
                             filter {
                                 val arg = args[1].lowercase()
                                 it.key.key.startsWith(arg) || it.key.full.startsWith(arg)

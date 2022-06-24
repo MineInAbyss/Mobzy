@@ -15,8 +15,8 @@ import org.bukkit.entity.LivingEntity
 //TODO Make sure this is the first thing to run when priority support comes
 @AutoScan
 class AddPrefabFromNMSTypeSystem : GearyListener() {
-    private val TargetScope.bukkitEntity by added<BukkitEntity>()
-    private val TargetScope.attributes by added<MobAttributes>()
+    private val TargetScope.bukkitEntity by onSet<BukkitEntity>()
+    private val TargetScope.attributes by onSet<MobAttributes>()
 
     @Handler
     fun TargetScope.addPrefab() {
