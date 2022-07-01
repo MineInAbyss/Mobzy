@@ -12,6 +12,7 @@ import com.mineinabyss.idofront.operators.plus
 import com.mineinabyss.idofront.operators.times
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.modelengine.playAnimation
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -30,14 +31,15 @@ import kotlin.time.Duration.Companion.seconds
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
     //TODO replace with serializable geary entity when that works
-    val spawn: String,
-    val minChaseRad: Double = 0.0,
-    val minThrowRad: Double = 7.0,
-    val yOffset: Double = 0.0,
-    val projectileSpeed: Float = 1.6f,
-    val projectileAngularDiameter: Double = 12.0,
-    val projectileCountPerThrow: Int = 1,
-    val cooldown: @Serializable(with = DurationSerializer::class) Duration = 3.seconds,
+    private val spawn: String,
+    private val minChaseRad: Double = 0.0,
+    private val minThrowRad: Double = 7.0,
+    private val yOffset: Double = 0.0,
+    private val projectileSpeed: Float = 1.6f,
+    private val projectileAngularDiameter: Double = 12.0,
+    private val projectileCountPerThrow: Int = 1,
+    private val cooldown: @Serializable(with = DurationSerializer::class) Duration = 3.seconds,
+    private val animationName: String? = null,
 ) : PathfinderComponent() {
     override fun build(mob: Mob) = ThrowItemsGoal(
         mob,
@@ -49,6 +51,7 @@ class ThrowItemsBehavior(
         projectileAngularDiameter,
         projectileCountPerThrow,
         cooldown,
+        animationName
     )
 }
 
@@ -67,7 +70,8 @@ class ThrowItemsGoal(
     private val speed: Float,
     private val randomAngle: Double,
     private val count: Int,
-    cooldown: Duration,
+    private val cooldown: Duration,
+    private val animationName: String? = null,
 ) : MobzyPathfinderGoal(cooldown = cooldown.inWholeMilliseconds) {
     private var distance = 0.0
 
@@ -114,6 +118,8 @@ class ThrowItemsGoal(
             val dY = targetLoc.y - y - 0.4
             val dZ = targetLoc.z - z
             snowball.shootDirection(dX, dY, dZ, speed, randomAngle)
+            if (animationName != null)
+                mob.playAnimation(animationName, 0, 0, 1.0)
         }
     }
 }

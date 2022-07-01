@@ -142,7 +142,7 @@ class DiveOnTargetAttackGoal(
         bashVelX = mob.location.direction.x * bashVelMultiplier
         bashVelZ = mob.location.direction.z * bashVelMultiplier
         mob.pathfinder.stopPathfinding()
-        mob.playAnimation("bash", 0, 5, 1.0)
+        mob.playAnimation("bash", 0, 0, 1.0)
     }
 
     private enum class Action {
