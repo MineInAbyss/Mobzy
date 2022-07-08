@@ -29,6 +29,11 @@ object RidableListener : Listener {
             if (!mount.hasDriver()) mount.driver = player
             else mount.addPassenger("p_${mount.passengers.size + 1}", player)
 
+            mount.setCanDamageMount(mount.driver, rideable.driverCanDamageMount)
+            mount.passengers["mount"]?.passengers?.forEach {
+                mount.setCanDamageMount(it, rideable.passengerCanDamageMount)
+            }
+
             if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
                 mount.addPassenger("p_${mount.passengers.size + 1}", player) // Adds passenger to the next seat
             }
