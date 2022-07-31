@@ -26,6 +26,7 @@ import com.mineinabyss.mobzy.spawning.helpers.categorizeMobs
 import net.minecraft.world.entity.FlyingMob
 import net.minecraft.world.entity.animal.AbstractFish
 import net.minecraft.world.entity.animal.Animal
+import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -64,7 +65,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
 
 
                         if (types.any { type ->
-                                fun excludeDefault() = !geary.has<Important>() && entity.customName() == null && !geary.has<Tamed>()
+                                fun excludeDefault() =
+                                    !geary.has<Important>() && entity.customName() == null && !geary.has<Tamed>()
                                 when (type) {
                                     "custom" -> excludeDefault()
                                     "passive" -> nmsEntity is Animal && excludeDefault()
@@ -137,6 +139,34 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                 createDebugCommands()
             }
 
+            "locate" {
+                val mobKey by optionArg(options = MobzyTypesQuery.run { map { it.key.toString() } }) {
+                    parseErrorMessage = { "No such entity: $passed" }
+                }
+                val radius by intArg {
+                    name = "radius to check"
+                    default = 0
+                }
+                playerAction {
+                    val key = PrefabKey.of(mobKey)
+                    if (radius <= 0) {
+                        Bukkit.getWorlds().forEach { world ->
+                            world.entities.filter { it.toGeary().instanceOf(key.toEntity()!!) }.forEach { entity ->
+                                val loc = entity.location
+                                player.info("Found ${key.key} at <click:run_command:/teleport ${loc.blockX} ${loc.blockY} ${loc.blockZ}>${entity.location}>${entity.location} in ${entity.world.name}")
+                            }
+                        }
+                    } else {
+                        player.location.getNearbyEntities(radius.toDouble(), radius.toDouble(), radius.toDouble())
+                            .filter { it.toGeary().instanceOf(key.toEntity()!!) }.forEach { entity ->
+                                val loc = entity.location
+                                player.info("Found ${key.key} at <click:run_command:/teleport ${loc.blockX} ${loc.blockY} ${loc.blockZ}>${entity.location}")
+
+                            }
+                    }
+                }
+            }
+
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
                 sender.success("All registered types:\n${MobzyTypesQuery.getKeys()}")
             }
@@ -150,6 +180,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                     action {
                         if (mobzyConfig.doMobSpawns != enabled) {
                             mobzyConfig.doMobSpawns = enabled
+                            if (!enabled) SpawnTask.stopTask()
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
                             sender.success("Config option doMobSpawns was already set to $enabled")

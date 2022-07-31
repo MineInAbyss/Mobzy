@@ -69,8 +69,8 @@ internal fun Command.createDebugCommands() {
     "pdc" {
         playerAction {
             sender.sendMessage(
-                player.getNearbyEntities(5.0, 5.0, 5.0).first()
-                    .persistentDataContainer.keys.toString()
+                player.getNearbyEntities(5.0, 5.0, 5.0).firstOrNull()
+                    ?.persistentDataContainer?.keys.toString()
             )
         }
     }
@@ -105,6 +105,6 @@ internal fun Command.createDebugCommands() {
         player.success("${snapshot.getBlockType(x, player.location.y.toInt() - 1, z)} at $x, $z")
     }
     "nearbyuuid"()?.playerAction {
-        player.info(player.getNearbyEntities(5.0, 5.0, 5.0).first().uniqueId.toString())
+        player.info(player.getNearbyEntities(5.0, 5.0, 5.0).firstOrNull()?.uniqueId.toString())
     }
 }
