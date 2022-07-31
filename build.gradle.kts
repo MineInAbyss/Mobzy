@@ -25,7 +25,13 @@ allprojects {
 
     repositories {
         maven("https://repo.mineinabyss.com")
-        maven("https://mvn.lumine.io/repository/maven-public/") // Model Engine
+        //maven("https://mvn.lumine.io/repository/maven-public/") // Model Engine
+        maven { // Temp ModelEngine repo until normal is fixed
+            url = uri("https://mvn.lumine.io/repository/maven-public")
+            metadataSources {
+                artifact()
+            }
+        }
     }
 
     dependencies {
