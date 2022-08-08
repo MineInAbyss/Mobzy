@@ -81,16 +81,10 @@ object MobzyPacketInterception {
                     val entityFlags = existingMeta.getObject(META_ENTITY_FLAGS) as? Byte ?: 0
 
                     // Ensure invisible but keep other parts (glowing) if active
-                    setObject(
-                        WrappedDataWatcherObject(META_ENTITY_FLAGS, byteSerializer),
-                        entityFlags or 0x20
-                    )
+                    setObject(META_ENTITY_FLAGS, byteSerializer, entityFlags or 0x20)
 
                     //Maker, no base pate
-                    setObject(
-                        WrappedDataWatcherObject(META_ARMORSTAND, byteSerializer),
-                        (0x08 or 0x10).toByte()
-                    )
+                    setObject(META_ARMORSTAND, byteSerializer, (0x08 or 0x10).toByte())
 
                     //Don't copy anything else to prevent crashes from bad packets
                 }

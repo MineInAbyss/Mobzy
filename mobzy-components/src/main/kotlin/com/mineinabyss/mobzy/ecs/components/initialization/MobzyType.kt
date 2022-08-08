@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 class MobzyType(
     val baseClass: PrefabKey,
     @SerialName("creatureType")
-    private val _creatureType: String = "misc",
+    private val _creatureType: String = "MISC",
     val mobCategory: MobCategory? = null,
 ) {
     val creatureType get() = net.minecraft.world.entity.MobCategory.valueOf(_creatureType)

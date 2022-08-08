@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.systems.systems
 
 import com.mineinabyss.geary.annotations.AutoScan
 import com.mineinabyss.geary.annotations.Handler
-import com.mineinabyss.geary.papermc.store.decodeComponentsFrom
+import com.mineinabyss.geary.papermc.store.loadComponentsFrom
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -24,7 +24,7 @@ class CopyNBTSystem : GearyListener() {
     @Handler
     fun TargetScope.copyNBT() {
         bukkitEntity.toNMS().load(nbt.compound)
-        entity.decodeComponentsFrom(bukkitEntity.persistentDataContainer)
+        entity.loadComponentsFrom(bukkitEntity.persistentDataContainer)
         entity.remove<CopyNBT>()
     }
 }

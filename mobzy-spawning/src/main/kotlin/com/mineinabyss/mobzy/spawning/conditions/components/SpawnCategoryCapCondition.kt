@@ -26,7 +26,7 @@ class SpawnCategoryCapCondition : GearyListener() {
 
     @Handler
     fun TargetScope.check(event: EventScope): Boolean {
-        val category = spawnType.prefab.toEntity()?.get<MobCategory>() ?: return false
+        val category = spawnType.prefab.toEntityOrNull()?.get<MobCategory>() ?: return false
         return MobCountManager.isCategoryAllowed(category) &&
                 (event.spawnInfo.localCategories[category] ?: 0) <
                 (MobCountManager.categoryCounts[category]?.get() ?: 0)

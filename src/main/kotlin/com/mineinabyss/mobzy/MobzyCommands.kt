@@ -77,7 +77,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                                     "flying" -> nmsEntity is FlyingMob && excludeDefault()
                                     "fish" -> nmsEntity is AbstractFish && excludeDefault()
                                     else -> {
-                                        val prefab = runCatching { PrefabKey.of(type).toEntity() }.getOrNull()
+                                        val prefab = runCatching { PrefabKey.of(type).toEntityOrNull() }.getOrNull()
                                             ?: this@commandGroup.stopCommand("No such prefab or selector $type")
                                         geary.instanceOf(prefab)
                                     }
@@ -151,14 +151,14 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                     val key = PrefabKey.of(mobKey)
                     if (radius <= 0) {
                         Bukkit.getWorlds().forEach { world ->
-                            world.entities.filter { it.toGeary().instanceOf(key.toEntity()!!) }.forEach { entity ->
+                            world.entities.filter { it.toGeary().instanceOf(key.toEntity()) }.forEach { entity ->
                                 val loc = entity.location
                                 player.info("Found ${key.key} at <click:run_command:/teleport ${loc.blockX} ${loc.blockY} ${loc.blockZ}>${entity.location}>${entity.location} in ${entity.world.name}")
                             }
                         }
                     } else {
                         player.location.getNearbyEntities(radius.toDouble(), radius.toDouble(), radius.toDouble())
-                            .filter { it.toGeary().instanceOf(key.toEntity()!!) }.forEach { entity ->
+                            .filter { it.toGeary().instanceOf(key.toEntity()) }.forEach { entity ->
                                 val loc = entity.location
                                 player.info("Found ${key.key} at <click:run_command:/teleport ${loc.blockX} ${loc.blockY} ${loc.blockZ}>${entity.location}")
 

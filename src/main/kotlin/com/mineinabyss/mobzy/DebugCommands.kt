@@ -45,7 +45,7 @@ internal fun Command.createDebugCommands() {
                     z = z,
                     startY = loc.blockY
                 )
-                PrefabKey.of(spawnName).toEntity()?.callEvent(spawnInfo, DoSpawn(player.location))
+                PrefabKey.of(spawnName).toEntityOrNull()?.callEvent(spawnInfo, DoSpawn(player.location))
                 //TODO list all failed conditions
             }
         }

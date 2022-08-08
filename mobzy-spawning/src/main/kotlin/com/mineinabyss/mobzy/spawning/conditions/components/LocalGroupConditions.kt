@@ -33,5 +33,5 @@ class CapFull : GearyListener() {
 
     @Handler
     fun TargetScope.check(event: EventScope): Boolean =
-        (event.spawnInfo.localTypes[spawnType.prefab.toEntity()?.get<PrefabKey>()?.toString()] ?: 0) < conf.max
+        (event.spawnInfo.localTypes[spawnType.prefab.toEntityOrNull()?.get<PrefabKey>()?.toString()] ?: 0) < conf.max
 }
