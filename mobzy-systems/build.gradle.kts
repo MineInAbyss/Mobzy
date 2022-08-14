@@ -20,7 +20,7 @@ dependencies {
 
     compileOnly(libs.minecraft.plugin.modelengine)
     compileOnly(libs.minecraft.plugin.protocollib)
-    compileOnly(mobzylibs.protocolburrito)
+    compileOnly(mobzyLibs.protocolburrito)
 
     compileOnly(project(":mobzy-core"))
     compileOnly(project(":mobzy-components"))
