@@ -36,9 +36,9 @@ allprojects {
 
     dependencies {
         val libs = rootProject.libs
-        val mobzylibs = rootProject.mobzylibs
+        val mobzyLibs = rootProject.mobzyLibs
 
-        compileOnly(mobzylibs.geary.papermc.core)
+        compileOnly(mobzyLibs.geary.papermc.core)
 
         implementation(libs.idofront.nms)
     }

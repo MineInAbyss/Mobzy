@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.systems.systems
 
 import com.mineinabyss.geary.annotations.AutoScan
-import com.mineinabyss.geary.systems.TickingSystem
+import com.mineinabyss.geary.systems.RepeatingSystem
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -13,7 +13,7 @@ import org.bukkit.entity.Mob
 import kotlin.time.Duration.Companion.seconds
 
 @AutoScan
-class WalkingAnimationSystem : TickingSystem(interval = 0.5.seconds) {
+class WalkingAnimationSystem : RepeatingSystem(interval = 0.5.seconds) {
     private val TargetScope.model by get<Model>()
     private val TargetScope.mob by get<BukkitEntity>()
 
