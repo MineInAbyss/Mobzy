@@ -1,6 +1,6 @@
 [versions]
-geary = "0.18.103"
+geary = "0.19.107"
 
 [libraries]
-protocolburrito = "com.mineinabyss:protocolburrito:0.4.33"
+protocolburrito = "com.mineinabyss:protocolburrito:0.5.34"
 geary-papermc-core = { module = "com.mineinabyss:geary-papermc-core", version.ref = "geary" }
