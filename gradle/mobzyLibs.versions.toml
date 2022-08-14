@@ -1,5 +1,5 @@
 [versions]
-geary = "0.19.107"
+geary = "0.19.108"
 
 [libraries]
 protocolburrito = "com.mineinabyss:protocolburrito:0.5.34"
