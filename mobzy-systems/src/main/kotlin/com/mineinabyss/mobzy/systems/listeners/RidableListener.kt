@@ -6,9 +6,11 @@ import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.Material
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 
 object RidableListener : Listener {
@@ -51,6 +53,29 @@ object RidableListener : Listener {
         gearyEntity.with { rideable: Rideable ->
             if (rideable.requiresItemToSteer && player.inventory.itemInMainHand != rideable.steerItem?.toItemStack())
                 isCancelled = true
+        }
+    }
+
+    /** Apply remaining damage to driver and passengers of a [Rideable] entity when it dies */
+    @EventHandler
+    fun EntityDamageEvent.onMountFallDamage() {
+        val mount = entity.toModelEntity()?.mountHandler ?: return
+        val health = (entity as LivingEntity).health
+
+        if (entity.toGearyOrNull() == null) return
+        if (cause != EntityDamageEvent.DamageCause.FALL) return
+        if (health - finalDamage > 0) return
+
+        if (mount.hasDriver() && mount.driver is Player) {
+            val driver = mount.driver as Player
+            driver.damage(damage - health)
+            driver.lastDamageCause = this
+            driver.noDamageTicks = 0
+        }
+        mount.passengers["mount"]?.passengers?.filterIsInstance<Player>()?.forEach {
+            it.damage(damage - health)
+            it.lastDamageCause = this
+            it.noDamageTicks = 0
         }
     }
 }
