@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.goal.TemptGoal
 import net.minecraft.world.item.crafting.Ingredient
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 import org.bukkit.inventory.ItemStack
 
@@ -27,4 +28,4 @@ class TemptBehavior(
 }
 
 fun Collection<ItemStack>.toNMSRecipeItemStack(): Ingredient =
-    Ingredient.of(stream().map { it.toNMS() })
+    Ingredient.of(stream().map { CraftItemStack.asNMSCopy(it) })
