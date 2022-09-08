@@ -7,18 +7,21 @@ import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.GearySystem
 import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.idofront.messaging.serialize
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.ticxo.modelengine.api.ModelEngineAPI
-import com.ticxo.modelengine.api.manager.ModelManager
+import com.ticxo.modelengine.api.model.AnimationMode
 import com.ticxo.modelengine.api.model.ModeledEntity
+import com.ticxo.modelengine.api.model.mananger.ModelRegistry
+import org.bukkit.Color
 import org.bukkit.event.Listener
 
 
 object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyContext by GearyMCContextKoin() {
-    private val modelManager: ModelManager? by lazy {
-        runCatching { ModelEngineAPI.api.modelManager }.getOrNull()
+    private val modelManager: ModelRegistry? by lazy {
+        runCatching { ModelEngineAPI.api.modelRegistry }.getOrNull()
     }
 
     override fun onStart() {
@@ -27,15 +30,23 @@ object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyCont
 
     override fun isModelEngineEntity(entity: BukkitEntity) = entity.toModelEntity() != null
 
-    fun BukkitEntity.toModelEntity(): ModeledEntity? = modelManager?.getModeledEntity(uniqueId)
+    fun BukkitEntity.toModelEntity(): ModeledEntity? = ModelEngineAPI.getModeledEntity(uniqueId)
 
-    override fun playAnimation(entity: BukkitEntity, state: String, lerpIn: Int, lerpOut: Int, speed: Double) =
-        entity.toModelEntity()?.allActiveModel?.values
-            ?.forEach { it.addState(state, lerpIn, lerpOut, speed) }
+    override fun playAnimation(
+        entity: BukkitEntity,
+        state: String,
+        lerpIn: Double,
+        lerpOut: Double,
+        speed: Double,
+        force: Boolean
+    ): Unit? =
+        entity.toModelEntity()?.models?.values?.forEach {
+            it.animationHandler.playAnimation(state, lerpIn, lerpOut, speed, force)
+        }
 
     override fun stopAnimation(entity: BukkitEntity, state: String, ignoreLerp: Boolean) =
-        entity.toModelEntity()?.allActiveModel?.values
-            ?.forEach { it.removeState(state, ignoreLerp) }
+        entity.toModelEntity()?.models?.values
+            ?.forEach { it.animationHandler.stopAnimation(state) }
 
     class ModelEngineTracker : GearyListener() {
         val TargetScope.bukkit by onSet<BukkitEntity>()
@@ -43,20 +54,23 @@ object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyCont
 
         @Handler
         fun TargetScope.registerModelEngine() {
-            val modelEntity = bukkit.toModelEntity() ?: modelManager?.createModeledEntity(bukkit) ?: return
+            val modelEntity = bukkit.toModelEntity() ?: ModelEngineAPI.createModeledEntity(bukkit)
 
-            val createdModel = modelManager?.createActiveModel(model.modelId)?.apply {
-                setDamageTint(model.damageTint)
-            }
-            modelEntity.addActiveModel(createdModel)
-
-            modelEntity.apply {
-                bukkit.customName?.let {
-                    modelEntity.nametagHandler.setCustomName("head", it)
+            val createdModel =
+                ModelEngineAPI.api.createActiveModelImpl(ModelEngineAPI.getBlueprint(model.modelId)).apply {
+                    if (model.damageTint) rendererHandler.setColor(Color.RED)
+                    animationMode = AnimationMode.C
                 }
 
-                modelEntity.nametagHandler.setCustomNameVisibility("head", model.nametag)
-                isInvisible = model.invisible
+            modelEntity.apply {
+                addModel(createdModel, false)
+                bukkit.customName()?.let {
+                    modelEntity.getModel(model.modelId).nametagHandler.bones["nametag"]?.apply {
+                        customName = it.serialize()
+                        isCustomNameVisible = model.nametag
+                    }
+                }
+                isBaseEntityVisible = !model.invisible
             }
         }
     }

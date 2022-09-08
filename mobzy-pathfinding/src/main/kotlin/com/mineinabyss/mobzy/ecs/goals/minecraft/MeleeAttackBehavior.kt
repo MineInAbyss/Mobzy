@@ -26,7 +26,7 @@ class MeleeAttackBehavior(
             val width = mob.bbWidth
             val d = (1 + width) * (1 + width) + target.bbWidth
             if (squaredDistance <= d && ticksUntilNextAttack <= 0) {
-                entity.playAnimation("attack", 0, 0, 1.0)
+                entity.playAnimation("attack", 0.0, 0.0, 1.0, false)
                 resetAttackCooldown()
                 mob.doHurtTarget(target)
             }

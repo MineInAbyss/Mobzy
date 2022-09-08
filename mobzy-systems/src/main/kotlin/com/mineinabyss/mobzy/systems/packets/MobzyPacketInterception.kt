@@ -9,6 +9,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObje
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGeary
+import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.MobzyConfig
@@ -48,8 +49,11 @@ object MobzyPacketInterception {
                 val geary = entity.toGeary()
 
                 geary.with { model: ModelEngineComponent ->
-                    entity.toModelEntity()?.addPlayer(player)
-                    isCancelled = true
+                    entity.toModelEntity()?.rangeManager?.apply {
+                        renderDistance = 10
+                        renderDistance.broadcastVal()
+                        updatePlayer(player)
+                    }
                 }
                 if (geary.has<Model>())
                     wrap.id = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)

@@ -12,7 +12,14 @@ interface AnimationController {
 
     fun isModelEngineEntity(entity: BukkitEntity): Boolean
 
-    fun playAnimation(entity: BukkitEntity, state: String, lerpIn: Int, lerpOut: Int, speed: Double): Unit?
+    fun playAnimation(
+        entity: BukkitEntity,
+        state: String,
+        lerpIn: Double,
+        lerpOut: Double,
+        speed: Double,
+        force: Boolean
+    ): Unit?
 
     fun stopAnimation(entity: BukkitEntity, state: String, ignoreLerp: Boolean = true): Unit?
 }
@@ -20,8 +27,8 @@ interface AnimationController {
 val BukkitEntity.isModelEngineEntity: Boolean
     get() =getServiceOrNull<AnimationController>()?.isModelEngineEntity(this) ?: false
 
-fun BukkitEntity.playAnimation(state: String, lerpIn: Int, lerpOut: Int, speed: Double) =
-    getServiceOrNull<AnimationController>()?.playAnimation(this, state, lerpIn, lerpOut, speed)
+fun BukkitEntity.playAnimation(state: String, lerpIn: Double, lerpOut: Double, speed: Double, force: Boolean) =
+    getServiceOrNull<AnimationController>()?.playAnimation(this, state, lerpIn, lerpOut, speed, force)
 
 fun BukkitEntity.stopAnimation(state: String, ignoreLerp: Boolean = true) =
     getServiceOrNull<AnimationController>()?.stopAnimation(this, state, ignoreLerp)
