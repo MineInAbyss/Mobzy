@@ -1,5 +1,5 @@
 [versions]
-geary = "0.20.114"
+geary = "0.20.115"
 protocolburrito = "0.5.38"
 
 [libraries]
