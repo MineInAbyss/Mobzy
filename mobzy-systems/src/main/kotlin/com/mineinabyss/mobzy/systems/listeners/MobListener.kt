@@ -82,10 +82,10 @@ object MobListener : Listener {
                     }
             }
         }
-        entity.toModelEntity()?.mountHandler?.updateHealth() ?: return
+        //entity.toModelEntity()?.mountManager?.model.hurt() ?: return
     }
 
-    /** Check several equipment related components and modify the mob's equipment accordingly when first spawned. */
+    /** Check some equipment related components and modify the mob's equipment accordingly when first spawned. */
     @EventHandler
     fun GearyMinecraftSpawnEvent.addEquipmentOnMobSpawn() {
         val mob = entity.toBukkit<Mob>() ?: return
@@ -171,8 +171,8 @@ object MobListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun EntityDeathEvent.setExpOnDeath() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        val mountHandler = entity.toModelEntity()?.mountHandler
-        if (mountHandler?.hasDriver() == true || mountHandler?.hasPassengers() == true) mountHandler.dismountAll()
+        val mountHandler = entity.toModelEntity()?.mountManager
+        if (mountHandler?.driver != null || mountHandler?.hasPassengers() == true) mountHandler.dismountAll()
 
         gearyEntity.with { deathLoot: DeathLoot ->
             drops.clear()

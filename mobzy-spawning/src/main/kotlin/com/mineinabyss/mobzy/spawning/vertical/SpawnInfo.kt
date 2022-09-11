@@ -39,12 +39,13 @@ class SpawnInfo(
     private val searchRadiusSquared = searchRadius * searchRadius
 
     //TODO more efficiently finding all ECS entities nearby
-    val localMobs: List<BukkitEntity> by lazy {
-        NearbyQuery.run {
-            map { it.bukkit }.filter {
-                it.location.world == bottom.world && it.location.distanceSquared(bottom) < searchRadiusSquared
-            }
-        }
+    val localMobs: Collection<BukkitEntity> by lazy {
+        bottom.getNearbyEntities(searchRadiusSquared, searchRadiusSquared, searchRadiusSquared)
+//        NearbyQuery.run {
+//            map { it.bukkit }.filter {
+//                it.location.world == bottom.world && it.location.distanceSquared(bottom) < searchRadiusSquared
+//            }
+//        }
     }
     val localTypes: Map<String, Int> by lazy { localMobs.categorizeMobs() }
     val localCategories: Map<MobCategory, Int> by lazy {

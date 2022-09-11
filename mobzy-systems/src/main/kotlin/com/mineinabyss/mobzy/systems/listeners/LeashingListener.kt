@@ -1,31 +1,18 @@
 package com.mineinabyss.mobzy.systems.listeners
 
-import com.mineinabyss.geary.helpers.with
-import com.mineinabyss.geary.papermc.access.toGeary
-import com.mineinabyss.geary.papermc.access.toGearyOrNull
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
-import com.mineinabyss.mobzy.ecs.components.interaction.LeashEntity
-import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
-import io.papermc.paper.event.entity.PufferFishStateChangeEvent
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.PufferFish
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.PlayerLeashEntityEvent
-import org.bukkit.event.player.PlayerUnleashEntityEvent
-import org.bukkit.potion.PotionEffectType
 
 object LeashingListener : Listener {
-
-    // Cancel Pufferfish change for leash-entities
+    // ModelEngine 3.0 adds this
+    /*// Cancel Pufferfish change for leash-entities
     @EventHandler
     fun PufferFishStateChangeEvent.onLeash() {
         isCancelled = entity.toGeary().has<LeashEntity>()
     }
 
-    /** Handling leashing of entities with [ModelEngineComponent] */
+    */
+    /** Handling leashing of entities with [ModelEngineComponent] *//*
     @EventHandler
     fun PlayerLeashEntityEvent.onLeashingMob() {
         val gearyEntity = entity.toGearyOrNull() ?: return
@@ -38,7 +25,7 @@ object LeashingListener : Listener {
             if (!componentEntity.leashable) return
             if ((entity as? LivingEntity ?: return).isLeashed) return
 
-            val mount = modelEntity.mountHandler
+            val mount = modelEntity.mountManager
             val pufferFish = player.world.spawnEntity(entity.location, EntityType.PUFFERFISH) as PufferFish
             pufferFish.apply {
                 puffState = 0
@@ -55,18 +42,19 @@ object LeashingListener : Listener {
         }
     }
 
-    /** Handle unleashing of entities with [ModelEngineComponent.leashable] */
+    */
+    /** Handle unleashing of entities with [ModelEngineComponent.leashable] *//*
     @EventHandler
     fun PlayerUnleashEntityEvent.onUnleashMob() {
         val gearyEntity = entity.toGearyOrNull() ?: return
         val modelEntity = entity.toModelEntity() ?: return
-
+        modelEntity.
         // Leash is tied to the ModelEngine BaseEntity and rendered via a mounted pufferfish.
         // Since we unleash, we unleash BaseEntity and remove pufferfish
         gearyEntity.with { componentEntity: ModelEngineComponent ->
             if (!componentEntity.leashable) return
-            modelEntity.isInvisible = true
-            modelEntity.entity.removePotionEffect(PotionEffectType.INVISIBILITY)
+            //modelEntity.isInvisible = true
+            modelEntity. .removePotionEffect(PotionEffectType.INVISIBILITY)
             modelEntity.mountHandler.getPassengersOnBone("leash")
                 .filter { it.toGeary().has<LeashEntity>() }.forEach {
                     (it as LivingEntity).setLeashHolder(null)
@@ -75,7 +63,8 @@ object LeashingListener : Listener {
         }
     }
 
-    /** Handle unleashing of entities with [ModelEngineComponent.leashable] on death */
+    */
+    /** Handle unleashing of entities with [ModelEngineComponent.leashable] on death *//*
     @EventHandler
     fun EntityDamageEvent.unleashOnDeath() {
         if ((entity as? LivingEntity ?: return).health - damage > 0) return
@@ -85,5 +74,5 @@ object LeashingListener : Listener {
             (it as LivingEntity).setLeashHolder(null)
             it.remove()
         } ?: return
-    }
+    }*/
 }

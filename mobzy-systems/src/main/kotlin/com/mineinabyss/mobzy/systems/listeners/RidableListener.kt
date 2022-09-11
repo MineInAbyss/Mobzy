@@ -22,22 +22,26 @@ object RidableListener : Listener {
         val modelEntity = rightClicked.toModelEntity() ?: return
 
         gearyEntity.with { rideable: Rideable ->
-            val mount = modelEntity.mountHandler
+            val mount = modelEntity.mountManager
             if (player.isSneaking || player.inventory.itemInMainHand.type == Material.LEAD) return
 
-            mount.setSteerable(true)
-            mount.setCanCarryPassenger(rideable.canTakePassenger)
+            mount.isCanSteer = true
 
-            if (!mount.hasDriver()) mount.driver = player
-            else mount.addPassenger("p_${mount.passengers.size + 1}", player)
+            if (mount.driver != null) mount.setDriver(player, mount.driverController)
+            else mount.addPassengerToSeat("something", "p_${mount.passengers.size + 1}", player, null)
 
-            mount.setCanDamageMount(mount.driver, rideable.driverCanDamageMount)
-            mount.passengers["mount"]?.passengers?.forEach {
+            mount.setCanDamageMount(mount.driver.uniqueId, false)
+            /*mount.passengers["mount"]?.passengers?.forEach {
                 mount.setCanDamageMount(it, rideable.passengerCanDamageMount)
-            }
+            }*/
 
             if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
-                mount.addPassenger("p_${mount.passengers.size + 1}", player) // Adds passenger to the next seat
+                mount.addPassengerToSeat(
+                    "something",
+                    "p_${mount.passengers.size + 1}",
+                    player,
+                    null
+                ) // Adds passenger to the next seat
             }
         }
     }
@@ -46,7 +50,7 @@ object RidableListener : Listener {
     @EventHandler
     fun EntityMoveEvent.onMountControl() {
         val gearyEntity = entity.toGearyOrNull() ?: return
-        val mount = entity.toModelEntity()?.mountHandler ?: return
+        val mount = entity.toModelEntity()?.mountManager ?: return
         val player = (mount.driver ?: return) as? Player ?: return
 
         //TODO Make mob move on its own if not holding correct item
@@ -59,23 +63,23 @@ object RidableListener : Listener {
     /** Apply remaining damage to driver and passengers of a [Rideable] entity when it dies */
     @EventHandler
     fun EntityDamageEvent.onMountFallDamage() {
-        val mount = entity.toModelEntity()?.mountHandler ?: return
+        val mount = entity.toModelEntity()?.mountManager ?: return
         val health = (entity as LivingEntity).health
 
         if (entity.toGearyOrNull() == null) return
         if (cause != EntityDamageEvent.DamageCause.FALL) return
         if (health - finalDamage > 0) return
 
-        if (mount.hasDriver() && mount.driver is Player) {
+        if (mount.driver != null && mount.driver is Player) {
             val driver = mount.driver as Player
             driver.damage(damage - health)
             driver.lastDamageCause = this
             driver.noDamageTicks = 0
         }
-        mount.passengers["mount"]?.passengers?.filterIsInstance<Player>()?.forEach {
+        /*mount.passengers["mount"]?.passengers?.filterIsInstance<Player>()?.forEach {
             it.damage(damage - health)
             it.lastDamageCause = this
             it.noDamageTicks = 0
-        }
+        }*/
     }
 }

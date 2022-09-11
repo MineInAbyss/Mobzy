@@ -43,7 +43,7 @@ open class IdleFlyGoal(override val mob: Mob) : MobzyPathfinderGoal(cooldown = 1
         val loc = findLoc() ?: return
         //TODO make a wrapper for the controller and figure out the difference between it and navigation
 
-        mob.playAnimation("fly", 0, 0, 1.0)
+        mob.playAnimation("fly", 0.0, 0.0, 1.0, false)
         nmsEntity.moveControl.setWantedPosition(loc.x, loc.y, loc.z, 1.0)
         mob.lookAt(loc)
     }

@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.systems.listeners
 
 import com.mineinabyss.geary.helpers.with
-import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
+import com.mineinabyss.idofront.messaging.serialize
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
@@ -64,22 +64,30 @@ object TamableListener : Listener {
                         )
                     }
                 }
+
                 tamed.owner != player.uniqueId -> return
                 itemInHand.type == Material.NAME_TAG -> {
-                    modelEntity.nametagHandler.setCustomName("nametag", itemInHand.itemMeta.displayName)
-                    modelEntity.nametagHandler.setCustomNameVisibility("nametag", true)
+                    modelEntity.getModel(gearyEntity.get<ModelEngineComponent>()?.modelId).nametagHandler.fakeEntity
+                        .firstNotNullOfOrNull { it.value }?.run {
+                            customName = itemInHand.itemMeta.displayName()?.serialize()
+                            isCustomNameVisible = true
+                        }
                 }
+
                 player.isSneaking -> {
-                    val model = gearyEntity.get<ModelEngineComponent>() ?: return
-                    val saddle = modelEntity.getActiveModel(model.modelId).getPartEntity("saddle")
+                    //TODO Fix later
+                    /*val model = gearyEntity.get<ModelEngineComponent>() ?: return
+                    val saddle = modelEntity.getModel(model.modelId).getBone("saddle").activeModel
                     if (rideable.isSaddled) {
-                        rightClicked.toGeary().setPersisting(!rideable.isSaddled)
-                        if (saddle.isVisible) saddle.setItemVisibility(rideable.isSaddled)
+                        rightClicked.toGeary().get<Rideable>()?.isSaddled = !rideable.isSaddled
+                        saddle.itemHolderHandler.
                     } else {
                         if (saddle.isVisible) saddle.setItemVisibility(false)
-                        else saddle.setItemVisibility(true)
-                    }
+                        else modelEntity.getModel(model.modelId).itemHolderHandler.bones["saddle"]?.itemStack = ItemStack(Material.AIR)
+                    }*/
                 }
+
+                else -> {}
             }
         }
     }

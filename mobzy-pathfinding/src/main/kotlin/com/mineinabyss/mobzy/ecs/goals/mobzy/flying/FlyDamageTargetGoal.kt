@@ -29,7 +29,7 @@ class FlyDamageTargetGoal(override val mob: Mob) : MobzyPathfinderGoal() {
         val target = mob.target ?: return
         val attackDamage: Double = mob.toGeary().get<MobAttributes>()?.attackDamage ?: return
         //if within range, harm
-        mob.playAnimation("attack", 0, 0, 1.0)
+        mob.playAnimation("attack", 0.0, 0.0, 1.0, false)
         target.damage(attackDamage, mob)
     }
 }
