@@ -108,7 +108,11 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
                     //TODO this should be immutable but bukkit doesn't have an immutable location!
                     val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
                     val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
-                    val success = choice.callEvent(RequestCheck, spawnInfo, spawnCheckLoc) { !it.has<FailedCheck>() }
+                    val success = choice.callEvent({
+                        set(spawnInfo)
+                        set(spawnCheckLoc)
+                        add<RequestCheck>()
+                    }) { !it.has<FailedCheck>() }
                     if (success) {
                         // Must spawn mobs on main thread
                         if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))

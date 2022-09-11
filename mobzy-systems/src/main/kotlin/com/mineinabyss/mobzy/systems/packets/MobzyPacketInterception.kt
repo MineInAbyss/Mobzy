@@ -9,14 +9,11 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObje
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGeary
-import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.nms.aliases.NMSEntityType
 import com.mineinabyss.idofront.time.ticks
 import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.ecs.components.initialization.Model
-import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.mobzy
-import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.mineinabyss.protocolburrito.dsl.protocolManager
 import com.mineinabyss.protocolburrito.dsl.sendTo
 import com.mineinabyss.protocolburrito.packets.ClientboundAddEntityPacketWrap
@@ -39,22 +36,12 @@ object MobzyPacketInterception {
     private const val META_ENTITY_FLAGS = 0
     private const val META_ARMORSTAND = 15
     fun registerPacketInterceptors() {
-
         protocolManager(mobzy) {
             //send zombie as entity type for custom mobs
             onSend<ClientboundAddEntityPacketWrap> { wrap ->
-                val entity = runCatching { entity(wrap.id) }.getOrElse {
-                    return@onSend
-                }//() ?: return@onSend
+                val entity = runCatching { entity(wrap.id) }.getOrElse { return@onSend }
                 val geary = entity.toGeary()
 
-                geary.with { model: ModelEngineComponent ->
-                    entity.toModelEntity()?.rangeManager?.apply {
-                        renderDistance = 10
-                        renderDistance.broadcastVal()
-                        updatePlayer(player)
-                    }
-                }
                 if (geary.has<Model>())
                     wrap.id = Registry.ENTITY_TYPE.getId(NMSEntityType.ARMOR_STAND)
             }

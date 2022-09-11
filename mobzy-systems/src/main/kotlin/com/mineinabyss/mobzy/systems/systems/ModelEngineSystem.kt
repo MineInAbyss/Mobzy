@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.systems.systems
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.context.GearyContext
 import com.mineinabyss.geary.helpers.systems
@@ -10,11 +11,12 @@ import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.messaging.serialize
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
+import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.ticxo.modelengine.api.ModelEngineAPI
-import com.ticxo.modelengine.api.model.AnimationMode
 import com.ticxo.modelengine.api.model.ModeledEntity
 import com.ticxo.modelengine.api.model.mananger.ModelRegistry
+import kotlinx.coroutines.yield
 import org.bukkit.Color
 import org.bukkit.event.Listener
 
@@ -54,23 +56,25 @@ object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyCont
 
         @Handler
         fun TargetScope.registerModelEngine() {
-            val modelEntity = bukkit.toModelEntity() ?: ModelEngineAPI.createModeledEntity(bukkit)
+            mobzy.launch {
+                yield() // Wait till next tick so some entity stuff gets initialized
+                val modelEntity = ModelEngineAPI.getOrCreateModeledEntity(bukkit)
 
-            val createdModel =
-                ModelEngineAPI.api.createActiveModelImpl(ModelEngineAPI.getBlueprint(model.modelId)).apply {
-                    if (model.damageTint) rendererHandler.setColor(Color.RED)
-                    animationMode = AnimationMode.C
-                }
-
-            modelEntity.apply {
-                addModel(createdModel, false)
-                bukkit.customName()?.let {
-                    modelEntity.getModel(model.modelId).nametagHandler.bones["nametag"]?.apply {
-                        customName = it.serialize()
-                        isCustomNameVisible = model.nametag
+                val createdModel =
+                    ModelEngineAPI.createActiveModel(ModelEngineAPI.getBlueprint(model.modelId)).apply {
+                        if (model.damageTint) rendererHandler.setColor(Color.RED)
                     }
+
+                modelEntity.apply {
+                    addModel(createdModel, false)
+                    bukkit.customName()?.let {
+                        modelEntity.getModel(model.modelId).nametagHandler.bones["nametag"]?.apply {
+                            customName = it.serialize()
+                            isCustomNameVisible = model.nametag
+                        }
+                    }
+                    isBaseEntityVisible = !model.invisible
                 }
-                isBaseEntityVisible = !model.invisible
             }
         }
     }
