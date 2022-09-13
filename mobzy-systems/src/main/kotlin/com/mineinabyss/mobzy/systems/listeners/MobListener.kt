@@ -82,7 +82,7 @@ object MobListener : Listener {
                     }
             }
         }
-        //entity.toModelEntity()?.mountManager?.model.hurt() ?: return
+        entity.toModelEntity()?.mountManager?.model?.hurt()
     }
 
     /** Check some equipment related components and modify the mob's equipment accordingly when first spawned. */
