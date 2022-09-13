@@ -27,13 +27,13 @@ object RidableListener : Listener {
 
             mount.isCanSteer = true
 
-            if (mount.driver != null) mount.setDriver(player, mount.driverController)
+            if (mount.driver == null) mount.setDriver(player, mount.driverController)
             else mount.addPassengerToSeat("something", "p_${mount.passengers.size + 1}", player, null)
 
             mount.setCanDamageMount(mount.driver.uniqueId, false)
-            /*mount.passengers["mount"]?.passengers?.forEach {
-                mount.setCanDamageMount(it, rideable.passengerCanDamageMount)
-            }*/
+            if (mount.hasPassengers()) mount.passengers.keys.filterIsInstance<Player>().forEach {
+                mount.setCanDamageMount(it.uniqueId, false)
+            }
 
             if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
                 mount.addPassengerToSeat(
@@ -76,10 +76,11 @@ object RidableListener : Listener {
             driver.lastDamageCause = this
             driver.noDamageTicks = 0
         }
-        /*mount.passengers["mount"]?.passengers?.filterIsInstance<Player>()?.forEach {
+
+        if (mount.hasPassengers()) mount.passengers.keys.filterIsInstance<Player>().forEach {
             it.damage(damage - health)
             it.lastDamageCause = this
             it.noDamageTicks = 0
-        }*/
+        }
     }
 }
