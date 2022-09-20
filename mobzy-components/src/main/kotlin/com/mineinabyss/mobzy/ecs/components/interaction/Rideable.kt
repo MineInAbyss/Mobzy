@@ -15,6 +15,5 @@ class Rideable(
     var isSaddled: Boolean = false,
     val canTakePassenger: Boolean = false,
     val maxPassengerCount: Int = 1,
-    val driverCanDamageMount: Boolean = true,
-    val passengerCanDamageMount: Boolean = true,
+    val canDamageMount: Boolean = true,
 )
