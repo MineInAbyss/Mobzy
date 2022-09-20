@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy.systems.listeners
 
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
 import com.ticxo.modelengine.api.ModelEngineAPI
@@ -23,7 +24,7 @@ object RidableListener : Listener {
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
 
-        gearyEntity.with { rideable: Rideable ->
+        gearyEntity.with { rideable: Rideable, modelengine: ModelEngineComponent ->
             val mount = modelEntity.mountManager
 
             // If player is not riding this or another entity, mount it
@@ -35,7 +36,7 @@ object RidableListener : Listener {
                 if (mount.driver == null)
                     mount.setDriver(player, controller)
                 else if (rideable.canTakePassengers && mount.passengers.size < rideable.maxPassengerCount)
-                    mount.addPassengerToSeat("something", "p_${mount.passengers.size + 1}", player, controller)
+                    mount.addPassengerToSeat(modelengine.modelId, "p_${mount.passengers.size + 1}", player, controller)
                 mount.setCanDamageMount(player.uniqueId, rideable.canDamageMount)
             }
         }
