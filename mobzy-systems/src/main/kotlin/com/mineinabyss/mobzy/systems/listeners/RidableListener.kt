@@ -28,13 +28,13 @@ object RidableListener : Listener {
 
             // If player is not riding this or another entity, mount it
             if (!mount.hasRider(player) && ModelEngineAPI.getMountPair(player.uniqueId) == null) {
-                val controller = ModelEngineAPI.getControllerRegistry().get("walking") ?: return@with
                 mount.isCanSteer = true
                 mount.isCanRide = true
 
+                val controller = ModelEngineAPI.getControllerRegistry().get(rideable.controllerID)
                 if (mount.driver == null)
                     mount.setDriver(player, controller)
-                else if (rideable.canTakePassenger)
+                else if (rideable.canTakePassengers && mount.passengers.size < rideable.maxPassengerCount)
                     mount.addPassengerToSeat("something", "p_${mount.passengers.size + 1}", player, controller)
                 mount.setCanDamageMount(player.uniqueId, rideable.canDamageMount)
             }
