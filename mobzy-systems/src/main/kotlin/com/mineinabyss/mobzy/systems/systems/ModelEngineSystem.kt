@@ -73,6 +73,7 @@ object ModelEngineSystem : GearySystem, Listener, AnimationController, GearyCont
                             isCustomNameVisible = model.nametag
                         }
                     }
+                    setStepHeight(model.stepHeight)
                     isBaseEntityVisible = !model.invisible
                 }
             }

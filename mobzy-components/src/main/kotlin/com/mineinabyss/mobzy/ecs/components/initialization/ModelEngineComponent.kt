@@ -12,4 +12,5 @@ class ModelEngineComponent(
     val damageTint: Boolean = true,
     val nametag: Boolean = true,
     val leashable: Boolean = false,
+    val stepHeight: Double = 0.0,
 )

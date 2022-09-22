@@ -2,8 +2,10 @@ package com.mineinabyss.mobzy.systems.listeners
 
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
+import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable
 import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem.toModelEntity
+import com.ticxo.modelengine.api.ModelEngineAPI
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
@@ -18,30 +20,24 @@ object RidableListener : Listener {
     /** Ride entities with [Rideable] component on right click. */
     @EventHandler
     fun PlayerInteractEntityEvent.rideOnRightClick() {
+        if (player.isSneaking || player.inventory.itemInMainHand.type == Material.LEAD) return
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
 
-        gearyEntity.with { rideable: Rideable ->
+        gearyEntity.with { rideable: Rideable, modelengine: ModelEngineComponent ->
             val mount = modelEntity.mountManager
-            if (player.isSneaking || player.inventory.itemInMainHand.type == Material.LEAD) return
 
-            mount.isCanSteer = true
+            // If player is not riding this or another entity, mount it
+            if (!mount.hasRider(player) && ModelEngineAPI.getMountPair(player.uniqueId) == null) {
+                mount.isCanSteer = true
+                mount.isCanRide = true
 
-            if (mount.driver == null) mount.setDriver(player, mount.driverController)
-            else mount.addPassengerToSeat("something", "p_${mount.passengers.size + 1}", player, null)
-
-            mount.setCanDamageMount(mount.driver.uniqueId, false)
-            if (mount.hasPassengers()) mount.passengers.keys.filterIsInstance<Player>().forEach {
-                mount.setCanDamageMount(it.uniqueId, false)
-            }
-
-            if (rideable.canTakePassenger && mount.passengers.size < rideable.maxPassengerCount) {
-                mount.addPassengerToSeat(
-                    "something",
-                    "p_${mount.passengers.size + 1}",
-                    player,
-                    null
-                ) // Adds passenger to the next seat
+                val controller = ModelEngineAPI.getControllerRegistry().get(rideable.controllerID)
+                if (mount.driver == null)
+                    mount.setDriver(player, controller)
+                else if (rideable.canTakePassengers && mount.passengers.size < rideable.maxPassengerCount)
+                    mount.addPassengerToSeat(modelengine.modelId, "p_${mount.passengers.size + 1}", player, controller)
+                mount.setCanDamageMount(player.uniqueId, rideable.canDamageMount)
             }
         }
     }
