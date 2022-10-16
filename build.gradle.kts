@@ -9,6 +9,7 @@ plugins {
     id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
+    id("com.mineinabyss.conventions.autoversion")
 }
 
 allprojects {
