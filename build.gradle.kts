@@ -25,7 +25,6 @@ allprojects {
 
     repositories {
         maven("https://repo.mineinabyss.com")
-        maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
     }
 
     dependencies {
@@ -42,6 +41,7 @@ allprojects {
 
 repositories {
     mavenCentral()
+    maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
     maven("https://jitpack.io")
 }
 

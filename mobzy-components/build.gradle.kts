@@ -6,6 +6,10 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+repositories {
+    maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
+}
+
 dependencies {
     compileOnly(libs.kotlinx.serialization.json)
 
