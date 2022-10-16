@@ -30,9 +30,6 @@ class MobzyPlugin : JavaPlugin() {
     }
 
     override fun onEnable() {
-        saveDefaultConfig()
-        reloadConfig()
-
         //Register events
         listeners(
             MobListener,
@@ -44,9 +41,6 @@ class MobzyPlugin : JavaPlugin() {
             //LeashingListener
         )
 
-        //Register commands
-        MobzyCommands()
-
         startOrAppendKoin(module {
             singleConfig(config<MobzyConfig>("config") {
                 fromPluginPath(loadDefault = true)
@@ -54,6 +48,7 @@ class MobzyPlugin : JavaPlugin() {
         })
 
         gearyAddon {
+            MobzyCommands()
             autoscan("com.mineinabyss") {
                 all()
                 custom<PathfinderComponent>()
