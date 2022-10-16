@@ -12,14 +12,16 @@ import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.ecs.components.MobCategory
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.koin.core.component.inject
 import java.util.concurrent.atomic.AtomicInteger
 
 object MobCountManager : Listener, GearyMCContext by GearyMCContextKoin() {
     val categoryCounts: MutableMap<MobCategory, AtomicInteger> = mutableMapOf()
+    val config by inject<MobzyConfig>()
 
     fun isCategoryAllowed(category: MobCategory) =
         (categoryCounts[category]?.get() ?: 0) <=
-                (MobzyConfig.getCreatureTypeCap(category) * GlobalSpawnInfo.playerGroupCount)
+                (config.getCreatureTypeCap(category) * GlobalSpawnInfo.playerGroupCount)
 
     @EventHandler
     fun EntityRemoveFromWorldEvent.unregisterOnRemove() {

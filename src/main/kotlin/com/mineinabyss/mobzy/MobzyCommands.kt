@@ -33,8 +33,11 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Monster
 import org.bukkit.entity.NPC
+import org.koin.core.component.inject
 
 class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by GearyMCContextKoin() {
+    val config by inject<MobzyConfig>()
+
     override val commands = commands(mobzy) {
         ("mobzy" / "mz") {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
@@ -43,9 +46,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                     sender.success("Reloaded spawn config")
                 }
 
-                action {
-                    MobzyConfig.reload(sender)
-                }
+                //TODO proper config reload support
             }
 
             commandGroup {
@@ -126,7 +127,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                 }
 
                 playerAction {
-                    val cappedSpawns = numOfSpawns.coerceAtMost(mobzyConfig.maxCommandSpawns)
+                    val cappedSpawns = numOfSpawns.coerceAtMost(config.maxCommandSpawns)
                     val key = PrefabKey.of(mobKey)
 
                     repeat(cappedSpawns) {
@@ -178,8 +179,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                     //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
                     // be made private once that's done
                     action {
-                        if (mobzyConfig.doMobSpawns != enabled) {
-                            mobzyConfig.doMobSpawns = enabled
+                        if (config.doMobSpawns != enabled) {
+                            config.doMobSpawns = enabled
                             if (!enabled) SpawnTask.stopTask()
                             sender.success("Config option doMobSpawns has been set to $enabled")
                         } else
@@ -237,7 +238,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by G
                             min = args[2].toInt()
                         } catch (_: NumberFormatException) {
                         }
-                        return (min until mobzyConfig.maxCommandSpawns).asIterable()
+                        return (min until config.maxCommandSpawns).asIterable()
                             .map { it.toString() }.filter { it.startsWith(min.toString()) }
                     }
 

@@ -1,6 +1,6 @@
 [versions]
-geary = "0.21.1"
-protocolburrito = "0.5.39"
+geary = "0.21.2"
+protocolburrito = "0.6.2"
 
 [libraries]
 protocolburrito = { module = "com.mineinabyss:protocolburrito", version.ref = "protocolburrito" }

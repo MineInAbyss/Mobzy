@@ -18,6 +18,7 @@ import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
+import org.koin.core.component.inject
 import org.nield.kotlinstatistics.WeightedDice
 import kotlin.random.Random
 
@@ -42,6 +43,7 @@ import kotlin.random.Random
  * the chosen region
  */
 object SpawnTask : GearyMCContext by GearyMCContextKoin() {
+    val config by inject<MobzyConfig>()
     private var runningTask: Job? = null
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
 
@@ -54,7 +56,7 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
         if (runningTask != null) return
         // TODO Switch back to async when we fix geary async access
         runningTask = mobzy.launch(mobzy.asyncDispatcher) {
-            while (mobzyConfig.doMobSpawns) {
+            while (config.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
                     runSpawnTask()
@@ -65,7 +67,7 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
                 } catch (e: RuntimeException) {
                     e.printStackTrace()
                 }
-                delay(mobzyConfig.spawnTaskDelay.inWholeTicks)
+                delay(config.spawnTaskDelay.inWholeTicks)
             }
             stopTask()
         }
@@ -82,7 +84,7 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
         playerGroups.shuffled().forEach playerLoop@{ playerGroup ->
             val heights = playerGroup.map { it.location.y.toInt() }
             val world = playerGroup.first().world
-            val heightRange = mobzyConfig.spawnHeightRange
+            val heightRange = config.spawnHeightRange
             val worldHeight = world.minHeight until world.maxHeight
             val min = (heights.minOrNull()!! - heightRange).coerceIn(worldHeight)
             val max = (heights.maxOrNull()!! + heightRange).coerceIn(worldHeight)

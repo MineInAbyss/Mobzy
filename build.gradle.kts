@@ -25,13 +25,7 @@ allprojects {
 
     repositories {
         maven("https://repo.mineinabyss.com")
-        //maven("https://mvn.lumine.io/repository/maven-public/") // Model Engine
-        maven { // Temp ModelEngine repo until normal is fixed
-            url = uri("https://mvn.lumine.io/repository/maven-public")
-            metadataSources {
-                artifact()
-            }
-        }
+        maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
     }
 
     dependencies {
@@ -40,6 +34,8 @@ allprojects {
 
         compileOnly(mobzyLibs.geary.papermc.core)
 
+
+        implementation(libs.bundles.idofront.core)
         implementation(libs.idofront.nms)
     }
 }
@@ -57,6 +53,7 @@ dependencies {
     compileOnly(libs.kotlinx.coroutines)
     compileOnly(libs.minecraft.mccoroutine)
     compileOnly(libs.koin.core)
+    compileOnly(libs.minecraft.plugin.modelengine)
 
     // Shaded
     api(project(":mobzy-pathfinding"))

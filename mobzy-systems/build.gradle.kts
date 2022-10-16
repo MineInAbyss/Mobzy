@@ -7,9 +7,9 @@ plugins {
 }
 
 repositories {
+    maven("https://repo.mineinabyss.com/releases")
     maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
     maven("https://jitpack.io")
-    maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
 }
 
 dependencies {

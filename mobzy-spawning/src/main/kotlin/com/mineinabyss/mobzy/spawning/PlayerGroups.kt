@@ -1,18 +1,21 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.google.common.math.IntMath.pow
-import com.mineinabyss.mobzy.mobzyConfig
+import com.mineinabyss.mobzy.MobzyConfig
 import org.bukkit.Chunk
 import org.bukkit.entity.Entity
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.nield.kotlinstatistics.dbScanCluster
 
-object PlayerGroups {
+object PlayerGroups: KoinComponent {
+    val config by inject<MobzyConfig>()
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
     fun group(entities: Collection<Entity>): List<List<Entity>> = entities
         .groupBy { it.world }
         .flatMap { (_, players) ->
             players.dbScanCluster(
-                maximumRadius = mobzyConfig.playerGroupRadius,
+                maximumRadius = config.playerGroupRadius,
                 minPoints = 0,
                 xSelector = { it.location.x },
                 ySelector = { it.location.z }
@@ -31,13 +34,13 @@ object PlayerGroups {
         val positions = group.mapTo(mutableSetOf()) { it.location.chunk.x to it.location.chunk.z }
         //TODO proper min max y for 3d space
         for (i in 0..10) {
-            val distX = mobzyConfig.chunkSpawnRad.random()
-            val distZ = mobzyConfig.chunkSpawnRad.random()
+            val distX = config.chunkSpawnRad.random()
+            val distZ = config.chunkSpawnRad.random()
             val newX = chunk.x `+-` distX
             val newZ = chunk.z `+-` distZ
             if (
                 positions.none { (x, z) ->
-                    distanceSquared(newX, newZ, x, z) < pow(mobzyConfig.chunkSpawnRad.first, 2)
+                    distanceSquared(newX, newZ, x, z) < pow(config.chunkSpawnRad.first, 2)
                 }
             ) {
                 val newChunk = chunk.world.getChunkAt(newX, newZ)

@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.systems.listeners
 
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.access.toGearyOrNull
-import com.mineinabyss.idofront.messaging.serialize
+import com.mineinabyss.idofront.textcomponents.serialize
 import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.ecs.components.interaction.Rideable

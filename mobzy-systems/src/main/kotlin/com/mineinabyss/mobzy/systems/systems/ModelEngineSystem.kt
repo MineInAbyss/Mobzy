@@ -8,7 +8,7 @@ import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.GearySystem
 import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.idofront.messaging.serialize
+import com.mineinabyss.idofront.textcomponents.serialize
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.mobzy.ecs.components.initialization.ModelEngineComponent
 import com.mineinabyss.mobzy.mobzy

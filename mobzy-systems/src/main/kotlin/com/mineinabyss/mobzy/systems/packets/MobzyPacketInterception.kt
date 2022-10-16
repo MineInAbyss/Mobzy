@@ -26,11 +26,15 @@ import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Entity
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.experimental.or
 
 class PlayingDeathAnimation
 
-object MobzyPacketInterception {
+object MobzyPacketInterception: KoinComponent {
+    val config by inject<MobzyConfig>()
+
     private val byteSerializer = WrappedDataWatcher.Registry.get(Class.forName("java.lang.Byte"))
     private val vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer()
     private const val META_ENTITY_FLAGS = 0
@@ -62,7 +66,7 @@ object MobzyPacketInterception {
                 }
             }
 
-            if (MobzyConfig.data.supportNonMEEntities) onSend<ClientboundSetEntityDataPacketWrap> { wrap ->
+            if (config.supportNonMEEntities) onSend<ClientboundSetEntityDataPacketWrap> { wrap ->
                 val entity: Entity = getEntityFromID(player.world, wrap.id) ?: return@onSend
                 val geary = entity.toGeary()
                 if (!geary.has<Model>() || geary.has<PlayingDeathAnimation>()) return@onSend
