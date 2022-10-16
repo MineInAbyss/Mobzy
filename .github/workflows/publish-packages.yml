@@ -21,15 +21,17 @@ jobs:
           java-version: 17
           cache: gradle
 
-      - name: Run gradle build and publish
-        run: gradle build publish dokkaHtmlMultiModule -PmineinabyssMavenUsername=${{ secrets.MAVEN_PUBLISH_USERNAME }} -PmineinabyssMavenPassword=${{ secrets.MAVEN_PUBLISH_PASSWORD }}
+      - name: Set env variable from latest maven version
+        run: >
+          echo "RELEASE_VERSION=$( \
+            curl https://repo.mineinabyss.com/releases/com/mineinabyss/geary-core/maven-metadata.xml | \
+            grep -oP '(?!<latest>)[\d\.]*(?=</latest>)' \
+          )" >> $GITHUB_ENV
 
-      - name: Get version from gradle
-        shell: bash
-        id: extract_version
-        run: |
-          version=`gradle properties --console=plain -q | grep "^version:" | awk '{printf $2}'`
-          echo "::set-output name=version::$version"
+      - name: Run gradle build and publish
+        run: >
+          gradle build publish dokkaHtmlMultiModule
+          -PmineinabyssMavenUsername=${{ secrets.MAVEN_PUBLISH_USERNAME }} -PmineinabyssMavenPassword=${{ secrets.MAVEN_PUBLISH_PASSWORD }}
 
       - name: Publish documentation to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -37,6 +39,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/dokka/htmlMultiModule
           force_orphan: true
+
+      - name: Get version from gradle
+        shell: bash
+        id: extract_version
+        run: |
+          version=`gradle :geary-papermc-core:properties --console=plain -q | grep "^version:" | awk '{printf $2}'`
+          echo "::set-output name=version::$version"
 
       - name: Create GitHub Release
         uses: marvinpinto/action-automatic-releases@latest

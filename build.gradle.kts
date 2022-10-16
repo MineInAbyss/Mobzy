@@ -69,9 +69,3 @@ dependencies {
     testImplementation(libs.kotlinx.serialization.json)
     testImplementation(libs.kotlinx.serialization.kaml)
 }
-
-tasks {
-    shadowJar {
-        archiveBaseName.set("Mobzy")
-    }
-}
