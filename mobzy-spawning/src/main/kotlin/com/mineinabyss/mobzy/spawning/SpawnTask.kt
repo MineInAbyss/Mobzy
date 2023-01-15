@@ -6,8 +6,6 @@ import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.geary.components.RequestCheck
 import com.mineinabyss.geary.components.events.FailedCheck
 import com.mineinabyss.geary.datatypes.GearyEntity
-import com.mineinabyss.geary.papermc.GearyMCContext
-import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
@@ -18,7 +16,6 @@ import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
-import org.koin.core.component.inject
 import org.nield.kotlinstatistics.WeightedDice
 import kotlin.random.Random
 
@@ -42,8 +39,7 @@ import kotlin.random.Random
  * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
  * the chosen region
  */
-object SpawnTask : GearyMCContext by GearyMCContextKoin() {
-    val config by inject<MobzyConfig>()
+class SpawnTask {
     private var runningTask: Job? = null
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
 

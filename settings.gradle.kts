@@ -6,12 +6,6 @@ pluginManagement {
         google()
     }
 
-    plugins {
-        val kotlinVersion: String by settings
-        kotlin("jvm") version kotlinVersion
-        kotlin("plugin.serialization") version kotlinVersion
-    }
-
     val idofrontVersion: String by settings
     resolutionStrategy {
         eachPlugin {
@@ -41,6 +35,6 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs").from("com.mineinabyss:catalog:$idofrontVersion")
-        create("mobzyLibs").from(files("gradle/mobzyLibs.versions.toml"))
+        create("myLibs").from(files("gradle/myLibs.versions.toml"))
     }
 }

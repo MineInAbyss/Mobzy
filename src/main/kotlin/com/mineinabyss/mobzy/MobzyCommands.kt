@@ -1,7 +1,5 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.context.GearyContext
-import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGeary
 import com.mineinabyss.geary.papermc.helpers.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
@@ -33,12 +31,11 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Monster
 import org.bukkit.entity.NPC
-import org.koin.core.component.inject
 
-class MobzyCommands : IdofrontCommandExecutor(), TabCompleter, GearyContext by GearyMCContextKoin() {
-    val config by inject<MobzyConfig>()
+class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
+    val config get() = mobzy.config
 
-    override val commands = commands(mobzy) {
+    override val commands = commands(mobzy.plugin) {
         ("mobzy" / "mz") {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
                 "spawns" {

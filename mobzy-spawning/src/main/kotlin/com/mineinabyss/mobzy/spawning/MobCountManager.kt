@@ -1,8 +1,8 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
-import com.mineinabyss.geary.annotations.AutoScan
 import com.mineinabyss.geary.annotations.Handler
+import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.papermc.GearyMCContext
 import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.geary.papermc.access.toGearyOrNull

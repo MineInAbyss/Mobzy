@@ -6,11 +6,6 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-repositories {
-    maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
-    maven("https://jitpack.io")
-}
-
 dependencies {
     compileOnly(libs.minecraft.mccoroutine)
     compileOnly(libs.kotlinx.serialization.json)

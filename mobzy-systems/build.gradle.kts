@@ -6,13 +6,6 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-repositories {
-    maven("https://repo.mineinabyss.com/releases")
-    maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
-    maven("https://jitpack.io")
-    maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
-}
-
 dependencies {
     compileOnly(libs.kotlinx.serialization.json)
     compileOnly(libs.kotlinx.serialization.kaml)
@@ -21,7 +14,7 @@ dependencies {
 
     compileOnly(libs.minecraft.plugin.modelengine)
     compileOnly(libs.minecraft.plugin.protocollib)
-    compileOnly(mobzyLibs.protocolburrito)
+    compileOnly(myLibs.protocolburrito)
 
     compileOnly(project(":mobzy-core"))
     compileOnly(project(":mobzy-components"))

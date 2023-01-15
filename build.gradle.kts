@@ -1,8 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinx.serialization)
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.nms")
@@ -25,25 +26,27 @@ allprojects {
     }
 
     repositories {
-        maven("https://repo.mineinabyss.com")
+        mavenCentral()
+        maven("https://repo.mineinabyss.com/releases")
+        maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
+        maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
+        maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
+        maven("https://jitpack.io")
     }
 
     dependencies {
         val libs = rootProject.libs
-        val mobzyLibs = rootProject.mobzyLibs
+        val myLibs = rootProject.myLibs
 
-        compileOnly(mobzyLibs.geary.papermc.core)
-
+        compileOnly(myLibs.geary.core)
+        compileOnly(myLibs.geary.autoscan)
+        compileOnly(myLibs.geary.serialization)
+        compileOnly(myLibs.geary.prefabs)
+        compileOnly(myLibs.geary.papermc.datastore)
 
         implementation(libs.bundles.idofront.core)
         implementation(libs.idofront.nms)
     }
-}
-
-repositories {
-    mavenCentral()
-    maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
-    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -53,7 +56,7 @@ dependencies {
     compileOnly(libs.kotlinx.serialization.kaml)
     compileOnly(libs.kotlinx.coroutines)
     compileOnly(libs.minecraft.mccoroutine)
-    compileOnly(libs.koin.core)
+    compileOnly(libs.idofront.di)
     compileOnly(libs.minecraft.plugin.modelengine)
 
     // Shaded

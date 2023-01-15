@@ -26,13 +26,12 @@ import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Entity
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.experimental.or
 
 class PlayingDeathAnimation
 
-object MobzyPacketInterception: KoinComponent {
+object MobzyPacketInterception {
     val config by inject<MobzyConfig>()
 
     private val byteSerializer = WrappedDataWatcher.Registry.get(Class.forName("java.lang.Byte"))

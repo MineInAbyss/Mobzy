@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.systems.systems
 
-import com.mineinabyss.geary.annotations.AutoScan
+import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.RepeatingSystem
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.nms.aliases.toNMS
