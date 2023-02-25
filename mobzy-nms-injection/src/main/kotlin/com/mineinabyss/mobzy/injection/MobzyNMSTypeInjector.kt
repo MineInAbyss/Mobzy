@@ -9,8 +9,8 @@ import com.mineinabyss.geary.prefabs.configuration.components.Prefab
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.geary.systems.query.GearyQuery
-import com.mineinabyss.mobzy.ecs.components.initialization.MobzyType
 import com.mineinabyss.mobzy.ecs.components.toMobzyCategory
+import com.mineinabyss.mobzy.initializers.attributes.MobzyType
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 

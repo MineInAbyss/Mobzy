@@ -1,10 +1,10 @@
 package com.mineinabyss.mobzy.pathfinding
 
 import com.destroystokyo.paper.entity.Pathfinder
-import com.mineinabyss.geary.papermc.access.toGeary
+import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSMob
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.mobzy.ecs.components.initialization.MobAttributes
+import com.mineinabyss.mobzy.initializers.attributes.MobAttributes
 import net.minecraft.world.entity.ai.goal.Goal
 import org.bukkit.GameMode
 import org.bukkit.Statistic

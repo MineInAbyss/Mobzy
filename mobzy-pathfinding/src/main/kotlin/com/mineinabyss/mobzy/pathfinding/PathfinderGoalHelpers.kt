@@ -3,7 +3,7 @@
 package com.mineinabyss.mobzy.pathfinding
 
 import com.mineinabyss.idofront.nms.aliases.toBukkit
-import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import net.minecraft.world.entity.Mob
 
 fun Mob.addPathfinderGoal(priority: Int, goal: PathfinderComponent) =

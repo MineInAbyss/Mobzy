@@ -2,15 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.mia.kotlin.jvm)
     alias(libs.plugins.kotlinx.serialization)
-    id("com.mineinabyss.conventions.kotlin")
-    id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.nms")
-    id("com.mineinabyss.conventions.copyjar")
-    id("com.mineinabyss.conventions.publication")
-    id("com.mineinabyss.conventions.testing")
-    id("com.mineinabyss.conventions.autoversion")
+    alias(libs.plugins.mia.papermc)
+    alias(libs.plugins.mia.nms)
+    alias(libs.plugins.mia.copyjar)
+    alias(libs.plugins.mia.publication)
+    alias(libs.plugins.mia.testing)
+    alias(libs.plugins.mia.autoversion)
 }
 
 allprojects {
@@ -37,12 +36,14 @@ allprojects {
     dependencies {
         val libs = rootProject.libs
         val myLibs = rootProject.myLibs
+        val gearyLibs = rootProject.gearyLibs
 
-        compileOnly(myLibs.geary.core)
-        compileOnly(myLibs.geary.autoscan)
-        compileOnly(myLibs.geary.serialization)
-        compileOnly(myLibs.geary.prefabs)
-        compileOnly(myLibs.geary.papermc.datastore)
+        compileOnly(myLibs.geary.papermc)
+        compileOnly(gearyLibs.autoscan)
+//        compileOnly(myLibs.geary.autoscan)
+//        compileOnly(myLibs.geary.serialization)
+//        compileOnly(myLibs.geary.prefabs)
+//        compileOnly(myLibs.geary.papermc.datastore)
 
         implementation(libs.bundles.idofront.core)
         implementation(libs.idofront.nms)
@@ -61,7 +62,7 @@ dependencies {
 
     // Shaded
     api(project(":mobzy-pathfinding"))
-    api(project(":mobzy-systems"))
+    api(project(":mobzy-features"))
     api(project(":mobzy-components"))
     api(project(":mobzy-spawning"))
     api(project(":mobzy-nms-injection"))

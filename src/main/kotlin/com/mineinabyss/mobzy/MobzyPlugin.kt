@@ -8,9 +8,12 @@ import com.mineinabyss.idofront.di.DI
 import com.mineinabyss.idofront.messaging.logSuccess
 import com.mineinabyss.idofront.platforms.Platforms
 import com.mineinabyss.idofront.plugin.*
-import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
+import com.mineinabyss.mobzy.features.listeners.*
+import com.mineinabyss.mobzy.features.systems.listeners.*
+import com.mineinabyss.mobzy.features.taming.TamableListener
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.modelengine.AnimationController
+import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.MobzySpawning
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
@@ -29,7 +32,7 @@ class MobzyPlugin : JavaPlugin() {
     override fun onEnable() = actions {
         //Register events
         listeners(
-            MobListener,
+            ChunkUnloadSystem,
             MobzyECSListener,
             MobCountManager,
             GearySpawningListener,

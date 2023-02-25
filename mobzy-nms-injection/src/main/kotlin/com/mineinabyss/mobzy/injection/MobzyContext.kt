@@ -1,9 +1,9 @@
 package com.mineinabyss.mobzy.injection
 
-import org.koin.mp.KoinPlatformTools
+import com.mineinabyss.idofront.di.DI
 
 interface NMSTypeInjectorContext {
     val nmsTypeInjector: MobzyNMSTypeInjector
 }
 
-var globalNMSTypeInjector = KoinPlatformTools.defaultContext().get().get<MobzyNMSTypeInjector>()
+val nmsTypeInjector by DI.observe<NMSTypeInjectorContext>()
