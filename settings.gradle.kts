@@ -41,3 +41,5 @@ dependencyResolutionManagement {
         create("gearyLibs").from("com.mineinabyss:geary-catalog:$gearyVersion")
     }
 }
+
+includeBuild("../geary-papermc")

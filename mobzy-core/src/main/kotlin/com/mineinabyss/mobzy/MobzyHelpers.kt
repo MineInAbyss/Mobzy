@@ -11,5 +11,5 @@ fun <T> T.debugVal(message: String = ""): T = debug("$message $this").let { this
  */
 fun debug(message: Any, colorChar: Char? = null) {
     // get global koin
-    if (mobzy.debug) logInfo(message)
+    if (mobzy.config.debug) logInfo(message)
 }

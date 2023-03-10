@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.features.bucketing
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.papermc.tracking.items.gearyItemInMainHand
+import com.mineinabyss.mobzy.helpers.spawnFromPrefab
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

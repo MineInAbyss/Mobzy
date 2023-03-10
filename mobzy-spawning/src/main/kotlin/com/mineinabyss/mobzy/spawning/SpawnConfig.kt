@@ -2,8 +2,8 @@ package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
-import com.mineinabyss.mobzy.ecs.components.MobCategory
 import kotlinx.serialization.Serializable
+import net.minecraft.world.entity.MobCategory
 import kotlin.time.Duration
 
 /**
@@ -16,6 +16,7 @@ import kotlin.time.Duration
  */
 @Serializable
 class SpawnConfig(
+    val doMobSpawns: Boolean = false,
     @Serializable(with = IntRangeSerializer::class)
     val chunkSpawnRad: IntRange,
     val maxCommandSpawns: Int,

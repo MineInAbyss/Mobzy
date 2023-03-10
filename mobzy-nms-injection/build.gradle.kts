@@ -8,5 +8,6 @@ plugins {
 dependencies {
     compileOnly(project(":mobzy-core"))
     compileOnly(project(":mobzy-components"))
+    compileOnly(project(":mobzy-features"))
     compileOnly(project(":mobzy-pathfinding"))
 }

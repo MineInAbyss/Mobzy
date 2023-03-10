@@ -11,9 +11,10 @@ import org.bukkit.entity.AbstractSkeleton
 import org.bukkit.entity.Phantom
 import org.bukkit.entity.Zombie
 
+@JvmInline
 @Serializable
 @SerialName("mobzy:set.burn_in_day")
-class SetBurnInDay(val value: Boolean = true)
+value class SetBurnInDay(val value: Boolean = true)
 
 @AutoScan
 class SetBurnInDaySystem : GearyListener() {

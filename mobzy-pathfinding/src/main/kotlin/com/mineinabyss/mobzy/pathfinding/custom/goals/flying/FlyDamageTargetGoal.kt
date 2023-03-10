@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.pathfinding.custom.goals.flying
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
-import com.mineinabyss.mobzy.initializers.attributes.MobAttributes
 import com.mineinabyss.mobzy.modelengine.playAnimation
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
@@ -27,9 +26,8 @@ class FlyDamageTargetGoal(override val mob: Mob) : MobzyPathfinderGoal() {
     override fun execute() {
         restartCooldown()
         val target = mob.target ?: return
-        val attackDamage: Double = mob.toGeary().get<MobAttributes>()?.attackDamage ?: return
         //if within range, harm
         mob.playAnimation("attack", 0.0, 0.0, 1.0, false)
-        target.damage(attackDamage, mob)
+        mob.attack(target)
     }
 }

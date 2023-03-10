@@ -1,9 +1,7 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.papermc.helpers.spawnFromPrefab
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.prefabs.PrefabKey
-import com.mineinabyss.idofront.commands.arguments.booleanArg
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
 import com.mineinabyss.idofront.commands.arguments.stringArg
@@ -14,13 +12,13 @@ import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.mobzy.ecs.components.Important
-import com.mineinabyss.mobzy.ecs.components.interaction.Tamed
-import com.mineinabyss.mobzy.initializers.attributes.MobzyType
+import com.mineinabyss.mobzy.features.spawning.Important
+import com.mineinabyss.geary.papermc.tracking.entities.components.SetEntityType
+import com.mineinabyss.mobzy.features.taming.Tamed
+import com.mineinabyss.mobzy.helpers.spawnFromPrefab
 import com.mineinabyss.mobzy.injection.MobzyTypesQuery
-import com.mineinabyss.mobzy.spawning.SpawnRegistry
-import com.mineinabyss.mobzy.spawning.SpawnTask
-import com.mineinabyss.mobzy.spawning.helpers.categorizeMobs
+import com.mineinabyss.mobzy.spawning.mobzySpawning
+import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import net.minecraft.world.entity.FlyingMob
 import net.minecraft.world.entity.animal.AbstractFish
 import net.minecraft.world.entity.animal.Animal
@@ -33,13 +31,11 @@ import org.bukkit.entity.Monster
 import org.bukkit.entity.NPC
 
 class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
-    val config get() = mobzy.config
-
     override val commands = commands(mobzy.plugin) {
         ("mobzy" / "mz") {
             ("reload" / "rl")(desc = "Reloads the configuration files") {
                 "spawns" {
-                    SpawnRegistry.reloadSpawns()
+                    mobzySpawning.spawnRegistry.reloadSpawns()
                     sender.success("Reloaded spawn config")
                 }
 
@@ -51,7 +47,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 val radius by intArg { default = 0 }
 
                 fun PlayerAction.removeOrInfo(isInfo: Boolean) {
-                    val worlds = mobzy.server.worlds
+                    val worlds = mobzy.plugin.server.worlds
                     var entityCount = 0
                     val entities = mutableSetOf<Entity>()
                     val types = query.split("+")
@@ -59,7 +55,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     for (world in worlds) for (entity in world.entities) {
                         val nmsEntity = entity.toNMS()
                         val geary = entity.toGeary()
-                        if (!geary.has<MobzyType>()) continue
+                        if (!geary.has<SetEntityType>()) continue
 
 
                         if (types.any { type ->
@@ -98,7 +94,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                         """.trimIndent().replace("\n", " ")
                     )
                     if (isInfo) {
-                        val categories = entities.categorizeMobs().entries.sortedByDescending { it.value }
+                        val categories = SpawnInfo.categorizeByType(entities).entries.sortedByDescending { it.value }
                         if (categories.isNotEmpty()) sender.info(
                             categories.joinToString("\n") { (type, amount) -> "<gray>${type}</gray>: $amount" }
                         )
@@ -124,7 +120,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
 
                 playerAction {
-                    val cappedSpawns = numOfSpawns.coerceAtMost(config.maxCommandSpawns)
+                    val cappedSpawns = numOfSpawns.coerceAtMost(mobzySpawning.config.maxCommandSpawns)
                     val key = PrefabKey.of(mobKey)
 
                     repeat(cappedSpawns) {
@@ -168,24 +164,6 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
                 sender.success("All registered types:\n${MobzyTypesQuery.getKeys()}")
             }
-
-            "config"(desc = "Configuration options") {
-                command("domobspawns", desc = "Whether custom mobs can spawn with the custom spawning system") {
-                    val enabled by booleanArg()
-
-                    //TODO expand for all properties, this will probably be done through MobzyConfig, so `serialized` can
-                    // be made private once that's done
-                    action {
-                        if (config.doMobSpawns != enabled) {
-                            config.doMobSpawns = enabled
-                            if (!enabled) SpawnTask.stopTask()
-                            sender.success("Config option doMobSpawns has been set to $enabled")
-                        } else
-                            sender.success("Config option doMobSpawns was already set to $enabled")
-                        if (enabled) SpawnTask.startTask()
-                    }
-                }
-            }
         }
     }
 
@@ -214,15 +192,14 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 "i",
                 "rm",
                 "s",
-                "config",
                 "stats"
-            )
-                .filter { it.startsWith(args[0]) }
+            ).filter { it.startsWith(args[0]) }
+
             else -> {
                 val subCommand = args[0]
 
-                if (subCommand == "spawn" || subCommand == "s")
-                    if (args.size == 2) {
+                when (subCommand) {
+                    "spawn", "s" -> if (args.size == 2) {
                         return MobzyTypesQuery.run {
                             filter {
                                 val arg = args[1].lowercase()
@@ -235,12 +212,11 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                             min = args[2].toInt()
                         } catch (_: NumberFormatException) {
                         }
-                        return (min until config.maxCommandSpawns).asIterable()
+                        return (min until mobzySpawning.config.maxCommandSpawns).asIterable()
                             .map { it.toString() }.filter { it.startsWith(min.toString()) }
                     }
 
-                if (subCommand in listOf("remove", "rm", "info", "i"))
-                    if (args.size == 2) {
+                    "remove", "rm", "info", "i" -> if (args.size == 2) {
                         val query = args[1].lowercase()
                         val parts = query.split("+")
                         val withoutLast = query.substringBeforeLast("+", missingDelimiterValue = "").let {
@@ -251,9 +227,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                                     it.substringAfter(":").startsWith(parts.last()))
                         }.take(20).map { "$withoutLast$it" }.toList()
                     }
-                return if (subCommand == "config") listOf("mobs", "spawns", "domobspawns")
-                    .filter { it.lowercase().startsWith(args[1].lowercase()) }
-                else emptyList()
+                }
+                return emptyList()
             }
         }
     }

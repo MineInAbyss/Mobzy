@@ -1,13 +1,12 @@
 package com.mineinabyss.mobzy.pathfinding
 
 import com.destroystokyo.paper.entity.Pathfinder
-import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.idofront.nms.aliases.NMSMob
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.mobzy.initializers.attributes.MobAttributes
 import net.minecraft.world.entity.ai.goal.Goal
 import org.bukkit.GameMode
 import org.bukkit.Statistic
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import java.util.*
@@ -69,7 +68,7 @@ abstract class MobzyPathfinderGoal(private val cooldown: Long = 500, flags: List
      * */
     fun isPlayerValidTarget(
         player: Player,
-        range: Double = mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0,
+        range: Double = mob.getAttribute(Attribute.GENERIC_FOLLOW_RANGE)?.value ?: 0.0,
         ticksWaitAfterPlayerDeath: Int
     ): Boolean {
         if (player.getStatistic(Statistic.TIME_SINCE_DEATH) < ticksWaitAfterPlayerDeath) return false
