@@ -11,7 +11,7 @@ import com.mineinabyss.geary.systems.accessors.*
 import com.mineinabyss.geary.systems.accessors.building.map
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
-import com.mineinabyss.mobzy.helpers.spawnFromPrefab
+import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp

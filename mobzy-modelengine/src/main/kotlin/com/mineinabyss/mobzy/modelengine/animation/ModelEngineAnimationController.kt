@@ -1,13 +1,10 @@
 package com.mineinabyss.mobzy.modelengine.animation
 
-import com.mineinabyss.geary.systems.GearySystem
 import com.mineinabyss.idofront.typealiases.BukkitEntity
-import com.mineinabyss.mobzy.modelengine.AnimationController
 import com.mineinabyss.mobzy.modelengine.toModelEntity
-import org.bukkit.event.Listener
 
 
-class ModelEngineAnimationController : GearySystem, Listener, AnimationController {
+class ModelEngineAnimationController : AnimationController {
     override fun isModelEngineEntity(entity: BukkitEntity) = entity.toModelEntity() != null
 
     override fun playAnimation(

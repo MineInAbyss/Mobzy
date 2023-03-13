@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.pathfinding.bindings.goals
 
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.mobzy.modelengine.playAnimation
+import com.mineinabyss.mobzy.modelengine.animation.playAnimation
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,7 +26,6 @@ class MeleeAttackBehavior(
             val width = mob.bbWidth
             val d = (1 + width) * (1 + width) + target.bbWidth
             if (squaredDistance <= d && ticksUntilNextAttack <= 0) {
-
                 entity.playAnimation("attack", 0.0, 0.0, 1.0, false)
                 resetAttackCooldown()
                 mob.doHurtTarget(target)

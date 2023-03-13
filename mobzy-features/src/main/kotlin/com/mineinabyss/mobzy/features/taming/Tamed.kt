@@ -8,5 +8,6 @@ import java.util.*
 @Serializable
 @SerialName("mobzy:tamed")
 class Tamed(
-    var owner: @Serializable(with = UUIDSerializer::class) UUID? = null,
+    @Serializable(with = UUIDSerializer::class)
+    val owner: UUID,
 )

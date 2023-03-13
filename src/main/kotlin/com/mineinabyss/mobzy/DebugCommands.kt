@@ -9,7 +9,6 @@ import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.mobzy.spawning.DoSpawn
-import com.mineinabyss.mobzy.spawning.MobCountManager
 import com.mineinabyss.mobzy.spawning.PlayerGroups
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Bukkit
@@ -20,11 +19,6 @@ fun Int.toChunkLoc() = (this % 16).let { if (it < 0) it + 16 else it }
 //TODO move debugging into its own module (perhaps in Geary-addons)
 internal fun Command.createDebugCommands() {
     "spawn" {
-        "categoryCounts" {
-            action {
-                sender.info(MobCountManager.categoryCounts)
-            }
-        }
         "groups" {
             action {
                 sender.info(PlayerGroups.group(Bukkit.getOnlinePlayers()))

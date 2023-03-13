@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.modelengine.riding
 
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
-import com.mineinabyss.mobzy.modelengine.ModelEngineComponent
+import com.mineinabyss.mobzy.modelengine.intializers.SetModelEngineModel
 import com.mineinabyss.mobzy.modelengine.toModelEntity
 import com.ticxo.modelengine.api.ModelEngineAPI
 import io.papermc.paper.event.entity.EntityMoveEvent
@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 
-class ModelEngineRidingSystem : Listener {
+class ModelEngineRidingListener : Listener {
     /** Ride entities with [Rideable] component on right click. */
     @EventHandler
     fun PlayerInteractEntityEvent.rideOnRightClick() {
@@ -24,7 +24,7 @@ class ModelEngineRidingSystem : Listener {
         val gearyEntity = rightClicked.toGearyOrNull() ?: return
         val modelEntity = rightClicked.toModelEntity() ?: return
 
-        gearyEntity.with { rideable: Rideable, modelengine: ModelEngineComponent ->
+        gearyEntity.with { rideable: Rideable, modelengine: SetModelEngineModel ->
             val mount = modelEntity.mountManager
 
             // If player is not riding this or another entity, mount it

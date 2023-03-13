@@ -22,7 +22,6 @@ include(
     "mobzy-core",
     "mobzy-features",
     "mobzy-modelengine",
-    "mobzy-nms-injection",
     "mobzy-pathfinding",
     "mobzy-spawning",
 )
@@ -43,3 +42,4 @@ dependencyResolutionManagement {
 }
 
 includeBuild("../geary-papermc")
+includeBuild("../Geary")

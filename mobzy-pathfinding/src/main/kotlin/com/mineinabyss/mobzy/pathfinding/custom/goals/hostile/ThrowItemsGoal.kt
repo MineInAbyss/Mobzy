@@ -1,9 +1,8 @@
 package com.mineinabyss.mobzy.pathfinding.custom.goals.hostile
 
 import com.mineinabyss.geary.datatypes.GearyEntity
-import com.mineinabyss.geary.papermc.helpers.spawnFromPrefab
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
-import com.mineinabyss.geary.serialization.parseEntity
+import com.mineinabyss.geary.serialization.helpers.parseEntity
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
@@ -11,6 +10,7 @@ import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.operators.plus
 import com.mineinabyss.idofront.operators.times
 import com.mineinabyss.idofront.serialization.DurationSerializer
+import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import kotlinx.serialization.SerialName
@@ -29,7 +29,6 @@ import kotlin.time.Duration.Companion.seconds
 @Serializable
 @SerialName("mobzy:behavior.throw_items")
 class ThrowItemsBehavior(
-    //TODO replace with serializable geary entity when that works
     val spawn: String,
     val minChaseRad: Double = 0.0,
     val minThrowRad: Double = 7.0,
@@ -126,7 +125,6 @@ class ThrowItemsGoal(
  * @param speed The speed at which the projectile should travel
  * @param randomAngle The maximum random angle that can be applied to the projectile shooting direction. Set to 0 to aim directly at the target.
  */
-//TODO: Implement the entity deltaPosition ticking ourselves at some point, to circumvent NMS.
 fun Projectile.shootDirection(dX: Double, dY: Double, dZ: Double, speed: Float, randomAngle: Double) {
     val directionVector = Vector(dX, dY, dZ).normalize()
     if (randomAngle != 0.0) {

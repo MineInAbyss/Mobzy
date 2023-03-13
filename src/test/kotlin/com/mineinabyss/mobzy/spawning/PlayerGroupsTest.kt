@@ -1,12 +1,30 @@
 package com.mineinabyss.mobzy.spawning
 
 import be.seeseemelk.mockbukkit.entity.PlayerMock
+import com.mineinabyss.idofront.di.DI
+import com.mineinabyss.idofront.time.ticks
 import io.kotest.matchers.collections.shouldContain
+import io.mockk.every
+import io.mockk.mockk
 import org.bukkit.Location
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PlayerGroupsTest: BukkitTest() {
+    @BeforeAll
+    fun setupConfig() {
+        DI.add(mockk<MobzySpawning> {
+            every { config } returns SpawnConfig(
+                chunkSpawnRad = 0..1,
+                maxCommandSpawns = 3,
+                playerGroupRadius = 20.0,
+                spawnTaskDelay = 10.ticks,
+                spawnHeightRange = 100,
+            )
+        })
+    }
 
     private fun playerAt(location: Location) = server.addPlayer().apply { this.location = location }
 

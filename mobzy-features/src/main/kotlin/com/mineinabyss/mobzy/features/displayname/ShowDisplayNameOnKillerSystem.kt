@@ -1,8 +1,7 @@
-package com.mineinabyss.geary.features.displayname
+package com.mineinabyss.mobzy.features.displayname
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.idofront.textcomponents.miniMsg
-import com.mineinabyss.mobzy.features.displayname.DisplayName
 import net.kyori.adventure.text.TranslatableComponent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler

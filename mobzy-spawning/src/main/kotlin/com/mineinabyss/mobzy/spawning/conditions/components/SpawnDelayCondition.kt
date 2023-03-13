@@ -6,6 +6,7 @@ import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.spawning.GlobalSpawnInfo
+import com.mineinabyss.mobzy.spawning.mobzySpawning
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -24,7 +25,7 @@ class SpawnDelayCondition : GearyListener() {
 
     @Handler
     fun TargetScope.check(): Boolean {
-        val iterationMod = (delay.attemptEvery / config.spawnTaskDelay)
+        val iterationMod = (delay.attemptEvery / mobzySpawning.config.spawnTaskDelay)
             .toInt().coerceAtLeast(1)
         return GlobalSpawnInfo.iterationNumber % iterationMod == 0
     }

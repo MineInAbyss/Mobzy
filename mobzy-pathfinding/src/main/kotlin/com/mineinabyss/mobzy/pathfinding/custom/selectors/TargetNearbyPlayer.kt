@@ -1,13 +1,12 @@
 package com.mineinabyss.mobzy.pathfinding.custom.selectors
 
-import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.idofront.nms.aliases.toBukkit
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.mobzy.initializers.attributes.MobAttributes
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityTargetEvent
@@ -28,7 +27,7 @@ class TargetNearbyPlayer(
     override fun build(mob: Mob) =
         TargetNearbyPlayerCustomGoal(
             mob,
-            range ?: mob.toGeary().get<MobAttributes>()?.followRange ?: 0.0,
+            range ?: mob.getAttribute(Attribute.GENERIC_FOLLOW_RANGE)?.value ?: 0.0,
             ticksWaitAfterPlayerDeath
         )
 }

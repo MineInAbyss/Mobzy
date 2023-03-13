@@ -6,13 +6,13 @@ import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Tameable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import kotlin.random.Random
 
-object TamableListener : Listener {
-
+class TamableListener : Listener {
     /** Tame entities with [Tamable] component on right click */
     @EventHandler
     fun PlayerInteractEntityEvent.tameMob() {
@@ -23,10 +23,9 @@ object TamableListener : Listener {
 
         gearyEntity.with { tamable: Tamable ->
             val tamed = gearyEntity.get<Tamed>() ?: run {
-                val random = Random(1).nextDouble()
+                val random = Random.nextDouble()
                 if (tamable.tameItem?.toItemStack() == itemInHand) {
-                    gearyEntity.setPersisting(Tamed)
-                    gearyEntity.get<Tamed>()?.owner = player.uniqueId
+                    gearyEntity.setPersisting(Tamed(owner = player.uniqueId))
                     player.spawnParticle(
                         Particle.HEART,
                         rightClicked.location.apply { y += 1.5 },

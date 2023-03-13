@@ -1,7 +1,7 @@
 package com.mineinabyss.mobzy.pathfinding.custom.goals.flying
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
-import com.mineinabyss.mobzy.modelengine.playAnimation
+import com.mineinabyss.mobzy.modelengine.animation.playAnimation
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import kotlinx.serialization.SerialName

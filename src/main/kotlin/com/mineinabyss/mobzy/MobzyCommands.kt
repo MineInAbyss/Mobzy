@@ -1,5 +1,8 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.papermc.tracking.entities.components.SetEntityType
+import com.mineinabyss.geary.papermc.tracking.entities.entityTracking
+import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.commands.arguments.intArg
@@ -13,10 +16,7 @@ import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.mobzy.features.spawning.Important
-import com.mineinabyss.geary.papermc.tracking.entities.components.SetEntityType
 import com.mineinabyss.mobzy.features.taming.Tamed
-import com.mineinabyss.mobzy.helpers.spawnFromPrefab
-import com.mineinabyss.mobzy.injection.MobzyTypesQuery
 import com.mineinabyss.mobzy.spawning.mobzySpawning
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import net.minecraft.world.entity.FlyingMob
@@ -111,7 +111,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("spawn" / "s")(desc = "Spawns a custom mob") {
-                val mobKey by optionArg(options = MobzyTypesQuery.run { map { it.key.toString() } }) {
+                val mobKey by optionArg(options = entityTracking.mobPrefabs.run { map { it.key.toString() } }) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val numOfSpawns by intArg {
@@ -134,7 +134,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             "locate" {
-                val mobKey by optionArg(options = MobzyTypesQuery.run { map { it.key.toString() } }) {
+                val mobKey by optionArg(options = entityTracking.mobPrefabs.run { map { it.key.toString() } }) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val radius by intArg {
@@ -162,7 +162,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
-                sender.success("All registered types:\n${MobzyTypesQuery.getKeys()}")
+                sender.success("All registered types:\n${entityTracking.mobPrefabs.getKeys()}")
             }
         }
     }
@@ -170,7 +170,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     private val mobs: List<String> by lazy {
         buildList {
             addAll(listOf("custom", "important", "mob", "renamed", "passive", "hostile", "flying"))
-            addAll(MobzyTypesQuery.getKeys().map { it.toString() })
+            addAll(entityTracking.mobPrefabs.getKeys().map { it.toString() })
         }
     }
 
@@ -200,7 +200,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 when (subCommand) {
                     "spawn", "s" -> if (args.size == 2) {
-                        return MobzyTypesQuery.run {
+                        return entityTracking.mobPrefabs.run {
                             filter {
                                 val arg = args[1].lowercase()
                                 it.key.key.startsWith(arg) || it.key.full.startsWith(arg)

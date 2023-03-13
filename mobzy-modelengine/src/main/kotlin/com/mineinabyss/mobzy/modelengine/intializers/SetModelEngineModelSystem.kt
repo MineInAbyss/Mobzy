@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.modelengine
+package com.mineinabyss.mobzy.modelengine.intializers
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.geary.annotations.Handler
@@ -11,9 +11,9 @@ import com.ticxo.modelengine.api.ModelEngineAPI
 import kotlinx.coroutines.yield
 import org.bukkit.Color
 
-class ModelEngineTracker : GearyListener() {
+class SetModelEngineModelSystem : GearyListener() {
     val TargetScope.bukkit by onSet<BukkitEntity>()
-    val TargetScope.model by onSet<ModelEngineComponent>()
+    val TargetScope.model by onSet<SetModelEngineModel>()
 
     @Handler
     fun TargetScope.registerModelEngine() {

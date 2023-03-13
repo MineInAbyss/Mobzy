@@ -10,9 +10,8 @@ import kotlinx.serialization.Serializable
  * @param goals A list of [PathfinderComponent]s to be added as pathfinder goals.
  * @param override Whether to clear the entity's default pathfinders.
  */
-//TODO clean up if https://github.com/Kotlin/kotlinx.serialization/issues/344 ever gets added
 @Serializable
-@SerialName("mobzy:pathfinders")
+@SerialName("mobzy:set.pathfinders")
 data class Pathfinders(
     val targets: Map<Double, PathfinderComponent>? = null,
     val goals: Map<Double, PathfinderComponent>? = null,

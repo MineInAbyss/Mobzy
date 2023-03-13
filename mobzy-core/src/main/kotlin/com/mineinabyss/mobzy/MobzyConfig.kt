@@ -10,4 +10,5 @@ import kotlinx.serialization.Serializable
 class MobzyConfig(
     val debug: Boolean = false,
     val supportNonMEEntities: Boolean = false,
+    val doMobSpawns: Boolean = false,
 )

@@ -6,7 +6,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.vehicle.VehicleEnterEvent
 
 class PreventRidingSystem: Listener {
-
     /** Prevents entities with <PreventRiding> component (NPCs) from getting in boats and other vehicles. */
     @EventHandler
     fun VehicleEnterEvent.onVehicleEnter() {

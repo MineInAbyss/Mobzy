@@ -11,4 +11,5 @@ dependencies {
 
     compileOnly(project(":mobzy-core"))
     compileOnly(project(":mobzy-components"))
+    compileOnly(project(":mobzy-modelengine"))
 }

@@ -39,6 +39,7 @@ allprojects {
         val gearyLibs = rootProject.gearyLibs
 
         compileOnly(myLibs.geary.papermc)
+        compileOnly(myLibs.geary.papermc)
         compileOnly(gearyLibs.autoscan)
 //        compileOnly(myLibs.geary.autoscan)
 //        compileOnly(myLibs.geary.serialization)
@@ -65,12 +66,18 @@ dependencies {
     api(project(":mobzy-features"))
     api(project(":mobzy-components"))
     api(project(":mobzy-spawning"))
-    api(project(":mobzy-nms-injection"))
     api(project(":mobzy-core"))
+    api(project(":mobzy-modelengine"))
 
     // Testing
     testImplementation(libs.kotlin.statistics)
     testImplementation(libs.minecraft.mockbukkit)
     testImplementation(libs.kotlinx.serialization.json)
     testImplementation(libs.kotlinx.serialization.kaml)
+}
+
+configurations {
+    findByName("runtimeClasspath")?.apply {
+        exclude(group = "org.jetbrains.kotlin")
+    }
 }

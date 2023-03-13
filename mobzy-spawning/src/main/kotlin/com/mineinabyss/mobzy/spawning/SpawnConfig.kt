@@ -3,7 +3,7 @@ package com.mineinabyss.mobzy.spawning
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import kotlinx.serialization.Serializable
-import net.minecraft.world.entity.MobCategory
+import org.bukkit.entity.SpawnCategory
 import kotlin.time.Duration
 
 /**
@@ -16,20 +16,16 @@ import kotlin.time.Duration
  */
 @Serializable
 class SpawnConfig(
-    val doMobSpawns: Boolean = false,
     @Serializable(with = IntRangeSerializer::class)
     val chunkSpawnRad: IntRange,
     val maxCommandSpawns: Int,
     val playerGroupRadius: Double,
     @Serializable(with = DurationSerializer::class)
     val spawnTaskDelay: Duration,
-    val creatureTypeCaps: MutableMap<MobCategory, Int> = mutableMapOf(),
+    val creatureTypeCaps: MutableMap<SpawnCategory, Int> = mutableMapOf(),
     val spawnHeightRange: Int,
 ) {
-    /**
-     * @param creatureType The name of the [EnumCreatureType].
-     * @return The mob cap for that mob in config.
-     */
-    fun getCreatureTypeCap(creatureType: MobCategory): Int = creatureTypeCaps[creatureType] ?: 0
+    /** @return The spawn cap for that mob in config. */
+    fun getCreatureTypeCap(creatureType: SpawnCategory): Int = creatureTypeCaps[creatureType] ?: 0
 }
 

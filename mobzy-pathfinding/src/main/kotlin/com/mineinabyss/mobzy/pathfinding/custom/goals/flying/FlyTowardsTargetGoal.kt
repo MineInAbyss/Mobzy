@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.pathfinding.custom.goals.flying
 
-import com.mineinabyss.mobzy.modelengine.isModelEngineEntity
+import com.mineinabyss.mobzy.modelengine.animation.isModelEngineEntity
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import kotlinx.serialization.SerialName

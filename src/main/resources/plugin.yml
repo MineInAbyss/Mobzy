@@ -3,8 +3,8 @@ version: ${plugin_version}
 author: Offz
 main: com.mineinabyss.mobzy.MobzyPlugin
 api-version: 1.16
-depend: [ Geary, WorldGuard, ProtocolLib, ProtocolBurrito ]
-softdepend: [ Looty, ModelEngine ]
+depend: [ Geary ]
+softdepend: [ Looty, ModelEngine, WorldGuard ]
 
 prefix: Mobzy
 description: A custom entities API

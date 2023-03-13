@@ -4,8 +4,8 @@ import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
 import com.mineinabyss.idofront.location.up
-import com.mineinabyss.mobzy.modelengine.playAnimation
-import com.mineinabyss.mobzy.modelengine.stopAnimation
+import com.mineinabyss.mobzy.modelengine.animation.playAnimation
+import com.mineinabyss.mobzy.modelengine.animation.stopAnimation
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import kotlinx.serialization.SerialName
