@@ -8,6 +8,6 @@ import java.util.*
  */
 @JvmInline
 @Serializable
-@SerialName("geary:display_name")
+@SerialName("mo:display_name")
 value class DisplayName(val name: String)
 

@@ -47,7 +47,7 @@ class MobzyPlugin : JavaPlugin() {
         geary {
             if (mobzy.config.doMobSpawns) install(MobzySpawning)
 
-            autoscan(classLoader, "com.mineinabyss") {
+            autoscan(classLoader, "com.mineinabyss.mobzy") {
                 all()
                 subClassesOf<PathfinderComponent>()
             }

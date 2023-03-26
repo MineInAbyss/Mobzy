@@ -9,7 +9,7 @@ fun <T> T.debugVal(message: String = ""): T = debug("$message $this").let { this
  *
  * @param message the message to be sent
  */
-fun debug(message: Any, colorChar: Char? = null) {
+fun debug(message: Any) {
     // get global koin
     if (mobzy.config.debug) logInfo(message)
 }
