@@ -40,7 +40,6 @@ class SetMobAttributesSystem : GearyListener() {
     private val TargetScope.bukkitEntity by onSet<BukkitEntity>()
     private val TargetScope.attributes by onSet<SetMobAttributes>()
 
-
     @Handler
     fun TargetScope.setAttributes() {
         bukkitEntity.toNMS().setDimensions(attributes.width, attributes.height)
@@ -56,8 +55,8 @@ class SetMobAttributesSystem : GearyListener() {
         }
 
         with(attributes) {
-            maxHealth?.let { living.health = it }
             set(Attribute.GENERIC_MAX_HEALTH, maxHealth)
+            maxHealth?.let { living.health = it }
             set(Attribute.GENERIC_FOLLOW_RANGE, followRange)
             set(Attribute.GENERIC_KNOCKBACK_RESISTANCE, knockbackResistance)
             set(Attribute.GENERIC_MOVEMENT_SPEED, movementSpeed)
