@@ -51,9 +51,6 @@ class MobzyPlugin : JavaPlugin() {
                 all()
                 subClassesOf<PathfinderComponent>()
             }
-            on(GearyPhase.ENABLE) {
-                logSuccess("Loaded types: ${entityTracking.mobPrefabs.getKeys()}")
-            }
 
             if (Plugins.isEnabled<ModelEngineAPI>()) {
                 install(ModelEngineSupport)

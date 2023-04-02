@@ -12,6 +12,7 @@ import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
+import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -120,11 +121,13 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
 
                 playerAction {
-                    val cappedSpawns = numOfSpawns.coerceAtMost(mobzySpawning.config.maxCommandSpawns)
+                    val cappedSpawns = numOfSpawns//.coerceAtMost(mobzySpawning.config.maxCommandSpawns)
                     val key = PrefabKey.of(mobKey)
 
                     repeat(cappedSpawns) {
-                        player.location.spawnFromPrefab(key) ?: error("Error while spawning $mobKey")
+                        player.location.spawnFromPrefab(key).onFailure {
+                            sender.error("Failed to spawn $key: ${it.message}")
+                        }
                     }
                 }
             }

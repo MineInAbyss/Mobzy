@@ -26,7 +26,8 @@ class DisableMobInteractionsSystem : GearyListener(), Listener {
 
     @EventHandler
     fun EntityMoveEvent.cancelMovement() {
-        if (!entity.toGeary().has<DisableMobInteractions>()) return
+        // For some reason this event seems to be called even for invalid entities??
+        if (entity.isValid && !entity.toGeary().has<DisableMobInteractions>()) return
         isCancelled = true
     }
 }
