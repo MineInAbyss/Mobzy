@@ -37,15 +37,8 @@ allprojects {
     dependencies {
         val libs = rootProject.libs
         val myLibs = rootProject.myLibs
-        val gearyLibs = rootProject.gearyLibs
 
         compileOnly(myLibs.geary.papermc)
-        compileOnly(myLibs.geary.papermc)
-        compileOnly(gearyLibs.autoscan)
-//        compileOnly(myLibs.geary.autoscan)
-//        compileOnly(myLibs.geary.serialization)
-//        compileOnly(myLibs.geary.prefabs)
-//        compileOnly(myLibs.geary.papermc.datastore)
 
         implementation(libs.bundles.idofront.core)
         implementation(libs.idofront.nms)
@@ -65,7 +58,6 @@ dependencies {
     // Shaded
     api(project(":mobzy-pathfinding"))
     api(project(":mobzy-features"))
-    api(project(":mobzy-components"))
     api(project(":mobzy-spawning"))
     api(project(":mobzy-core"))
     api(project(":mobzy-modelengine"))

@@ -13,7 +13,6 @@ dependencies {
     compileOnly(libs.minecraft.mccoroutine)
 
     compileOnly(libs.minecraft.plugin.protocollib)
-    compileOnly(myLibs.protocolburrito)
 
     compileOnly(project(":mobzy-core"))
 }

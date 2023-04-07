@@ -52,7 +52,7 @@ class MobzyPlugin : JavaPlugin() {
                 subClassesOf<PathfinderComponent>()
             }
 
-            if (Plugins.isEnabled<ModelEngineAPI>()) {
+            if (Plugins.isEnabled(ModelEngineAPI.api)) {
                 install(ModelEngineSupport)
             }
         }

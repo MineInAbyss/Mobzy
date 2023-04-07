@@ -17,7 +17,5 @@ dependencies {
 
     compileOnly(libs.minecraft.plugin.worldguard) { exclude(group = "org.bukkit") }
 
-    compileOnly(project(":mobzy-components"))
     compileOnly(project(":mobzy-core"))
-
 }

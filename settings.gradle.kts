@@ -1,3 +1,5 @@
+rootProject.name = "mobzy"
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -15,20 +17,8 @@ pluginManagement {
     }
 }
 
-rootProject.name = "mobzy"
-
-include(
-    "mobzy-components",
-    "mobzy-core",
-    "mobzy-features",
-    "mobzy-modelengine",
-    "mobzy-pathfinding",
-    "mobzy-spawning",
-)
-
 dependencyResolutionManagement {
     val idofrontVersion: String by settings
-    val gearyVersion: String by settings
 
     repositories {
         maven("https://repo.mineinabyss.com/releases")
@@ -37,6 +27,13 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs").from("com.mineinabyss:catalog:$idofrontVersion")
         create("myLibs").from(files("gradle/myLibs.versions.toml"))
-        create("gearyLibs").from("com.mineinabyss:geary-catalog:$gearyVersion")
     }
 }
+
+include(
+    "mobzy-core",
+    "mobzy-features",
+    "mobzy-modelengine",
+    "mobzy-pathfinding",
+    "mobzy-spawning",
+)

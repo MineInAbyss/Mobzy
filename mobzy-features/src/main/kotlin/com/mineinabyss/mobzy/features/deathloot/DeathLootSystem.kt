@@ -28,9 +28,6 @@ class DeathLootSystem: Listener {
                 val heldItem = entity.killer?.inventory?.itemInMainHand
                 val looting = heldItem?.enchantments?.get(Enchantment.LOOT_BONUS_MOBS) ?: 0
                 drops.addAll(deathLoot.drops.mapNotNull { it.chooseDrop(looting, entity.fireTicks > 0) })
-
-                //TODO only enable running commands when we prevent creative players from spawning entities w/ custom data
-//            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
             }
         }
     }
