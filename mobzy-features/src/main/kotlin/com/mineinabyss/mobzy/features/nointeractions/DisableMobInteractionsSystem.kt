@@ -2,7 +2,7 @@ package com.mineinabyss.mobzy.features.nointeractions
 
 import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.papermc.tracking.entities.toGeary
+import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -26,7 +26,7 @@ class DisableMobInteractionsSystem : GearyListener(), Listener {
 
     @EventHandler
     fun EntityMoveEvent.cancelMovement() {
-        if (!entity.toGeary().has<DisableMobInteractions>()) return
+        if (entity.toGearyOrNull()?.has<DisableMobInteractions>() != true) return
         isCancelled = true
     }
 }

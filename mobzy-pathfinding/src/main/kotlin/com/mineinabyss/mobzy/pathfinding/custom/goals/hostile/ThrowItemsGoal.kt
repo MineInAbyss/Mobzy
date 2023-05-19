@@ -101,7 +101,7 @@ class ThrowItemsGoal(
     /** Throws the mob's defined item at the [target]*/
     private fun throwItem(target: LivingEntity) {
         repeat(count) {
-            val entity = (mob.location.up(mob.height / 1.2) + mob.location.direction.normalize() * (mob.width)).spawnFromPrefab(prefab = prefab) ?: return@repeat
+            val entity = (mob.location.up(mob.height / 1.2) + mob.location.direction.normalize() * (mob.width)).spawnFromPrefab(prefab = prefab)
             val snowball = entity as? Snowball ?: return
             snowball.shooter = mob
 //            snowball.velocity = Vector(0.0, 0.0, 0.1)

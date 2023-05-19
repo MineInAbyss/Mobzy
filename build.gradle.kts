@@ -5,8 +5,7 @@ plugins {
     alias(libs.plugins.mia.kotlin.jvm)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.mia.papermc)
-    alias(libs.plugins.mia.nms.deobfuscated)
-    alias(libs.plugins.mia.nms.reobfuscate)
+    alias(libs.plugins.mia.nms)
     alias(libs.plugins.mia.copyjar)
     alias(libs.plugins.mia.publication)
     alias(libs.plugins.mia.testing)
@@ -28,6 +27,7 @@ allprojects {
     repositories {
         mavenCentral()
         maven("https://repo.mineinabyss.com/releases")
+        maven("https://repo.mineinabyss.com/snapshots")
         maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
         maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
         maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
@@ -67,10 +67,4 @@ dependencies {
     testImplementation(libs.minecraft.mockbukkit)
     testImplementation(libs.kotlinx.serialization.json)
     testImplementation(libs.kotlinx.serialization.kaml)
-}
-
-configurations {
-    findByName("runtimeClasspath")?.apply {
-        exclude(group = "org.jetbrains.kotlin")
-    }
 }

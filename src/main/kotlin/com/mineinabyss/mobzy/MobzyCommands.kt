@@ -111,27 +111,6 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 }
             }
 
-            ("spawn" / "s")(desc = "Spawns a custom mob") {
-                val mobKey by optionArg(options = entityTracking.mobPrefabs.run { map { it.key.toString() } }) {
-                    parseErrorMessage = { "No such entity: $passed" }
-                }
-                val numOfSpawns by intArg {
-                    name = "number of spawns"
-                    default = 1
-                }
-
-                playerAction {
-                    val cappedSpawns = numOfSpawns//.coerceAtMost(mobzySpawning.config.maxCommandSpawns)
-                    val key = PrefabKey.of(mobKey)
-
-                    repeat(cappedSpawns) {
-                        player.location.spawnFromPrefab(key).onFailure {
-                            sender.error("Failed to spawn $key: ${it.message}")
-                        }
-                    }
-                }
-            }
-
             "debug" {
                 createDebugCommands()
             }
@@ -199,7 +178,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             ).filter { it.startsWith(args[0]) }
 
             else -> {
-                val subCommand = args[0]
+                val subCommand = args[1]
 
                 when (subCommand) {
                     "spawn", "s" -> if (args.size == 2) {
