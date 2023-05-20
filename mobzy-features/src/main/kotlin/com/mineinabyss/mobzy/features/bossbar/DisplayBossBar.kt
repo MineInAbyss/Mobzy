@@ -9,11 +9,10 @@ import net.kyori.adventure.text.Component
 import java.util.*
 
 /**
- * `geary:bossbar`
  * Displays a bossbar to nearby players when added to a bukkit entity.
  */
 @Serializable
-@SerialName("geary:bossbar")
+@SerialName("mobzy:bossbar")
 class DisplayBossBar(
     @Serializable(with = MiniMessageSerializer::class)
     val title: Component,
