@@ -16,6 +16,7 @@ import com.mineinabyss.mobzy.features.despawning.RemoveOnChunkUnloadSystem
 import com.mineinabyss.mobzy.features.displayname.ShowDisplayNameOnKillerSystem
 import com.mineinabyss.mobzy.features.nointeractions.DisableMobInteractionsSystem
 import com.mineinabyss.mobzy.features.riding.PreventRidingSystem
+import com.mineinabyss.mobzy.features.sounds.OverrideMobSoundsSystem
 import com.mineinabyss.mobzy.features.taming.TamableListener
 import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
@@ -64,7 +65,8 @@ class MobzyPlugin : JavaPlugin() {
             ShowDisplayNameOnKillerSystem(),
             TamableListener(),
             PreventRidingSystem(),
-            DisableMobInteractionsSystem()
+            DisableMobInteractionsSystem(),
+            OverrideMobSoundsSystem(),
         )
 
         geary.pipeline.addSystems(

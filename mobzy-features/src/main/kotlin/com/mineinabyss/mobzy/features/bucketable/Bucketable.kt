@@ -10,6 +10,5 @@ import org.bukkit.Material
 @SerialName("mobzy:bucketable")
 class Bucketable(
     val bucketLiquidRequired: Material = Material.WATER,
-    val bucketItem: SerializableItemStack,
-    val bucketMob: PrefabKey,
+    val bucketItem: SerializableItemStack
 )

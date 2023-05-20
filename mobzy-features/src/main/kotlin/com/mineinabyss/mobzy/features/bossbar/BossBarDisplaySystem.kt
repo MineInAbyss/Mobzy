@@ -1,21 +1,18 @@
-package com.mineinabyss.geary.papermc.systems
+package com.mineinabyss.mobzy.features.bossbar
 
-import com.mineinabyss.geary.annotations.AutoScan
-import com.mineinabyss.geary.annotations.Handler
-import com.mineinabyss.geary.commons.components.interaction.Attacked
-import com.mineinabyss.geary.components.events.EntityRemoved
-import com.mineinabyss.geary.datatypes.family.family
-import com.mineinabyss.geary.papermc.components.DisplayBossBar
-import com.mineinabyss.geary.systems.GearyListener
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.systems.RepeatingSystem
-import com.mineinabyss.geary.systems.accessors.EventScope
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.entities.toPlayer
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDeathEvent
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -45,34 +42,18 @@ class BossBarDisplaySystem : RepeatingSystem(interval = 0.5.seconds), Listener {
         bossbar.updateHealth(bukkit)
     }
 
-    @AutoScan
-    class RemoveBossBarOnDeath : GearyListener() {
-        //TODO convert to a component remove listener when those get added
-        val TargetScope.bossBar by get<DisplayBossBar>()
-        val EventScope.removed by family { has<EntityRemoved>() }
-
-        @Handler
-        fun TargetScope.remove() {
-            bossBar.playersInRange.forEach {
-                it.toPlayer()?.hideBossBar(bossBar.bossBar)
-            }
+    fun EntityDeathEvent.onDeath() {
+        val bossBar = entity.toGeary().get<DisplayBossBar>() ?: return
+        bossBar.playersInRange.forEach {
+            it.toPlayer()?.hideBossBar(bossBar.bossBar)
         }
     }
 
-    @AutoScan
-    class UpdateBossBarOnDamage : GearyListener() {
-        //TODO convert to a component remove listener when those get added
-        val TargetScope.bossBar by get<DisplayBossBar>()
-        val TargetScope.bukkitEntity by get<BukkitEntity>()
-        val EventScope.damaged by family { has<Attacked>() }
-
-        @Handler
-        fun TargetScope.update() {
-            val living = bukkitEntity as? LivingEntity ?: return
-            bossBar.updateHealth(living)
-        }
+    @EventHandler
+    fun EntityDamageByEntityEvent.onDamage() {
+        val bossBar = entity.toGeary().get<DisplayBossBar>()
+        bossBar?.updateHealth(entity as? LivingEntity ?: return)
     }
-
 
     companion object {
         fun DisplayBossBar.updateHealth(bukkit: LivingEntity) {

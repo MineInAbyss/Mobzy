@@ -1,4 +1,4 @@
-package com.mineinabyss.geary.papermc.components
+package com.mineinabyss.mobzy.features.bossbar
 
 import com.mineinabyss.idofront.serialization.MiniMessageSerializer
 import kotlinx.serialization.SerialName

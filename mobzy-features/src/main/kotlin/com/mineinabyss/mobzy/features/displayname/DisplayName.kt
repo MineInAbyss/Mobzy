@@ -10,4 +10,3 @@ import java.util.*
 @Serializable
 @SerialName("mobzy:display_name")
 value class DisplayName(val name: String)
-
