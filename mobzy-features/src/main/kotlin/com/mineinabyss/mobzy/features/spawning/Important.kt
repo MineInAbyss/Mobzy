@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("mobzy:important")
-sealed class Important
+class Important

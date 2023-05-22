@@ -27,7 +27,6 @@ class SetBurnInDaySystem : GearyListener() {
             is Phantom -> mob.setShouldBurnInDay(burn.value)
             is AbstractSkeleton -> mob.setShouldBurnInDay(burn.value)
             is Zombie -> mob.setShouldBurnInDay(burn.value)
-            else -> error("Tried setting can burn in daylight for a mob that doesn't have that property: $mob")
         }
     }
 }

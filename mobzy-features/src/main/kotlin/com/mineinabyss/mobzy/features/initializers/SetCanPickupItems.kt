@@ -22,7 +22,6 @@ class SetCanPickupItemsSystem : GearyListener() {
     fun TargetScope.apply() {
         when (val mob = bukkit) {
             is LivingEntity -> mob.canPickupItems = pickup.value
-            else -> error("Cannot set canPickupItems on $mob")
         }
     }
 }

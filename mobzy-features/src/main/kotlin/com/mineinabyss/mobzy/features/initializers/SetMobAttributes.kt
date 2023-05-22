@@ -45,8 +45,7 @@ class SetMobAttributesSystem : GearyListener() {
         bukkitEntity.toNMS().setDimensions(attributes.width, attributes.height)
 
         // Set attributes
-        val living: LivingEntity = bukkitEntity as? LivingEntity
-            ?: error("Tried to set attributes of non living entity $bukkitEntity")
+        val living: LivingEntity = bukkitEntity as? LivingEntity ?: return
 
         fun set(type: Attribute, baseValue: Double?) {
             if (baseValue == null) return

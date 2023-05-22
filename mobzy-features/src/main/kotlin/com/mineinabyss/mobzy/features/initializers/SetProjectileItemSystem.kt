@@ -23,8 +23,7 @@ class SetProjectileItemSystem : GearyListener() {
 
     @Handler
     fun TargetScope.applyModel() {
-        val projectile = bukkit as? ThrowableProjectile
-            ?: error("Tried to apply projectile model to a non-projectile entity: $bukkit")
+        val projectile = bukkit as? ThrowableProjectile ?: return
         projectile.item = model.item.toItemStack()
     }
 }

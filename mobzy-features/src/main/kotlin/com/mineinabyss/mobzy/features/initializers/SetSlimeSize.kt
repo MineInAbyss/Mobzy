@@ -23,7 +23,7 @@ class SetSlimeSizeSystem : GearyListener() {
 
     @Handler
     fun TargetScope.apply() {
-        val slime = (bukkit as? Slime) ?: error("Tried to set slime size on a mob that isn't a slime: $bukkit")
+        val slime = (bukkit as? Slime) ?: return
         slime.size = slimeSize.size.randomOrMin()
     }
 }

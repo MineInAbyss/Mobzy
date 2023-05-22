@@ -27,7 +27,7 @@ class SetEquipmentSystem : GearyListener() {
 
     @EventHandler
     fun TargetScope.apply() {
-        val mob = bukkit as? Mob ?: error("Mob $bukkit is not a mob but a component tried to set its equipment.")
+        val mob = bukkit as? Mob ?: return
         mob.equipment.apply {
             equipment.helmet?.toItemStack()?.let { helmet = it }
             equipment.chestplate?.toItemStack()?.let { chestplate = it }

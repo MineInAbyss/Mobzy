@@ -1,8 +1,9 @@
 package com.mineinabyss.mobzy.pathfinding.custom.goals.hostile
 
 import com.mineinabyss.geary.datatypes.GearyEntity
+import com.mineinabyss.geary.papermc.configlang.helpers.parseEntity
+import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
-import com.mineinabyss.geary.serialization.helpers.parseEntity
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
@@ -10,7 +11,6 @@ import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.operators.plus
 import com.mineinabyss.idofront.operators.times
 import com.mineinabyss.idofront.serialization.DurationSerializer
-import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.mobzy.pathfinding.MobzyPathfinderGoal
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import kotlinx.serialization.SerialName
@@ -71,7 +71,8 @@ class ThrowItemsGoal(
     private var distance = 0.0
 
     override fun shouldExecute(): Boolean {
-        return mob.target != null && mob.location.distanceSquared(mob.target?.location ?: return false).also { distance = it } >
+        return mob.target != null && mob.location.distanceSquared(mob.target?.location ?: return false)
+            .also { distance = it } >
                 //if there's no minChaseRad, stop pathfinder completely when we can't throw anymore
                 (if (minChaseRad <= 0) minThrowRad else min(minChaseRad, minThrowRad)).pow(2)
     }
@@ -101,7 +102,10 @@ class ThrowItemsGoal(
     /** Throws the mob's defined item at the [target]*/
     private fun throwItem(target: LivingEntity) {
         repeat(count) {
-            val entity = (mob.location.up(mob.height / 1.2) + mob.location.direction.normalize() * (mob.width)).spawnFromPrefab(prefab = prefab)
+            val entity =
+                (mob.location.up(mob.height / 1.2) + mob.location.direction.normalize() * (mob.width)).spawnFromPrefab(
+                    prefab = prefab
+                )
             val snowball = entity as? Snowball ?: return
             snowball.shooter = mob
 //            snowball.velocity = Vector(0.0, 0.0, 0.1)

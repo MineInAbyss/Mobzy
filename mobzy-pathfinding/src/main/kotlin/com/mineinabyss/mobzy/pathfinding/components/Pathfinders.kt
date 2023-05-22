@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.pathfinding.components
 
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -13,7 +14,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("mobzy:set.pathfinders")
 data class Pathfinders(
-    val targets: Map<Double, PathfinderComponent>? = null,
-    val goals: Map<Double, PathfinderComponent>? = null,
+    val targets: Map<Double, @Polymorphic PathfinderComponent>? = null,
+    val goals: Map<Double, @Polymorphic PathfinderComponent>? = null,
     val override: Boolean = true,
 )

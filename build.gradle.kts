@@ -68,10 +68,3 @@ dependencies {
     testImplementation(libs.kotlinx.serialization.json)
     testImplementation(libs.kotlinx.serialization.kaml)
 }
-
-configurations {
-    runtimeClasspath {
-        exclude(group = "org.jetbrains.kotlin")
-        exclude(group = "org.jetbrains.kotlinx")
-    }
-}

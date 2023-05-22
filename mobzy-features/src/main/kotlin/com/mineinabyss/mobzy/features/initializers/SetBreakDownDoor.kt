@@ -23,7 +23,6 @@ class SetBreakDownDoorListener : GearyListener() {
     fun TargetScope.apply() {
         when (val mob = bukkit) {
             is Zombie -> if (mob.supportsBreakingDoors()) mob.setCanBreakDoors(breakDoor.value)
-            else error("Mob $mob does not support breaking doors but a component tried to set it.")
         }
     }
 }

@@ -20,11 +20,12 @@ class SetModelEngineModelSystem : GearyListener() {
         mobzy.plugin.launch {
             yield() // Wait till next tick so some entity stuff gets initialized
             val modelEntity = ModelEngineAPI.getOrCreateModeledEntity(bukkit)
+            val blueprint =
+                ModelEngineAPI.getBlueprint(model.modelId) ?: error("No blueprint registered for ${model.modelId}")
 
-            val createdModel =
-                ModelEngineAPI.createActiveModel(ModelEngineAPI.getBlueprint(model.modelId)).apply {
-                    if (model.damageTint) rendererHandler.setColor(Color.RED)
-                }
+            val createdModel = ModelEngineAPI.createActiveModel(blueprint).apply {
+                if (model.damageTint) rendererHandler.setColor(Color.RED)
+            }
 
             modelEntity.apply {
                 addModel(createdModel, false)

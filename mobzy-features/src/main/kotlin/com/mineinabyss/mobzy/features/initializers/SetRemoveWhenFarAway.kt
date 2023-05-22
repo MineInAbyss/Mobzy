@@ -25,8 +25,7 @@ class SetRemoveWhenFarAwaySystem : GearyListener() {
 
     @Handler
     fun TargetScope.setRemoveWhenFarAway() {
-        val living = bukkit as? LivingEntity
-            ?: error("Cannot set remove when far away on non-living entity: $bukkit")
+        val living = bukkit as? LivingEntity ?: return
         living.removeWhenFarAway = removeWhenFarAway.value
     }
 }
