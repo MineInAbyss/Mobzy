@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy.features.bossbar
 
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
+import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.systems.RepeatingSystem
 import com.mineinabyss.geary.systems.accessors.TargetScope
 import com.mineinabyss.idofront.entities.toPlayer
@@ -43,7 +44,7 @@ class BossBarDisplaySystem : RepeatingSystem(interval = 0.5.seconds), Listener {
     }
 
     fun EntityDeathEvent.onDeath() {
-        val bossBar = entity.toGeary().get<DisplayBossBar>() ?: return
+        val bossBar = entity.toGearyOrNull()?.get<DisplayBossBar>() ?: return
         bossBar.playersInRange.forEach {
             it.toPlayer()?.hideBossBar(bossBar.bossBar)
         }
@@ -51,8 +52,8 @@ class BossBarDisplaySystem : RepeatingSystem(interval = 0.5.seconds), Listener {
 
     @EventHandler
     fun EntityDamageByEntityEvent.onDamage() {
-        val bossBar = entity.toGeary().get<DisplayBossBar>()
-        bossBar?.updateHealth(entity as? LivingEntity ?: return)
+        val bossBar = entity.toGearyOrNull()?.get<DisplayBossBar>() ?: return
+        bossBar.updateHealth(entity as? LivingEntity ?: return)
     }
 
     companion object {
