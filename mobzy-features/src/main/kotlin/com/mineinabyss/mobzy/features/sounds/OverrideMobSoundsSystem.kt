@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.features.sounds
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
+import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.idofront.destructure.component1
 import com.mineinabyss.idofront.destructure.component2
 import com.mineinabyss.idofront.destructure.component3
@@ -20,9 +21,9 @@ class OverrideMobSoundsSystem : Listener {
         makeSound(entity, sounds, sounds.death)
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     fun EntityDamageByEntityEvent.onDamage() {
-        val sounds = entity.toGeary().get<Sounds>() ?: return
+        val sounds = entity.toGearyOrNull()?.get<Sounds>() ?: return
         makeSound(entity, sounds, sounds.hurt)
     }
 
