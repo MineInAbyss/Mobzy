@@ -1,8 +1,7 @@
 package com.mineinabyss.mobzy
 
 import com.mineinabyss.geary.papermc.tracking.entities.components.SetEntityType
-import com.mineinabyss.geary.papermc.tracking.entities.entityTracking
-import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
+import com.mineinabyss.geary.papermc.tracking.entities.gearyMobs
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.commands.arguments.intArg
@@ -12,7 +11,6 @@ import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
 import com.mineinabyss.idofront.commands.execution.stopCommand
 import com.mineinabyss.idofront.commands.extensions.actions.PlayerAction
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
-import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.nms.aliases.toNMS
@@ -116,7 +114,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             "locate" {
-                val mobKey by optionArg(options = entityTracking.mobPrefabs.run { map { it.key.toString() } }) {
+                val mobKey by optionArg(options = gearyMobs.mobPrefabs.run { map { it.key.toString() } }) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val radius by intArg {
@@ -144,7 +142,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
-                sender.success("All registered types:\n${entityTracking.mobPrefabs.getKeys()}")
+                sender.success("All registered types:\n${gearyMobs.mobPrefabs.getKeys()}")
             }
         }
     }
@@ -152,7 +150,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     private val mobs: List<String> by lazy {
         buildList {
             addAll(listOf("custom", "important", "mob", "renamed", "passive", "hostile", "flying"))
-            addAll(entityTracking.mobPrefabs.getKeys().map { it.toString() })
+            addAll(gearyMobs.mobPrefabs.getKeys().map { it.toString() })
         }
     }
 
@@ -182,7 +180,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
 
                 when (subCommand) {
                     "spawn", "s" -> if (args.size == 2) {
-                        return entityTracking.mobPrefabs.run {
+                        return gearyMobs.mobPrefabs.run {
                             filter {
                                 val arg = args[1].lowercase()
                                 it.key.key.startsWith(arg) || it.key.full.startsWith(arg)

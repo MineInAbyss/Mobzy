@@ -28,7 +28,7 @@ class SetModelEngineModelSystem : GearyListener() {
             }
 
             modelEntity.apply {
-                addModel(createdModel, false)
+                addModel(createdModel, true)
                 bukkit.customName()?.let {
                     modelEntity.getModel(model.modelId).nametagHandler.bones["nametag"]?.apply {
                         customName = it.serialize()

@@ -16,8 +16,8 @@ import org.bukkit.entity.LivingEntity
 @Serializable
 @SerialName("mobzy:set.attributes")
 data class SetMobAttributes(
-    val width: Float = 0.7f,
-    val height: Float = 0.7f,
+    val width: Float? = null,
+    val height: Float? = null,
     val fireImmune: Boolean = false,
     val armor: Double? = null,
     val armorToughness: Double? = null,
@@ -42,7 +42,9 @@ class SetMobAttributesSystem : GearyListener() {
 
     @Handler
     fun TargetScope.setAttributes() {
-        bukkitEntity.toNMS().setDimensions(attributes.width, attributes.height)
+        if(attributes.width != null && attributes.height != null) {
+            bukkitEntity.toNMS().setDimensions(attributes.width!!, attributes.height!!)
+        }
 
         // Set attributes
         val living: LivingEntity = bukkitEntity as? LivingEntity ?: return
