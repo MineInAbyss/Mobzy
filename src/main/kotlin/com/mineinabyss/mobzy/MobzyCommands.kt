@@ -164,7 +164,6 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
         return when {
             command.name != "mobzy" -> emptyList()
             args.size <= 1 -> listOf(
-                "spawn",
                 "info",
                 "remove",
                 "reload",
@@ -179,23 +178,6 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                 val subCommand = args[1]
 
                 when (subCommand) {
-                    "spawn", "s" -> if (args.size == 2) {
-                        return gearyMobs.mobPrefabs.run {
-                            filter {
-                                val arg = args[1].lowercase()
-                                it.key.key.startsWith(arg) || it.key.full.startsWith(arg)
-                            }.map { it.key.toString() }
-                        }
-                    } else if (args.size == 3) {
-                        var min = 1
-                        try {
-                            min = args[2].toInt()
-                        } catch (_: NumberFormatException) {
-                        }
-                        return (min until mobzySpawning.config.maxCommandSpawns).asIterable()
-                            .map { it.toString() }.filter { it.startsWith(min.toString()) }
-                    }
-
                     "remove", "rm", "info", "i" -> if (args.size == 2) {
                         val query = args[1].lowercase()
                         val parts = query.split("+")
