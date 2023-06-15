@@ -20,7 +20,6 @@ import com.mineinabyss.mobzy.features.taming.TamableListener
 import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import com.mineinabyss.mobzy.spawning.MobzySpawning
-import com.ticxo.modelengine.api.ModelEngineAPI
 import org.bukkit.plugin.java.JavaPlugin
 
 class MobzyPlugin : JavaPlugin() {
@@ -50,7 +49,7 @@ class MobzyPlugin : JavaPlugin() {
                 subClassesOf<PathfinderComponent>()
             }
 
-            if (Plugins.isEnabled(ModelEngineAPI.api)) {
+            if (Plugins.isEnabled("ModelEngine")) {
                 install(ModelEngineSupport)
             }
         }
