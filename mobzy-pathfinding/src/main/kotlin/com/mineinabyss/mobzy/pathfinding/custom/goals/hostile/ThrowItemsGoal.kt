@@ -103,11 +103,12 @@ class ThrowItemsGoal(
     private fun throwItem(target: LivingEntity) {
         repeat(count) {
             val entity =
-                (mob.location.up(mob.height / 1.2) + mob.location.direction.normalize() * (mob.width)).spawnFromPrefab(
-                    prefab = prefab
-                )
+                (mob.location.up(mob.height / 1.2))
+                    .spawnFromPrefab(prefab = prefab)
+                    .getOrNull()
             val snowball = entity as? Snowball ?: return
             snowball.shooter = mob
+            snowball.ownerUniqueId
 //            snowball.velocity = Vector(0.0, 0.0, 0.1)
             val loc = entity.location
             val (x, y, z) = loc
