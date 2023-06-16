@@ -34,7 +34,6 @@ interface MobzySpawning {
 
             worldGuardFlags.registerFlags()
 
-            DI.add(this@install)
             geary {
                 on(GearyPhase.ENABLE) {
                     "Spawns" {

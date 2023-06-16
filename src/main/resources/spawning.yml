@@ -1,0 +1,11 @@
+chunkSpawnRad: 2..4
+maxCommandSpawns: 20
+playerGroupRadius: 96.0
+spawnTaskDelay: 40t
+creatureTypeCaps:
+  "CREATURE": 60
+  "MONSTER": 55
+  "WATER_CREATURE": 30
+  "FLYING": 10
+  "AMBIENT": 0
+spawnHeightRange: 40
