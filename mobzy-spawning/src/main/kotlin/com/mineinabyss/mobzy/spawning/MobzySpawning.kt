@@ -25,14 +25,12 @@ interface MobzySpawning {
             override val config: SpawnConfig by config("spawning") {
                 mobzy.plugin.fromPluginPath(loadDefault = true)
             }
-            override val worldGuardFlags = WorldGuardSpawnFlags()
+            override val worldGuardFlags: WorldGuardSpawnFlags = DI.get<WorldGuardSpawnFlags>()
         }
 
         override fun MobzySpawning.install() = actions {
-            if (!Plugins.isEnabled<WorldGuardPlugin>())
+            if (!Plugins.isEnabled("WorldGuard"))
                 error("Could not load spawning module, WorldGuard is not installed.")
-
-            worldGuardFlags.registerFlags()
 
             geary {
                 on(GearyPhase.ENABLE) {

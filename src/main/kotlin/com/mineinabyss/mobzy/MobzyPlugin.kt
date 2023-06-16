@@ -20,11 +20,18 @@ import com.mineinabyss.mobzy.features.taming.TamableListener
 import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import com.mineinabyss.mobzy.spawning.MobzySpawning
+import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 class MobzyPlugin : JavaPlugin() {
     override fun onLoad() {
         Platforms.load(this, "mineinabyss")
+        if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
+            val flags = WorldGuardSpawnFlags()
+            DI.add<WorldGuardSpawnFlags>(flags)
+            flags.registerFlags()
+        }
     }
 
     inline fun actions(run: ActionScope.() -> Unit) {
