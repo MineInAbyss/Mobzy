@@ -4,6 +4,7 @@ import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bukkit.SoundCategory
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -24,18 +25,26 @@ import kotlin.time.Duration.Companion.seconds
 @Serializable
 @SerialName("mobzy:sounds")
 class Sounds(
-    val volume: Float = 1F,
-    val pitch: Double = 1.0,
-    val pitchRange: Double = 0.2,
+    val step: Sound? = null,
+    val ambient: Sound? = null,
+    val death: Sound? = null,
+    val hurt: Sound? = null,
+    val splash: Sound? = null,
+    val swim: Sound? = null,
     @Serializable(with = DurationSerializer::class)
     val ambientRate: Duration = 10.seconds,
-    val step: String? = null,
-    val ambient: String? = null,
-    val death: String? = null,
-    val hurt: String? = null,
-    val splash: String? = null,
-    val swim: String? = null,
 ) {
     val ambientChance: Double = 1.ticks / ambientRate
-    fun adjustedPitch() = (pitch + (Random.nextDouble(-pitchRange, pitchRange))).toFloat()
+
+    @Serializable
+    @SerialName("mobzy:sound")
+    class Sound(
+        val sound: String,
+        val volume: Float = 1F,
+        val pitch: Double = 1.0,
+        val pitchRange: Double = 0.2,
+        val category: SoundCategory = SoundCategory.MASTER
+    ) {
+        fun adjustedPitch() = (pitch + (Random.nextDouble(-pitchRange, pitchRange))).toFloat()
+    }
 }
