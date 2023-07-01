@@ -14,6 +14,6 @@ class AmbientSoundsSystem : RepeatingSystem(interval = 1.ticks) {
 
     override fun TargetScope.tick() {
         if (Random.nextDouble() < sounds.ambientChance)
-            OverrideMobSoundsSystem.makeSound(bukkit, sounds, sounds.ambient)
+            OverrideMobSoundsSystem.makeSound(bukkit, sounds.ambient)
     }
 }

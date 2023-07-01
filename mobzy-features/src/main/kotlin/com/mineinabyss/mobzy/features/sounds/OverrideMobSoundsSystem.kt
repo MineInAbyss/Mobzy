@@ -18,28 +18,28 @@ class OverrideMobSoundsSystem : Listener {
     @EventHandler
     fun EntityDeathEvent.makeSoundOnDeath() {
         val sounds = entity.toGeary().get<Sounds>() ?: return
-        makeSound(entity, sounds, sounds.death)
+        makeSound(entity, sounds.death)
     }
 
     @EventHandler(ignoreCancelled = true)
     fun EntityDamageByEntityEvent.onDamage() {
         val sounds = entity.toGearyOrNull()?.get<Sounds>() ?: return
-        makeSound(entity, sounds, sounds.hurt)
+        makeSound(entity, sounds.hurt)
     }
 
     companion object {
-        fun makeSound(mob: BukkitEntity, sounds: Sounds, sound: String?) {
+        fun makeSound(mob: BukkitEntity, sound: Sounds.Sound?) {
             if (sound == null) return
             val (x, y, z) = mob.location
             mob.getNearbyEntities(32.0, 32.0, 32.0).filterIsInstance<Player>().forEach {
                 val dist = mob.location.distance(it.location).toFloat()
-                val volume = sounds.volume * ((32F - dist).coerceAtLeast(0F) / 32F)
+                val volume = sound.volume * ((32F - dist).coerceAtLeast(0F) / 32F)
                 it.playSound(
                     Sound.sound(
-                        Key.key(sound),
-                        Sound.Source.AMBIENT,
+                        Key.key(sound.sound),
+                        sound.category,
                         volume,
-                        sounds.adjustedPitch()
+                        sound.adjustedPitch()
                     ), x, y, z
                 )
             }
