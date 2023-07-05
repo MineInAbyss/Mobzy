@@ -15,6 +15,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
+import org.bukkit.event.player.PlayerQuitEvent
 
 class ModelEngineRidingListener : Listener {
     /** Ride entities with [Rideable] component on right click. */
@@ -84,5 +85,13 @@ class ModelEngineRidingListener : Listener {
     fun EntityDeathEvent.dismountPassengers() {
         val mountHandler = entity.toModelEntity()?.mountManager
         if (mountHandler?.driver != null || mountHandler?.hasPassengers() == true) mountHandler.dismountAll()
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun PlayerQuitEvent.dismountOnQuit() {
+        ModelEngineAPI.getMountPair(player.uniqueId)?.mountManager?.let {
+            if (it.driver.uniqueId == player.uniqueId) it.removeDriver()
+            else it.removePassenger(player)
+        }
     }
 }
