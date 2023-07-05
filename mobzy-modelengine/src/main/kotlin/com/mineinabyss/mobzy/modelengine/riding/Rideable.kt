@@ -12,7 +12,6 @@ import kotlinx.serialization.Serializable
 class Rideable(
     val controllerID: String = "walking",
     val steerItem: SerializableItemStack? = null,
-    val requiresItemToSteer: Boolean = steerItem != null,
     val canTakePassengers: Boolean = false,
     val maxPassengerCount: Int = 1,
     val canDamageMount: Boolean = false

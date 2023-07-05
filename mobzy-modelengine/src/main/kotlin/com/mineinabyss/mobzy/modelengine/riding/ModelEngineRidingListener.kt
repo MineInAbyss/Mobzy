@@ -51,7 +51,7 @@ class ModelEngineRidingListener : Listener {
 
         //TODO Make mob move on its own if not holding correct item
         gearyEntity.with { rideable: Rideable ->
-            if (rideable.requiresItemToSteer && player.inventory.itemInMainHand != rideable.steerItem?.toItemStack())
+            if (player.inventory.itemInMainHand != rideable.steerItem?.toItemStack())
                 isCancelled = true
         }
     }
@@ -60,7 +60,7 @@ class ModelEngineRidingListener : Listener {
     @EventHandler
     fun EntityDamageEvent.onMountFallDamage() {
         val mount = entity.toModelEntity()?.mountManager ?: return
-        val health = (entity as LivingEntity).health
+        val health = (entity as? LivingEntity)?.health ?: return
 
         if (entity.toGearyOrNull() == null) return
         if (cause != EntityDamageEvent.DamageCause.FALL) return
