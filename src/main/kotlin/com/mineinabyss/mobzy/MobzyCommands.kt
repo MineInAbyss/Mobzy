@@ -1,5 +1,8 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.components.relations.InstanceOf
+import com.mineinabyss.geary.datatypes.GearyEntity
+import com.mineinabyss.geary.helpers.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.components.SetEntityType
 import com.mineinabyss.geary.papermc.tracking.entities.gearyMobs
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
@@ -72,7 +75,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                                     else -> {
                                         val prefab = runCatching { PrefabKey.of(type).toEntityOrNull() }.getOrNull()
                                             ?: this@commandGroup.stopCommand("No such prefab or selector $type")
-                                        geary.instanceOf(prefab)
+                                        geary.deepInstanceOf(prefab)
                                     }
                                 }
                             }) {
@@ -114,7 +117,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             "locate" {
-                val mobKey by optionArg(options = gearyMobs.mobPrefabs.run { map { it.key.toString() } }) {
+                val mobKey by optionArg(options = gearyMobs.prefabs.run { map { it.key.toString() } }) {
                     parseErrorMessage = { "No such entity: $passed" }
                 }
                 val radius by intArg {
@@ -125,14 +128,14 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
                     val key = PrefabKey.of(mobKey)
                     if (radius <= 0) {
                         Bukkit.getWorlds().forEach { world ->
-                            world.entities.filter { it.toGeary().instanceOf(key.toEntity()) }.forEach { entity ->
+                            world.entities.filter { it.toGeary().deepInstanceOf(key.toEntity()) }.forEach { entity ->
                                 val loc = entity.location
                                 player.info("Found ${key.key} at <click:run_command:/teleport ${loc.blockX} ${loc.blockY} ${loc.blockZ}>${entity.location}>${entity.location} in ${entity.world.name}")
                             }
                         }
                     } else {
                         player.location.getNearbyEntities(radius.toDouble(), radius.toDouble(), radius.toDouble())
-                            .filter { it.toGeary().instanceOf(key.toEntity()) }.forEach { entity ->
+                            .filter { it.toGeary().deepInstanceOf(key.toEntity()) }.forEach { entity ->
                                 val loc = entity.location
                                 player.info("Found ${key.key} at <click:run_command:/teleport ${loc.blockX} ${loc.blockY} ${loc.blockZ}>${entity.location}")
 
@@ -142,7 +145,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             }
 
             ("list" / "l")(desc = "Lists all custom mob types")?.action {
-                sender.success("All registered types:\n${gearyMobs.mobPrefabs.getKeys()}")
+                sender.success("All registered types:\n${gearyMobs.prefabs.getKeys()}")
             }
         }
     }
@@ -150,7 +153,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
     private val mobs: List<String> by lazy {
         buildList {
             addAll(listOf("custom", "important", "mob", "renamed", "passive", "hostile", "flying"))
-            addAll(gearyMobs.mobPrefabs.getKeys().map { it.toString() })
+            addAll(gearyMobs.prefabs.getKeys().map { it.toString() })
         }
     }
 
@@ -175,7 +178,7 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
             ).filter { it.startsWith(args[0]) }
 
             else -> {
-                val subCommand = args[1]
+                val subCommand = args[0]
 
                 when (subCommand) {
                     "remove", "rm", "info", "i" -> if (args.size == 2) {
@@ -195,3 +198,8 @@ class MobzyCommands : IdofrontCommandExecutor(), TabCompleter {
         }
     }
 }
+
+fun GearyEntity.deepInstanceOf(entity: GearyEntity): Boolean =
+    instanceOf(entity) || getRelations<InstanceOf?, Any?>().any {
+        it.target.toGeary().deepInstanceOf(entity)
+    }
