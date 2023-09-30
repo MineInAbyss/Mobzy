@@ -16,5 +16,6 @@ import kotlinx.serialization.Serializable
 data class Pathfinders(
     val targets: Map<Double, @Polymorphic PathfinderComponent>? = null,
     val goals: Map<Double, @Polymorphic PathfinderComponent>? = null,
+    val noLookControl: Boolean = false,
     val override: Boolean = true,
 )

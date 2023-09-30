@@ -1,8 +1,6 @@
 package com.mineinabyss.mobzy.modelengine.nametag
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
-import com.mineinabyss.idofront.textcomponents.serialize
-import com.mineinabyss.mobzy.modelengine.intializers.SetModelEngineModel
 import com.mineinabyss.mobzy.modelengine.toModelEntity
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -17,11 +15,11 @@ class ModelEngineNameTagListener : Listener {
         val modelEntity = rightClicked.toModelEntity() ?: return
 
         if (itemInHand.type == Material.NAME_TAG) {
-            modelEntity.getModel(gearyEntity.get<SetModelEngineModel>()?.modelId).nametagHandler.fakeEntity
+            /*modelEntity.getModel(gearyEntity.get<SetModelEngineModel>()?.modelId).nametagHandler.fakeEntity
                 .firstNotNullOfOrNull { it.value }?.run {
                     customName = itemInHand.itemMeta.displayName()?.serialize()
                     isCustomNameVisible = true
-                }
+                }*/
         }
     }
 }

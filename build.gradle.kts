@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URI
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -12,6 +13,8 @@ plugins {
     alias(libs.plugins.mia.autoversion)
 }
 
+val mavenUser: String by project
+val mavenPassword: String by project
 allprojects {
     apply(plugin = "java")
     apply(plugin = "org.jetbrains.dokka")
@@ -28,6 +31,13 @@ allprojects {
         mavenCentral()
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
+        maven {
+            url = URI("https://${mavenUser}:${mavenPassword}@repo.mineinabyss.com/private")
+            credentials {
+                username = mavenUser
+                password = mavenPassword
+            }
+        }
         maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
         maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
         maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine

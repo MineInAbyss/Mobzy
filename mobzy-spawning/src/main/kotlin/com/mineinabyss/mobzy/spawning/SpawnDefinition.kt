@@ -3,15 +3,13 @@
 package com.mineinabyss.mobzy.spawning
 
 
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.*
-import com.mineinabyss.geary.systems.accessors.building.map
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
-import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import com.mineinabyss.mobzy.spawning.vertical.checkDown
 import com.mineinabyss.mobzy.spawning.vertical.checkUp
@@ -88,16 +86,15 @@ data class DoSpawn(
 
 @AutoScan
 class SpawnRequestListener : GearyListener() {
-    private val TargetScope.type by get<SpawnType>()
-    private val TargetScope.amount by getOrNull<SpawnAmount>().map { it?.amount }
-    private val TargetScope.spawnPos by getOrDefault<SpawnPosition>(SpawnPosition.GROUND)
-    private val TargetScope.radius by getOrNull<SpawnSpread>().map { it?.radius ?: 0.0 }
+    private val Pointers.type by get<SpawnType>().on(target)
+    private val Pointers.amount by get<SpawnAmount>().orNull().map { it?.amount }.on(target)
+    private val Pointers.spawnPos by get<SpawnPosition>().orDefault { SpawnPosition.GROUND }.on(target)
+    private val Pointers.radius by get<SpawnSpread>().orNull().map { it?.radius ?: 0.0 }.on(target)
 
-    private val EventScope.spawnEvent by get<DoSpawn>()
+    private val Pointers.spawnEvent by get<DoSpawn>().on(event)
 
-    @Handler
-    fun TargetScope.handleSpawn(event: EventScope) {
-        val location = event.spawnEvent.location
+    override fun Pointers.handle() {
+        val location = spawnEvent.location
         val spawns = amount?.randomOrMin() ?: 1
         for (i in 0 until spawns) {
             val chosenLoc =
@@ -107,7 +104,7 @@ class SpawnRequestListener : GearyListener() {
 
             chosenLoc.spawnFromPrefab(type.prefab)
         }
-        event.spawnEvent.spawnedAmount = spawns
+        spawnEvent.spawnedAmount = spawns
     }
 
     /**

@@ -1,9 +1,8 @@
 package com.mineinabyss.mobzy.features.initializers
 
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.nms.aliases.NMSEntity
 import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.mineinabyss.idofront.typealiases.BukkitEntity
@@ -37,12 +36,11 @@ data class SetMobAttributes(
 
 @AutoScan
 class SetMobAttributesSystem : GearyListener() {
-    private val TargetScope.bukkitEntity by onSet<BukkitEntity>()
-    private val TargetScope.attributes by onSet<SetMobAttributes>()
+    private val Pointers.bukkitEntity by get<BukkitEntity>().whenSetOnTarget()
+    private val Pointers.attributes by get<SetMobAttributes>().whenSetOnTarget()
 
-    @Handler
-    fun TargetScope.setAttributes() {
-        if(attributes.width != null && attributes.height != null) {
+    override fun Pointers.handle() {
+        if (attributes.width != null && attributes.height != null) {
             bukkitEntity.toNMS().setDimensions(attributes.width!!, attributes.height!!)
         }
 

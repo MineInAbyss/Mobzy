@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy.features.bossbar
 
 import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.systems.RepeatingSystem
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointer
 import com.mineinabyss.idofront.entities.toPlayer
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import org.bukkit.attribute.Attribute
@@ -22,10 +21,10 @@ import kotlin.time.Duration.Companion.seconds
  */
 @AutoScan
 class BossBarDisplaySystem : RepeatingSystem(interval = 0.5.seconds), Listener {
-    private val TargetScope.bossbar by get<DisplayBossBar>()
-    private val TargetScope.bukkitentity by get<BukkitEntity>()
+    private val Pointer.bossbar by get<DisplayBossBar>()
+    private val Pointer.bukkitentity by get<BukkitEntity>()
 
-    override fun TargetScope.tick() {
+    override fun Pointer.tick() {
         val bukkit = bukkitentity as? LivingEntity ?: return
         val playersInRange = bukkitentity.getNearbyEntities(bossbar.range, bossbar.range, bossbar.range)
             .filterIsInstance<Player>().mapTo(mutableSetOf()) { it.uniqueId }

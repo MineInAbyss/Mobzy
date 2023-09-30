@@ -29,9 +29,6 @@ interface MobzySpawning {
         }
 
         override fun MobzySpawning.install() = actions {
-            if (!Plugins.isEnabled("WorldGuard"))
-                error("Could not load spawning module, WorldGuard is not installed.")
-
             geary {
                 on(GearyPhase.ENABLE) {
                     "Spawns" {

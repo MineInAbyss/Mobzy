@@ -1,10 +1,8 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.EventScope
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.events.CheckingListener
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import kotlinx.serialization.SerialName
@@ -23,12 +21,11 @@ class SpawnGap(
 )
 
 @AutoScan
-class SpawnGapCondition : GearyListener() {
-    private val TargetScope.spawnGap by get<SpawnGap>()
+class SpawnGapCondition : CheckingListener() {
+    private val Pointers.spawnGap by get<SpawnGap>().on(target)
 
-    private val EventScope.spawnInfo by get<SpawnInfo>()
+    private val Pointers.spawnInfo by get<SpawnInfo>().on(event)
 
-    @Handler
-    fun TargetScope.check(event: EventScope): Boolean =
-        event.spawnInfo.gap in spawnGap.range
+    override fun Pointers.check(): Boolean =
+        spawnInfo.gap in spawnGap.range
 }

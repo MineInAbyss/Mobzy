@@ -1,9 +1,8 @@
 package com.mineinabyss.mobzy.features.initializers
 
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,11 +17,10 @@ value class SetBurnInDay(val value: Boolean = true)
 
 @AutoScan
 class SetBurnInDaySystem : GearyListener() {
-    private val TargetScope.burn by onSet<SetBurnInDay>()
-    private val TargetScope.bukkit by onSet<BukkitEntity>()
+    private val Pointers.burn by get<SetBurnInDay>().whenSetOnTarget()
+    private val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
 
-    @Handler
-    fun TargetScope.apply() {
+    override fun Pointers.handle() {
         when (val mob = bukkit) {
             is Phantom -> mob.setShouldBurnInDay(burn.value)
             is AbstractSkeleton -> mob.setShouldBurnInDay(burn.value)

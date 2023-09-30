@@ -1,13 +1,12 @@
 package com.mineinabyss.mobzy.features.initializers
 
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Mob
-import org.bukkit.event.EventHandler
 
 /**
  * A component for adding equipment to spawned mobs.
@@ -22,11 +21,10 @@ data class SetEquipment(
 )
 
 class SetEquipmentSystem : GearyListener() {
-    private val TargetScope.equipment by onSet<SetEquipment>()
-    private val TargetScope.bukkit by onSet<BukkitEntity>()
+    private val Pointers.equipment by get<SetEquipment>().whenSetOnTarget()
+    private val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
 
-    @EventHandler
-    fun TargetScope.apply() {
+    override fun Pointers.handle() {
         val mob = bukkit as? Mob ?: return
         mob.equipment.apply {
             equipment.helmet?.toItemStack()?.let { helmet = it }

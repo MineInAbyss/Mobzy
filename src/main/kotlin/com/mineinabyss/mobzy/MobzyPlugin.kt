@@ -27,7 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class MobzyPlugin : JavaPlugin() {
     override fun onLoad() {
         Platforms.load(this, "mineinabyss")
-        if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
             val flags = WorldGuardSpawnFlags()
             DI.add<WorldGuardSpawnFlags>(flags)
             flags.registerFlags()
@@ -49,7 +49,11 @@ class MobzyPlugin : JavaPlugin() {
         MobzyCommands()
 
         geary {
-            if (mobzy.config.doMobSpawns) install(MobzySpawning)
+            if (mobzy.config.doMobSpawns) {
+                if (!Plugins.isEnabled("WorldGuard"))
+                    logger.warning("Could not load spawning module, WorldGuard is not installed.")
+                else install(MobzySpawning)
+            }
 
             autoscan(classLoader, "com.mineinabyss.mobzy") {
                 all()

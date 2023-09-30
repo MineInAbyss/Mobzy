@@ -1,9 +1,8 @@
 package com.mineinabyss.mobzy.features.initializers
 
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,11 +19,10 @@ class SetRemoveWhenFarAway(val value: Boolean)
 
 @AutoScan
 class SetRemoveWhenFarAwaySystem : GearyListener() {
-    private val TargetScope.removeWhenFarAway by onSet<SetRemoveWhenFarAway>()
-    private val TargetScope.bukkit by onSet<BukkitEntity>()
+    private val Pointers.removeWhenFarAway by get<SetRemoveWhenFarAway>().whenSetOnTarget()
+    private val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
 
-    @Handler
-    fun TargetScope.setRemoveWhenFarAway() {
+    override fun Pointers.handle() {
         val living = bukkit as? LivingEntity ?: return
         living.removeWhenFarAway = removeWhenFarAway.value
     }

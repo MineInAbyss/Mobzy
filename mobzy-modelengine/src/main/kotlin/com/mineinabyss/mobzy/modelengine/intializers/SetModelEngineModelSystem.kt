@@ -1,22 +1,20 @@
 package com.mineinabyss.mobzy.modelengine.intializers
 
 import com.github.shynixn.mccoroutine.bukkit.launch
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.idofront.textcomponents.serialize
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.typealiases.BukkitEntity
+import com.mineinabyss.idofront.util.randomOrMin
 import com.mineinabyss.mobzy.mobzy
 import com.ticxo.modelengine.api.ModelEngineAPI
 import kotlinx.coroutines.yield
 import org.bukkit.Color
 
 class SetModelEngineModelSystem : GearyListener() {
-    val TargetScope.bukkit by onSet<BukkitEntity>()
-    val TargetScope.model by onSet<SetModelEngineModel>()
+    val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
+    val Pointers.model by get<SetModelEngineModel>().whenSetOnTarget()
 
-    @Handler
-    fun TargetScope.registerModelEngine() {
+    override fun Pointers.handle() {
         mobzy.plugin.launch {
             yield() // Wait till next tick so some entity stuff gets initialized
             val modelEntity = ModelEngineAPI.getOrCreateModeledEntity(bukkit)
@@ -24,19 +22,36 @@ class SetModelEngineModelSystem : GearyListener() {
                 ModelEngineAPI.getBlueprint(model.modelId) ?: error("No blueprint registered for ${model.modelId}")
 
             val createdModel = ModelEngineAPI.createActiveModel(blueprint).apply {
-                if (model.damageTint) rendererHandler.setColor(Color.RED)
+                if (model.damageTint) damageTint = Color.RED
+                val scale = model.scale.randomOrMin()
+                setScale(scale)
+                setHitboxScale(scale)
             }
 
             modelEntity.apply {
                 addModel(createdModel, true)
-                bukkit.customName()?.let {
-                    modelEntity.getModel(model.modelId).nametagHandler.bones["nametag"]?.apply {
-                        customName = it.serialize()
-                        isCustomNameVisible = model.nametag
+                this.base.maxStepHeight = model.stepHeight
+                isBaseEntityVisible = !model.invisible
+                base.bodyRotationController.rotationDuration = 20
+                base.data?.let { data ->
+                    model.verticalCull?.let {
+                        data.verticalCull = true
+                        data.verticalCullType = it.type
+                        data.verticalCullDistance = it.distance
+                    }
+                    model.backCull?.let {
+                        data.backCull = true
+                        data.backCullAngle = it.angle
+                        data.backCullType = it.type
+                        data.backCullIgnoreRadius = it.ignoreRadius
+                    }
+                    model.blockedCull?.let {
+                        data.blockedCull = true
+                        data.blockedCullType = it.type
+                        data.blockedCullIgnoreRadius = it.ignoreRadius
                     }
                 }
-                setStepHeight(model.stepHeight)
-                isBaseEntityVisible = !model.invisible
+
             }
         }
     }

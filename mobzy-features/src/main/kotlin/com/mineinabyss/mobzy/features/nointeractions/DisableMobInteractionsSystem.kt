@@ -1,10 +1,9 @@
 package com.mineinabyss.mobzy.features.nointeractions
 
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.event.EventHandler
@@ -12,11 +11,10 @@ import org.bukkit.event.Listener
 
 @AutoScan
 class DisableMobInteractionsSystem : GearyListener(), Listener {
-    val TargetScope.bukkit by onSet<BukkitEntity>()
-    val TargetScope.cancel by onSet<DisableMobInteractions>()
+    val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
+    val Pointers.cancel by get<DisableMobInteractions>().whenSetOnTarget()
 
-    @Handler
-    fun TargetScope.handle() {
+    override fun Pointers.handle() {
         bukkit.isInvulnerable = true
         bukkit.setGravity(false)
     }

@@ -1,10 +1,11 @@
 package com.mineinabyss.mobzy.spawning
 
-import com.mineinabyss.geary.annotations.Handler
+import com.mineinabyss.geary.annotations.optin.UnsafeAccessors
 import com.mineinabyss.geary.datatypes.GearyEntity
 import com.mineinabyss.geary.prefabs.prefabs
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointer
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.geary.systems.query.GearyQuery
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
@@ -26,8 +27,8 @@ class SpawnRegistry {
 
     fun reloadSpawns() {
         unregisterSpawns()
-        spawnConfigsQuery.toList().forEach {
-            prefabLoader.reread(it.entity)
+        spawnConfigsQuery.matchedEntities.forEach {
+            prefabLoader.reread(it)
         }
     }
 
@@ -36,18 +37,18 @@ class SpawnRegistry {
         flatMap { regionSpawns[it.id] ?: setOf() }
 
     inner class SpawnTracker : GearyListener() {
-        private val TargetScope.parentRegions by onSet<WGRegions>()
-        private val TargetScope.spawn by onSet<SpawnType>()
+        private val Pointers.parentRegions by get<WGRegions>().whenSetOnTarget()
+        private val Pointers.spawn by get<SpawnType>().whenSetOnTarget()
 
-        @Handler
-        fun TargetScope.trackSpawns() {
+        @OptIn(UnsafeAccessors::class)
+        override fun Pointers.handle() {
             parentRegions.keys.forEach {
-                regionSpawns.getOrPut(it) { mutableSetOf() } += entity
+                regionSpawns.getOrPut(it) { mutableSetOf() } += target.entity
             }
         }
     }
 
     class SpawnConfigs : GearyQuery() {
-        val TargetScope.config by get<SpawnType>()
+        val Pointer.config by get<SpawnType>()
     }
 }

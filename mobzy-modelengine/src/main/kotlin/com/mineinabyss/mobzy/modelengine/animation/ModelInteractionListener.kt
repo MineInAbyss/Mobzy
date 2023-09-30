@@ -9,6 +9,6 @@ class ModelInteractionListener: Listener {
     /** Switch to the hit model of the entity, then shortly after, back to the normal one to create a hit effect. */
     @EventHandler(ignoreCancelled = true)
     fun EntityDamageEvent.onHit() {
-        entity.toModelEntity()?.mountManager?.model?.hurt()
+        entity.toModelEntity()?.markHurt()
     }
 }

@@ -1,9 +1,8 @@
 package com.mineinabyss.mobzy.features.initializers
 
-import com.mineinabyss.geary.annotations.Handler
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import kotlinx.serialization.SerialName
@@ -18,11 +17,10 @@ data class SetProjectileItem(
 
 @AutoScan
 class SetProjectileItemSystem : GearyListener() {
-    private val TargetScope.model by onSet<SetProjectileItem>()
-    private val TargetScope.bukkit by onSet<BukkitEntity>()
+    private val Pointers.model by get<SetProjectileItem>().whenSetOnTarget()
+    private val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
 
-    @Handler
-    fun TargetScope.applyModel() {
+    override fun Pointers.handle() {
         val projectile = bukkit as? ThrowableProjectile ?: return
         projectile.item = model.item.toItemStack()
     }

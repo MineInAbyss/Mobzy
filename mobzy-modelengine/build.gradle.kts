@@ -13,3 +13,7 @@ dependencies {
 
     compileOnly(project(":mobzy-core"))
 }
+
+/*configurations.all {
+    resolutionStrategy.cacheChangingModulesFor( 0, "seconds")
+}*/
