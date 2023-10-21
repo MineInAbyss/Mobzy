@@ -39,13 +39,7 @@ class MobzyPlugin : JavaPlugin() {
     }
 
     override fun onEnable() = actions {
-        DI.add<MobzyModule>(object : MobzyModule {
-            override val plugin: MobzyPlugin = this@MobzyPlugin
-            override val config: MobzyConfig by config("config") {
-                fromPluginPath(loadDefault = true)
-            }
-        })
-
+        createMobzyContext()
         MobzyCommands()
 
         geary {
@@ -79,5 +73,13 @@ class MobzyPlugin : JavaPlugin() {
         geary.pipeline.addSystems(
             CopyNBTSystem(),
         )
+    }
+
+    fun createMobzyContext() {
+        DI.remove<MobzyModule>()
+        DI.add<MobzyModule>(object : MobzyModule {
+            override val plugin: MobzyPlugin = this@MobzyPlugin
+            override val config: MobzyConfig by config("config", dataFolder.toPath(), MobzyConfig())
+        })
     }
 }

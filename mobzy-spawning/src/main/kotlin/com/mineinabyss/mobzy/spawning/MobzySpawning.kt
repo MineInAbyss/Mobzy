@@ -5,10 +5,8 @@ import com.mineinabyss.geary.addons.dsl.GearyAddonWithDefault
 import com.mineinabyss.geary.modules.geary
 import com.mineinabyss.idofront.config.config
 import com.mineinabyss.idofront.di.DI
-import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
 import com.mineinabyss.mobzy.mobzy
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin
 
 val mobzySpawning by DI.observe<MobzySpawning>()
 
@@ -22,9 +20,7 @@ interface MobzySpawning {
         override fun default() = object : MobzySpawning {
             override val spawnTask = SpawnTask()
             override val spawnRegistry = SpawnRegistry()
-            override val config: SpawnConfig by config("spawning") {
-                mobzy.plugin.fromPluginPath(loadDefault = true)
-            }
+            override val config: SpawnConfig by config("spawning", mobzy.plugin.dataFolder.toPath(), SpawnConfig())
             override val worldGuardFlags: WorldGuardSpawnFlags = DI.get<WorldGuardSpawnFlags>()
         }
 

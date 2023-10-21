@@ -22,10 +22,10 @@ class MeleeAttackBehavior(
     inner class MeleeAttackGoal(
         private val entity: Mob
     ) : NMSMeleeAttackGoal(entity.toNMS<PathfinderMob>(), attackSpeed, seeThroughWalls) {
-        override fun checkAndPerformAttack(target: LivingEntity, squaredDistance: Double) {
+        override fun checkAndPerformAttack(target: LivingEntity/*, squaredDistance: Double*/) {
             val width = mob.bbWidth
             val d = (1 + width) * (1 + width) + target.bbWidth
-            if (squaredDistance <= d && ticksUntilNextAttack <= 0) {
+            if (/*squaredDistance <= d && */ticksUntilNextAttack <= 0) {
                 entity.playAnimation("attack", 0.0, 0.0, 1.0, false)
                 resetAttackCooldown()
                 mob.doHurtTarget(target)
