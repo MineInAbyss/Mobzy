@@ -4,7 +4,6 @@ import com.mineinabyss.geary.autoscan.autoscan
 import com.mineinabyss.geary.modules.geary
 import com.mineinabyss.idofront.config.config
 import com.mineinabyss.idofront.di.DI
-import com.mineinabyss.idofront.platforms.Platforms
 import com.mineinabyss.idofront.plugin.ActionScope
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.listeners
@@ -26,21 +25,13 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class MobzyPlugin : JavaPlugin() {
     override fun onLoad() {
-        Platforms.load(this, "mineinabyss")
         if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
             val flags = WorldGuardSpawnFlags()
             DI.add<WorldGuardSpawnFlags>(flags)
             flags.registerFlags()
         }
-    }
 
-    inline fun actions(run: ActionScope.() -> Unit) {
-        ActionScope().apply(run)
-    }
-
-    override fun onEnable() = actions {
         createMobzyContext()
-        MobzyCommands()
 
         geary {
             if (mobzy.config.doMobSpawns) {
@@ -58,6 +49,14 @@ class MobzyPlugin : JavaPlugin() {
                 install(ModelEngineSupport)
             }
         }
+    }
+
+    inline fun actions(run: ActionScope.() -> Unit) {
+        ActionScope().apply(run)
+    }
+
+    override fun onEnable() = actions {
+        MobzyCommands()
 
         listeners(
             PreventBreedingSystem(),
