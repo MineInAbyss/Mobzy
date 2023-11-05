@@ -1,15 +1,10 @@
+rootProject.name = "mobzy"
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
         maven("https://repo.mineinabyss.com/releases")
-        maven("https://papermc.io/repo/repository/maven-public/")
         google()
-    }
-
-    plugins {
-        val kotlinVersion: String by settings
-        kotlin("jvm") version kotlinVersion
-        kotlin("plugin.serialization") version kotlinVersion
     }
 
     val idofrontVersion: String by settings
@@ -21,17 +16,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "mobzy"
-
-include(
-    "mobzy-pathfinding",
-    "mobzy-systems",
-    "mobzy-spawning",
-    "mobzy-nms-injection",
-    "mobzy-core",
-    "mobzy-components"
-)
-
 dependencyResolutionManagement {
     val idofrontVersion: String by settings
 
@@ -40,7 +24,17 @@ dependencyResolutionManagement {
     }
 
     versionCatalogs {
-        create("libs").from("com.mineinabyss:catalog:$idofrontVersion")
-        create("mobzyLibs").from(files("gradle/mobzyLibs.versions.toml"))
+        create("libs") {
+            from("com.mineinabyss:catalog:$idofrontVersion")
+        }
+        create("myLibs").from(files("gradle/myLibs.versions.toml"))
     }
 }
+
+include(
+    "mobzy-core",
+    "mobzy-features",
+    "mobzy-modelengine",
+    "mobzy-pathfinding",
+    "mobzy-spawning",
+)

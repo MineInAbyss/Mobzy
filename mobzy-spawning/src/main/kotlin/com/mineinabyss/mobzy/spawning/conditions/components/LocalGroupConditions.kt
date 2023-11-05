@@ -1,11 +1,8 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
-import com.mineinabyss.geary.annotations.AutoScan
-import com.mineinabyss.geary.annotations.Handler
-import com.mineinabyss.geary.prefabs.PrefabKey
-import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.EventScope
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.events.CheckingListener
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.mobzy.spawning.SpawnType
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import kotlinx.serialization.SerialName
@@ -25,13 +22,12 @@ class LocalGroupConditions(
 )
 
 @AutoScan
-class CapFull : GearyListener() {
-    val TargetScope.conf by get<LocalGroupConditions>()
-    val TargetScope.spawnType by get<SpawnType>()
+class CapFull : CheckingListener() {
+    val Pointers.conf by get<LocalGroupConditions>().on(target)
+    val Pointers.spawnType by get<SpawnType>().on(target)
 
-    val EventScope.spawnInfo by get<SpawnInfo>()
+    val Pointers.spawnInfo by get<SpawnInfo>().on(event)
 
-    @Handler
-    fun TargetScope.check(event: EventScope): Boolean =
-        (event.spawnInfo.localTypes[spawnType.prefab.toEntityOrNull()?.get<PrefabKey>()?.toString()] ?: 0) < conf.max
+    override fun Pointers.check(): Boolean =
+        (spawnInfo.localTypes[spawnType.prefab] ?: 0) < conf.max
 }

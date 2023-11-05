@@ -1,14 +1,9 @@
 plugins {
-    id("com.mineinabyss.conventions.kotlin")
+    id("com.mineinabyss.conventions.kotlin.jvm")
     id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.nms")
     id("com.mineinabyss.conventions.publication")
     kotlin("plugin.serialization")
-}
-
-repositories {
-    maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
-    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -22,7 +17,5 @@ dependencies {
 
     compileOnly(libs.minecraft.plugin.worldguard) { exclude(group = "org.bukkit") }
 
-    compileOnly(project(":mobzy-components"))
     compileOnly(project(":mobzy-core"))
-
 }

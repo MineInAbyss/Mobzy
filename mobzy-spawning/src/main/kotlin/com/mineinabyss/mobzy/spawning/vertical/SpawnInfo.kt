@@ -1,17 +1,17 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
-import com.mineinabyss.geary.systems.accessors.TargetScope
-import com.mineinabyss.geary.systems.query.GearyQuery
+import com.mineinabyss.geary.papermc.tracking.entities.toGeary
+import com.mineinabyss.geary.prefabs.PrefabKey
+import com.mineinabyss.geary.prefabs.helpers.prefabs
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
 import com.mineinabyss.idofront.typealiases.BukkitEntity
-import com.mineinabyss.mobzy.ecs.components.MobCategory
-import com.mineinabyss.mobzy.ecs.components.mobCategory
 import com.mineinabyss.mobzy.spawning.SpawnPosition
 import com.mineinabyss.mobzy.spawning.components.SubChunkBlockComposition
-import com.mineinabyss.mobzy.spawning.helpers.categorizeMobs
 import org.bukkit.ChunkSnapshot
 import org.bukkit.Location
+import org.bukkit.entity.Entity
+import org.bukkit.entity.SpawnCategory
 import kotlin.random.Random
 
 //TODO name could be confused with SpawnRegion
@@ -32,24 +32,14 @@ class SpawnInfo(
 
     val blockComposition by lazy { SubChunkBlockComposition(this.chunkSnapshot, bottom.blockY) }
 
-    object NearbyQuery : GearyQuery() {
-        val TargetScope.bukkit by get<BukkitEntity>()
-    }
-
     private val searchRadiusSquared = searchRadius * searchRadius
 
-    //TODO more efficiently finding all ECS entities nearby
     val localMobs: Collection<BukkitEntity> by lazy {
         bottom.getNearbyEntities(searchRadiusSquared, searchRadiusSquared, searchRadiusSquared)
-//        NearbyQuery.run {
-//            map { it.bukkit }.filter {
-//                it.location.world == bottom.world && it.location.distanceSquared(bottom) < searchRadiusSquared
-//            }
-//        }
     }
-    val localTypes: Map<String, Int> by lazy { localMobs.categorizeMobs() }
-    val localCategories: Map<MobCategory, Int> by lazy {
-        localMobs.groupingBy { it.mobCategory }.eachCount()
+    val localTypes: Map<PrefabKey?, Int> by lazy { categorizeByType(localMobs) }
+    val localCategories: Map<SpawnCategory, Int> by lazy {
+        localMobs.groupingBy { it.spawnCategory }.eachCount()
     }
 
     //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
@@ -89,6 +79,12 @@ class SpawnInfo(
         var result = bottom.hashCode()
         result = 31 * result + top.hashCode()
         return result
+    }
+
+    companion object {
+        //TODO perhaps give normal mobs prefab keys too to make this more type safe
+        fun categorizeByType(mobs: Collection<Entity>): Map<PrefabKey?, Int> =
+            mobs.groupingBy { it.toGeary().prefabs.first().get<PrefabKey>() }.eachCount()
     }
 }
 

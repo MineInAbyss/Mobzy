@@ -1,15 +1,13 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.google.common.math.IntMath.pow
-import com.mineinabyss.mobzy.MobzyConfig
 import org.bukkit.Chunk
 import org.bukkit.entity.Entity
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.nield.kotlinstatistics.dbScanCluster
 
-object PlayerGroups: KoinComponent {
-    val config by inject<MobzyConfig>()
+object PlayerGroups {
+    val config get() = mobzySpawning.config
+
     /** Converts a list of players to lists of groups of players within 2x spawn radius of each other. */
     fun group(entities: Collection<Entity>): List<List<Entity>> = entities
         .groupBy { it.world }

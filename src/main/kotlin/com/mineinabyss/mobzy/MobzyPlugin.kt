@@ -1,103 +1,84 @@
 package com.mineinabyss.mobzy
 
-import com.mineinabyss.geary.addon.GearyLoadPhase.ENABLE
-import com.mineinabyss.geary.addon.autoscan
-import com.mineinabyss.geary.papermc.access.toGearyOrNull
-import com.mineinabyss.geary.papermc.dsl.gearyAddon
+import com.mineinabyss.geary.autoscan.autoscan
+import com.mineinabyss.geary.modules.geary
 import com.mineinabyss.idofront.config.config
-import com.mineinabyss.idofront.config.singleConfig
-import com.mineinabyss.idofront.messaging.logSuccess
-import com.mineinabyss.idofront.platforms.Platforms
-import com.mineinabyss.idofront.plugin.*
-import com.mineinabyss.mobzy.ecs.components.initialization.pathfinding.PathfinderComponent
-import com.mineinabyss.mobzy.injection.MobzyTypesQuery
-import com.mineinabyss.mobzy.modelengine.AnimationController
-import com.mineinabyss.mobzy.spawning.MobCountManager
-import com.mineinabyss.mobzy.spawning.SpawnRegistry
-import com.mineinabyss.mobzy.spawning.SpawnTask
+import com.mineinabyss.idofront.di.DI
+import com.mineinabyss.idofront.plugin.ActionScope
+import com.mineinabyss.idofront.plugin.Plugins
+import com.mineinabyss.idofront.plugin.listeners
+import com.mineinabyss.mobzy.features.breeding.PreventBreedingSystem
+import com.mineinabyss.mobzy.features.copynbt.CopyNBTSystem
+import com.mineinabyss.mobzy.features.deathloot.DeathLootSystem
+import com.mineinabyss.mobzy.features.despawning.RemoveOnChunkUnloadSystem
+import com.mineinabyss.mobzy.features.displayname.ShowDisplayNameOnKillerSystem
+import com.mineinabyss.mobzy.features.nointeractions.DisableMobInteractionsSystem
+import com.mineinabyss.mobzy.features.riding.PreventRidingSystem
+import com.mineinabyss.mobzy.features.sounds.OverrideMobSoundsSystem
+import com.mineinabyss.mobzy.features.taming.TamableListener
+import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
+import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
+import com.mineinabyss.mobzy.spawning.MobzySpawning
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
-import com.mineinabyss.mobzy.systems.listeners.*
-import com.mineinabyss.mobzy.systems.packets.MobzyPacketInterception
-import com.mineinabyss.mobzy.systems.systems.ModelEngineSystem
-import com.ticxo.modelengine.api.ModelEngineAPI
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
-import org.koin.dsl.module
 
 class MobzyPlugin : JavaPlugin() {
     override fun onLoad() {
-        WorldGuardSpawnFlags.registerFlags()
-        Platforms.load(this, "mineinabyss")
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
+            val flags = WorldGuardSpawnFlags()
+            DI.add<WorldGuardSpawnFlags>(flags)
+            flags.registerFlags()
+        }
+
+        createMobzyContext()
+
+        geary {
+            if (mobzy.config.doMobSpawns) {
+                if (!Plugins.isEnabled("WorldGuard"))
+                    logger.warning("Could not load spawning module, WorldGuard is not installed.")
+                else install(MobzySpawning)
+            }
+
+            autoscan(classLoader, "com.mineinabyss.mobzy") {
+                all()
+                subClassesOf<PathfinderComponent>()
+            }
+
+            if (Plugins.isEnabled("ModelEngine")) {
+                install(ModelEngineSupport)
+            }
+        }
     }
 
-    override fun onEnable() {
-        //Register events
+    inline fun actions(run: ActionScope.() -> Unit) {
+        ActionScope().apply(run)
+    }
+
+    override fun onEnable() = actions {
+        MobzyCommands()
+
         listeners(
-            MobListener,
-            MobzyECSListener,
-            MobCountManager,
-            GearySpawningListener,
-            RidableListener,
-            TamableListener,
-            //LeashingListener
+            PreventBreedingSystem(),
+            DeathLootSystem(),
+            RemoveOnChunkUnloadSystem(),
+            ShowDisplayNameOnKillerSystem(),
+            TamableListener(),
+            PreventRidingSystem(),
+            DisableMobInteractionsSystem(),
+            OverrideMobSoundsSystem(),
         )
 
-        startOrAppendKoin(module {
-            singleConfig(config<MobzyConfig>("config") {
-                fromPluginPath(loadDefault = true)
-            })
-        })
-
-        gearyAddon {
-            MobzyCommands()
-            autoscan("com.mineinabyss") {
-                all()
-                custom<PathfinderComponent>()
-            }
-
-            systems(ModelEngineSystem)
-            if (Plugins.isEnabled<ModelEngineAPI>()) {
-                service<AnimationController>(ModelEngineSystem)
-            }
-
-            startup {
-                ENABLE {
-                    actions {
-                        "Spawns" {
-                            !"Load spawns" {
-                                SpawnRegistry.reloadSpawns()
-                            }
-                            !"Start spawn task" {
-                                SpawnTask.startTask()
-                            }
-                        }
-
-                        logSuccess("Loaded types: ${MobzyTypesQuery.getKeys()}")
-                        logSuccess("Successfully loaded config")
-                    }
-
-                }
-            }
-
-            MobzyPacketInterception.registerPacketInterceptors()
-        }
+        geary.pipeline.addSystems(
+            CopyNBTSystem(),
+        )
     }
 
-    override fun onDisable() {
-        actions {
-            "Stop spawn task" {
-                SpawnTask.stopTask()
-            }
-            "Cancel all other tasks" {
-                server.scheduler.cancelTasks(this@MobzyPlugin)
-            }
-            "Remove all geary entities" {
-                server.worlds.forEach { world ->
-                    world.entities.forEach { entity ->
-                        // Encode geary entity data
-                        entity.toGearyOrNull()?.removeEntity()
-                    }
-                }
-            }
-        }
+    fun createMobzyContext() {
+        DI.remove<MobzyModule>()
+        DI.add<MobzyModule>(object : MobzyModule {
+            override val plugin: MobzyPlugin = this@MobzyPlugin
+            override val config: MobzyConfig by config("config", dataFolder.toPath(), MobzyConfig())
+        })
     }
 }

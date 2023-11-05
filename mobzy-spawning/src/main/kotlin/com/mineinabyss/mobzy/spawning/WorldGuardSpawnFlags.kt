@@ -4,7 +4,7 @@ import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.flags.StringFlag
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException
 
-object WorldGuardSpawnFlags {
+class WorldGuardSpawnFlags {
     //TODO Make these into their own custom flags instead of StringFlag
     //TODO rename this to MZ_... in the WorldGuard config files :mittysweat:
     var MZ_SPAWN_REGIONS: StringFlag? = null

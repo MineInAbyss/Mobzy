@@ -1,6 +1,5 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
-import com.mineinabyss.geary.papermc.GearyMCContext
 import org.bukkit.Chunk
 import org.bukkit.ChunkSnapshot
 import org.bukkit.Location

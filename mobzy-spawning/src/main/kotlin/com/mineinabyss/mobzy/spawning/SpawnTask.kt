@@ -6,19 +6,14 @@ import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.geary.components.RequestCheck
 import com.mineinabyss.geary.components.events.FailedCheck
 import com.mineinabyss.geary.datatypes.GearyEntity
-import com.mineinabyss.geary.papermc.GearyMCContext
-import com.mineinabyss.geary.papermc.GearyMCContextKoin
 import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
-import com.mineinabyss.mobzy.spawning.SpawnRegistry.getMobSpawnsForRegions
-import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags.MZ_SPAWN_OVERLAP
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
-import org.koin.core.component.inject
 import org.nield.kotlinstatistics.WeightedDice
 import kotlin.random.Random
 
@@ -42,8 +37,8 @@ import kotlin.random.Random
  * Does a weighted random decision based on each spawn's priority, and schedules a sync task that will spawn mobs in
  * the chosen region
  */
-object SpawnTask : GearyMCContext by GearyMCContextKoin() {
-    val config by inject<MobzyConfig>()
+class SpawnTask {
+    private val config get() = mobzySpawning.config
     private var runningTask: Job? = null
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
 
@@ -55,8 +50,8 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
     fun startTask() {
         if (runningTask != null) return
         // TODO Switch back to async when we fix geary async access
-        runningTask = mobzy.launch(mobzy.asyncDispatcher) {
-            while (config.doMobSpawns) {
+        runningTask = mobzy.plugin.launch(mobzy.plugin.asyncDispatcher) {
+            while (mobzy.config.doMobSpawns) {
                 try {
                     GlobalSpawnInfo.iterationNumber++
                     runSpawnTask()
@@ -94,15 +89,17 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
             val chunkSnapshot = chunk.chunkSnapshot
             val spawnInfo = VerticalSpawn.findGap(chunk, chunkSnapshot, min, max)
 
-            withContext(mobzy.minecraftDispatcher) {
-                val priorities = regionContainer.createQuery()
-                    .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
-                    .sorted()
-                    .filterWhenOverlapFlag()
-                    .getMobSpawnsForRegions()
-                    .associateWithTo(mutableMapOf()) {
-                        (it.get<SpawnPriority>()?.priority ?: 1.0) * Random.nextDouble()
-                    }
+            withContext(mobzy.plugin.minecraftDispatcher) {
+                val priorities = with(mobzySpawning.spawnRegistry) {
+                    regionContainer.createQuery()
+                        .getApplicableRegions(BukkitAdapter.adapt(spawnInfo.bottom)).regions
+                        .sorted()
+                        .filterWhenOverlapFlag()
+                        .getMobSpawnsForRegions()
+                        .associateWithTo(mutableMapOf()) {
+                            (it.get<SpawnPriority>()?.priority ?: 1.0) * Random.nextDouble()
+                        }
+                }
 
                 while (priorities.isNotEmpty()) {
                     val choice: GearyEntity = WeightedDice(priorities).roll()
@@ -117,7 +114,7 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
                     }) { !it.has<FailedCheck>() }
                     if (success) {
                         // Must spawn mobs on main thread
-                        if (mobzy.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
+                        if (mobzy.plugin.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
                         break
                     } else priorities.remove(choice)
                 }
@@ -128,7 +125,11 @@ object SpawnTask : GearyMCContext by GearyMCContextKoin() {
     /** If any of the overlapping regions is set to override, return a list with only the highest priority one,
      * otherwise the original list. */
     private fun List<ProtectedRegion>.filterWhenOverlapFlag(): List<ProtectedRegion> =
-        firstOrNull { region -> region.flags.containsKey(MZ_SPAWN_OVERLAP) && region.getFlag(MZ_SPAWN_OVERLAP) == "override" }
+        firstOrNull { region ->
+            region.flags.containsKey(mobzySpawning.worldGuardFlags.MZ_SPAWN_OVERLAP) && region.getFlag(
+                mobzySpawning.worldGuardFlags.MZ_SPAWN_OVERLAP
+            ) == "override"
+        }
             ?.let {
                 return listOf(it)
             } ?: this

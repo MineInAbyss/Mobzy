@@ -1,15 +1,13 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
-import com.mineinabyss.geary.annotations.AutoScan
-import com.mineinabyss.geary.annotations.Handler
-import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.TargetScope
+import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.events.CheckingListener
+import com.mineinabyss.geary.systems.accessors.Pointers
 import com.mineinabyss.idofront.serialization.DurationSerializer
-import com.mineinabyss.mobzy.MobzyConfig
 import com.mineinabyss.mobzy.spawning.GlobalSpawnInfo
+import com.mineinabyss.mobzy.spawning.mobzySpawning
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.koin.core.component.inject
 import kotlin.time.Duration
 
 @Serializable
@@ -20,14 +18,12 @@ class SpawnDelay(
 )
 
 @AutoScan
-class SpawnDelayCondition : GearyListener() {
-    val config by inject<MobzyConfig>()
+class SpawnDelayCondition : CheckingListener() {
 
-    private val TargetScope.delay by get<SpawnDelay>()
+    private val Pointers.delay by get<SpawnDelay>().on(target)
 
-    @Handler
-    fun TargetScope.check(): Boolean {
-        val iterationMod = (delay.attemptEvery / config.spawnTaskDelay)
+    override fun Pointers.check(): Boolean {
+        val iterationMod = (delay.attemptEvery / mobzySpawning.config.spawnTaskDelay)
             .toInt().coerceAtLeast(1)
         return GlobalSpawnInfo.iterationNumber % iterationMod == 0
     }

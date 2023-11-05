@@ -1,15 +1,16 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URI
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("com.mineinabyss.conventions.kotlin")
-    id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.nms")
-    id("com.mineinabyss.conventions.copyjar")
-    id("com.mineinabyss.conventions.publication")
-    id("com.mineinabyss.conventions.testing")
-    id("com.mineinabyss.conventions.autoversion")
+    alias(libs.plugins.mia.kotlin.jvm)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.mia.papermc)
+    alias(libs.plugins.mia.nms)
+    alias(libs.plugins.mia.copyjar)
+    alias(libs.plugins.mia.publication)
+    alias(libs.plugins.mia.testing)
+    alias(libs.plugins.mia.autoversion)
 }
 
 allprojects {
@@ -25,25 +26,24 @@ allprojects {
     }
 
     repositories {
-        maven("https://repo.mineinabyss.com")
+        mavenCentral()
+        maven("https://repo.mineinabyss.com/releases")
+        maven("https://repo.mineinabyss.com/snapshots")
+        maven("https://repo.dmulloy2.net/nexus/repository/public/") //ProtocolLib
+        maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
+        maven("https://mvn.lumine.io/repository/maven-public/")
+        maven("https://jitpack.io")
     }
 
     dependencies {
         val libs = rootProject.libs
-        val mobzyLibs = rootProject.mobzyLibs
+        val myLibs = rootProject.myLibs
 
-        compileOnly(mobzyLibs.geary.papermc.core)
-
+        compileOnly(myLibs.geary.papermc)
 
         implementation(libs.bundles.idofront.core)
         implementation(libs.idofront.nms)
     }
-}
-
-repositories {
-    mavenCentral()
-    maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } } // Model Engine
-    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -53,16 +53,15 @@ dependencies {
     compileOnly(libs.kotlinx.serialization.kaml)
     compileOnly(libs.kotlinx.coroutines)
     compileOnly(libs.minecraft.mccoroutine)
-    compileOnly(libs.koin.core)
+    compileOnly(libs.idofront.di)
     compileOnly(libs.minecraft.plugin.modelengine)
 
     // Shaded
     api(project(":mobzy-pathfinding"))
-    api(project(":mobzy-systems"))
-    api(project(":mobzy-components"))
+    api(project(":mobzy-features"))
     api(project(":mobzy-spawning"))
-    api(project(":mobzy-nms-injection"))
     api(project(":mobzy-core"))
+    api(project(":mobzy-modelengine"))
 
     // Testing
     testImplementation(libs.kotlin.statistics)
