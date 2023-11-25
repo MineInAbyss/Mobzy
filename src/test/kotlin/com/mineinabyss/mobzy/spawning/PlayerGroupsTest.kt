@@ -8,14 +8,13 @@ import io.mockk.every
 import io.mockk.mockk
 import org.bukkit.Location
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PlayerGroupsTest: BukkitTest() {
     @BeforeAll
     fun setupConfig() {
-        DI.add(mockk<MobzySpawning> {
+        DI.add(mockk<MobzySpawnFeature.Context> {
             every { config } returns SpawnConfig(
                 chunkSpawnRad = 0..1,
                 maxCommandSpawns = 3,

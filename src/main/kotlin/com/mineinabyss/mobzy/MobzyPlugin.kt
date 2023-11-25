@@ -4,8 +4,11 @@ import com.mineinabyss.geary.autoscan.autoscan
 import com.mineinabyss.geary.modules.geary
 import com.mineinabyss.idofront.config.config
 import com.mineinabyss.idofront.di.DI
-import com.mineinabyss.idofront.plugin.ActionScope
+import com.mineinabyss.idofront.features.Feature
+import com.mineinabyss.idofront.features.FeatureDSL
+import com.mineinabyss.idofront.features.FeatureManager
 import com.mineinabyss.idofront.plugin.Plugins
+import com.mineinabyss.idofront.plugin.actions
 import com.mineinabyss.idofront.plugin.listeners
 import com.mineinabyss.mobzy.features.breeding.PreventBreedingSystem
 import com.mineinabyss.mobzy.features.copynbt.CopyNBTSystem
@@ -18,7 +21,7 @@ import com.mineinabyss.mobzy.features.sounds.OverrideMobSoundsSystem
 import com.mineinabyss.mobzy.features.taming.TamableListener
 import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
-import com.mineinabyss.mobzy.spawning.MobzySpawning
+import com.mineinabyss.mobzy.spawning.MobzySpawnFeature
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -34,12 +37,6 @@ class MobzyPlugin : JavaPlugin() {
         createMobzyContext()
 
         geary {
-            if (mobzy.config.doMobSpawns) {
-                if (!Plugins.isEnabled("WorldGuard"))
-                    logger.warning("Could not load spawning module, WorldGuard is not installed.")
-                else install(MobzySpawning)
-            }
-
             autoscan(classLoader, "com.mineinabyss.mobzy") {
                 all()
                 subClassesOf<PathfinderComponent>()
@@ -51,11 +48,8 @@ class MobzyPlugin : JavaPlugin() {
         }
     }
 
-    inline fun actions(run: ActionScope.() -> Unit) {
-        ActionScope().apply(run)
-    }
-
     override fun onEnable() = actions {
+        MobzyFeatureManager(this@MobzyPlugin).enable()
         MobzyCommands()
 
         listeners(
@@ -74,6 +68,10 @@ class MobzyPlugin : JavaPlugin() {
         )
     }
 
+    override fun onDisable() {
+        super.onDisable()
+    }
+
     fun createMobzyContext() {
         DI.remove<MobzyModule>()
         DI.add<MobzyModule>(object : MobzyModule {
@@ -81,4 +79,12 @@ class MobzyPlugin : JavaPlugin() {
             override val config: MobzyConfig by config("config", dataFolder.toPath(), MobzyConfig())
         })
     }
+
+    class MobzyContext(override val plugin: JavaPlugin) : FeatureDSL() {
+        override val features: List<Feature> = buildList {
+            if (mobzy.config.doMobSpawns) add(MobzySpawnFeature())
+        }
+    }
+
+    class MobzyFeatureManager(val plugin: JavaPlugin) : FeatureManager<MobzyContext>({ MobzyContext(plugin) })
 }
