@@ -84,7 +84,7 @@ class SpawnInfo(
     companion object {
         //TODO perhaps give normal mobs prefab keys too to make this more type safe
         fun categorizeByType(mobs: Collection<Entity>): Map<PrefabKey?, Int> =
-            mobs.groupingBy { it.toGeary().prefabs.first().get<PrefabKey>() }.eachCount()
+            mobs.groupingBy { it.toGeary().prefabs.firstOrNull()?.get<PrefabKey>() }.eachCount()
     }
 }
 
