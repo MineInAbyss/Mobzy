@@ -66,6 +66,12 @@ class MobzyPlugin : JavaPlugin() {
         geary.pipeline.addSystems(
             CopyNBTSystem(),
         )
+
+        geary {
+            if (Plugins.isEnabled("ModelEngine")) {
+                install(ModelEngineSupport)
+            }
+        }
     }
 
     override fun onDisable() {
