@@ -49,7 +49,6 @@ class SpawnTask {
 
     fun startTask() {
         if (runningTask != null) return
-        // TODO Switch back to async when we fix geary async access
         runningTask = mobzy.plugin.launch(mobzy.plugin.asyncDispatcher) {
             while (mobzy.config.doMobSpawns) {
                 try {
