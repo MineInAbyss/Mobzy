@@ -32,7 +32,7 @@ class Sounds(
     val splash: Sound? = null,
     val swim: Sound? = null,
     @Serializable(with = DurationSerializer::class)
-    val ambientRate: Duration = 10.seconds,
+    val ambientRate: Duration = 15.seconds,
 ) {
     val ambientChance: Double = 1.ticks / ambientRate
 
