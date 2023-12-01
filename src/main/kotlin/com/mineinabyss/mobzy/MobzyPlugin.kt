@@ -16,6 +16,7 @@ import com.mineinabyss.mobzy.features.deathloot.DeathLootSystem
 import com.mineinabyss.mobzy.features.despawning.RemoveOnChunkUnloadSystem
 import com.mineinabyss.mobzy.features.displayname.ShowDisplayNameOnKillerSystem
 import com.mineinabyss.mobzy.features.nointeractions.DisableMobInteractionsSystem
+import com.mineinabyss.mobzy.features.nointeractions.DisableRightClickSystem
 import com.mineinabyss.mobzy.features.riding.PreventRidingSystem
 import com.mineinabyss.mobzy.features.sounds.OverrideMobSoundsSystem
 import com.mineinabyss.mobzy.features.taming.TamableListener
@@ -60,6 +61,7 @@ class MobzyPlugin : JavaPlugin() {
             TamableListener(),
             PreventRidingSystem(),
             DisableMobInteractionsSystem(),
+            DisableRightClickSystem(),
             OverrideMobSoundsSystem(),
         )
 
