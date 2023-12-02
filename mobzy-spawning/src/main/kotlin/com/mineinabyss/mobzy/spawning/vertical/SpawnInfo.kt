@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
+import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.geary.prefabs.helpers.prefabs
 import com.mineinabyss.idofront.location.down
@@ -84,7 +85,7 @@ class SpawnInfo(
     companion object {
         //TODO perhaps give normal mobs prefab keys too to make this more type safe
         fun categorizeByType(mobs: Collection<Entity>): Map<PrefabKey?, Int> =
-            mobs.groupingBy { it.toGeary().prefabs.firstOrNull()?.get<PrefabKey>() }.eachCount()
+            mobs.groupingBy { it.toGearyOrNull()?.prefabs?.firstOrNull()?.get<PrefabKey>() }.eachCount()
     }
 }
 
