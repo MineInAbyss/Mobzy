@@ -29,5 +29,5 @@ class CapFull : CheckingListener() {
     val Pointers.spawnInfo by get<SpawnInfo>().on(event)
 
     override fun Pointers.check(): Boolean =
-        (spawnInfo.localTypes[spawnType.prefab] ?: 0) < conf.max
+        spawnInfo.nearbyEntities(spawnType.prefab, conf.radius) < conf.max
 }
