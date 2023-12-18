@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.geary.autoscan.autoscan
 import com.mineinabyss.geary.modules.geary
 import com.mineinabyss.idofront.config.config
@@ -24,6 +25,7 @@ import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import com.mineinabyss.mobzy.spawning.MobzySpawnFeature
 import com.mineinabyss.mobzy.spawning.WorldGuardSpawnFlags
+import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -78,6 +80,7 @@ class MobzyPlugin : JavaPlugin() {
 
     override fun onDisable() {
         super.onDisable()
+        minecraftDispatcher.cancel()
     }
 
     fun createMobzyContext() {

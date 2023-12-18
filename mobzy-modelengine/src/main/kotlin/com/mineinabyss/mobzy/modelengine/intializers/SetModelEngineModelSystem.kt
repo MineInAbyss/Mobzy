@@ -9,6 +9,7 @@ import com.mineinabyss.mobzy.mobzy
 import com.ticxo.modelengine.api.ModelEngineAPI
 import kotlinx.coroutines.yield
 import org.bukkit.Color
+import com.ticxo.modelengine.api.utils.data.io.SavedData as ModelEngineSaveData
 
 class SetModelEngineModelSystem : GearyListener() {
     val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
@@ -20,6 +21,10 @@ class SetModelEngineModelSystem : GearyListener() {
         mobzy.plugin.launch {
             yield() // Wait till next tick so some entity stuff gets initialized
             if (bukkit.isDead) return@launch
+
+            // MEG persists models by default, this ensures any geary entities are handling models on their own
+            if (bukkit.persistentDataContainer.has(ModelEngineSaveData.DATA_KEY))
+                bukkit.persistentDataContainer.remove(ModelEngineSaveData.DATA_KEY)
             val modelEntity = ModelEngineAPI.getOrCreateModeledEntity(bukkit)
             val blueprint =
                 ModelEngineAPI.getBlueprint(model.modelId) ?: error("No blueprint registered for ${model.modelId}")
@@ -32,7 +37,8 @@ class SetModelEngineModelSystem : GearyListener() {
             }
 
             modelEntity.apply {
-                addModel(createdModel, true)
+                setSaved(false)
+                addModel(createdModel, true).ifPresent { it.destroy() }
                 this.base.maxStepHeight = model.stepHeight
                 isBaseEntityVisible = !model.invisible
                 base.bodyRotationController.rotationDuration = 20

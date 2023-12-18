@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.net.URI
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -54,7 +53,6 @@ dependencies {
     compileOnly(libs.kotlinx.coroutines)
     compileOnly(libs.minecraft.mccoroutine)
     compileOnly(libs.idofront.di)
-    compileOnly(libs.minecraft.plugin.modelengine)
 
     // Shaded
     api(project(":mobzy-pathfinding"))

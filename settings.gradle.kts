@@ -26,6 +26,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             from("com.mineinabyss:catalog:$idofrontVersion")
+            version("modelengine", "R4.0.4")
         }
         create("myLibs").from(files("gradle/myLibs.versions.toml"))
     }
