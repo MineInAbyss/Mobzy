@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.initializers
+package com.mineinabyss.mobzy.features.initializers.projectile
 
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener

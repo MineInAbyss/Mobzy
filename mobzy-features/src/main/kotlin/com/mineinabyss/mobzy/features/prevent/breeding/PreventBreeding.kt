@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.breeding
+package com.mineinabyss.mobzy.features.prevent.breeding
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
  * Removes vanilla breeding behaviour on mobs
  */
 @Serializable
-@SerialName("mobzy:prevent_breeding")
+@SerialName("mobzy:prevent.breeding")
 class PreventBreeding

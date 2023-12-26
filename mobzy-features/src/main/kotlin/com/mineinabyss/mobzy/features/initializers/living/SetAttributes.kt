@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.initializers
+package com.mineinabyss.mobzy.features.initializers.living
 
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener
@@ -17,7 +17,6 @@ import org.bukkit.entity.LivingEntity
 data class SetMobAttributes(
     val width: Float? = null,
     val height: Float? = null,
-    val fireImmune: Boolean = false,
     val armor: Double? = null,
     val armorToughness: Double? = null,
     val attackDamage: Double? = null,
@@ -29,10 +28,9 @@ data class SetMobAttributes(
     val knockbackResistance: Double? = null,
     val luck: Double? = null,
     val maxHealth: Double? = null,
-    val movementSpeed: Double? = 0.25,
+    val movementSpeed: Double? = null,
     val spawnReinforcements: Double? = null
-) {
-}
+)
 
 @AutoScan
 class SetMobAttributesSystem : GearyListener() {

@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.initializers
+package com.mineinabyss.mobzy.features.initializers.living
 
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener
@@ -8,17 +8,18 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.LivingEntity
 
+@JvmInline
 @Serializable
-@SerialName("mobzy:set.can_pickup_items")
-class SetCanPickupItems(val value: Boolean)
+@SerialName("mobzy:set.collidable")
+value class SetCollidable(val value: Boolean = true)
 
 @AutoScan
-class SetCanPickupItemsSystem : GearyListener() {
-    private val Pointers.pickup by get<SetCanPickupItems>().whenSetOnTarget()
+class SetCollidableSystem : GearyListener() {
+    private val Pointers.collidable by get<SetCollidable>().whenSetOnTarget()
     private val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
+
     override fun Pointers.handle() {
-        when (val mob = bukkit) {
-            is LivingEntity -> mob.canPickupItems = pickup.value
-        }
+        val entity = (bukkit as? LivingEntity) ?: return
+        entity.isCollidable = collidable.value
     }
 }

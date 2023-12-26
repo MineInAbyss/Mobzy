@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.features.deathloot
 
 import com.mineinabyss.geary.helpers.with
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
-import com.mineinabyss.mobzy.features.deathloot.components.DeathLoot
 import net.minecraft.world.entity.Saddleable
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment

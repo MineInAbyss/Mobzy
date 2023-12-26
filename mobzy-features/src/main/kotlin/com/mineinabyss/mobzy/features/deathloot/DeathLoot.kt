@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.deathloot.components
+package com.mineinabyss.mobzy.features.deathloot
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

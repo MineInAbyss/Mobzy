@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.initializers
+package com.mineinabyss.mobzy.features.initializers.living
 
 import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.Pointers

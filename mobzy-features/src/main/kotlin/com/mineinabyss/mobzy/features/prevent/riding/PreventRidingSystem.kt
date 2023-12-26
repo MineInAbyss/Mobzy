@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.riding
+package com.mineinabyss.mobzy.features.prevent.riding
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import org.bukkit.event.EventHandler

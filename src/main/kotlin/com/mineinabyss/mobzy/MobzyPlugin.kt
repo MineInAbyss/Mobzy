@@ -11,14 +11,14 @@ import com.mineinabyss.idofront.features.FeatureManager
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
 import com.mineinabyss.idofront.plugin.listeners
-import com.mineinabyss.mobzy.features.breeding.PreventBreedingSystem
 import com.mineinabyss.mobzy.features.copynbt.CopyNBTSystem
 import com.mineinabyss.mobzy.features.deathloot.DeathLootSystem
 import com.mineinabyss.mobzy.features.despawning.RemoveOnChunkUnloadSystem
 import com.mineinabyss.mobzy.features.displayname.ShowDisplayNameOnKillerSystem
-import com.mineinabyss.mobzy.features.nointeractions.DisableMobInteractionsSystem
-import com.mineinabyss.mobzy.features.nointeractions.DisableRightClickSystem
-import com.mineinabyss.mobzy.features.riding.PreventRidingSystem
+import com.mineinabyss.mobzy.features.prevent.breeding.PreventBreedingSystem
+import com.mineinabyss.mobzy.features.prevent.interaction.PreventInteractionSystem
+import com.mineinabyss.mobzy.features.prevent.regen.PreventRegenerationSystem
+import com.mineinabyss.mobzy.features.prevent.riding.PreventRidingSystem
 import com.mineinabyss.mobzy.features.sounds.OverrideMobSoundsSystem
 import com.mineinabyss.mobzy.features.taming.TamableListener
 import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
@@ -62,8 +62,8 @@ class MobzyPlugin : JavaPlugin() {
             ShowDisplayNameOnKillerSystem(),
             TamableListener(),
             PreventRidingSystem(),
-            DisableMobInteractionsSystem(),
-            DisableRightClickSystem(),
+            PreventRegenerationSystem(),
+            PreventInteractionSystem(),
             OverrideMobSoundsSystem(),
         )
 

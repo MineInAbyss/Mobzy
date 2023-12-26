@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.initializers
+package com.mineinabyss.mobzy.features.initializers.living
 
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.systems.GearyListener
@@ -9,13 +9,11 @@ import kotlinx.serialization.Serializable
 import org.bukkit.entity.LivingEntity
 
 /**
- * > mobzy:remove_when_far_away
- *
  * Specifies this entity should get removed when it is far away from any player.
  */
 @Serializable
-@SerialName("mobzy:remove_when_far_away")
-class SetRemoveWhenFarAway(val value: Boolean)
+@SerialName("mobzy:set.remove_when_far_away")
+class SetRemoveWhenFarAway(val value: Boolean = true)
 
 @AutoScan
 class SetRemoveWhenFarAwaySystem : GearyListener() {

@@ -12,19 +12,15 @@ import org.bukkit.entity.Zombie
 
 @JvmInline
 @Serializable
-@SerialName("mobzy:set.burn_in_day")
-value class SetBurnInDay(val value: Boolean = true)
+@SerialName("mobzy:set.always_show_name")
+value class SetAlwaysShowName(val value: Boolean = true)
 
 @AutoScan
-class SetBurnInDaySystem : GearyListener() {
-    private val Pointers.burn by get<SetBurnInDay>().whenSetOnTarget()
+class SetAlwaysShowNameSystem : GearyListener() {
+    private val Pointers.visibility by get<SetAlwaysShowName>().whenSetOnTarget()
     private val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
 
     override fun Pointers.handle() {
-        when (val mob = bukkit) {
-            is Phantom -> mob.setShouldBurnInDay(burn.value)
-            is AbstractSkeleton -> mob.setShouldBurnInDay(burn.value)
-            is Zombie -> mob.setShouldBurnInDay(burn.value)
-        }
+        bukkit.isCustomNameVisible = visibility.value
     }
 }

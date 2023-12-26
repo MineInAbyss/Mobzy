@@ -7,7 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("mobzy:set.modelengine-model")
+@SerialName("mobzy:set.modelengine_model")
 class SetModelEngineModel(
     val modelId: String,
 //    val hitbox: Boolean = true,
