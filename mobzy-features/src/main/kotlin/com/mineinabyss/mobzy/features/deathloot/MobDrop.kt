@@ -17,8 +17,7 @@ import kotlin.random.Random
  * @param cooked The cooked version of this item.
  * @param cookExp The amount of exp to drop when this item is cooked.
  * @param cookTime How long it takes for this item to cook
- * @param minAmount The minimum stack size of this item.
- * @param maxAmount The maximum stack size of this item.
+ * @param amount A range for the stack size of this item.
  * @param dropChance A chance from 0 to 1 for this item to be dropped.
  *
  */
@@ -38,7 +37,7 @@ data class MobDrop(
 
         val lootingMaxAmount: Int =
             if (dropChance >= 0.5)
-                (amount.first + lootingLevel * Random.nextDouble()).roundToInt()
+                (amount.last + lootingLevel * Random.nextDouble()).roundToInt()
             else amount.last
 
         val lootingDropChance =
@@ -53,7 +52,7 @@ data class MobDrop(
                 else item.toItemStack()
             drop.amount =
                 if (lootingMaxAmount <= amount.first) amount.first
-                else Random.nextInt(amount.last, lootingMaxAmount)
+                else Random.nextInt(amount.first, lootingMaxAmount)
             drop
         } else null
     }
