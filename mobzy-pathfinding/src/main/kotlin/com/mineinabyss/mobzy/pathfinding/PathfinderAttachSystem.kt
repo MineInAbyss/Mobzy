@@ -40,17 +40,17 @@ class PathfinderAttachSystem : GearyListener() {
             }
         }
 
-        targets?.forEach { (priority, component) ->
+        targets?.forEachIndexed { priority, component ->
             runCatching {
-                nmsMob.addTargetSelector(priority.toInt(), component)
+                nmsMob.addTargetSelector(component.preferredPriority ?: priority, component)
                 entity.set(component)
             }.onFailure {
                 it.printStackTrace()
             }
         }
 
-        goals?.forEach { (priority, component) ->
-            nmsMob.addPathfinderGoal(priority.toInt(), component)
+        goals?.forEachIndexed { priority, component ->
+            nmsMob.addPathfinderGoal(component.preferredPriority ?: priority, component)
             entity.set(component)
         }
     }

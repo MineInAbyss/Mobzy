@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.pathfinding.components
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.minecraft.world.entity.ai.goal.Goal
 import org.bukkit.entity.Mob
@@ -10,6 +11,9 @@ import org.bukkit.entity.Mob
  */
 @Serializable
 abstract class PathfinderComponent {
+    @SerialName("priority")
+    val preferredPriority: Int? = null
+
     /** @return A new [Goal] for this [mob]. */
     abstract fun build(mob: Mob): Goal
 }

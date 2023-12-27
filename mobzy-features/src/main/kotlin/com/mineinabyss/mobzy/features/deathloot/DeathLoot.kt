@@ -1,9 +1,10 @@
 package com.mineinabyss.mobzy.features.deathloot
 
+import com.mineinabyss.idofront.serialization.IntRangeSerializer
+import com.mineinabyss.idofront.util.randomOrMin
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
-import kotlin.random.Random
 
 /**
  * A component for loot that should drop on entity death.
@@ -16,8 +17,7 @@ import kotlin.random.Random
 @Serializable
 @SerialName("mobzy:death_loot")
 class DeathLoot(
-    val minExp: Int? = null,
-    val maxExp: Int? = null,
+    val exp: @Serializable(with = IntRangeSerializer::class) IntRange? = null,
     val deathCommands: List<String> = listOf(),
     val drops: List<MobDrop> = listOf(),
     val ignoredCauses: List<DamageCause> = listOf(
@@ -29,11 +29,5 @@ class DeathLoot(
     ),
 ) {
     /** Helper function for randomly picking some amount of exp to drop. */
-    fun expToDrop(): Int? {
-        return when {
-            minExp == null || maxExp == null -> null
-            maxExp <= minExp -> minExp
-            else -> Random.nextInt(minExp, maxExp)
-        }
-    }
+    fun expToDrop(): Int? = exp?.randomOrMin()
 }

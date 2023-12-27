@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy.features.deathloot
 
+import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import kotlinx.serialization.Serializable
 import org.bukkit.inventory.ItemStack
@@ -27,8 +28,7 @@ data class MobDrop(
     val cooked: SerializableItemStack? = null,
     val cookExp: Float = 0f,
     val cookTime: Int = 200,
-    val minAmount: Int = 1,
-    val maxAmount: Int = 1,
+    val amount: @Serializable(with = IntRangeSerializer::class) IntRange = 1..1,
     val dropChance: Double = 1.0
 ) {
     /** @return The amount of items to be dropped, or null if the drop does not succeed */
@@ -38,8 +38,8 @@ data class MobDrop(
 
         val lootingMaxAmount: Int =
             if (dropChance >= 0.5)
-                (maxAmount + lootingLevel * Random.nextDouble()).roundToInt()
-            else maxAmount
+                (amount.first + lootingLevel * Random.nextDouble()).roundToInt()
+            else amount.last
 
         val lootingDropChance =
             if (dropChance >= 0.10)
@@ -52,8 +52,8 @@ data class MobDrop(
                     cooked.toItemStack()
                 else item.toItemStack()
             drop.amount =
-                if (lootingMaxAmount <= minAmount) minAmount
-                else Random.nextInt(minAmount, lootingMaxAmount)
+                if (lootingMaxAmount <= amount.first) amount.first
+                else Random.nextInt(amount.last, lootingMaxAmount)
             drop
         } else null
     }
