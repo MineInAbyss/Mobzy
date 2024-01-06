@@ -2,7 +2,6 @@ package com.mineinabyss.mobzy.spawning.vertical
 
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.prefabs.PrefabKey
-import com.mineinabyss.geary.prefabs.helpers.prefabs
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
 import com.mineinabyss.mobzy.spawning.SpawnPosition

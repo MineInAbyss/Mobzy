@@ -5,6 +5,7 @@ pluginManagement {
         gradlePluginPortal()
         maven("https://repo.mineinabyss.com/releases")
         google()
+        mavenLocal()
     }
 
     val idofrontVersion: String by settings
@@ -21,6 +22,7 @@ dependencyResolutionManagement {
 
     repositories {
         maven("https://repo.mineinabyss.com/releases")
+        mavenLocal()
     }
 
     versionCatalogs {

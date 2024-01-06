@@ -32,6 +32,7 @@ allprojects {
         maven("https://maven.enginehub.org/repo/") //WorldGuard/Edit
         maven("https://mvn.lumine.io/repository/maven-public/")
         maven("https://jitpack.io")
+        mavenLocal()
     }
 
     dependencies {

@@ -1,8 +1,9 @@
-package com.mineinabyss.mobzy.features.deathloot
+package com.mineinabyss.mobzy.features.drops
 
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.serialization.SerializableItemStack
 import kotlinx.serialization.Serializable
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.inventory.ItemStack
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -22,17 +23,26 @@ import kotlin.random.Random
  *
  */
 @Serializable
-data class MobDrop(
-    val item: SerializableItemStack,
+data class Drop(
+    val exp: @Serializable(with = IntRangeSerializer::class) IntRange? = null,
+    val item: SerializableItemStack? = null,
     val cooked: SerializableItemStack? = null,
     val cookExp: Float = 0f,
     val cookTime: Int = 200,
     val amount: @Serializable(with = IntRangeSerializer::class) IntRange = 1..1,
-    val dropChance: Double = 1.0
+    val dropChance: Double = 1.0,
+    val ignoredCauses: List<DamageCause> = listOf(
+        DamageCause.SUFFOCATION,
+        DamageCause.DROWNING,
+        DamageCause.DRYOUT,
+        DamageCause.CRAMMING,
+        DamageCause.FALL
+    ),
 ) {
     /** @return The amount of items to be dropped, or null if the drop does not succeed */
     // TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.
     fun chooseDrop(lootingLevel: Int, fire: Boolean): ItemStack? {
+        if(item == null) return null
         val lootingPercent = lootingLevel / 100.0
 
         val lootingMaxAmount: Int =
