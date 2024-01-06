@@ -12,9 +12,9 @@ import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
 import com.mineinabyss.idofront.plugin.listeners
 import com.mineinabyss.mobzy.features.copynbt.CopyNBTSystem
-import com.mineinabyss.mobzy.features.deathloot.DeathLootSystem
 import com.mineinabyss.mobzy.features.despawning.RemoveOnChunkUnloadSystem
 import com.mineinabyss.mobzy.features.displayname.ShowDisplayNameOnKillerSystem
+import com.mineinabyss.mobzy.features.drops.DropsSystem
 import com.mineinabyss.mobzy.features.prevent.breeding.PreventBreedingSystem
 import com.mineinabyss.mobzy.features.prevent.interaction.PreventInteractionSystem
 import com.mineinabyss.mobzy.features.prevent.regen.PreventRegenerationSystem
@@ -57,7 +57,6 @@ class MobzyPlugin : JavaPlugin() {
 
         listeners(
             PreventBreedingSystem(),
-            DeathLootSystem(),
             RemoveOnChunkUnloadSystem(),
             ShowDisplayNameOnKillerSystem(),
             TamableListener(),
@@ -69,6 +68,7 @@ class MobzyPlugin : JavaPlugin() {
 
         geary.pipeline.addSystems(
             CopyNBTSystem(),
+            DropsSystem(),
         )
 
         geary {

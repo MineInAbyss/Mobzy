@@ -1,6 +1,6 @@
 package com.mineinabyss.mobzy.pathfinding.components
 
-import com.mineinabyss.geary.prefabs.serializers.PolymorphicListAsMapSerializer
+import com.mineinabyss.geary.serialization.serializers.PolymorphicListAsMapSerializer
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
