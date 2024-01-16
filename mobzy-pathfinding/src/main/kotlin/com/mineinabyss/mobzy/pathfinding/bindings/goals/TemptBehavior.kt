@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.goal.TemptGoal
 import net.minecraft.world.item.crafting.Ingredient
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.entity.Mob
 import org.bukkit.inventory.ItemStack
 
