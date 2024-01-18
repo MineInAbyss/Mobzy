@@ -28,7 +28,7 @@ class SpawnRegistry {
     fun reloadSpawns() {
         unregisterSpawns()
         spawnConfigsQuery.matchedEntities.forEach {
-            prefabLoader.reread(it)
+            prefabLoader.reload(it)
         }
     }
 
