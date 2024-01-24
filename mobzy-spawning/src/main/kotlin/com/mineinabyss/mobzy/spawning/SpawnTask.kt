@@ -6,6 +6,8 @@ import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.geary.components.RequestCheck
 import com.mineinabyss.geary.components.events.FailedCheck
 import com.mineinabyss.geary.datatypes.GearyEntity
+import com.mineinabyss.geary.papermc.bridge.config.inputs.Input
+import com.mineinabyss.geary.papermc.bridge.config.inputs.Variables
 import com.mineinabyss.idofront.time.inWholeTicks
 import com.mineinabyss.mobzy.*
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
@@ -108,7 +110,11 @@ class SpawnTask {
                     val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
                     val success = choice.callEvent({
                         set(spawnInfo)
-                        set(spawnCheckLoc)
+                        set(
+                            Variables.Evaluated(
+                                entries = mapOf("location" to Input.of(spawnCheckLoc))
+                            )
+                        )
                         add<RequestCheck>()
                     }) { !it.has<FailedCheck>() }
                     if (success) {
