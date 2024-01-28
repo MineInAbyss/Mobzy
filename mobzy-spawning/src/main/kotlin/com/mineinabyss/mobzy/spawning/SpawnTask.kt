@@ -6,6 +6,7 @@ import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.geary.components.RequestCheck
 import com.mineinabyss.geary.components.events.FailedCheck
 import com.mineinabyss.geary.datatypes.GearyEntity
+import com.mineinabyss.geary.helpers.temporaryEntity
 import com.mineinabyss.geary.papermc.bridge.config.inputs.Input
 import com.mineinabyss.geary.papermc.bridge.config.inputs.Variables
 import com.mineinabyss.idofront.time.inWholeTicks
@@ -108,15 +109,17 @@ class SpawnTask {
                     //TODO this should be immutable but bukkit doesn't have an immutable location!
                     val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
                     val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
-                    val success = choice.callEvent({
-                        set(spawnInfo)
-                        set(
-                            Variables.Evaluated(
-                                entries = mapOf("location" to Input.of(spawnCheckLoc))
+                    val success = temporaryEntity { target -> //TODO should just pass null for target
+                        target.callEvent(init = {
+                            set(spawnInfo)
+                            set(
+                                Variables.Evaluated(
+                                    entries = mapOf("location" to Input.of(spawnCheckLoc))
+                                )
                             )
-                        )
-                        add<RequestCheck>()
-                    }) { !it.has<FailedCheck>() }
+                            add<RequestCheck>()
+                        }, source = choice) { !it.has<FailedCheck>() }
+                    }
                     if (success) {
                         // Must spawn mobs on main thread
                         if (mobzy.plugin.isEnabled) choice.callEvent(spawnInfo, DoSpawn(spawnLoc))
