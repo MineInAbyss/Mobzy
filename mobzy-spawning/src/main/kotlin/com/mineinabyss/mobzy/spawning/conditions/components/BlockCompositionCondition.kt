@@ -23,7 +23,7 @@ class BlockComposition(
 
 @AutoScan
 class BlockCompositionCondition : CheckingListener() {
-    private val Pointers.blockComposition by get<BlockComposition>().on(target)
+    private val Pointers.blockComposition by get<BlockComposition>().on(source)
     val Pointers.spawnInfo by get<SpawnInfo>().on(event)
 
     override fun Pointers.check(): Boolean =

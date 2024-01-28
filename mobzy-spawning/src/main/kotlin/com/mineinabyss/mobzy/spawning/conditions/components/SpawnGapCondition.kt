@@ -22,7 +22,7 @@ class SpawnGap(
 
 @AutoScan
 class SpawnGapCondition : CheckingListener() {
-    private val Pointers.spawnGap by get<SpawnGap>().on(target)
+    private val Pointers.spawnGap by get<SpawnGap>().on(source)
 
     private val Pointers.spawnInfo by get<SpawnInfo>().on(event)
 

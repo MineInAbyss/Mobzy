@@ -23,8 +23,8 @@ class LocalGroupConditions(
 
 @AutoScan
 class CapFull : CheckingListener() {
-    val Pointers.conf by get<LocalGroupConditions>().on(target)
-    val Pointers.spawnType by get<SpawnType>().on(target)
+    val Pointers.conf by get<LocalGroupConditions>().on(source)
+    val Pointers.spawnType by get<SpawnType>().on(source)
 
     val Pointers.spawnInfo by get<SpawnInfo>().on(event)
 

@@ -19,8 +19,7 @@ class SpawnDelay(
 
 @AutoScan
 class SpawnDelayCondition : CheckingListener() {
-
-    private val Pointers.delay by get<SpawnDelay>().on(target)
+    private val Pointers.delay by get<SpawnDelay>().on(source)
 
     override fun Pointers.check(): Boolean {
         val iterationMod = (delay.attemptEvery / mobzySpawning.config.spawnTaskDelay)
