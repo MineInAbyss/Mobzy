@@ -29,6 +29,12 @@ class SetModelEngineModelSystem : GearyListener() {
             val blueprint =
                 ModelEngineAPI.getBlueprint(model.modelId) ?: error("No blueprint registered for ${model.modelId}")
 
+            // Clear any old models
+            modelEntity.models.toList().forEach { (key, value) ->
+                modelEntity.removeModel(key)
+                value.destroy()
+            }
+
             val createdModel = ModelEngineAPI.createActiveModel(blueprint).apply {
                 if (model.damageTint) damageTint = Color.RED
                 val scale = model.scale.randomOrMin()
@@ -60,7 +66,6 @@ class SetModelEngineModelSystem : GearyListener() {
                         data.blockedCullIgnoreRadius = it.ignoreRadius
                     }
                 }
-
             }
         }
     }
