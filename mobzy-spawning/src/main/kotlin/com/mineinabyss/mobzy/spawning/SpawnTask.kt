@@ -3,6 +3,7 @@ package com.mineinabyss.mobzy.spawning
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
+import com.mineinabyss.geary.components.KeepArchetype
 import com.mineinabyss.geary.components.RequestCheck
 import com.mineinabyss.geary.components.events.FailedCheck
 import com.mineinabyss.geary.datatypes.GearyEntity
@@ -110,7 +111,9 @@ class SpawnTask {
                     val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
                     val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
                     val success = temporaryEntity { target -> //TODO should just pass null for target
+                        target.add<KeepArchetype>()
                         target.callEvent(init = {
+                            add<KeepArchetype>()
                             set(spawnInfo)
                             set(
                                 Variables.Evaluated(
