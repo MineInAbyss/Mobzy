@@ -1,5 +1,8 @@
 package com.mineinabyss.mobzy.pathfinding.components
 
+import com.mineinabyss.geary.datatypes.ComponentDefinition
+import com.mineinabyss.geary.papermc.bridge.events.EventHelpers
+import com.mineinabyss.geary.papermc.bridge.events.entities.OnSpawn
 import com.mineinabyss.geary.serialization.serializers.PolymorphicListAsMapSerializer
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
@@ -19,4 +22,6 @@ data class Pathfinders(
     val goals: @Serializable(with = PolymorphicListAsMapSerializer::class) List<@Polymorphic PathfinderComponent>? = null,
     val noLookControl: Boolean = false,
     val override: Boolean = true,
-)
+) {
+    companion object : ComponentDefinition by EventHelpers.defaultTo<OnSpawn>()
+}

@@ -1,7 +1,6 @@
 package com.mineinabyss.mobzy.spawning
 
 import com.mineinabyss.geary.modules.geary
-import com.mineinabyss.idofront.config.IdofrontConfig
 import com.mineinabyss.idofront.config.config
 import com.mineinabyss.idofront.di.DI
 import com.mineinabyss.idofront.features.Configurable
@@ -12,8 +11,8 @@ import com.mineinabyss.mobzy.mobzy
 
 val mobzySpawning by DI.observe<MobzySpawnFeature.Context>()
 
-class MobzySpawnFeature: FeatureWithContext<MobzySpawnFeature.Context>(::Context) {
-    class Context: Configurable<SpawnConfig> {
+class MobzySpawnFeature : FeatureWithContext<MobzySpawnFeature.Context>(::Context) {
+    class Context : Configurable<SpawnConfig> {
         override val configManager = config("spawning", mobzy.plugin.dataFolder.toPath(), SpawnConfig())
         val spawnTask = SpawnTask()
         val spawnRegistry = SpawnRegistry()
@@ -26,7 +25,6 @@ class MobzySpawnFeature: FeatureWithContext<MobzySpawnFeature.Context>(::Context
         DI.add<MobzySpawnFeature>(this@MobzySpawnFeature)
         "Spawns" {
             !"Load spawns" {
-                geary.pipeline.addSystem(context.spawnRegistry.SpawnTracker())
                 context.spawnRegistry.reloadSpawns()
             }
             !"Start spawn task" {

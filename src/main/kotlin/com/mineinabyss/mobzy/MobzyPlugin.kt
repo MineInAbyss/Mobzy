@@ -11,16 +11,14 @@ import com.mineinabyss.idofront.features.FeatureManager
 import com.mineinabyss.idofront.plugin.Plugins
 import com.mineinabyss.idofront.plugin.actions
 import com.mineinabyss.idofront.plugin.listeners
-import com.mineinabyss.mobzy.features.copynbt.CopyNBTSystem
 import com.mineinabyss.mobzy.features.despawning.RemoveOnChunkUnloadSystem
 import com.mineinabyss.mobzy.features.displayname.ShowDisplayNameOnKillerSystem
-import com.mineinabyss.mobzy.features.drops.DropsSystem
 import com.mineinabyss.mobzy.features.prevent.breeding.PreventBreedingSystem
 import com.mineinabyss.mobzy.features.prevent.interaction.PreventInteractionSystem
 import com.mineinabyss.mobzy.features.prevent.regen.PreventRegenerationSystem
 import com.mineinabyss.mobzy.features.prevent.riding.PreventRidingSystem
-import com.mineinabyss.mobzy.features.sounds.OverrideMobSoundsSystem
-import com.mineinabyss.mobzy.features.taming.TamableListener
+import com.mineinabyss.mobzy.features.sounds.OverrideMobSoundsBukkitListener
+import com.mineinabyss.mobzy.features.taming.TamingBukkitListener
 import com.mineinabyss.mobzy.modelengine.ModelEngineSupport
 import com.mineinabyss.mobzy.pathfinding.components.PathfinderComponent
 import com.mineinabyss.mobzy.spawning.MobzySpawnFeature
@@ -59,16 +57,11 @@ class MobzyPlugin : JavaPlugin() {
             PreventBreedingSystem(),
             RemoveOnChunkUnloadSystem(),
             ShowDisplayNameOnKillerSystem(),
-            TamableListener(),
+            TamingBukkitListener(),
             PreventRidingSystem(),
             PreventRegenerationSystem(),
             PreventInteractionSystem(),
-            OverrideMobSoundsSystem(),
-        )
-
-        geary.pipeline.addSystems(
-            CopyNBTSystem(),
-            DropsSystem(),
+            OverrideMobSoundsBukkitListener(),
         )
 
         geary {

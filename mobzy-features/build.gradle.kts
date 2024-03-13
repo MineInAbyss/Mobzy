@@ -7,12 +7,12 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.kotlinx.serialization.json)
-    compileOnly(libs.kotlinx.serialization.kaml)
-    compileOnly(libs.kotlinx.coroutines)
-    compileOnly(libs.minecraft.mccoroutine)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
+    compileOnly(idofrontLibs.kotlinx.serialization.kaml)
+    compileOnly(idofrontLibs.kotlinx.coroutines)
+    compileOnly(idofrontLibs.minecraft.mccoroutine)
 
-    compileOnly(libs.minecraft.plugin.protocollib)
+    compileOnly(idofrontLibs.minecraft.plugin.protocollib)
 
     compileOnly(project(":mobzy-core"))
 }

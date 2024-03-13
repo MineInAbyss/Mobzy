@@ -7,15 +7,15 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.minecraft.mccoroutine)
-    compileOnly(libs.kotlinx.serialization.json)
-    compileOnly(libs.kotlinx.serialization.kaml)
-    compileOnly(libs.kotlinx.coroutines)
-    compileOnly(libs.kotlin.statistics) {
+    compileOnly(idofrontLibs.minecraft.mccoroutine)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
+    compileOnly(idofrontLibs.kotlinx.serialization.kaml)
+    compileOnly(idofrontLibs.kotlinx.coroutines)
+    compileOnly(idofrontLibs.kotlin.statistics) {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    compileOnly(libs.minecraft.plugin.worldguard) { exclude(group = "org.bukkit") }
+    compileOnly(idofrontLibs.minecraft.plugin.worldguard) { exclude(group = "org.bukkit") }
 
     compileOnly(project(":mobzy-core"))
 }

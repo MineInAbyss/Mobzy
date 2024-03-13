@@ -1,8 +1,9 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
 import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.events.CheckingListener
-import com.mineinabyss.geary.systems.accessors.Pointers
+import com.mineinabyss.geary.modules.GearyModule
+import com.mineinabyss.geary.systems.builders.listener
+import com.mineinabyss.geary.systems.query.ListenerQuery
 import com.mineinabyss.idofront.serialization.DurationSerializer
 import com.mineinabyss.mobzy.spawning.GlobalSpawnInfo
 import com.mineinabyss.mobzy.spawning.mobzySpawning
@@ -18,12 +19,10 @@ class SpawnDelay(
 )
 
 @AutoScan
-class SpawnDelayCondition : CheckingListener() {
-    private val Pointers.delay by get<SpawnDelay>().on(source)
-
-    override fun Pointers.check(): Boolean {
-        val iterationMod = (delay.attemptEvery / mobzySpawning.config.spawnTaskDelay)
-            .toInt().coerceAtLeast(1)
-        return GlobalSpawnInfo.iterationNumber % iterationMod == 0
-    }
+fun GearyModule.spawnDelayCondition() = listener(object : ListenerQuery() {
+    val delay by source.get<SpawnDelay>()
+}).check {
+    val iterationMod = (delay.attemptEvery / mobzySpawning.config.spawnTaskDelay)
+        .toInt().coerceAtLeast(1)
+    GlobalSpawnInfo.iterationNumber % iterationMod == 0
 }

@@ -2,14 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(libs.plugins.mia.kotlin.jvm)
-    alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.mia.papermc)
-    alias(libs.plugins.mia.nms)
-    alias(libs.plugins.mia.copyjar)
-    alias(libs.plugins.mia.publication)
-    alias(libs.plugins.mia.testing)
-    alias(libs.plugins.mia.autoversion)
+    alias(idofrontLibs.plugins.mia.kotlin.jvm)
+    alias(idofrontLibs.plugins.kotlinx.serialization)
+    alias(idofrontLibs.plugins.mia.papermc)
+    alias(idofrontLibs.plugins.mia.nms)
+    alias(idofrontLibs.plugins.mia.copyjar)
+    alias(idofrontLibs.plugins.mia.publication)
+    alias(idofrontLibs.plugins.mia.testing)
+    alias(idofrontLibs.plugins.mia.autoversion)
 }
 
 allprojects {
@@ -36,24 +36,24 @@ allprojects {
     }
 
     dependencies {
+        val idofrontLibs = rootProject.idofrontLibs
         val libs = rootProject.libs
-        val myLibs = rootProject.myLibs
 
-        compileOnly(myLibs.geary.papermc)
+        compileOnly(libs.geary.papermc)
 
-        implementation(libs.bundles.idofront.core)
-        implementation(libs.idofront.nms)
+        implementation(idofrontLibs.bundles.idofront.core)
+        implementation(idofrontLibs.idofront.nms)
     }
 }
 
 dependencies {
     // MineInAbyss platform
-    compileOnly(libs.kotlin.stdlib)
-    compileOnly(libs.kotlinx.serialization.json)
-    compileOnly(libs.kotlinx.serialization.kaml)
-    compileOnly(libs.kotlinx.coroutines)
-    compileOnly(libs.minecraft.mccoroutine)
-    compileOnly(libs.idofront.di)
+    compileOnly(idofrontLibs.kotlin.stdlib)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
+    compileOnly(idofrontLibs.kotlinx.serialization.kaml)
+    compileOnly(idofrontLibs.kotlinx.coroutines)
+    compileOnly(idofrontLibs.minecraft.mccoroutine)
+    compileOnly(idofrontLibs.idofront.di)
 
     // Shaded
     api(project(":mobzy-pathfinding"))
@@ -63,8 +63,8 @@ dependencies {
     api(project(":mobzy-modelengine"))
 
     // Testing
-    testImplementation(libs.kotlin.statistics)
-    testImplementation(libs.minecraft.mockbukkit)
-    testImplementation(libs.kotlinx.serialization.json)
-    testImplementation(libs.kotlinx.serialization.kaml)
+    testImplementation(idofrontLibs.kotlin.statistics)
+    testImplementation(idofrontLibs.minecraft.mockbukkit)
+    testImplementation(idofrontLibs.kotlinx.serialization.json)
+    testImplementation(idofrontLibs.kotlinx.serialization.kaml)
 }

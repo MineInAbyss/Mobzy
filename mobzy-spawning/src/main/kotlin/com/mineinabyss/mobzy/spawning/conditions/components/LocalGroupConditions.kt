@@ -1,8 +1,9 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
 import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.events.CheckingListener
-import com.mineinabyss.geary.systems.accessors.Pointers
+import com.mineinabyss.geary.modules.GearyModule
+import com.mineinabyss.geary.systems.builders.listener
+import com.mineinabyss.geary.systems.query.ListenerQuery
 import com.mineinabyss.mobzy.spawning.SpawnType
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
 import kotlinx.serialization.SerialName
@@ -22,12 +23,10 @@ class LocalGroupConditions(
 )
 
 @AutoScan
-class CapFull : CheckingListener() {
-    val Pointers.conf by get<LocalGroupConditions>().on(source)
-    val Pointers.spawnType by get<SpawnType>().on(source)
-
-    val Pointers.spawnInfo by get<SpawnInfo>().on(event)
-
-    override fun Pointers.check(): Boolean =
-        spawnInfo.nearbyEntities(spawnType.prefab, conf.radius) < conf.max
+fun GearyModule.mobCapChecker() = listener(object : ListenerQuery() {
+    val conf by source.get<LocalGroupConditions>()
+    val spawnType by source.get<SpawnType>()
+    val spawnInfo by event.get<SpawnInfo>()
+}).check {
+    spawnInfo.nearbyEntities(spawnType.prefab, conf.radius) < conf.max
 }

@@ -2,10 +2,11 @@ package com.mineinabyss.mobzy.features.initializers.slime
 
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.datatypes.ComponentDefinition
+import com.mineinabyss.geary.modules.GearyModule
 import com.mineinabyss.geary.papermc.bridge.events.EventHelpers
 import com.mineinabyss.geary.papermc.bridge.events.entities.OnSpawn
-import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.Pointers
+import com.mineinabyss.geary.systems.builders.listener
+import com.mineinabyss.geary.systems.query.ListenerQuery
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 import com.mineinabyss.idofront.util.randomOrMin
@@ -21,12 +22,10 @@ value class SetSlimeSize(@Serializable(with = IntRangeSerializer::class) val siz
 }
 
 @AutoScan
-class SetSlimeSizeSystem : GearyListener() {
-    private val Pointers.bukkit by get<BukkitEntity>().on(target)
-    private val Pointers.slimeSize by get<SetSlimeSize>().on(source)
-
-    override fun Pointers.handle() {
-        val slime = (bukkit as? Slime) ?: return
-        slime.size = slimeSize.size.randomOrMin()
-    }
+fun GearyModule.slimeSizeSetter() = listener(object : ListenerQuery() {
+    val bukkit by get<BukkitEntity>()
+    val slimeSize by source.get<SetSlimeSize>()
+}).exec {
+    val slime = (bukkit as? Slime) ?: return@exec
+    slime.size = slimeSize.size.randomOrMin()
 }

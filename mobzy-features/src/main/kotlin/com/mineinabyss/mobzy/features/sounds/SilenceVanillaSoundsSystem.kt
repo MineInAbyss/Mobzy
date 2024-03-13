@@ -1,16 +1,16 @@
 package com.mineinabyss.mobzy.features.sounds
 
 import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.systems.GearyListener
-import com.mineinabyss.geary.systems.accessors.Pointers
+import com.mineinabyss.geary.modules.GearyModule
+import com.mineinabyss.geary.systems.builders.listener
+import com.mineinabyss.geary.systems.query.ListenerQuery
 import com.mineinabyss.idofront.typealiases.BukkitEntity
 
 @AutoScan
-class SilenceVanillaSoundsSystem : GearyListener() {
-    private val Pointers.bukkit by get<BukkitEntity>().whenSetOnTarget()
-    private val Pointers.sounds by get<Sounds>().whenSetOnTarget()
-
-    override fun Pointers.handle() {
-        bukkit.isSilent = true
-    }
+fun GearyModule.createSilenceVanillaSoundsSystem() = listener(object : ListenerQuery() {
+    val bukkit by get<BukkitEntity>()
+    val sounds by get<Sounds>()
+    override fun ensure() = event.anySet(::sounds, ::bukkit)
+}).exec {
+    bukkit.isSilent = true
 }

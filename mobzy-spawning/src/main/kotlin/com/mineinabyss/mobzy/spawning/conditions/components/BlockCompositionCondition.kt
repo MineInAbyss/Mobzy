@@ -1,8 +1,9 @@
 package com.mineinabyss.mobzy.spawning.conditions.components
 
 import com.mineinabyss.geary.autoscan.AutoScan
-import com.mineinabyss.geary.events.CheckingListener
-import com.mineinabyss.geary.systems.accessors.Pointers
+import com.mineinabyss.geary.modules.GearyModule
+import com.mineinabyss.geary.systems.builders.listener
+import com.mineinabyss.geary.systems.query.ListenerQuery
 import com.mineinabyss.idofront.serialization.DoubleRangeSerializer
 import com.mineinabyss.idofront.util.DoubleRange
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
@@ -22,12 +23,11 @@ class BlockComposition(
 )
 
 @AutoScan
-class BlockCompositionCondition : CheckingListener() {
-    private val Pointers.blockComposition by get<BlockComposition>().on(source)
-    val Pointers.spawnInfo by get<SpawnInfo>().on(event)
-
-    override fun Pointers.check(): Boolean =
-        blockComposition.materials.all { (material, range) ->
-            spawnInfo.blockComposition.percent(material) in range
-        }
+fun GearyModule.blockCompositionChecker() = listener(object : ListenerQuery() {
+    val blockComposition by source.get<BlockComposition>()
+    val spawnInfo by event.get<SpawnInfo>()
+}).check {
+    blockComposition.materials.all { (material, range) ->
+        spawnInfo.blockComposition.percent(material) in range
+    }
 }

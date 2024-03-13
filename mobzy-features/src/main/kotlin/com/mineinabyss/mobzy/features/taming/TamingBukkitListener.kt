@@ -6,13 +6,12 @@ import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Tameable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import kotlin.random.Random
 
-class TamableListener : Listener {
+class TamingBukkitListener : Listener {
     /** Tame entities with [Tamable] component on right click */
     @EventHandler
     fun PlayerInteractEntityEvent.tameMob() {

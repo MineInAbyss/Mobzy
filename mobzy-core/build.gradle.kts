@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
 
     // As a rule, core must not depend on any other modules
 }

@@ -4,10 +4,12 @@ package com.mineinabyss.mobzy.spawning
 
 
 import com.mineinabyss.geary.autoscan.AutoScan
+import com.mineinabyss.geary.modules.GearyModule
 import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
-import com.mineinabyss.geary.systems.GearyListener
 import com.mineinabyss.geary.systems.accessors.*
+import com.mineinabyss.geary.systems.builders.listener
+import com.mineinabyss.geary.systems.query.ListenerQuery
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.util.randomOrMin
 import com.mineinabyss.mobzy.spawning.vertical.SpawnInfo
@@ -74,10 +76,6 @@ enum class SpawnPosition {
  * be chosen when compared to other spawns.
  * @property spawnPos Whether the mob should be spawned directly on the ground, in air, or under cliffs.
  */
-
-/**
- *
- */
 data class DoSpawn(
     val location: Location
 ) {
@@ -85,48 +83,47 @@ data class DoSpawn(
 }
 
 @AutoScan
-class SpawnRequestListener : GearyListener() {
-    private val Pointers.type by get<SpawnType>().on(target)
-    private val Pointers.amount by get<SpawnAmount>().orNull().map { it?.amount }.on(target)
-    private val Pointers.spawnPos by get<SpawnPosition>().orDefault { SpawnPosition.GROUND }.on(target)
-    private val Pointers.radius by get<SpawnSpread>().orNull().map { it?.radius ?: 0.0 }.on(target)
+fun GearyModule.spawnRequestListener() = listener(object : ListenerQuery() {
+    val type by get<SpawnType>()
+    val amount by get<SpawnAmount>().orNull().map { it?.amount }
+    val spawnPos by get<SpawnPosition>().orDefault { SpawnPosition.GROUND }
+    val radius by get<SpawnSpread>().orNull().map { it?.radius ?: 0.0 }
 
-    private val Pointers.spawnEvent by get<DoSpawn>().on(event)
+    val spawnEvent by event.get<DoSpawn>()
+}).exec {
+    val location = spawnEvent.location
+    val spawns = amount?.randomOrMin() ?: 1
+    for (i in 0 until spawns) {
+        val chosenLoc =
+            if (spawnPos != SpawnPosition.AIR)
+                getSpawnInRadius(location, radius) ?: location
+            else location
 
-    override fun Pointers.handle() {
-        val location = spawnEvent.location
-        val spawns = amount?.randomOrMin() ?: 1
-        for (i in 0 until spawns) {
-            val chosenLoc =
-                if (spawnPos != SpawnPosition.AIR)
-                    getSpawnInRadius(location, radius) ?: location
-                else location
-
-            chosenLoc.spawnFromPrefab(type.prefab)
-        }
-        spawnEvent.spawnedAmount = spawns
+        chosenLoc.spawnFromPrefab(type.prefab)
     }
+    spawnEvent.spawnedAmount = spawns
+}
 
-    /**
-     * Gets a location to spawn in a mob given an original location and min/max radii around it
-     *
-     * @param loc    the location to check off of
-     * @param maxRad the maximum radius for the new location to be picked at
-     * @return a new position to spawn in
-     */
-    private fun getSpawnInRadius(loc: Location, maxRad: Double): Location? {
-        if (maxRad == 0.0) return loc
-        if (!loc.chunk.isLoaded) return null
-        for (i in 0..29) { //TODO, arbitrary number, should instead search all locations around the spawn
-            val x = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
-            val z = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
-            val searchLoc: Location = loc.clone().add(Vector(x, 0.0, z))
 
-            return if (!searchLoc.block.type.isSolid)
-                searchLoc.checkDown(2) ?: continue
-            else
-                searchLoc.checkUp(2) ?: continue
-        }
-        return null
+/**
+ * Gets a location to spawn in a mob given an original location and min/max radii around it
+ *
+ * @param loc    the location to check off of
+ * @param maxRad the maximum radius for the new location to be picked at
+ * @return a new position to spawn in
+ */
+private fun getSpawnInRadius(loc: Location, maxRad: Double): Location? {
+    if (maxRad == 0.0) return loc
+    if (!loc.chunk.isLoaded) return null
+    for (i in 0..29) { //TODO, arbitrary number, should instead search all locations around the spawn
+        val x = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
+        val z = sign(Math.random() - 0.5) * Random.nextDouble(maxRad)
+        val searchLoc: Location = loc.clone().add(Vector(x, 0.0, z))
+
+        return if (!searchLoc.block.type.isSolid)
+            searchLoc.checkDown(2) ?: continue
+        else
+            searchLoc.checkUp(2) ?: continue
     }
+    return null
 }

@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(idofrontLibs.kotlinx.serialization.json)
 
     compileOnly(project(":mobzy-core"))
     compileOnly(project(":mobzy-modelengine"))

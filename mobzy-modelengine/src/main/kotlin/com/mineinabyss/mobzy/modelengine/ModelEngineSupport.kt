@@ -9,7 +9,7 @@ import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.modelengine.animation.AnimationController
 import com.mineinabyss.mobzy.modelengine.animation.ModelEngineAnimationController
 import com.mineinabyss.mobzy.modelengine.animation.ModelInteractionListener
-import com.mineinabyss.mobzy.modelengine.intializers.SetModelEngineModelSystem
+import com.mineinabyss.mobzy.modelengine.intializers.createModelEngineListener
 import com.mineinabyss.mobzy.modelengine.nametag.ModelEngineNameTagListener
 import com.mineinabyss.mobzy.modelengine.riding.ModelEngineRidingListener
 
@@ -23,12 +23,10 @@ interface ModelEngineSupport {
             override val animationController = ModelEngineAnimationController()
         }
 
-        override fun ModelEngineSupport.install() {
+        override fun ModelEngineSupport.install(): Unit = geary.run {
             DI.add(this)
 
-            geary.pipeline.addSystems(
-                SetModelEngineModelSystem(),
-            )
+            createModelEngineListener()
 
             mobzy.plugin.apply {
                 listeners(

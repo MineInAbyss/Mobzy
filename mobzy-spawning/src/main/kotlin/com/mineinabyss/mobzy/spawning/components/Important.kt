@@ -1,4 +1,4 @@
-package com.mineinabyss.mobzy.features.spawning
+package com.mineinabyss.mobzy.spawning.components
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
