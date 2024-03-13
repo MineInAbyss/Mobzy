@@ -19,6 +19,8 @@ fun GearyModule.createModelEngineListener() = listener(
         override fun ensure() = event.anySet(::bukkit, ::model)
     }
 ).exec {
+    val bukkit = bukkit
+    val model = model
     mobzy.plugin.launch {
         yield() // Wait till next tick so some entity stuff gets initialized
         if (bukkit.isDead) return@launch
