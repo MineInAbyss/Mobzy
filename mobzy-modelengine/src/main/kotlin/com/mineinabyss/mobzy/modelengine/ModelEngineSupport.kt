@@ -9,6 +9,7 @@ import com.mineinabyss.mobzy.mobzy
 import com.mineinabyss.mobzy.modelengine.animation.AnimationController
 import com.mineinabyss.mobzy.modelengine.animation.ModelEngineAnimationController
 import com.mineinabyss.mobzy.modelengine.animation.ModelInteractionListener
+import com.mineinabyss.mobzy.modelengine.intializers.ModelEngineWorldListener
 import com.mineinabyss.mobzy.modelengine.intializers.createModelEngineListener
 import com.mineinabyss.mobzy.modelengine.nametag.ModelEngineNameTagListener
 import com.mineinabyss.mobzy.modelengine.riding.ModelEngineRidingListener
@@ -33,6 +34,7 @@ interface ModelEngineSupport {
                     ModelInteractionListener(),
                     ModelEngineNameTagListener(),
                     ModelEngineRidingListener(),
+                    ModelEngineWorldListener(),
                 )
                 service<AnimationController>(ModelEngineAnimationController())
             }
