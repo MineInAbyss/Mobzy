@@ -90,5 +90,5 @@ class MobzyPlugin : JavaPlugin() {
         }
     }
 
-    class MobzyFeatureManager(val plugin: JavaPlugin) : FeatureManager<MobzyContext>({ MobzyContext(plugin) })
+    class MobzyFeatureManager(plugin: JavaPlugin) : FeatureManager<MobzyContext>(plugin, { MobzyContext(plugin) })
 }
