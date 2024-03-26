@@ -2,10 +2,10 @@ package com.mineinabyss.mobzy.features.drops
 
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
 import com.mineinabyss.idofront.serialization.SerializableItemStack
+import com.mineinabyss.idofront.util.randomOrMin
 import kotlinx.serialization.Serializable
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.inventory.ItemStack
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 /**
@@ -20,7 +20,8 @@ import kotlin.random.Random
  * @param cookTime How long it takes for this item to cook
  * @param amount A range for the stack size of this item.
  * @param dropChance A chance from 0 to 1 for this item to be dropped.
- *
+ * @param lootingAffectsAmount Should looting affect amount dropped? If null, does so when dropChance >= 10%
+ * @param lootingAffectsDropChance Should looting affect drop chance? If null, does so when dropChance < 10%
  */
 @Serializable
 data class Drop(
@@ -38,32 +39,36 @@ data class Drop(
         DamageCause.CRAMMING,
         DamageCause.FALL
     ),
+    val lootingAffectsAmount: Boolean? = null,
+    val lootingAffectsDropChance: Boolean? = null,
 ) {
     /** @return The amount of items to be dropped, or null if the drop does not succeed */
     // TODO I'd like to use exactly what Minecraft's existing system is, but I can't seem to find a way to reuse that.
     fun chooseDrop(lootingLevel: Int, fire: Boolean): ItemStack? {
-        if(item == null) return null
+        if (item == null) return null
+
+        // From the wiki: Increases the maximum number of items for most common drops by 1 per level.
+        val isCommonDrop = dropChance >= 0.1
+        val amountWithLooting =
+            if (lootingAffectsAmount ?: isCommonDrop) amount.first..(amount.last + lootingLevel)
+            else amount
+
+        // Also from wiki: Looting increases the chance of rare drops by making a second attempt to drop if the original attempt failed.
+        // The success chance of this second attempt is level / (level + 1).
+        // Looting also increases the chance of rare drops and equipment drops by 1 percentage point per level.
+
+        // We don't re-roll, just increase the percent for now
         val lootingPercent = lootingLevel / 100.0
-
-        val lootingMaxAmount: Int =
-            if (dropChance >= 0.5)
-                (amount.last + lootingLevel * Random.nextDouble()).roundToInt()
-            else amount.last
-
         val lootingDropChance =
-            if (dropChance >= 0.10)
-                dropChance * (10.0 + lootingLevel) / 10.0
-            else dropChance + lootingPercent
+            if (lootingAffectsDropChance ?: !isCommonDrop)
+                dropChance + lootingPercent
+            else dropChance
+
 
         return if (Random.nextDouble() < lootingDropChance) {
-            val drop =
-                if (fire && cooked != null)
-                    cooked.toItemStack()
-                else item.toItemStack()
-            drop.amount =
-                if (lootingMaxAmount <= amount.first) amount.first
-                else Random.nextInt(amount.first, lootingMaxAmount)
-            drop
+            (if (fire && cooked != null) cooked.toItemStack() else item.toItemStack()).apply {
+                amount = amountWithLooting.randomOrMin()
+            }
         } else null
     }
 }
