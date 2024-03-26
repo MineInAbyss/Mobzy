@@ -1,7 +1,12 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
+import com.mineinabyss.geary.components.relations.InstanceOf
+import com.mineinabyss.geary.helpers.componentId
+import com.mineinabyss.geary.helpers.getArchetype
+import com.mineinabyss.geary.helpers.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.prefabs.PrefabKey
+import com.mineinabyss.geary.prefabs.configuration.components.Prefab
 import com.mineinabyss.idofront.location.down
 import com.mineinabyss.idofront.location.up
 import com.mineinabyss.mobzy.spawning.SpawnPosition
@@ -29,9 +34,9 @@ class SpawnInfo(
     val blockComposition by lazy { SubChunkBlockComposition(this.chunkSnapshot, bottom.blockY) }
 
     fun nearbyEntities(key: PrefabKey, radius: Double): Int {
-        return bottom.world.getNearbyEntities(bottom, radius * 2, radius * 2, radius * 2) {
-            it.toGearyOrNull()?.prefabs?.firstOrNull()?.get<PrefabKey>() == key
-        }.count()
+        val prefabEntity = key.toEntity()
+        return bottom.world.getNearbyEntities(bottom, radius * 2, radius * 2, radius * 2)
+            .count { it.toGearyOrNull()?.instanceOf(prefabEntity) == true }
     }
 
     //adding one since if the blocks are on the same block, they still have a gap of 1 from top to bottom
