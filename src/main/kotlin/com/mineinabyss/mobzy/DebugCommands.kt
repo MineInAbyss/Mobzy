@@ -1,5 +1,6 @@
 package com.mineinabyss.mobzy
 
+import com.mineinabyss.geary.helpers.temporaryEntity
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.commands.Command
 import com.mineinabyss.idofront.commands.arguments.intArg
@@ -8,8 +9,7 @@ import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.messaging.broadcastVal
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.mobzy.spawning.DoSpawn
-import com.mineinabyss.mobzy.spawning.PlayerGroups
+import com.mineinabyss.mobzy.spawning.*
 import com.mineinabyss.mobzy.spawning.vertical.VerticalSpawn
 import org.bukkit.Bukkit
 import kotlin.system.measureTimeMillis
@@ -19,6 +19,21 @@ fun Int.toChunkLoc() = (this % 16).let { if (it < 0) it + 16 else it }
 //TODO move debugging into its own module (perhaps in Geary-addons)
 internal fun Command.createDebugCommands() {
     "spawn" {
+        "attempt" {
+            val prefab: String by stringArg()
+            val amount: Int by intArg { default = 1 }
+            val spread: Int by intArg { default = 0 }
+
+            playerAction {
+                temporaryEntity { spawnInfo ->
+                    spawnInfo.set(SpawnAmount(amount..amount))
+                    spawnInfo.set(SpawnSpread(spread.toDouble()))
+                    spawnInfo.set(SpawnType(PrefabKey.of(prefab)))
+                    spawnInfo.set(SpawnPosition.AIR)
+                    spawnInfo.callEvent(DoSpawn(player.location))
+                }
+            }
+        }
         "groups" {
             action {
                 sender.info(PlayerGroups.group(Bukkit.getOnlinePlayers()))

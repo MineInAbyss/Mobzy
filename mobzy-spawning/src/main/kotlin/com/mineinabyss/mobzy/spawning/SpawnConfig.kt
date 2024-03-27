@@ -30,6 +30,8 @@ class SpawnConfig(
         SpawnCategory.AMBIENT to 0
     ),
     val spawnHeightRange: Int = 40,
+    val preventSpawningInsideBlock: Boolean = true,
+    val retriesUpWhenInsideBlock: Int = 3
 ) {
     /** @return The spawn cap for that mob in config. */
     fun getCreatureTypeCap(creatureType: SpawnCategory): Int = creatureTypeCaps[creatureType] ?: 0

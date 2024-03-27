@@ -108,7 +108,7 @@ class SpawnTask {
                     val choice: GearyEntity = WeightedDice(priorities).roll()
 
                     //TODO this should be immutable but bukkit doesn't have an immutable location!
-                    val spawnLoc = spawnInfo.getSpawnFor(choice.get() ?: SpawnPosition.GROUND)
+                    val spawnLoc = spawnInfo.getSpawnFor(choice.get<SpawnPosition>() ?: SpawnPosition.GROUND)
                     val spawnCheckLoc = spawnLoc.clone().add(0.0, -1.0, 0.0)
                     val success = temporaryEntity { target -> //TODO should just pass null for target
                         target.add<KeepArchetype>()

@@ -8,7 +8,10 @@ import com.ticxo.modelengine.api.ModelEngineAPI
 import com.ticxo.modelengine.api.utils.data.io.SavedData
 import org.bukkit.Color
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.CreatureSpawnEvent
+import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.world.EntitiesLoadEvent
 
 class ModelEngineWorldListener : Listener {
@@ -18,6 +21,13 @@ class ModelEngineWorldListener : Listener {
             entity.toGearyOrNull()?.with { model: SetModelEngineModel ->
                 ensureModelLoaded(entity, model)
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    fun CreatureSpawnEvent.onSpawn() {
+        entity.toGearyOrNull()?.with { model: SetModelEngineModel ->
+            ensureModelLoaded(entity, model)
         }
     }
 

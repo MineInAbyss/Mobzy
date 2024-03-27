@@ -7,6 +7,7 @@ import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.modules.GearyModule
 import com.mineinabyss.geary.papermc.tracking.entities.helpers.spawnFromPrefab
 import com.mineinabyss.geary.prefabs.PrefabKey
+import com.mineinabyss.geary.serialization.serializers.InnerSerializer
 import com.mineinabyss.geary.systems.accessors.*
 import com.mineinabyss.geary.systems.builders.listener
 import com.mineinabyss.geary.systems.query.ListenerQuery
@@ -18,8 +19,12 @@ import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.builtins.serializer
 import org.bukkit.Location
+import org.bukkit.entity.LivingEntity
 import org.bukkit.util.Vector
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.sign
 import kotlin.random.Random
 
@@ -29,17 +34,29 @@ class WGRegions(
     val keys: Set<String>
 )
 
-@Serializable
-@SerialName("mobzy:spawn.spread")
+@Serializable(with = SpawnSpread.Serializer::class)
 class SpawnSpread(
     val radius: Double,
-)
+) {
+    class Serializer : InnerSerializer<Double, SpawnSpread>(
+        "mobzy:spawn.spread",
+        Double.serializer(),
+        { SpawnSpread(it) },
+        { it.radius },
+    )
+}
 
-@Serializable
-@SerialName("mobzy:spawn.amount")
+@Serializable(with = SpawnAmount.Serializer::class)
 class SpawnAmount(
     val amount: IntRange,
-)
+) {
+    class Serializer : InnerSerializer<IntRange, SpawnAmount>(
+        "mobzy:spawn.amount",
+        IntRangeSerializer,
+        { SpawnAmount(it) },
+        { it.amount },
+    )
+}
 
 @Serializable
 @SerialName("mobzy:spawn.type")
@@ -78,9 +95,7 @@ enum class SpawnPosition {
  */
 data class DoSpawn(
     val location: Location
-) {
-    var spawnedAmount: Int = 0
-}
+)
 
 @AutoScan
 fun GearyModule.spawnRequestListener() = listener(object : ListenerQuery() {
@@ -93,15 +108,42 @@ fun GearyModule.spawnRequestListener() = listener(object : ListenerQuery() {
 }).exec {
     val location = spawnEvent.location
     val spawns = amount?.randomOrMin() ?: 1
-    for (i in 0 until spawns) {
+    val config = mobzySpawning.config
+    repeat(spawns) {
         val chosenLoc =
             if (spawnPos != SpawnPosition.AIR)
                 getSpawnInRadius(location, radius) ?: location
             else location
 
-        chosenLoc.spawnFromPrefab(type.prefab)
+        val prefab = type.prefab.toEntity()
+        chosenLoc.spawnFromPrefab(prefab).onSuccess { spawned ->
+            if (spawned !is LivingEntity || !config.preventSpawningInsideBlock) return@onSuccess
+            val bb = spawned.boundingBox
+            // We shrink the box by a bit since overlap checks are strict inequalities
+            val bbShrunk = spawned.boundingBox.apply {
+                expand(-0.1, -0.1, -0.1, -0.1, -0.1, -0.1)
+            }
+
+            repeat(config.retriesUpWhenInsideBlock + 1) { offsetY ->
+                checkLoop@for (x in floor(bb.minX).toInt()..ceil(bb.maxX).toInt())
+                    for (y in floor(bb.minY).toInt()..ceil(bb.maxY).toInt())
+                        for (z in floor(bb.minZ).toInt()..ceil(bb.maxZ).toInt())
+                            if (chosenLoc.world.getBlockAt(x, y, z).collisionShape.boundingBoxes.any { shape ->
+                                    shape.shift(x.toDouble(), y.toDouble(), z.toDouble())
+                                    shape.overlaps(bbShrunk)
+                                }) {
+                                bb.shift(0.0, 1.0, 0.0)
+                                bbShrunk.shift(0.0, 1.0, 0.0)
+                                return@repeat
+                            }
+                if(offsetY != 0) {
+                    spawned.teleport(chosenLoc.clone().add(0.0, offsetY.toDouble(), 0.0))
+                }
+                return@onSuccess
+            }
+            spawned.remove()
+        }
     }
-    spawnEvent.spawnedAmount = spawns
 }
 
 

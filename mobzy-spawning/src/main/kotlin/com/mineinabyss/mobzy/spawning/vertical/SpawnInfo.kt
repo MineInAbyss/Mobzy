@@ -1,6 +1,7 @@
 package com.mineinabyss.mobzy.spawning.vertical
 
 import com.mineinabyss.geary.components.relations.InstanceOf
+import com.mineinabyss.geary.datatypes.GearyEntity
 import com.mineinabyss.geary.helpers.componentId
 import com.mineinabyss.geary.helpers.getArchetype
 import com.mineinabyss.geary.helpers.toGeary
