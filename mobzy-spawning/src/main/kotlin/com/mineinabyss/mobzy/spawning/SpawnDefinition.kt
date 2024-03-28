@@ -19,6 +19,7 @@ import com.mineinabyss.mobzy.spawning.vertical.checkUp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.builtins.SetSerializer
 import kotlinx.serialization.builtins.serializer
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
@@ -28,11 +29,17 @@ import kotlin.math.floor
 import kotlin.math.sign
 import kotlin.random.Random
 
-@Serializable
-@SerialName("mobzy:spawn_regions")
+@Serializable(with = WGRegions.Serializer::class)
 class WGRegions(
     val keys: Set<String>
-)
+) {
+    class Serializer : InnerSerializer<Set<String>, WGRegions>(
+        "mobzy:spawn.regions",
+        SetSerializer(String.serializer()),
+        { WGRegions(it) },
+        { it.keys },
+    )
+}
 
 @Serializable(with = SpawnSpread.Serializer::class)
 class SpawnSpread(
@@ -58,17 +65,29 @@ class SpawnAmount(
     )
 }
 
-@Serializable
-@SerialName("mobzy:spawn.type")
+@Serializable(with = SpawnType.Serializer::class)
 class SpawnType(
     val prefab: PrefabKey,
-)
+) {
+    class Serializer : InnerSerializer<PrefabKey, SpawnType>(
+        "mobzy:spawn.type",
+        PrefabKey.serializer(),
+        { SpawnType(it) },
+        { it.prefab },
+    )
+}
 
-@Serializable
-@SerialName("mobzy:spawn.priority")
+@Serializable(with = SpawnPriority.Serializer::class)
 class SpawnPriority(
     val priority: Double,
-)
+) {
+    class Serializer : InnerSerializer<Double, SpawnPriority>(
+        "mobzy:spawn.priority",
+        Double.serializer(),
+        { SpawnPriority(it) },
+        { it.priority },
+    )
+}
 
 /**
  * Where we should look for a location to actually spawn mobs in when calling [spawn]
@@ -125,7 +144,7 @@ fun GearyModule.spawnRequestListener() = listener(object : ListenerQuery() {
             }
 
             repeat(config.retriesUpWhenInsideBlock + 1) { offsetY ->
-                checkLoop@for (x in floor(bb.minX).toInt()..ceil(bb.maxX).toInt())
+                checkLoop@ for (x in floor(bb.minX).toInt()..ceil(bb.maxX).toInt())
                     for (y in floor(bb.minY).toInt()..ceil(bb.maxY).toInt())
                         for (z in floor(bb.minZ).toInt()..ceil(bb.maxZ).toInt())
                             if (chosenLoc.world.getBlockAt(x, y, z).collisionShape.boundingBoxes.any { shape ->
@@ -136,7 +155,7 @@ fun GearyModule.spawnRequestListener() = listener(object : ListenerQuery() {
                                 bbShrunk.shift(0.0, 1.0, 0.0)
                                 return@repeat
                             }
-                if(offsetY != 0) {
+                if (offsetY != 0) {
                     spawned.teleport(chosenLoc.clone().add(0.0, offsetY.toDouble(), 0.0))
                 }
                 return@onSuccess
