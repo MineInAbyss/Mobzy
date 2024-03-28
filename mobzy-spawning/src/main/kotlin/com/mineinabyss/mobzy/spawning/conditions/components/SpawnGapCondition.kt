@@ -2,6 +2,7 @@ package com.mineinabyss.mobzy.spawning.conditions.components
 
 import com.mineinabyss.geary.autoscan.AutoScan
 import com.mineinabyss.geary.modules.GearyModule
+import com.mineinabyss.geary.serialization.serializers.InnerSerializer
 import com.mineinabyss.geary.systems.builders.listener
 import com.mineinabyss.geary.systems.query.ListenerQuery
 import com.mineinabyss.idofront.serialization.IntRangeSerializer
@@ -14,12 +15,18 @@ import kotlinx.serialization.Serializable
  *
  * Ensures that when a mob spawn happens, the gap of air blocks is within a [range] of heights.
  */
-@Serializable
-@SerialName("mobzy:check.spawn.gap")
+@Serializable(with = SpawnGap.Serializer::class)
 class SpawnGap(
     @Serializable(with = IntRangeSerializer::class)
     val range: IntRange
-)
+) {
+    class Serializer : InnerSerializer<IntRange, SpawnGap>(
+        "mobzy:check.spawn.gap",
+        IntRangeSerializer,
+        { SpawnGap(it) },
+        { it.range },
+    )
+}
 
 @AutoScan
 fun GearyModule.spawnGroupChecker() = listener(object : ListenerQuery() {

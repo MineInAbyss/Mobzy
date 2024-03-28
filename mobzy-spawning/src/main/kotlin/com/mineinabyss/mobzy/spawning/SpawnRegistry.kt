@@ -4,9 +4,8 @@ import com.mineinabyss.geary.datatypes.GearyEntity
 import com.mineinabyss.geary.modules.geary
 import com.mineinabyss.geary.prefabs.prefabs
 import com.mineinabyss.geary.systems.builders.cachedQuery
-import com.mineinabyss.geary.systems.builders.listener
 import com.mineinabyss.geary.systems.query.GearyQuery
-import com.mineinabyss.geary.systems.query.ListenerQuery
+import com.mineinabyss.geary.systems.query.Query
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedRegion
 
@@ -18,33 +17,42 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion
 class SpawnRegistry {
     private val prefabLoader get() = prefabs.loader
 
+    private val spawnsWithWGRegion = geary.cachedQuery(object : Query() {
+        val parentRegions by get<WGRegions>()
+        val spawn by get<SpawnType>()
+    })
+
     private val regionContainer = WorldGuard.getInstance().platform.regionContainer
-    private val regionSpawns: MutableMap<String, MutableSet<GearyEntity>> = HashMap()
+    private var regionSpawns: Map<String, MutableSet<GearyEntity>> = mapOf()
     val spawnConfigsQuery = geary.cachedQuery(SpawnConfigs())
 
     /** Clears [regionSpawns] */
-    fun unregisterSpawns() = regionSpawns.clear()
+    fun unregisterSpawns() { regionSpawns = mapOf() }
 
     fun reloadSpawns() {
         unregisterSpawns()
         spawnConfigsQuery.entities().forEach {
-            prefabLoader.reload(it)
+            runCatching {
+                prefabLoader.reload(it)
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
+        val map = mutableMapOf<String, MutableSet<GearyEntity>>()
+        spawnsWithWGRegion.mapWithEntity {
+            parentRegions.keys
+        }.forEach {
+            it.data.forEach { regionName ->
+                map.getOrPut(regionName) { mutableSetOf() }.add(it.entity)
+            }
+        }
+        regionSpawns = map
     }
 
     /** Takes a list of spawn region names and converts to a list of [SpawnDefinition]s from those regions */
     fun List<ProtectedRegion>.getMobSpawnsForRegions(): List<GearyEntity> =
         flatMap { regionSpawns[it.id] ?: setOf() }
 
-    val spawnTracker = geary.listener(object : ListenerQuery() {
-        val parentRegions by get<WGRegions>()
-        val spawn by get<SpawnType>()
-        override fun ensure() = event.anySet(::parentRegions, ::spawn)
-    }).exec {
-        parentRegions.keys.forEach {
-            regionSpawns.getOrPut(it) { mutableSetOf() } += entity
-        }
-    }
 
     class SpawnConfigs : GearyQuery() {
         val config by get<SpawnType>()
