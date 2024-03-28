@@ -25,7 +25,7 @@ class MobzySpawnFeature : FeatureWithContext<MobzySpawnFeature.Context>(::Contex
         DI.add<MobzySpawnFeature>(this@MobzySpawnFeature)
         "Spawns" {
             !"Load spawns" {
-                context.spawnRegistry.reloadSpawns()
+                context.spawnRegistry.loadSpawns()
             }
             !"Start spawn task" {
                 context.spawnTask.startTask()

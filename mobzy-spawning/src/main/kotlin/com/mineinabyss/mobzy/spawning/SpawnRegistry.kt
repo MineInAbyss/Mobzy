@@ -38,6 +38,10 @@ class SpawnRegistry {
                 it.printStackTrace()
             }
         }
+        loadSpawns()
+    }
+
+    fun loadSpawns() {
         val map = mutableMapOf<String, MutableSet<GearyEntity>>()
         spawnsWithWGRegion.mapWithEntity {
             parentRegions.keys
@@ -47,6 +51,7 @@ class SpawnRegistry {
             }
         }
         regionSpawns = map
+
     }
 
     /** Takes a list of spawn region names and converts to a list of [SpawnDefinition]s from those regions */
